@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>安装领用单</title>
+
+<style>
+	/* 横线的样式  */
+	
+	/* 页大小 */	
+	@page{
+		/*纵向打印*/
+		/* size:70mm 90mm portrait; */
+		/* 设置纸张为A5 */
+		size:210mm 152mm ;
+	}
+	
+	/* 横线样式 */
+	/* hr{
+		background-color:red;height: 1px;width:100%;border: none;
+	} */
+	
+	table#meter-record-item{
+		border-collapse:collapse;
+		width: 100%;
+		text-align:center;
+	}
+	table#meter-record-item tr td.title{
+		border:1.5px solid black;
+		font-size: 17px;
+		width:15%;
+		height:40px;
+	}
+	table#meter-record-item tr td.content{
+		border:1.5px solid black;
+		font-size: 17px;
+		width:35%;
+		height:40px;
+	}
+	
+	table#total-table{
+		border-collapse:collapse;
+		width: 90%;
+		text-align:left;
+	}
+	
+	td#total-table-td{
+		font-weight:bold;
+		font-size: 17px;
+		text-decoration: underline;
+	}
+
+
+		
+</style>
+
+
+</head>
+<body style = "font-family: SimSun;" >
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- 标题信息 -->
+				<div class="row">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-12" style="text-align:center;font-size:25px;font-weight:bold;">
+								<span>水表报废单</span>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-12">
+								<span style="font-size:17px;margin-left: 459px">编号：</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 通知单内容 -->
+				<div class="row">
+					<div class="col-md-12">
+						<table class="" id="meter-record-item">
+							<tr>
+								<td class="title">单位名称</td>
+								<td class="content" th:text="${textData.customerName==null ? '' : textData.customerName}"></td>
+								<td class="title">水表位置</td>
+								<td class="content" th:text="${textData.installPlace==null ? '' : textData.installPlace}"></td>
+							</tr>
+							<tr>
+								<td class="title">施工单位</td>
+								<td class="content" th:text="${textData.constructionCompany==null ? '' : textData.constructionCompany}"></td>
+								<td class="title">水表编号</td>
+								<td class="content" th:text="${textData.meterNo==null ? '' : textData.meterNo}"></td>
+							</tr>
+							<tr>
+								<td class="title">截止日期</td>
+								<td class="content" th:text="${textData.endDateStr==null ? '' : textData.endDateStr}"></td>
+								<td class="title">检验证号</td>
+								<td class="content" th:text="${textData.certificateNo==null ? '' : textData.certificateNo}"></td>
+							</tr>
+							<tr>
+								<td class="title">水表口径</td>
+								<td class="content" th:text="${textData.caliber==null ? '' : textData.caliber}"></td>
+								<td class="title">退表日期</td>
+								<td class="content" th:text="${textData.returnMeterDateStr==null ? '' : textData.returnMeterDateStr}"></td>
+							</tr>
+							<tr>
+								<td class="title">水表表底</td>
+								<td class="content" th:text="${textData.meterBottom==null ? '' : textData.meterBottom}"></td>
+								<td class="title">营业处负责人</td>
+								<td class="content" th:text="${textData.yycPeople==null ? '' : textData.yycPeople}"></td>
+							</tr>
+							<tr>
+								<td class="title">退库人 </td>
+								<td class="content" th:text="${textData.returnPeople==null ? '' : textData.returnPeople}"></td>
+								<td class="title">物资处接收人</td>
+								<td class="content" th:text="${textData.wzcReceivePeople==null ? '' : textData.wzcReceivePeople}"></td>
+							</tr>
+							<tr>
+								<td class="title">物资处负责人</td>
+								<td class="content" th:text="${textData.wzcPeople==null ? '' : textData.wzcPeople}"></td>
+								<td class="title">报废原因</td>
+								<td class="content" th:text="${textData.scrapReason==null ? '' : textData.scrapReason}"></td>
+							</tr>
+							<tr>
+								<td class="title">备注</td>
+								<td class="content" colspan="3" th:text="${textData.remark==null ? '' : textData.remark}"></td>
+							</tr>
+						
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+</body>
+
+</html>

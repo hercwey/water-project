@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CcbBatchWithholdRecordMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CcbBatchWithholdRecord">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="FILE_TYPE" jdbcType="VARCHAR" property="fileType" />
+    <result column="FILE_SN" jdbcType="VARCHAR" property="fileSn" />
+    <result column="WITHHOLD_FILE" jdbcType="VARCHAR" property="withholdFile" />
+    <result column="SUMMARY_FILE" jdbcType="VARCHAR" property="summaryFile" />
+    <result column="CCB_VCHR_ID" jdbcType="VARCHAR" property="ccbVchrId" />
+    <result column="CCB_VCHR_FILE" jdbcType="VARCHAR" property="ccbVchrFile" />
+    <result column="CCB_SUMMARY_FIEL" jdbcType="VARCHAR" property="ccbSummaryFiel" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="SUCCESS_TOTAL_AMOUNT" jdbcType="DECIMAL" property="successTotalAmount" />
+    <result column="SUCCESS_TOTAL_NUM" jdbcType="DECIMAL" property="successTotalNum" />
+    <result column="FAIL_TOTAL_AMOUNT" jdbcType="DECIMAL" property="failTotalAmount" />
+    <result column="FAIL_TOTAL_NUM" jdbcType="DECIMAL" property="failTotalNum" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="TRACE_ID" jdbcType="VARCHAR" property="traceId" />
+    <result column="PIN_YIN_CODE" jdbcType="VARCHAR" property="pinYinCode" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, FILE_TYPE, FILE_SN, WITHHOLD_FILE, SUMMARY_FILE, CCB_VCHR_ID, CCB_VCHR_FILE, 
+    CCB_SUMMARY_FIEL, STATUS, SUCCESS_TOTAL_AMOUNT, SUCCESS_TOTAL_NUM, FAIL_TOTAL_AMOUNT, 
+    FAIL_TOTAL_NUM, PERIOD, TRACE_ID, PIN_YIN_CODE, REMARK
+  </sql>
+  
+  <!-- 查询CCB代扣客户账目,返回列表 -->
+	<select id="searchCcbHoldFileItem" resultType="map">
+		SELECT
+			I.*
+		FROM
+			CCB_BATCH_WITHHOLD_RECORD I
+			<if test="traceIds!=null and traceIds!=''">
+				LEFT JOIN LOCATION L ON L.TRACE_IDS = I.TRACE_ID			
+			</if>
+			
+		<where>
+			<if test="traceIds!=null and traceIds!=''">
+				<!-- 删除状态，1=已删除，0=未删除（默认） -->
+				L.DELETED=0 
+			</if>
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+				I.WITHHOLD_FILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR 
+				I.FILE_SN LIKE CONCAT('%', CONCAT((#{searchCond}), '%'))
+				OR 
+				I.CCB_VCHR_ID LIKE CONCAT('%', CONCAT((#{searchCond}), '%'))
+					)
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND L.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<if test="holdStatus!=null and holdStatus!=''">
+				AND I.STATUS =#{holdStatus}
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+	</select>
+	
+	
+	 <!-- 查询CCB代扣客户账目,返回列表 -->
+	<select id="searchCcbHoldFileList" resultMap="BaseResultMap">
+		SELECT
+			I.*
+		FROM
+			CCB_BATCH_WITHHOLD_RECORD I
+		<where>
+			1=1
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				
+				AND (
+				I.WITHHOLD_FILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR 
+				I.FILE_SN LIKE CONCAT('%', CONCAT((#{searchCond}), '%'))
+				OR 
+				I.CCB_VCHR_ID LIKE CONCAT('%', CONCAT((#{searchCond}), '%'))
+					)
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND I.TRACE_ID LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<!-- 状态：0=已生成；1=已上传；2=已申请处理；3=CCB处理完成；4=已下载回盘；5=已预处理回盘；6=已做销账处理 -->
+			<if test="holdStatus!=null and holdStatus!=''">
+				AND I.STATUS =#{holdStatus}
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+	</select>
+</mapper>

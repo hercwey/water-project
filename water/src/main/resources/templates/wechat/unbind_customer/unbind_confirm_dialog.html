@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!-- 解除绑定用户确定对话框-使用中 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 模态框 -->
+	<div class="modal fade" id="unbind-confirm-dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<!-- 模态框头部 -->
+				<div class="modal-header">
+					<h5 class="modal-title">提示</h5>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				
+				<!-- 前三个用于显示 -->
+				<!-- <input type="hidden" id="unbind-customer-code" name="">
+				<input type="hidden" id="unbind-customer-address" name="">
+				<input type="hidden" id="unbind-customer-room" name=""> -->
+				<!-- 最后一个用于向后台传递参数 -->
+				<input type="hidden" id="unbind-customer-relation-id" name="">
+
+				<!-- 模态框主体 -->
+				<div class="modal-body">
+					<div style="padding-left:20px;">是否确认解除绑定?</div>
+					<div style="text-align:center;" id="msg-customer-code">用户编号(营业系统端)</div>
+					<div style="text-align:center;" id="msg-customer-location">用户地址(营业系统端)</div>
+				</div>
+
+				<!-- 模态框底部 -->
+				<div class="modal-footer">
+					<button type="button" class="btn btn-warning btn-sm" id="confirm-dialog-btn-ok"
+						data-dismiss="modal">确认</button>
+					<button type="button" class="btn btn-primary btn-sm"
+						data-dismiss="modal">关闭</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		
+		/*
+			解绑确认对话框
+		*/
+		function UnbindConfirmDialog(){
+			
+			/*
+				设置监听器
+			*/
+			this.addListener=function(){
+				$("#confirm-dialog-btn-ok").on('click',function(){
+					//获取解绑时关系ID
+					var relationId=$('#unbind-customer-relation-id').val();
+					//解除绑定
+					unbindCustomer.unbindCustomer(relationId);
+				});
+			}
+			
+			/*
+				设置对话框中的参数Parms
+					relationId
+					customerCode
+					customerAddress
+					customerRoom
+			*/
+			this.setDialogParms=function(parms){
+				console.log("对话框接收到的参数是:"+JSON.stringify(parms));
+				//设置隐藏域参数
+				$('#unbind-customer-relation-id').val(parms.relationId);	
+				
+				//设置显示时参数
+				$('#msg-customer-code').text(parms.customerCode);			
+				$('#msg-customer-location').text(parms.customerAddress+parms.customerRoom);
+			}
+						
+		}
+		
+		var unbindConfirmDialog=new   UnbindConfirmDialog();
+
+		/*
+			page loaded ready
+		*/		
+		$(function(){
+			unbindConfirmDialog.addListener();
+		});
+		
+		
+		
+	</script>
+	
+	
+	
+	
+</body>
+</html>

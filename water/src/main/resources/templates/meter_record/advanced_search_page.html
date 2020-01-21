@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>高级查询页面</title>
+
+<style type="text/css">
+	 #card-advanced-search {margin-top: 10px;border: 1px solid #617775;background: lightgray;width:50%;height:50%;overflow-y:auto;overflow-x:auto;} 
+	 
+</style>
+</head>
+<body>
+	<div class="card card-advanced-search" id="card-advanced-search"style="display:none; position: absolute;">
+		<!-- <h5 class="card-header">
+			地理位置树状结构列表
+		</h5> -->
+		<div class="card-body">
+			<!-- 查询面板 -->
+			<div class="row" id="advanced-search-div">
+				<div class="col-md-12 column" style="">
+					<!-- 高级查询 -->
+					<table style="width:100%;">
+						<tbody>
+							<tr>
+								<td class="input-group-sm">
+									<select class="form-control btn-sm location-block" id="" name="locationBlockId" title="请选择小区" data-location-curr-node-type="BLOCK" data-location-next-node-type="BUILDING" style="display:inline-block;">
+										<option value="" data-location-traceids=''>小区</option>
+										<span th:each="item,iterStat: ${locationList}" th:remove="tag">
+											<option th:value="${item.id}" th:attr="data-location-traceids=${item.traceIds}, data-location-code=${item.code},data-location-name=${item.name}"
+													th:text="${item.name}">小区名称</option>
+										</span>
+									</select>
+								</td>
+								<td class="input-group-sm">
+									<select class="form-control input-sm location-building" id="" name="locationBuildingId" title="请选择楼号" data-location-curr-node-type="BUILDING" data-location-next-node-type="UNIT" disabled="disabled" style="display:inline-block;">
+										<option value="" data-location-traceids=''>楼号</option>
+									</select>
+								</td>
+								<td class="input-group-sm">
+									<select class="form-control input-sm location-unit" id="" name="locationUnitId" title="请选择单元" data-location-curr-node-type="UNIT" data-location-next-node-type="ROOM" disabled="disabled" style="display:inline-block;">
+										<option value="" data-location-traceids=''>单元</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="input-group-sm">
+									<select class="form-control search-read-type input-sm" id="" title="请选择抄表类型">
+										<option value="">抄表类型</option>
+										<option value="0">正常抄表</option>
+										<option value="1">估抄</option>
+										<option value="2">预抄</option>
+									</select>
+								</td>
+								<td class="input-group-sm">
+									<input type="text" class="form-control input-sm Wdate start-date"
+										id="start-date" name="" title="开始日期"
+										onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});"
+										placeholder="开始日期" style=" background-color: white;">
+								</td>
+								<td class="input-group-sm">
+									<input type="text" class="form-control input-sm Wdate end-date"
+											id="end-date" name="" title="结束日期"
+											onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});"
+											placeholder="结束日期" style=" background-color: white;">
+								
+								</td>
+							</tr>
+							<tr>
+				                <td colspan="3"><hr style="height: 1px; border: none; border-top: 1px solid blue;"></td>
+				            </tr>
+							<tr>
+								<td></td>
+								<td></td>
+								<td class="input-group-sm">
+									<button type="button" class="btn btn-success btn-sm" id="btn-advanced-search" title="查询">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+									
+									<button type="button" class="btn btn-warning btn-sm" id="btn-advanced-search-reset" title="清除">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			//var zNodes = [[${locationListJson}]];
+		/*]]>*/
+	</script>
+
+	<script type="text/javascript">
+	
+		//------------------------------显示/隐藏高级查询部分------------------------------	
+		/**
+		 * 	显示/隐藏高级查询按钮 class
+		 */
+		function ShowHideAdvancedSearch(){
+			/**
+			 * 	显示高级查询
+			 */
+			this.showAdvancedSearchFn = function() {
+				var cityObj = $("#btn-show-hide-advanced-search");
+				var cityOffset = $("#btn-show-hide-advanced-search").offset();
+				$("#card-advanced-search").css({
+					
+						width:"40%",
+						height:"20%",
+						left:cityOffset.left-400 + "px",
+						//right:cityOffset.left + "px",
+						top:cityOffset.top + cityObj.outerHeight() + "px", 
+						"z-index":999999
+						}).slideDown("fast");
+		
+				$("body").bind("mousedown", this.onBodyDown);
+			}
+			/**
+			 * 	隐藏高级查询
+			 */
+			this.hideAdvancedSearchFn = function() {
+				$("#card-advanced-search").fadeOut("fast");
+				$("body").unbind("mousedown", this.onBodyDown);
+			}
+			/**
+			 * 	切换显示隐藏高级查询
+			 */
+			this.toggle = function(){
+				if($('#card-advanced-search').is(':hidden')){
+					//如果隐藏时。。。
+					this.showAdvancedSearchFn();//显示高级查询
+
+				}else{
+					//如果显示时。。。
+					this.hideAdvancedSearchFn();//隐藏高级查询
+				}
+			}
+			/**
+			 * 	body down 事件
+			 */
+			this.onBodyDown = function(event) {
+				if (!(event.target.id == "card-advanced-search" || $(event.target).parents("#card-advanced-search").length>0)) {
+				//if (!(event.target.id == "select-ztree-btn" || event.target.id == "card-select-ztree" || $(event.target).parents("#card-select-ztree").length>0)) {
+					showHideAdvancedSearch.hideAdvancedSearchFn();//隐藏下拉菜单（ztree）
+				}
+			}	
+		}
+		
+		//------------------业务操作根据地理位置查询客户----------------------
+		/**
+		 * 	高级查询参数 class
+		 */
+		function AdvancedSearchParams(){
+			/**
+			 * 	获取高级查询参数（不包括分页信息）
+			 */
+			this.getParams = function(){
+				//地理位置痕迹ID（ID-ID-ID-ID）
+				var traceIds = null;
+				var locaUnitTraceIds = advancedSearchLocationSelect.getUnitId();
+				var locaBuildingTraceIds = advancedSearchLocationSelect.getBuildingId();
+				var locaBlockTraceIds = advancedSearchLocationSelect.getBlockId();
+				if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+					traceIds = locaUnitTraceIds;
+				}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+					traceIds = locaBuildingTraceIds;
+				}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+					traceIds = locaBlockTraceIds;
+				}
+				//var searchCond=$("#search-cond").val();
+				var readType = $("#advanced-search-div .search-read-type").val();//抄表类型
+				var isAddSubWater = $("#advanced-search-div .is-add-sub-water").val();//是否增加减免水量
+				var isPartWater = $("#advanced-search-div .is-part-water").val();//是否需要分水量
+				var startDate = $("#advanced-search-div .start-date").val();//开始日期
+				var endDate = $("#advanced-search-div .end-date").val();//开始日期
+				
+				//初始化请求参数
+				var parms = new Object();
+				//parms.searchCond=searchCond;
+				parms.traceIds=traceIds;
+				parms.readType=readType;
+				parms.isAddSubWater=isAddSubWater;
+				parms.isPartWater=isPartWater;
+				parms.startDate=startDate;
+				parms.endDate=endDate;
+				return parms;
+			}
+			/**
+			 * 	重新高级查询条件
+			 */
+			this.reset = function(){
+				$('#advanced-search-div #btn-advanced-search-reset').click();//重新高级查询条件
+			}
+		}
+		/**
+		 * 	抄表记录中获取地理位置级联的下级节点和节点的traceIds class
+		 */
+		function AdvancedSearchLocationSelect(){
+			/**
+			 * 	获取小区ID
+			 */
+			this.getBlockId = function(){
+				return $('#advanced-search-div .location-block').find("option:selected").attr("data-location-traceids");
+			}
+			/**
+			 * 	获取小区楼号ID
+			 */
+			this.getBuildingId = function(){
+				return $('#advanced-search-div .location-building').find("option:selected").attr("data-location-traceids");
+			}
+			/**
+			 * 	获取小区楼号单元ID
+			 */
+			this.getUnitId = function(){
+				return $('#advanced-search-div .location-unit').find("option:selected").attr("data-location-traceids");
+			}
+			
+			/**
+			 * 	查询地理位置-小区/楼号/单元
+			 */
+			this.getLocationChildNodeFn = function(locationId, nodeType){
+				var url = BASE_CONTEXT_PATH + "/location/get-block-building-unit";
+				var params = new Object();
+				params.locationId = locationId;
+				params.nodeType = nodeType;
+				$.post(url, params, function(res){
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							var locationList = res.locationList;
+							if(nodeType=="BUILDING"){
+								advancedSearchSetLocationOption.setLocationBuildingHtml(locationList);
+							}else{
+								advancedSearchSetLocationOption.setLocationUnitHtml(locationList);
+							}
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					} 
+				});
+			}
+			
+		}
+		/**
+		 * 设置地理位置级联的子节点的值 class
+		 */
+		function AdvancedSearchSetLocationOption(){
+			/**
+			 * 	设置地理位置-楼号的下拉列表
+			 */
+			this.setLocationBuildingHtml = function(locationList){
+				
+				$("#advanced-search-div .location-building").attr("disabled", false);//设置地理位置-楼号可编辑
+				
+				var html = "<option value='' data-location-traceids=''>楼号</option>";
+				$.each(locationList, function(){
+					html = html + "<option value='"+this.id+"' data-location-traceids='"+this.traceIds+"' data-location-code='"+this.code+"' data-location-name='"+this.name+"'>"+this.name+"</option>";
+				});
+				$('#advanced-search-div .location-building').html(html);
+			}
+			/**
+			 * 	设置地理位置-单元的下拉列表
+			 */
+			this.setLocationUnitHtml = function(locationList){
+				
+				$("#advanced-search-div .location-unit").attr("disabled", false);//设置地理位置-单元可编辑
+				
+				var html = "<option value='' data-location-traceids=''>单元</option>";
+				$.each(locationList, function(){
+					html = html + "<option value='"+this.id+"' data-location-traceids='"+this.traceIds+"' data-location-code='"+this.code+"' data-location-name='"+this.name+"'>"+this.name+"</option>";
+				});
+				$('#advanced-search-div .location-unit').html(html);
+			}
+		}
+		//创建地理位置实例
+		var advancedSearchLocationSelect = new AdvancedSearchLocationSelect();
+		var advancedSearchSetLocationOption = new AdvancedSearchSetLocationOption();
+		var showHideAdvancedSearch = new ShowHideAdvancedSearch();//创建选择高级查询实例
+		var advancedSearchParams = new AdvancedSearchParams();
+	
+		/**
+		 * 	绑定地理位置-小区的change事件
+		 */
+		$('#advanced-search-div .location-block').on('change',function() {
+			
+			$("#advanced-search-div .location-building").val("");//设置地理位置-楼号值为空
+			$("#advanced-search-div .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+			$("#advanced-search-div .location-unit").val("");//设置地理位置-单元值为空
+			$("#advanced-search-div .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			
+			var locationId = $(this).val();
+			if(locationId!=null && locationId!=""){
+				var nextNodeType = $(this).attr("data-location-next-node-type");
+				advancedSearchLocationSelect.getLocationChildNodeFn(locationId, nextNodeType);
+			}
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			$('#btn-general-search-reset').click();//清除基本查询的查询条件
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+			//defaultSearchMeterRecord();//查询抄表记录	
+		});
+		
+		/**
+		 * 	绑定地理位置-楼号的change事件
+		 */
+		$('#advanced-search-div .location-building').on('change',function() {
+			
+			$("#advanced-search-div .location-unit").val("");//设置地理位置-单元值为空
+			$("#advanced-search-div .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			
+			var locationId = $(this).val();
+			if(locationId!=null && locationId!=""){
+				var nextNodeType = $(this).attr("data-location-next-node-type");
+				advancedSearchLocationSelect.getLocationChildNodeFn(locationId, nextNodeType);	
+			}
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			$('#btn-general-search-reset').click();//清除基本查询的查询条件
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+			//defaultSearchMeterRecord();//查询抄表记录
+		});
+		/**
+		 * 	绑定地理位置-单元的change事件
+		 */
+		$('#advanced-search-div .location-unit').on('change',function() {
+			
+			var locationId = $(this).val();
+			if(locationId!=null && locationId!=""){
+				var nextNodeType = $(this).attr("data-location-next-node-type");
+			}
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			$('#btn-general-search-reset').click();//清除基本查询的查询条件
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+			//defaultSearchMeterRecord();//查询抄表记录
+		});
+		/**
+		 * 	绑定抄表类型的change事件
+		 */
+		$('#advanced-search-div .search-read-type').on('change',function() {
+			
+			var readType = $(this).val();
+			
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			$('#btn-general-search-reset').click();//清除基本查询的查询条件
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+			//defaultSearchMeterRecord();//查询抄表记录
+		});
+		/**
+		 * 	绑定增加减免水量的change事件
+		 */
+		$('#advanced-search-div .is-add-sub-water').on('change',function() {
+			
+			var isAddSubWater = $(this).val();
+			
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			$('#btn-general-search-reset').click();//清除基本查询的查询条件
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+			//defaultSearchMeterRecord();//查询抄表记录
+		});
+		/**
+		 * 	绑定分水量的change事件
+		 */
+		$('#advanced-search-div .is-part-water').on('change',function() {
+			
+			var isPartWater = $(this).val();
+			
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			$('#btn-general-search-reset').click();//清除基本查询的查询条件
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+			//defaultSearchMeterRecord();//查询抄表记录
+		});
+		
+		/**
+		 * 	绑定开始日期的change事件
+		 */
+		$('#advanced-search-div .start-date').on('change',function() {
+			
+			var startDate = $(this).val();
+			
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			$('#btn-general-search-reset').click();//清除基本查询的查询条件
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+		});
+		
+		/**
+		 * 	绑定结束日期的change事件
+		 */
+		$('#advanced-search-div .end-date').on('change',function() {
+			
+			var endDate = $(this).val();
+			
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			$('#btn-general-search-reset').click();//清除基本查询的查询条件
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+		});
+		
+		/**
+		 * 绑定高级查询中查询按钮的click事件
+		 */
+		$('#advanced-search-div #btn-advanced-search').on('click',function() {
+			
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+			defaultSearchMeterRecord();//查询抄表记录
+		});
+		/**
+		 * 绑定高级查询中清除按钮的click事件
+		 */
+		$('#advanced-search-div #btn-advanced-search-reset').on('click',function() {
+			
+			//globalLocation.cancelAllSelectedNode();//取消ztree的选中状态
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+			
+			$("#advanced-search-div .location-block").val("");//设置地理位置-小区值为空
+			$("#advanced-search-div .location-building").val("");//设置地理位置-楼号值为空
+			$("#advanced-search-div .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+			$("#advanced-search-div .location-unit").val("");//设置地理位置-单元值为空
+			$("#advanced-search-div .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			
+			$("#advanced-search-div .search-read-type").val("");//抄表类型
+			$("#advanced-search-div .is-add-sub-water").val("");//是否增加减免水量
+			$("#advanced-search-div .is-part-water").val("");//是否需要分水量
+			$("#advanced-search-div .start-date").val("");//开始时间
+			$("#advanced-search-div .end-date").val("");//结束时间
+			
+			//defaultSearchMeterRecord();//查询抄表记录
+			
+		});
+		
+	</script>
+
+</body>
+</html>

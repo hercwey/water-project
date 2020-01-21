@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!-- 柱状图-echart -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<div th:include="common/common_head::headx('柱状图统计')" th:remove="tag"></div>
+</head>
+<body>
+	<div id="chart-container" style="width: 800px; height: 500px; margin:0 auto;"></div>
+</body>
+
+<!-- 引入echart -->
+<script type="text/javascript" src="/echart/4.2.1/dist/echarts.js"></script>
+
+<!-- 引入显示图表js -->
+<script type="text/javascript" src="/statistic/customer/js/StatBarChart.js"></script>
+
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		var statData = [[${statData}]];  	//统计数据
+		var period=[[${period}]];   		//期间
+		console.log("所接收到的统计数据为:"+JSON.stringify(statData));
+	/*]]>*/
+</script>
+
+
+<script type="text/javascript">
+
+	/*
+		page loaded ready
+	*/
+	$(function(){								   
+		//var title="新增客户月统计:"+period;
+		var chartContainer="chart-container";
+		var statBarChart=new StatBarChart(statData,chartContainer);
+		statBarChart.setTitle('客户年统计'+period);
+		statBarChart.setLegendName('人数');
+		statBarChart.displayChart();
+	});	
+	
+</script>
+</html>

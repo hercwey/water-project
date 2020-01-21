@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.StatMonthUseWaterMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.StatMonthUseWater">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="WATER_AMOUNT" jdbcType="DECIMAL" property="waterAmount" />
+    <result column="REAL_WATER_AMOUNT" jdbcType="DECIMAL" property="realWaterAmount" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, PERIOD, WATER_AMOUNT, REAL_WATER_AMOUNT, CREATE_TIME
+  </sql>
+</mapper>

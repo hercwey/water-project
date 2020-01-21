@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<!-- wechat-用户编号结果列表 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')"	th:remove="tag"></div> -->
+<title>石家庄高新区供水排水公司</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta name="context-path" content="/" />
+
+
+
+<link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h5 style="text-align: center; margin-top: 10px;">用户编号</h5>
+				<hr class="style-two" /> -->
+				<div th:include="wechat/public_page/header::header('业务流程')"
+					th:remove="tag"></div>
+				<div class="weui-news">
+					<ul class="weui-news-list">
+					
+						<!-- data-bind-id:文章ID -->
+						<li th:each="article,iter:${articleList}" class="weui-news-item"   th:attr="data-bind-id=${article.id}"  >
+							<div class="weui-news-inner">
+														
+								<div class="weui-news-inners">
+									<div class="weui-news-text">
+										<div class="weui-news-title" th:text="${article.title}">Flutter 是 Google 用以帮助开发者在
+											Android 和 iOS 两个平台，同时开发高质量原生应用的全新移动 UI 框架</div>
+									</div>
+									<div class="weui-news-info">
+										<div class="weui-news-infoitem">
+											<img th:src="@{/images/logo1.png}" class="weui-news-round">
+												<span class="weui-news-left" th:text="${article.author}">Google</span>
+										</div>
+										<div class="weui-news-infoitem" th:text="${#dates.format(article.publicDate,'yyyy-MM-dd HH:mm')}">2018-12-14 10:31</div>
+									</div>
+								</div>
+								<div class="weui-news-media">
+									<!-- <img th:src="${article.imgPath}" class="weui-news-round"> -->
+									<img th:src="${article.imgPath}" >
+								</div>
+								
+							</div>
+						</li>
+												
+					</ul>
+				</div>
+				
+			</div>
+
+		</div>
+		
+		
+		<!-- <div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')"
+				th:remove="tag"></div>
+		</div> -->
+		
+		<div class="weui-footer ">
+			<p class="weui-footer__links" style="margin-bottom:5px;">
+				<a href="#" class="weui-footer__link">石家庄高新区供水排水公司</a>
+			</p>
+			<p class="weui-footer__links" style="margin-bottom:5px;">
+				<a href="#" class="weui-footer__link">供水热线:69099838</a>
+			</p>
+			<!-- <p class="weui-footer__text">Copyright &copy; 石家庄高新区供排水公司</p> -->
+		</div>
+		
+		
+		
+	</div>
+	
+	<script type="text/javascript" src="/weui/js/zepto.min.js"></script>
+	
+	<script type="text/javascript">
+			var BASE_CONTEXT_PATH = $('meta[name=context-path]')
+					.attr("content");
+			console.log("BASE_CONTEXT_PATH0:"+BASE_CONTEXT_PATH) ;
+			BASE_CONTEXT_PATH = BASE_CONTEXT_PATH.substr(0,BASE_CONTEXT_PATH.length - 1);
+			console.log("BASE_CONTEXT_PATH1:"+BASE_CONTEXT_PATH) ;
+	</script>
+	
+	
+	
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var articleType=[[${articleType}]];  //文章类型		
+		/*]]>*/
+	</script>
+	
+	<script type="text/javascript">	
+	
+	/*
+		文章列表操作对象
+	*/
+	function ArticleList(){
+		//文章详情URL
+		var url=BASE_CONTEXT_PATH+'/wechat/article/';
+		const ARTICLE_TYPE_WORKFLOW="BUSINESS_PROCESS";			//文件类型:业务流程
+		const ARTICLE_TYPE_PUBLIC="WATER_QUALITY_REPORT";		//文件类型:水质公开
+		const ARTICLE_TYPE_GUIDE="WATER_KNOWLEDGE";				//文件类型:用水指南
+		const ARTICLE_TYPE_NOTIFY="NOTIFY_INFORMATION";			//文件类型:停水通知
+		const ARTICLE_TYPE_OUTLETS="BUSINESS_OUTLETS"			//文件类弄:营业网点
+		
+		/*
+		public method
+		功能:
+			设置文章点击事情处理器
+		*/
+		this. setArticleClickListener=function(){
+			$(".weui-news-item").on('click',function(){
+				var articleId=$(this).attr("data-bind-id");
+				showArticle(articleId);
+			});
+		}
+		
+	    /*
+		    public method
+		        功能:
+		       	设置page title	
+		        参数:
+		    	articleType:文章类型
+	    */
+		this.setPageTitle=function(articleType){
+		    var title="";		
+    		switch(articleType) {
+		 	     case ARTICLE_TYPE_WORKFLOW:  //业务流程
+		 	        title="业务流程";	
+		 	        break;
+		 	     case ARTICLE_TYPE_PUBLIC:
+		 	    	 title="水质公开";
+		 	        break;
+		 	     case ARTICLE_TYPE_GUIDE:
+		 	    	 title="用水指南";
+		 	        break;   
+		 	     case ARTICLE_TYPE_NOTIFY:
+		 	    	 title="停水通知";
+		 	        break;
+		 	     default:
+		 	        break;
+    		} 
+			$("#page-title").text(title);
+		}
+		
+		/*
+		private method
+		功能:
+			请求文章
+		参数说明:
+			articleId:文章id
+		*/
+		showArticle=function(articleId){
+			var reqUrl=url+"?articleId="+articleId;
+			window.open(reqUrl,"_blank");
+		}
+		
+		
+	}
+	
+	//page loaded ready
+	$(function(){
+		var articleList=new ArticleList();
+		articleList.setArticleClickListener();  //设置文章click listener
+		articleList.setPageTitle(articleType);
+	});
+	
+	
+	</script>
+
+
+</body>
+</html>

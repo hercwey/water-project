@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<!-- jQuery Popup Overlay -->
+<script type="text/javascript" src="/jquery/jquery-popup/jquery.popupoverlay.js"></script>
+<link rel="stylesheet" href="/css/components/invoicenotifytooltip/tooltip.css" />
+</head>
+<body>
+	<!-- 保存通知单ID -->
+	<input type="hidden" id="water-notify-id" value="0" />
+	<!-- 批次列表 -->
+	<table class="table table-hover table-sm" id="customer-printer-table">
+		<thead>
+			<tr>
+				<th>
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-customer-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-customer-toggle"></label>
+					</div>
+				</th>
+				<th>序号</th>
+				<th>客户名称</th>
+				<th>期间</th>
+				<th>账单金额</th>
+				<th>往期欠费金额</th>
+				<th>欠费总金额</th>
+				<th>生成时间</th>
+				<th>备注</th>
+				<th>操作员</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${customerMapList}" >
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 序号 -->
+				<td th:text="${item.serialNo}">序号</td>
+				<!-- 客户名称 -->
+				<td th:text="${item.customerName}">客户名称</td>
+				<!-- 期间-->
+				<td th:text="${item.period}">期间</td>
+				<!-- 账单金额 -->
+				<td th:text="${item.sumBaseAmount+item.sumSewageAmount}">账单金额</td>
+				<!-- 往期欠费 -->
+				<td th:text="${item.pastBaseOweAmount+item.pastSewageOweAmount}">往期欠费</td>
+				<!-- 欠费总金额 -->
+				<td th:text="${item.totalOweAmount}">欠费总金额</td>
+				<td th:text="${item.createDateStr}">生成时间</td>
+				<td th:text="${item.remark}">备注</td>
+				<td th:text="${item.meterReader}">抄表员</td>
+				<td>
+					<div class="dropdown">
+					    <button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+					      	操作
+					    </button>
+					    <div class="dropdown-menu">
+							<a class="dropdown-item preview-notify-single btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="data-bind=${item.id}, data-period=${item.period}, data-serial=${item.serialNo}">
+								<i class="fa fa-eye" aria-hidden="true"></i><span>预览</span>
+							</a>
+							<a class="dropdown-item edit-notify-remark btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="data-bind=${item.id}">
+								<i class="fa fa-pencil" aria-hidden="true"></i><span>备注</span>
+							</a>
+							<a class="dropdown-item print-customer-pdf-single btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="data-bind=${item.id}">
+								<i class="fa fa-print" aria-hidden="true"></i><span>打印</span>
+							</a>
+							<a class="dropdown-item destory-water-notify-single btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="data-bind=${item.id}">
+								<i class="fa fa-exclamation-circle" aria-hidden="true"></i><span>报废</span>
+							</a>
+					    </div>
+					</div>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+	<!-- Tooltip -->
+	<div id="customer-notify-tooltip" class="well rounded  border border-secondary" style="padding:10px;">
+	    <div class="water-fee-notify-container">此处显示水费通知单</div>
+	</div>
+	
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerCustomer')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_customer_pageNum=[[${pageNum}]];
+		var curr_customer_pageSize=[[${pageSize}]];
+		var curr_customer_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	/**
+	 * 	设置通知单ID
+	 */
+	function setNotifyId(notifyId){
+		$("#water-notify-id").val(notifyId);
+	}
+	/**
+	 * 	获取通知单ID
+	 */
+	function getNotifyId(){
+		return $("#water-notify-id").val();
+	}
+	
+	
+	/**
+	 * 加载通知单详情（加完成功后显示）
+	 */
+	 $("#customer-printer-table .preview-notify-single").click(function(){
+		 var notifyId = $(this).attr("data-bind"); //条目ID
+		/* var notifyId = $(this).attr("data-bind"); //条目ID
+		setNotifyId(notifyId);
+		var parms = new Object();
+		parms.notifyId = notifyId;
+		var url = BASE_CONTEXT_PATH+"/notify-print/loadPreviewDialog"; // 需要提交的url
+		$("#preview-dialog").load(url,parms,openPreviewDialog); */
+	 	var self = this;
+		const PREFIX = "#"+self.containerId;
+		const NOTIFY_TOOLTIP_ID = "#customer-notify-tooltip";
+		const NOTIFY_CONTAINER_CLASS = "#customer-notify-tooltip .water-fee-notify-container";
+		var parms = new Object();
+		parms.notifyId = notifyId;
+		var url = BASE_CONTEXT_PATH + "/select-customer-notify/detail"
+		$(NOTIFY_CONTAINER_CLASS).load(url, parms, loadNotifyDetailCallback);
+		function loadNotifyDetailCallback(res){
+			console.log("load notify detail callback...");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+	        
+	        $(NOTIFY_TOOLTIP_ID).popup('show');
+	        
+		}
+		
+	})
+	
+	/*
+		批量打印
+	*/
+	function printCustomerConfirm(notifyId){		
+		var parms = new Object();
+		parms.notifyId = notifyId;
+		var url = BASE_CONTEXT_PATH+"/notify-print/loadPrinterDialog"; // 需要提交的url
+		$("#print-customer-dialog").load(url,parms,openPrintDialog);
+	}
+	
+	/*
+		开始打印
+	*/
+	function startPrintCustomer(notifyId, printerId, noticeDate, chargePeople, paperSize){
+		var parms = getSearchCustomerParams();
+		var period = getCustomerPeriod();
+		var notifyIdArr = getSelectedNotifyIds();
+		var traceIds = parms.traceIds;
+		parms.printerId=printerId;
+		parms.period=period;
+		parms.noticeDate=noticeDate;
+		parms.chargePeople=chargePeople;
+		parms.paperSize=paperSize;
+		parms.notifyIdArr = notifyIdArr.toString();
+		if(notifyId==null || notifyId ==""){
+			if(notifyIdArr.length <0){
+				if(parms.locaUnitTraceIds == null || parms.locaUnitTraceIds== ""){
+					util.message("请选择地理位置到单元");
+					return false;
+				}
+				if(period == null || period== ""){
+					util.message("请选择期间");
+					return false;
+				}
+			}
+			
+			printNotifyBatch(parms); 
+		} else{
+			printNotifySingle(notifyId,printerId,period,  noticeDate, chargePeople, paperSize);  // 单个打印单位用户的通知单
+		}
+		
+		
+	}
+	
+
+	/*
+	功能:
+		单个打印单位用户的水费通知单
+	*/
+	function printNotifySingle(notifyId,printerId,period, noticeDate, chargePeople, paperSize){
+		var url = BASE_CONTEXT_PATH+"/notify-print/printNotifySingle"; // 需要提交的url
+		$.ajax({
+			type : "POST", // 提交方式 get/post
+			url : url,
+			data : {"notifyId":notifyId,"period":period,"printerId":printerId,"noticeDate":noticeDate,"chargePeople":chargePeople, "paperSize":paperSize},
+			success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closePrintDialog();
+						util.message(res.result_msg,null,"info");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				util.message("AJAX请求时发生错误!");
+			}
+		});				
+	}
+	
+
+	/*
+	功能:
+		批量打印单位用户的水费通知单
+	参数:
+		accountItemIds:账单ID
+		printerId:打印机ID
+	*/
+	function printNotifyBatch(parms){
+		var url = BASE_CONTEXT_PATH+"/notify-print/printNotifyBatch"; // 需要提交的url
+		$.ajax({
+			type : "POST", // 提交方式 get/post
+			url : url,
+			data : parms,
+			success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closePrintDialog();
+						util.message(res.result_msg,null,"info");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				util.message("AJAX请求时发生错误!");
+			}
+		});				
+	}
+	
+	
+	/**
+		返回所选条目的 id(每行对应一个唯一的ID)
+		@returns   
+	 */
+	function getSelectedNotifyIds(){
+		var idArr = new Array();
+	
+		// 扫描用户所选择条目ID
+		$("#customer-printer-table .item-selector").each(function(index, elem) {
+			if (this.checked) { // 对于己选条目
+				var notifyId = $(this).attr("data-bind"); //
+				idArr.push(notifyId);
+			}
+		}); // end of item-selector
+		return idArr;
+	}
+	
+	//------------------单个打印------------------
+	
+	/* 
+		单个打印
+	*/
+	$('.print-customer-pdf-single').on('click', function() {
+		var itemId = $(this).attr("data-bind"); //分录ID
+		var idsArr=new Array();
+		idsArr.push(itemId);	
+		printCustomerConfirm(itemId);
+	})
+	
+	/* 
+		修改备注
+	*/
+	$('.edit-notify-remark').on('click', function() {
+		var url = BASE_CONTEXT_PATH+'/notify-print/load-edit-remark-dialog';
+		var itemId = $(this).attr("data-bind"); //分录ID
+		var parms = new Object(); //参数
+		parms.itemId = itemId;
+	
+		$("#edit-remark-dialog").load(url, parms,openEditRemarkDialog); //加载完毕后显示 
+	})
+
+	/*
+		操作-预览按钮
+	*/
+	$('#customer-printer-table .ppreview-notify-single').on('click',function(){	
+		var notifyId = $(this).attr("data-bind"); //条目ID
+		var period = $(this).attr("data-period"); //期间
+		var serialNo = $(this).attr("data-serial"); //编号
+		previewNotifyPrepare(notifyId, period, serialNo);
+			
+	});
+	
+	/*
+		功能:
+			btn-pdf-preview
+			PDF 预览
+	*/
+	function previewNotify(period, serialNo){
+		var curWwwPath=window.document.location.href;
+		var pathName=window.document.location.pathname;
+		var pos=curWwwPath.indexOf(pathName);
+		var localhostPath=curWwwPath.substring(0,pos);
+		
+		var attachmentUrl="";
+		var pdfFileName=period+"_"+serialNo+".pdf";
+		
+		var url="/pdfjs/web/viewer.html?file=";
+		var parms="/preview?fileName%3D";   //"%3D"即是 =  的URL编码
+		
+		
+		console.log("PDF FILE NAME IS:"+pdfFileName);
+		console.log("url is:"+ localhostPath+url+attachmentUrl + "/preview?fileName%3D"+pdfFileName);
+		
+		window.open(localhostPath+url+attachmentUrl + "/preview?fileName%3D"+pdfFileName,"new window");
+	
+	};
+	
+	/*
+		功能:
+			预览准备.
+	*/
+	function previewNotifyPrepare(notifyId,period, serialNo){
+		var urlStr = BASE_CONTEXT_PATH+"/notify-print/previewNotifyPrepare"; // 需要提交的url
+		
+		$.ajax({
+			type : "POST", // 提交方式 get/post
+			url : urlStr,
+			data : {notifyId, period, serialNo},
+			success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+				console.log(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						previewNotify(period, notifyId);  //预览
+					} else {
+						util.message("生成PDF时发生错误",null,"warning");
+					}
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				util.message("AJAX请求时发生错误!");
+			}
+		});
+	}
+	
+	//--------------批量报废-----------------
+	/*
+		批量报废确认
+	*/
+	function destoryWaterNotifyConfirm(){			
+		//注: 回调函数需要采用引号引起来
+		util.confirm("报废所选择的记录？", "xxx", "ok_callback_name", "cancel_callback_name")			
+	}
+	
+	/*
+		批量删除确认:确认(回调)
+	*/
+	function ok_callback_name(id){
+		var ids=getSelectedNotifyIds();  //此函数定义于_table.html中
+		destoryBatchItem(ids);
+	}
+	
+	/*
+		批量删除确认:取消(回调)  桩函数
+	*/
+	function cancel_callback_name(){
+		console.log('cancel!');
+	}
+	
+	//------------------------	删除功能业务处理	-------------------------------
+	//单个报废-确认回调函数
+	function destorySingle(itemId){
+		var idsArr=new Array();
+		idsArr.push(itemId);		
+		destoryBatchItem(idsArr);
+	}
+	
+	/*
+		报废通知单
+	*/
+	function destoryBatchItem(ids) {
+		var urlStr = BASE_CONTEXT_PATH + "/notify-print/destoryWaterNotify";
+		$.ajax({
+			type : "POST", // 提交方式 get/post
+			url : urlStr,
+			contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+			data : JSON.stringify(ids),
+			success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						loadCustomerPage();
+						util.message(res.result_msg,null,"success");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				util.message("AJAX请求时发生错误!");
+			}
+		});
+		
+	}
+	//-----------------page loaded ready------------------
+	$(function() {
+		
+		//------------------------------	单个报废------------------------------
+		/**
+		 * 绑定删除按钮的click事件
+		 */
+		$(".destory-water-notify-single").on("click", function(){
+			
+			var itemId = $(this).attr("data-bind"); //分录ID
+			util.delConfirm("确认报废该通知单？", itemId, "destorySingle");
+			
+		});
+		
+		/*
+			选择/取消选择  当前页记录
+			select all  or  deselect all			 	
+		*/
+		$("#customer-printer-table #select-all-customer-toggle").on('click', function(e) {
+			var prefix = "item-selector-";
+	
+			if (this.checked) {					
+				//查询列表中的项目
+				$("#customer-printer-table .item-selector").each(function(index, elem) {
+					this.checked = true;
+					var surfix = $(this).attr("data-bind");  //item'id
+					var rowId = prefix + surfix; 
+					$('#customer-printer-table #' + rowId).addClass("selected");
+				});
+			} 
+			else{
+				$("#customer-printer-table .item-selector").each(function(index, elem) {
+					this.checked = false;
+					var surfix = $(this).attr("data-bind");
+					var rowId = prefix + surfix;
+					$('#customer-printer-table #' + rowId).removeClass("selected");
+				});
+			} // end of else
+		});
+
+	});
+	//创建分页组件实例
+	var pager=new Pager("pagerCustomer");
+	$(function(){			
+		pager.init(loadCustomerPage,curr_customer_searchCond);			
+	});
+	</script>
+</body>
+</html>

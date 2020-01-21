@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>选择客户列表</title>
+</head>
+<body>
+	
+	<!-- 表计列表 -->
+	<table class="table table-striped table-hover table-sm" id="customer-select-item-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input select-all-toggle"
+							id="meter-select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="meter-select-all-toggle"></label>
+					</div>
+				</th>
+				<th>地理位置</th>
+				<th>客户姓名</th>
+				<th>客户电话</th>
+				<th>客户手机</th>
+				<th>客户类型</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${customerList}" th:attr="data-bind=${item.id}, data-meter-place=${item.place}" class="customer-item-selector-tr">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input customer-item-selector" name="example1" th:attr="id='customer-item-selector'+'-'+${item.id},data-bind=${item.id}, data-customer-id=${item.id}, data-meter-place=${item.place}">
+						<label class="custom-control-label"	th:attr="for='customer-item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 地理位置-->
+				<td th:text="${item.place}">地理位置</td>
+				<!-- 客户名称-->
+				<td th:text="${item.customerName}">客户名称</td>
+				<!-- 客户电话-->
+				<td th:text="${item.customerTel}">客户电话</td>
+				<!-- 客户手机-->
+				<td th:text="${item.customerMobile}">客户手机</td>
+				<!-- 客户类型-->
+				<td >
+					<span th:if=${item.customerType==1}>个人</span>
+					<span th:if=${item.customerType==2}>单位</span>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager::pager" class="pagerx" id="meter-select-pager"
+		style="float: right; margin-right: 10px;"></div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_select_pageNum=[[${pageNum}]];
+		var curr_select_pageSize=[[${pageSize}]];
+		var curr_select_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		
+		
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedCustomer(){
+			var params = new Object();
+			//设置非当前选中行的checkbox为未选中状态，并设置当前选中行的checkbox为选中状态
+			$("#customer-select-item-table tbody .customer-item-selector").each(function(index, elem) {
+				if(this.checked){
+					var customerId = $(this).attr("data-customer-id");
+					var place = $(this).attr("data-meter-place");
+					params.customerId = customerId;
+					params.place = place;
+					return false;
+				}
+			});
+			return params;
+		}
+		
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/**
+			 * 绑定客户列表行的click事件，用户点击行来设置该行是否选中（checkbox是否选中）
+			 */
+			$("#customer-select-item-table .customer-item-selector-tr").on('click', function(e) {
+				
+				var itemId = $(this).attr("data-bind");  //item'id
+				var prefix = "customer-item-selector-";
+				
+				//设置非当前选中行的checkbox为未选中状态，并设置当前选中行的checkbox为选中状态
+				$("#customer-select-item-table tbody .customer-item-selector").each(function(index, elem) {
+					this.checked = true;
+					var surfix = $(this).attr("data-bind");  //item'id
+					var rowId = prefix + surfix; 
+					if(surfix==itemId){
+						//console.log("checkbox true:"+surfix);
+						$('#customer-select-item-table tbody #' + rowId).prop("checked", true);
+					}else{
+						//console.log("checkbox false:"+surfix);
+						$('#customer-select-item-table tbody #' + rowId).prop("checked", false);
+					}
+				});
+				
+			});
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#customer-select-item-table .select-all-toggle").on('click', function(e) {
+				var prefix = "customer-item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$("#customer-select-item-table .customer-item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#customer-select-item-table #' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$("#customer-select-item-table .customer-item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#customer-select-item-table #' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+			//======================分页（页码导航）========================
+
+			/*
+			 	【分页】导航： 当点击页号时读取需要导航到的页码及每页记录数（pageNum,pageSize）
+			 	 data-bind:pageNum-pageSize形式 
+			 	 如果data-bind为空字符串，不做动作 
+			 	 当用户点击某页时，	 则发送请求
+			*/
+			$("#customer-select-pager .pagination li a").on('click', function(e) {
+				var dataBind = $(this).attr("data-bind");
+				//当dataBind有数据时处理
+				if (dataBind != "") {
+					var pageArr = new Array();
+					pageArr = dataBind.split("-");
+					// 置分页数据
+					curr_select_pageNum = pageArr[0];
+					curr_select_pageSize = pageArr[1];
+					//加载页
+					loadCustomerPageClickPageNum(); 
+				}
+
+			});
+
+		});
+	</script>
+</body>
+</html>

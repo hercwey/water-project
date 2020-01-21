@@ -1,0 +1,59 @@
+<html> 
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>
+<style type="text/css" mce_bogus="1">
+.mybodySt{font-family: SimSun;font-size: 11px; padding:10px 5px;margin:0px;}
+.myheadSt,.mycontentSt,.myTheadSt{width:100%;}
+.mytableSt{width:100%;table-layout:fixed;word-break:break-strict;}
+.mytableSt tr{width:100%;height:20px;line-height:20px;font-size: 15px;}
+.mytableSt td{text-align:center;height:20px;line-height:20px;}
+.myfootSt{margin-top:2px;width:100%;height:20px;line-height:20px;text-align:center;}
+.foot_item{float:left;text-align:left;width:33%;font-size:13px;}
+.bdLeft{border-left:1px solid #000000;border-bottom:1px solid #000000;padding:0 5px;text-align:left;}
+.bdRight{border-left:1px solid #000000;border-right:1px solid #000000;border-bottom:1px solid #000000;padding:0 5px;text-align:left;}
+.bdBottom{border-bottom:1px solid #000000;}
+.myheadtwooo{width:350px;border:1px solid;margin: 10px auto;padding: 10px;min-height:320px;}
+</style>
+</head>
+<body class="mybodySt">
+<div class="myheadtwo">
+	<div class="myheadSt">
+		<div style="width:100%;height:25px;line-height:25px;font-size:22px;text-align:center;">PIVAS药品统计单 $sysDate #if($selectName)$selectName#end</div>
+	</div>
+	
+	<div class="mycontentSt">
+		<table class="mytableSt" border="0" cellpadding="0" cellspacing="0">
+			<thead class="myTheadSt">
+				<tr>
+					<td class="bdBottom" style="width:17%;">货位</td>
+					<td class="bdBottom" style="width:50%;">药品名称[规格]</td>
+					<td class="bdBottom" style="width:10%">数量</td>
+					<td class="bdBottom" style="width:8%">单位</td>
+					<td class="bdBottom" style="width:15%">取药量</td>
+				</tr>
+			</thead>
+			#foreach($element in $medicamentList)
+				<tr> 
+					<td class="bdLeft" style="text-align:left">#if(${element.shelfNo})${element.shelfNo}#end</td>
+					<td class="bdLeft" style="text-align:left">#if(${element.drugAliasName})${element.drugAliasName}#end[#if(${element.specifications})${element.specifications}#end]</td>
+					<td class="bdLeft">#if(${element.quantity})${element.quantity}#end</td>
+					<td class="bdLeft">#if(${element.packingUnit})${element.packingUnit}#end</td>
+					<td class="bdRight"></td>
+				</tr>
+			#end
+		</table>
+	
+	</div>
+	#if($footIsShow)
+		<div class="myfootSt">
+			<div style="width:98%;margin:0 auto;">
+				<div class="foot_item">排药：</div>
+				<div class="foot_item">核对：</div>
+				<div class="foot_item">签收：</div>
+			</div>
+		</div>
+	#end
+</div>
+</body>
+</html>

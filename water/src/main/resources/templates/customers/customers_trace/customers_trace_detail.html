@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户档案详细信息</title>
+
+</head>
+
+<body>
+
+	<th:block th:fragment="dialog">
+		<table class="table" id="customer-trace-detail">
+			<tbody>
+				<tr>
+					<td>客户名称：</td>
+					<td th:text="${customer==null ? '' : customer.customerName}"></td>
+					<td>操作类型：</td>
+					<td th:text="${customer==null ? '' : customer.operationTypeStr}"></td>
+				</tr>
+				<tr>
+					<td>操作时间：</td>
+					<td th:text="${customer==null ? '' : customer.operationTimeStr}"></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>变更前：</td>
+					<td colspan="3">
+						<textarea rows="4" cols="100" class="form-control"  style="width:1300px;"
+							th:text="${customer==null ? '' : customer.changeBefore}" ></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>变更后：</td>
+					<td colspan="3">
+						<textarea rows="6" cols="100" class="form-control"  style="width:1300px;"
+							th:text="${customer==null ? '' : customer.changeAfter}" ></textarea>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</th:block>
+	
+	
+	<script type="text/javascript">
+
+	
+	
+	</script>
+</body>
+</html>

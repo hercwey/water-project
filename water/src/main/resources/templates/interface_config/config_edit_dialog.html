@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+
+</script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-config-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>接口配置</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="config-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 配置项 -->
+													<div class="form-group form-inline">
+														<label for="config-key" class="col-sm-4 control-label">配置项</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.key}" 
+																	id="config-key" name="key" 
+																	maxlength=100 title="请输入1-100个字符" placeholder="配置项，保存后不可编辑"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 配置值 -->
+													<div class="form-group form-inline">
+														<label for="config-value" class="col-sm-4 control-label">配置值</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.value}" 
+																	id="config-value" name="value" 
+																	maxlength=100 title="请输入1-100个字符" placeholder="配置值"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 备注 -->
+													<div class="form-group form-inline">
+														<label for="config-remark" class="col-sm-4 control-label">备注</label>
+														<span class="input-group-sm col-sm-8">
+															<textarea rows="3" cols="10" class="form-control  "
+																id="config-remark" name="remark"
+																th:text="${currItem==null ? '' : currItem.remark}"
+																maxlength=100 title="请输入1-100个字符" placeholder="备注"></textarea>
+														</span>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			
+			var id = $("#config-id").val();
+			var key = $("#config-key").val();
+			var value = $("#config-value").val();
+			var remark = $("#config-remark").val();
+			
+			if(key==null || key==""){
+				//dialog type: success warning info error,默认为info
+				util.message("配置项不能为空！",null,"warning");
+				return;
+			}
+			if(value==null || value==""){
+				//dialog type: success warning info error,默认为info
+				util.message("配置值不能为空！",null,"warning");
+				return;
+			}
+			
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/interface-config/insert";
+			
+			var id = $("#config-id").val();
+			if(G_IS_EDIT){
+				urlStr = BASE_CONTEXT_PATH + "/interface-config/update";
+			}
+			
+			var interfaceType = getInterfaceType();//接口类型
+			console.log(interfaceType);
+			
+			var parms = new Object();
+			parms.id = id;
+			parms.interfaceType = interfaceType;
+			parms.key = key;
+			parms.value = value;
+			parms.remark = remark;
+			
+			$.post(urlStr, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						loadPageByPager();//重新刷新当前页面
+						if (closeDialogFlag){
+							closeEditDialog();
+						}
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+			
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				modiItem(true);				
+			});
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

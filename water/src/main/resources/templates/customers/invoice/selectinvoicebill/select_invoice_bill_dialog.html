@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>选择开票账单对话框</title>
+
+</head>
+<!-- 选择开票账单对话框 -->
+<body>
+
+	<th:block th:fragment="dialog(dialogId)">
+	
+		<style type="text/css">
+			/* 客户开票信息列表选中行的颜色 */
+			.selected-color{
+				background: #8FBC8F;
+				color: #fff
+				
+			}
+			#customer-invoice-table tbody tr:hover{
+				cursor: default;
+				background: #8FBC8F;
+				color: #fff
+			}
+		</style>
+	
+		<!-- 引入通用对话框工具 -->
+		<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<!-- modal-container-invoice-dialog -->
+				<div class="modal fade" th:id="${dialogId}" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog">
+					
+						<div class="modal-content" style="width:1000px;">
+						
+							<!-- 头部 -->
+							<div class="modal-header">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>选择:<b id="dialog-header-customer-name">客户</b>的开票账单</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<div class="card">
+									<div class="card-header">
+										<div class="btn-group btn-group-sm invoice-bill-type">
+											<button type="button" class="btn btn-outline-info active btn-select-customer-notify">
+												<i class="fa fa-flag" aria-hidden="true"> <span>按通知单选择</span></i>
+											</button>
+											<button type="button" class="btn btn-outline-info btn-select-customer-bill">
+												<i class="fa fa-list" aria-hidden="true"> <span>按账单选择</span>	</i>
+											</button>
+										</div>
+									</div>
+									<div class="card-body select-invoice-bill-div">此处加载选择开票账单页面</div> 
+									<!-- <div class="card-footer">底部</div> -->
+								</div>
+							</div>
+
+							<!-- 尾部 -->
+							<!-- <div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm btn-bank-modify-and-back"	id="btn-bank-modify-and-back">确认</button>
+							</div> -->
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			//var curr_bank_item=[[${currBankItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			
+			//---------------click event process binding---------------
+
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

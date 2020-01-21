@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-hover table-sm" id="meter-book-meter-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<!-- <th>表册ID</th> -->
+				<th>客户名称</th>
+				<th>客户手机</th>
+				<th>水表钢印号</th>
+				<th>水表位置</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${mbList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- <td th:text="${item.meterBookId}">表册ID</td> -->
+				<td th:text="${item.customerName}">客户名称</td>
+				<td th:text="${item.customerMobile}">客户电话</td>
+				<td th:text="${item.steelSealNo}">水表钢印号</td>
+				<td th:text="${item.place}">水表位置</td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 查看表计详情 -->
+					<button type="button" class="btn-meter-book-meter-detail btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id},data-meter-id=${item.meterId}, data-customer-id=${item.customerId}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i>
+						<span>查看表计详情</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerMeterBookMeter')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var meterBook_pageNum=[[${pageNum}]];
+		var meterBook_pageSize=[[${pageSize}]];
+		var meterBook_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		
+		//--------查看表册的表计详情---------
+		/* 
+			绑定查看表册按钮的click事件
+		*/
+		$(".btn-meter-book-meter-detail").on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/meter-book-allot/load-meter-book-meter-detail';
+
+			var meterId = $(this).attr("data-meter-id"); //条目ID
+			var customerId = $(this).attr("data-customer-id"); //条目ID
+			var parm = new Object();
+			parm.meterId = meterId;
+			parm.customerId = customerId;
+			
+			$("#meter-book-meter-detail").load(url, parm,showMeterBookMeterDetail); //加载完毕后显示 
+			
+		});
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#meter-book-table #select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$("#meter-book-table .item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#meter-book-table #' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$("#meter-book-table .item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#meter-book-table #' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		//创建分页组件实例
+		var pager=new Pager("pagerMeterBookMeter");
+		$(function(){			
+			pager.init(loadMeterBookMeterPage,meterBook_searchCond);			
+		});
+	</script>
+</body>
+</html>

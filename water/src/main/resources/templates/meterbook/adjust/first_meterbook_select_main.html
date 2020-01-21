@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="meter-book-search" style="display: inline-block" id="first-meterbook-select-search-form">
+				<ul class="extra-l" style="list-style: none;">
+				
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" title="请输入业主名称/水表位置查询" placeholder="业主名称/水表位置">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm" id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						<button type="button" class="btn btn-warning btn-sm" id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+						<button type="button" class="btn btn-success btn-sm" id="btn-move-meter-book-meter" title="移动表册">
+							<i class="fa fa-arrow-right" aria-hidden="true"></i>
+						</button>
+					</li>
+				</ul>
+			</div>
+
+
+			<!-- 容器:字典列表 -->
+			<div class="first-meter-book-select-table table-container"></div>
+
+		</div>
+	</div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchMeterBookSelectFirst(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meter-book-adjust/first-meter-book-select-table"
+			$(".first-meter-book-select-table").load(url, parms, triggerResize);
+		}
+		
+		function triggerResize(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchFirstBookParams(){
+			var meterBookId = METER_BOOK_ID_ARR;
+			var searchCond=$("#first-meterbook-select-search-form #search-cond").val();
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.meterBookId = meterBookId[0];
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchMeterBookSelectFirst() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchFirstBookParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchMeterBookSelectFirst(parms);
+
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchMeterBookSelectFirstClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchFirstBookParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchMeterBookSelectFirst(parms);
+
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadMeterBookSelectFirstPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchFirstBookParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchMeterBookSelectFirst(parms);
+
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		/*		
+			加载(Load): 增加/编辑对话框
+			将对话框内容加载到指定的容器中
+		 */
+		function loadEditDialog() {
+			var url = BASE_CONTEXT_PATH + '/meter-book/load-edit-dialog';
+			$("#meterbook-dialog-edit").load(url, null, openEditDialog); //加载完毕后显示
+		}
+		
+		//-------------------	对话框操作	--------------------
+		/**
+		  	打开编辑对话框
+		  	@returns
+		 */
+		function openEditDialog() {
+			//	可拖拽
+			$("#modal-container-meterbook-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-meterbook-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:关闭编辑对话框 
+		*/
+		function closeEditDialog() {
+			$("#modal-container-meterbook-dialog").modal("hide");
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchMeterBookSelectFirst();
+
+			//---------事件绑定--------------
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#first-meterbook-select-search-form #btn-search').on('click', function() {
+				btnSearchMeterBookSelectFirstClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#first-meterbook-select-search-form #btn-search-reset').on('click', function() {
+				$("#first-meterbook-select-search-form #search-cond").val("");
+				$("#first-meterbook-select-search-form #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#first-meterbook-select-search-form #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('.meter-book-search #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/**
+			 * 	移动表册
+			 */
+			$("#first-meterbook-select-search-form #btn-move-meter-book-meter").on("click", function(){
+				var meterIds = getFirstMeterBookSelectedIds();
+				if(meterIds==null || meterIds.length<=0){
+					util.message("请选择要添加的表计！",null,"warning");
+					return;
+				}
+				var firstMeterBookId = METER_BOOK_ID_ARR[1];
+				var secondMeterBookId = METER_BOOK_ID_ARR[0];
+				//var secondmeterBookId = METER_BOOK_ID_ARR[1];
+				console.log("first id:"+firstMeterBookId+", second id:"+secondMeterBookId);
+				//初始化请求参数
+				var params = new Object();
+				params.firstMeterBookId=firstMeterBookId.toString();
+				params.secondMeterBookId=secondMeterBookId.toString();
+				params.meterIds=meterIds.toString();
+
+				//加载字典列表页面
+				var url = BASE_CONTEXT_PATH + "/meter-book-adjust/move-meters";
+				$.post(url, params, function(res){
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							defaultSearchMeterBookSelectSecond();//加载所有表计
+							defaultSearchMeterBookSelectFirst();//我的表册的所有表计
+							util.message(res.result_msg,null,"warning");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				});
+				
+			});
+			
+			
+		});
+	</script>
+
+</body>
+</html>

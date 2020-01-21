@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>客户账单列表页面</title>
+
+<!-- <script th:src="@{/bootstrap/4.3.1/js/bootstrap.min.js}"></script> -->
+
+<!-- jQuery Popup Overlay -->
+<script type="text/javascript" src="/jquery/jquery-popup/jquery.popupoverlay.js"></script>
+<link rel="stylesheet" href="/css/components/invoicenotifytooltip/tooltip.css" />
+
+</head>
+<body>
+	<!-- 列表 -->
+	<table class="table table-hover table-sm" id="customer-bill-table">
+		<thead>
+			<tr>
+				<th>期间</th>
+				<th>本期基础水费</th>
+				<th>本期污水水费</th>
+				<th>往期基础水费欠费</th>
+				<th>往期污水水费欠费</th>
+				<th>本期合计水费</th>
+				<th>是否已选择</th>
+				<th>水费通知单</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${notifyList}" th:attr="id='notify-table-tr-'+${item.id}, data-bind-id=${item.id}, data-customer-id=${item.customerId}, data-period=${item.period}, data-sum-base-amount=${item.sumBaseAmount}, data-sum-sewage-amount=${item.sumSewageAmount}, data-past-base-owe-amount=${item.pastBaseOweAmount}, data-past-sewage-owe-amount=${item.pastSewageOweAmount}, data-total-owe-amount=${item.totalOweAmount}, data-notify-res=${item.notifyResMap}" title="双击选择/取消">
+			
+				<!-- 期间 -->
+				<td th:text="${item.period}">期间</td>
+				<!-- 本期基础水费 -->
+				<td th:text="${item.sumBaseAmount}">本期基础水费</td>
+				<!-- 本期污水水费 -->
+				<td th:text="${item.sumSewageAmount}">本期污水水费</td>
+				<!-- 往期基础水费欠费 -->
+				<td th:text="${item.pastBaseOweAmount}">往期基础水费欠费</td>
+				<!-- 往期污水水费欠费 -->
+				<td th:text="${item.pastSewageOweAmount}">往期污水水费欠费</td>
+				<!-- 合计水费 -->
+				<td th:text="${item.totalOweAmount}">合计水费</td>
+				<!-- 是否已选择 -->
+				<td th:attr="class='selected-flag selected-flag-'+${item.id}, data-bill-id=${item.id}"></td>
+				<!-- 水费通知单 -->
+				<td style="text-align:center;">
+					<button type="button" class="btn btn-secondary btn-sm btn-show-customer-notify" th:attr="data-bind-id=${item.id}" title="查看水费通知单">
+						<i class="fa fa-file-text-o" aria-hidden="true"></i>
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- Tooltip -->
+	<div id="customer-notify-tooltip" class="well rounded  border border-secondary" style="padding:10px;">
+	    <div class="water-fee-notify-container">此处显示水费通知单</div>
+	</div>
+
+	<!-- 加入分页 -->
+	<!-- <div th:include="common/common_pager_pagesize::pager(${dialogId}+'-pager-customer-bill')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div> -->	
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		//var curr_pageNum=[[${pageNum}]];
+		//var curr_pageSize=[[${pageSize}]];
+		//var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	</script>
+</body>
+</html>

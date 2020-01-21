@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('中国建设银行接口测试')" th:remove="tag"></div>
+
+</head>
+<body>
+	<!-- 参数配置主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<div>
+					<h4 class="panel-title">中国建设银行接口测试</h4>
+					<hr style="height:1px;border:none;border-top:1px solid blue;">
+				</div>
+				<!-- 业务页面 -->
+				<div id="container">
+					<button type="button" class="btn btn-success" id="btn-create-local-rsa">
+						<span>生成本地RSA密钥对</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-get-ccb-des-to-save">
+						<span>获取CCB-DES密钥并保存</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-get-ccb-rsa-public-key-to-save">
+						<span>获取CCB-RSA公钥并保存</span>
+					</button>
+					<br>
+					<button type="button" class="btn btn-success" id="btn-login">
+						<span>签到</span>
+					</button>
+					<br>
+					<button type="button" class="btn btn-success" id="btn-generator-withhold-file">
+						<span>生成批量扣费文件</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-upload-withhold-file">
+						<span>上传批量扣费文件</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-apply-process-withhold-file">
+						<span>申请处理批量扣费文件</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-query-withhold-file-process-status">
+						<span>查询批量扣费文件处理状态(查询凭证状态)</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-query-withhold-cert-detail-packet">
+						<span>查询凭证明细-报文方式</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-query-withhold-cert-detail-file">
+						<span>查询凭证明细-文件方式</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-download-withhold-file-process-result">
+						<span>下载批量扣费处理结果</span>
+					</button>
+					<br>
+					<button type="button" class="btn btn-success" id="btn-transfer-account">
+						<span>转账</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-query-transfer-account-result">
+						<span>查询转账结果</span>
+					</button>
+					<br>
+					<button type="button" class="btn btn-success" id="btn-query-account-balance">
+						<span>查询账户余额</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-query-account-detail">
+						<span>查询账户明细</span>
+					</button>
+					<br>
+					<button type="button" class="btn btn-success" id="btn-logout">
+						<span>签退</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	
+		function ajax(url, params){
+			//var url = BASE_CONTEXT_PATH + "/location/updatePidById";
+			//var params = {"updateDataListJSON":updateDataListJSON};
+			$.post(url, params, function(res){
+				console.log(res);
+				if(res!=null){
+					var obj = res;//$.parseJSON(res);
+					if(obj.result_code=="success"){
+						util.message(obj.result_msg);
+					}else{
+						util.message(obj.result_msg);
+					}
+				}
+			});
+		}
+	
+		$(function() {
+			//==========主要业务部分==========
+			/**
+			 * 	生成本地RSA钥匙对
+			 */
+			$("#btn-create-local-rsa").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/create-local-rsa";
+				ajax(url, null);
+			});
+			/**
+			 * 	获取CCB-DES密钥并保存
+			 */
+			$("#btn-get-ccb-des-to-save").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/get-ccb-des-to-save";
+				ajax(url, null);
+			});
+			/**
+			 * 	获取CCB-RSA公钥并保存
+			 */
+			$("#btn-get-ccb-rsa-public-key-to-save").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/get-ccb-rsa-public-key-to-save";
+				ajax(url, null);
+			});
+			/**
+			 * 	生成批量代扣文件
+			 */
+			$("#btn-generator-withhold-file").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/generator-withhold-file";
+				ajax(url, null);
+			});
+			/**
+			 * 	上传批量代扣文件
+			 */
+			$("#btn-upload-withhold-file").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/upload-withhold-file";
+				ajax(url, null);
+			});
+			/**
+			 * 	申请处理批量代扣文件
+			 */
+			$("#btn-apply-process-withhold-file").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/apply-process-withhold-file";
+				ajax(url, null);
+			});
+			/**
+			 * 	查询批量代扣文件处理状态
+			 */
+			$("#btn-query-withhold-file-process-status").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/query-withhold-file-process-status";
+				ajax(url, null);
+			});
+			/**
+			 * 	查询凭证明细-报文方式
+			 */
+			$("#btn-query-withhold-cert-detail-packet").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/query-withhold-cert-detail-packet";
+				ajax(url, null);
+			});
+			/**
+			 * 	查询凭证明细-文件方式
+			 */
+			$("#btn-query-withhold-cert-detail-file").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/query-withhold-cert-detail-file";
+				ajax(url, null);
+			});
+			/**
+			 * 	下载批量代扣文件处理结果
+			 */
+			$("#btn-download-withhold-file-process-result").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/download-withhold-file-process-result";
+				ajax(url, null);
+			});
+			/**
+			 * 	转账
+			 */
+			$("#btn-transfer-account").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/transfer-account";
+				ajax(url, null);
+			});
+			/**
+			 * 	查询转账结果
+			 */
+			$("#btn-query-transfer-account-result").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/query-transfer-account-result";
+				ajax(url, null);
+			});
+			/**
+			 * 	查询账户余额
+			 */
+			$("#btn-query-account-balance").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/query-account-balance";
+				ajax(url, null);
+			});
+			/**
+			 * 	查询账户明细
+			 */
+			$("#btn-query-account-detail").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/query-account-detail";
+				ajax(url, null);
+			});
+			/**
+			 * 	签到
+			 */
+			$("#btn-login").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/login";
+				ajax(url, null);
+			});
+			/**
+			 * 	签退
+			 */
+			$("#btn-logout").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-test/logout";
+				ajax(url, null);
+			});
+		})
+	</script>
+
+</body>
+</html>

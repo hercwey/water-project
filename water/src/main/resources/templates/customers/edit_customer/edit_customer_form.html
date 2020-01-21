@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<style type="text/css">
+.edit-customer-from .card{
+	margin-top:1px;
+}
+</style>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+	<!-- 客户类型 -->
+	<div class="" id="customer-type-btn-group">
+		<button type="button" class="btn btn-outline-info btn-sm active" id="load-person-customer-table">个人</button>
+		<button type="button" class="btn btn-outline-info btn-sm  load-company-customer-table" id="load-company-customer-table">单位</button>
+		<input type="hidden" class="" id="hide-customers-type" name="" value="1">
+	</div>
+	<div class="edit-customer-from">
+		<div class="card">
+			<!-- <h5 class="card-header">
+				Card title
+			</h5> -->
+			<div class="card-body">
+				<form class="form-horizontal " role="form" id="edit-customer-tab-form">
+									
+					<!-- 当前所编辑的条目ID -->
+					<input type="hidden" id="customers-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+					
+					<div id="load-edit-customer-table">
+						<!-- 加载编辑客户table -->
+					</div>
+				</form>
+				<div class="form-group form-inline">
+					<button type="button" class="btn btn-primary btn-sm" id="btn-save-form" style="margin-left:70%;">保存</button>&nbsp;&nbsp;
+					<button type="button" class="btn btn-primary btn-sm" id="btn-save-form-and-detail" >保存并查看详情</button>
+				</div>	
+			</div>
+		</div>
+		
+	</div>
+	
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		var G_CUSTOMER_TYPE_INPUT_ID = "#hide-customers-type";//隐藏域-客户类型的input标签ID
+		var save_and_detail = false;//点击的是保存还是保存并查看详情
+		var CUSTOMER_TYPE_PERSON = 1;//客户类型-个人
+		/**
+		 * 	获取客户类型
+		 */
+		function getCustomersTypeFn(){
+			return $(G_CUSTOMER_TYPE_INPUT_ID).val();
+		}
+		/**
+		 * 	设置客户类型
+		 */
+		function setCustomersTypeFn(customerType){
+			$(G_CUSTOMER_TYPE_INPUT_ID).val(customerType);//设置全局客户ID
+		}
+			
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			 var customersId= getCustomerIdFn();
+			 $("#customers-id").val(customersId);
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/customers/insert";
+			//var customersId= $("#customers-id").val();
+			if(customersId!=null && customersId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/customers/update";
+			}
+			
+			var customerType = getCustomersTypeFn();
+			var locationCode = "";
+			if(customerType==CUSTOMER_TYPE_PERSON){//个人用户
+				locationCode = $("#edit-customer-tab-form #customers-address").find("option:selected").attr("location-code");
+			}else{//单位用户
+				locationCode = $("#edit-customer-tab-form #location-code").val();
+			}
+			
+			if(locationCode==null || locationCode==""){
+				//dialog type: success warning info error,默认为info
+				util.message("请选择片区分组！",null,"warning");
+				return false;
+			}
+			
+			var form=new FormData($("#edit-customer-tab-form")[0]);
+			form.append('customerType', customerType)
+			form.append('customerType', customerType);
+			form.append('locationCode', locationCode);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							var customerId = res.customerId;//客户ID
+							setCustomerIdFn(customerId)//设置客户ID
+							var params = new Object();//参数：功能模块标识
+							params.customerId =customerId;
+							console.log(customerId);
+							if(!save_and_detail){//判断点击的是保存还是保存并查看详情
+								var formId = "edit-customer-tab-form";
+								clearFormFn(formId);//清空form表单
+							} else {
+								loadDetailList(params, loadDetailListCallback);//加载某客户的详细信息
+								hideAddCustomerTabs();
+							}
+							//clearBindMeterTabContent();
+							//$('#btn-save-form').attr("disabled", true);//设置保存按钮为disabled状态
+							//$('#btn-save-form-and-detail').attr("disabled", true);//设置保存按钮为disabled状态
+							
+							util.message(res.result_msg,null,"success");
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+			
+		function clearFormFn(formId){
+			$(':input','#'+formId).not(':button, :submit, :reset, :hidden') .val('');  
+			$("#customers-use-num").val("3");
+			$("#customers-water-status").val("0");
+			$("#customers-notify-mode").val("3");
+			$("#customers-is-part-water").val("0");
+			 
+		}
+		/**
+		 * 	windowsresize窗口
+		 */
+		function windowResize(){
+			//initScroll();
+			//$(".customers-table").niceScroll();
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+	        //$("html").getNiceScroll().resize();
+	       // $("html").getNiceScroll().onResize();
+		}
+			
+		/*
+			设置input背景色
+		*/
+		function setBackGround() {
+			$("#customers-settle_time").css("background-color", "white");
+		}
+		
+		
+		//--------------------load customer table---------------------
+		/**
+		 * 	加载客户table
+		 */
+		function loadCustomerTableFn(url, parms, callback){
+			//var url = BASE_CONTEXT_PATH+"/customers/load-person-customer-table";
+			var callbackFunc = callback;
+			var containerId = "#load-edit-customer-table";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		/**
+		 * 	加载个人客户表单table
+		 */
+		function loadPersonCustomerTableFn(){
+			/* 客户类型，1=个人；2=单位；3=水司； */
+			var customerId = getCustomerIdFn();
+			console.log(customerId)
+			var url = BASE_CONTEXT_PATH+"/customers/load-customer-table";
+			var parms = {"customerType": 1,"customerId": customerId};
+			loadCustomerTableFn(url, parms, null);
+		}
+		/**
+		 * 	加载单位客户表单table
+		 */
+		function loadCompanyCustomerTableFn(){
+			/* 客户类型，1=个人；2=单位；3=水司； */
+			var customerId = getCustomerIdFn();
+			var url = BASE_CONTEXT_PATH+"/customers/load-customer-table";
+			var parms = {"customerType": 2,"customerId": customerId};
+			loadCustomerTableFn(url, parms, null);
+		}
+		
+		/**
+		 * 	清除客户类型当前选中的css
+		 */
+		function clearActiveCustomerType(){
+			$("#customer-type-btn-group button").removeClass("active");
+		}
+		/**
+		 * 	清空编辑客户的选项卡内容（银行信息、开票信息和多人口调整信息）
+		 */
+		function emptyEditCustomerTab(){
+			//$("#edit-detail-tab").empty();//清空客户基本信息
+			$("#edit-tabs-customers-detail div.tab-content #edit-banks-tab").empty();//清空客户-银行信息
+			$("#edit-tabs-customers-detail div.tab-content #edit-bills-tab").empty();//清空客户-开票信息
+			$("#edit-tabs-customers-detail div.tab-content #edit-people-tab").empty();//清空多人口调整信息
+		}
+		
+		//--------------------加载选项卡内容--------------------------------------------------------------
+		/**
+		 * 	加载绑定/解绑表计页面
+		 */
+		function loadEditBindMeterPage(parms, callback){
+			//var url = BASE_CONTEXT_PATH+"/customers/load-bind-bigmeter-page";
+			var url = BASE_CONTEXT_PATH+"/customers/customer-unbindmeter-main";
+			//var parms = new Object();
+			var customerId = getCustomerIdFn();
+			parms.customerId = customerId;
+			
+			var callbackFunc = callback;
+			var containerId = "#edit-bind-meter-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		/* 
+			加载银行信息页
+		*/
+		function loadEditCustomerBankList(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/customer-bank/main";
+			var callbackFunc = callback;
+			var containerId = "#edit-banks-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		/* 
+			加载开票信息页
+		*/
+		function loadEditCustomerBillList(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/customer-bill/main";
+			var callbackFunc = callback;
+			var containerId = "#edit-bills-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		/* 
+			加载多人口调整信息页
+		*/
+		function loadEditCustomerPeopleList(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/customer-people/main";
+			var callbackFunc = callback;
+			var containerId = "#edit-people-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		function togglePersonCustomerBtn(){//加载个人用户信息
+			
+			$("#customer-type-btn-group #load-person-customer-table").click();//默认显示个人客户界面
+			$("#load-company-customer-table").hide();//隐藏单位用户按钮
+			
+			
+			$(G_EDIT_CUSTOMER_DETAIL_TAB_ID).show();//显示编辑客户选项卡
+			transferTabs(G_TABS_NAV_CUSTOMERS, G_EDIT_CUSTOMER_DETAIL_TAB, "show");//跳转到编辑客户选项卡
+			
+		}
+		
+		function toggleCompanyCustomerBtn(){//加载单位用户信息
+			
+			$("#customer-type-btn-group #load-company-customer-table").click();//默认显示单位客户界面
+			$("#load-person-customer-table").hide();//隐藏个人用户按钮
+			
+			$(G_EDIT_CUSTOMER_DETAIL_TAB_ID).show();//显示编辑客户选项卡
+			transferTabs(G_TABS_NAV_CUSTOMERS, G_EDIT_CUSTOMER_DETAIL_TAB, "show");//跳转到编辑客户选项卡
+			
+		}
+		
+		/**
+		 * 	加载个人客户table
+		 */
+		$("#customer-type-btn-group #load-person-customer-table").on("click", function(){
+
+			console.log("click person");
+			
+			clearActiveCustomerType();//清除客户类型当前选中的css
+			$(this).addClass("active");//设置当前选中的按钮CSS
+			
+			setCustomersTypeFn(G_CUSTOMER_TYPE_PERSION);//设置客户类型-个人
+			
+			//TODO get customer id
+			loadPersonCustomerTableFn();//加载个人客户表单table
+			$("#edit-people-item-tab").show();
+			
+			//setCustomerIdFn("")//设置客户ID
+			emptyEditCustomerTab();//清空编辑客户的选项卡信息
+		});
+		
+		/**
+		 * 	加载单位客户table
+		 */
+		$("#customer-type-btn-group #load-company-customer-table").on("click", function(){
+			console.log("单位用户")
+			clearActiveCustomerType();//清除客户类型当前选中的css
+			$(this).addClass("active");//设置当前选中的按钮CSS
+			
+			setCustomersTypeFn(G_CUSTOMER_TYPE_COMPANY);//设置客户类型-个人
+			
+			
+			//TODO get customer id
+			loadCompanyCustomerTableFn();//加载单位客户表单table
+			$("#edit-people-item-tab").hide();
+			
+			//setCustomerIdFn("")//设置客户ID
+			emptyEditCustomerTab();//清空编辑客户的选项卡信息
+		});
+		
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			
+			//windowResize();
+			
+			
+			$.validator.setDefaults({//验证成功后，保存数据
+			    submitHandler: function() {
+			    	modiItem(true);
+			    }
+			});
+			//初始化表单验证
+			$("#edit-customer-tab-form").validate({//设置正则验证
+			    rules: {
+			        propEmail: {
+			          required: true,
+			          email: true
+			        },
+			      },
+			      messages: {
+			        propEmail: "请输入一个正确的邮箱",
+			      }
+			});
+			
+			//默认加载个人客户表单table
+			//loadPersonCustomerTableFn();//加载个人客户表单table
+			
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-save-form').on('click',function() {
+				save_and_detail = false;
+				$("#edit-customer-tab-form").submit();
+			});
+			
+			/*
+				保存添加的客户信息并跳转到详情信息选项卡
+			*/
+			$('#btn-save-form-and-detail').on('click',function() {
+				save_and_detail = true;
+				$("#edit-customer-tab-form").submit();
+			});
+
+		});
+		
+	</script>
+	
+	
+	</th:block>
+	
+</body>
+</html>

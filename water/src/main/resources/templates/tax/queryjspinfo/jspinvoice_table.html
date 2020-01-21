@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>金税盘状态查询-增值税专用发票,增值税普通发票-table</title>
+</head>
+<body>
+
+<!-- 
+	是否到抄税期	
+	是否到锁死期	
+	专用发票离线限额	
+	普通发票离线限额	
+	专用发票离线剩余金额	
+	普通发票离线剩余金额	
+	专用发票开票限额	
+	普通发票开票限额	
+	锁死日期	
+	上次报税日期	
+	抄税起始日期	
+	报税资料	
+	报税成功标志	
+	购入发票信息	
+	退回发票信息	 
+-->
+<table class="table table-bordered table-condensed" contenteditable="false">
+
+	
+	<!-- 
+	Sfdcsq	是否到抄税期	字符	1		固定值
+									0：未到抄税期
+									1：已到抄税期
+	Sfdssq	是否到锁死期	字符	1		固定值
+									0：未到锁死期
+									1：已到锁死期
+	Zyfplxxe	专用发票离线限额	数值	16,2		
+	Ptfplxxe	普通发票离线限额	数值	16,2		
+	Zyfplxsyje	专用发票离线剩余金额	数值	16,2		
+	Ptfplxsyje	普通发票离线剩余金额	数值	16,2		
+	Zyfpkpxe	专用发票开票限额	数值	16,2		
+	Ptfpkpxe	普通发票开票限额	数值	16,2		
+	Ssrq	锁死日期	日期	8		格式为yyyy-MM-dd
+	Sccbrq	上次报税日期	日期	12		格式为yyyy-MM-dd HH:mm
+	Csqsrq	抄税起始日期	日期	8		格式为yyyy-MM-dd
+	Bszl	报税资料	字符	1		固定值
+									0：无
+									1：有
+	Bscgbz	报税成功标志	字符	1		固定值
+									0：无
+									1：有
+	Grfpxx	购入发票信息	字符	1		固定值
+									0：无
+									1：有
+	Thfpxx	退回发票信息	字符	1		固定值
+									0：无
+									1：有 -->
+	
+
+	<tbody>
+		<tr>						
+			<td>是否到抄税期</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Sfdcsq}"></td>					
+		</tr>
+		<tr>						
+			<td>是否到锁死期</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Sfdssq}"></td>					
+		</tr>
+		<tr>						
+			<td>专用发票离线限额</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Zyfplxxe}"></td>					
+		</tr>
+		<tr>						
+			<td>普通发票离线限额</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Ptfplxxe}"></td>					
+		</tr>
+		<tr>						
+			<td>专用发票离线剩余金额</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Zyfplxsyje}"></td>					
+		</tr>
+		<tr>						
+			<td>普通发票离线剩余金额</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Ptfplxsyje}"></td>					
+		</tr>
+		<tr>						
+			<td>专用发票开票限额</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Zyfpkpxe}"></td>					
+		</tr>
+		<tr>						
+			<td>普通发票开票限额</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Ptfpkpxe}"></td>					
+		</tr>
+		<tr>						
+			<td>锁死日期</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Ssrq}"></td>					
+		</tr>
+		<tr>						
+			<td>上次报税日期</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Sccbrq}"></td>					
+		</tr>
+		<tr>						
+			<td>抄税起始日期</td>  
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Csqsrq}"></td>					
+		</tr>
+		<tr>						
+			<td>报税资料</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Bszl}"></td>					
+		</tr>
+		<tr>						
+			<td>报税成功标志</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Bscgbz}"></td>					
+		</tr>
+		<tr>						
+			<td>购入发票信息</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Grfpxx}"></td>					
+		</tr>
+		<tr>						
+			<td>退回发票信息</td>
+			<td th:text="(${resultObj}==null) ?  '' : ${resultObj.vatSpecialAndNormal.Thfpxx}"></td>					
+		</tr>
+		
+	</tbody>
+</table>
+
+
+</body>
+</html>

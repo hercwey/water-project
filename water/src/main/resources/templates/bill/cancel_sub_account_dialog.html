@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 输入布局 */
+.table-layout td {
+	border: 0px;
+	padding: 0px;
+}
+</style>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-cancel-sub-account-dialog"
+					role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header"
+								style="background-color: #a5f1b6; height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>撤销分账</span> <i class="fa fa-tags fa-1x"
+										aria-hidden="true" style="color: blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close"
+									data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+								<!-- 当前所编辑的条目ID -->
+								<input type="hidden" id="account-item-id" name="" th:value="${currItem==null ? '' : currItem.id}" />
+								<input type="hidden" id="account-item-customer-id" name="" th:value="${currItem==null ? '' : currItem.customerId}" />
+								<input type="hidden" id="account-item-period" name="" th:value="${currItem==null ? '' : currItem.period}" />
+									<h5 th:text="${currItem.period}">期间</h5>
+									<!-- 采用表格进行布局 -->
+									<table class="table table-sm">
+										<thead>
+											<tr>
+												<th>名称</th>
+												<!-- <th>借/贷</th> -->
+												<th>科目</th>
+												<th>金额（元）</th>
+												<th>备注</th>
+											</tr>
+										</thead>
+										<tbody id="sub-account-body">
+											<tr th:each="item,iterStat: ${customerList}">
+
+												<!-- 客户名称 -->
+												<td class="customerName" th:text="${item.customerName}">客户名称</td>
+												<!-- 借/贷 -->
+												<!-- <td class="debitCredit" th:text="${item.debitCredit}">借/贷</td> -->
+												<!-- 贷方科目 -->
+												<td class="creditSubject" th:text="${item.creditSubject}">贷方科目</td>
+												<!-- 贷方金额 -->
+												<td class="creditAmount" th:text="${item.creditAmount}">贷方金额</td>
+												<!-- 贷方摘要-->
+												<!-- <td class="creditDigest" th:text="${item.creditDigest}">贷方摘要</td> -->
+												<!-- 备注 -->
+												<td class="creditDigest" th:text="${item.remark}">备注</td>
+											</tr>
+											
+										</tbody>
+									</table>
+
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"
+									id="btn-modify-and-back-cancel-sub-account">撤销分账</button>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+		<script>
+		//------------------业务操作----------------------
+		
+		function getSubParms(){
+			
+			var accountItemId = $("#account-item-id").val();
+			var customerId = $("#account-item-customer-id").val();
+			var period = $("#account-item-period").val();
+			
+			var parms = new Object();
+			parms.accountItemId = accountItemId;
+			parms.customerId = customerId;
+			parms.period = period;
+			return parms;
+			
+		}
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem() {
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH + "/account-item/save-cancel-sub-account";
+			var parms = getSubParms();
+			console.log(parms);
+			if(!parms){
+				return false;
+			}
+			$.post(url, parms, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeCancelSubAccountDialog();
+						loadPageClickPageNum(); 
+						util.message(res.result_msg,null,"warning");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+		
+		/*
+			撤销分账单按钮
+		*/
+		$('#btn-modify-and-back-cancel-sub-account').on('click', function() {	
+			modiItem();
+		});
+	
+
+		
+		//======================分页（页码导航）========================
+
+		/*
+		 	【分页】导航： 当点击页号时读取需要导航到的页码及每页记录数（pageNum,pageSize）
+		 	 data-bind:pageNum-pageSize形式 
+		 	 如果data-bind为空字符串，不做动作 
+		 	 当用户点击某页时，	 则发送请求
+		*/
+		$(".pagination li a").on('click', function(e) {
+			var dataBind = $(this).attr("data-bind");
+			//当dataBind有数据时处理
+			if (dataBind != "") {
+				var pageArr = new Array();
+				pageArr = dataBind.split("-");
+				// 置分页数据
+				curr_pageNum = pageArr[0];
+				curr_pageSize = pageArr[1];
+				//加载页
+				loadPage(); 
+			}
+
+		});
+	});
+	</script>
+
+
+
+	</th:block>
+
+</body>
+</html>

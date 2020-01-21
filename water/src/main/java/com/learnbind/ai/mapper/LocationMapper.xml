@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.LocationMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.Location">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="LOCAL_NODE_TYPE" jdbcType="VARCHAR" property="localNodeType" />
+    <result column="PID" jdbcType="DECIMAL" property="pid" />
+    <result column="LOCATION_LEVEL" jdbcType="DECIMAL" property="locationLevel" />
+    <result column="SORT_VALUE" jdbcType="DECIMAL" property="sortValue" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="LONG_CODE" jdbcType="VARCHAR" property="longCode" />
+    <result column="TRACE_IDS" jdbcType="VARCHAR" property="traceIds" />
+    <result column="PYCODE" jdbcType="DECIMAL" property="pycode" />
+    <result column="PYLONGCODE" jdbcType="VARCHAR" property="pylongcode" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, NAME, CODE, LOCAL_NODE_TYPE, PID, LOCATION_LEVEL, SORT_VALUE, REMARK, DELETED, LONG_CODE, TRACE_IDS, PYCODE, PYLONGCODE 
+  </sql>
+  <!-- 根据id查询子节点集合 -->
+  <select id="getChildListById" resultType="com.learnbind.ai.bean.LocationBean">
+  	SELECT
+		L.ID AS id,
+		L.NAME AS name,
+		L.CODE AS code,
+		L.LOCAL_NODE_TYPE AS localNodeType,
+		L.PID AS pid,
+		L.LOCATION_LEVEL AS locationLevel,
+		L.SORT_VALUE AS sortValue,
+		L.REMARK AS remark,
+		L.DELETED AS deleted,
+		L.LONG_CODE AS longCode,
+		L.TRACE_IDS AS traceIds,
+		L.PYCODE AS pycode,
+		L.PYLONGCODE AS pylongcode,
+		( CASE WHEN ( EXISTS ( SELECT * FROM LOCATION WHERE PID = L.ID )) THEN 'true' ELSE 'false' END ) isParent 
+	FROM
+		LOCATION L 
+	WHERE
+		L.DELETED=0
+		AND L.PID = #{id}
+	ORDER BY L.PID ASC, L.SORT_VALUE ASC, L.TRACE_IDS ASC
+  </select>
+  <!-- 根据条件查询地理位置信息，用于地理位置页面中的查询 -->
+  <select id="getListBySearchCond" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		LOCATION 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		DELETED=0
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				UPPER(LONG_CODE) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%')) 
+				OR NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+			)
+		</if>
+		
+	</where>
+  </select>
+  
+  <!-- 查询符合条件的记录,返回第一条记录 -->
+  <select id="getFirstBySearchCond" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		(
+			SELECT
+				L.*,
+				row_number () over ( ORDER BY PID ASC, SORT_VALUE ASC, TRACE_IDS ASC ) rn 
+			FROM
+				LOCATION L 
+			WHERE
+				<!--删除状态，1=已删除，0=未删除（默认）  -->
+				L.DELETED=0
+				AND (
+					L.LONG_CODE LIKE CONCAT('%', CONCAT( UPPER(#{searchCond}), '%' ))
+					OR L.PYLONGCODE LIKE CONCAT('%', CONCAT( UPPER(#{searchCond}), '%' ))
+				)
+		)  
+	where 
+		rn=1
+  
+  </select>
+  
+  <!-- 查询符合条件的记录（根据rowNum返回某一条记录） -->
+  <select id="getOneBySearchCond" resultMap="BaseResultMap">
+  	SELECT
+		p.* 
+	FROM
+		(
+		SELECT
+			L.*,
+			row_number () over ( ORDER BY PID ASC, SORT_VALUE ASC, TRACE_IDS ASC ) rn 
+		FROM
+			LOCATION L 
+		WHERE
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			DELETED=0
+			AND (
+				L.LONG_CODE LIKE CONCAT('%', CONCAT( UPPER(#{searchCond}), '%' ))
+				OR L.PYLONGCODE LIKE CONCAT('%', CONCAT( UPPER(#{searchCond}), '%' ))
+			)
+		) p 
+	WHERE
+		p.rn = (
+			SELECT
+				p.rn 
+			FROM
+				(
+				SELECT
+					id,
+					row_number () over ( ORDER BY PID ASC, SORT_VALUE ASC, TRACE_IDS ASC ) rn 
+				FROM
+					LOCATION 
+				WHERE
+					<!--删除状态，1=已删除，0=未删除（默认）  -->
+					DELETED=0
+					AND (
+						LONG_CODE LIKE CONCAT('%', CONCAT( UPPER(#{searchCond}), '%' ))
+						OR PYLONGCODE LIKE CONCAT('%', CONCAT( UPPER(#{searchCond}), '%' ))
+					)
+				) p 
+			WHERE
+				p.ID = #{id} 
+			) + #{action}
+  
+  </select>
+  
+   <select id="getUnitList" resultType="map">
+  	select * 
+  		from location 
+  	<where>
+  		1=1
+  		<if test="traceIds!=null and traceIds!=''">
+		AND	TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<if test="localNodeType!=null and localNodeType!=''">
+			AND  LOCAL_NODE_TYPE=#{localNodeType}
+		</if>
+  	</where> 
+  	ORDER BY
+		CAST( REGEXP_REPLACE(PYCODE, '[a-zA-Z]*[-]*', '') AS int )
+  
+  </select>
+  
+  <select id="getBlockNameByTraceIds" resultType="String">
+  	select NAME
+  		from location 
+  	<where>
+  		1=1
+  		<if test="locaBlockTraceIds!=null and locaBlockTraceIds!=''">
+		AND	TRACE_IDS =#{locaBlockTraceIds}
+		</if>
+		
+  	</where> 
+  </select>
+  
+  <select id="getUnitLongCode" resultType="String">
+  	select PYCODE
+  		from location 
+  	<where>
+  		1=1
+  		<if test="traceIds!=null and traceIds!=''">
+		AND	TRACE_IDS =#{traceIds}
+		</if>
+		
+  	</where> 
+  </select>
+  <!-- 根据pid获取当前节点下的最大行数+1 -->
+  <select id="getSortValue" resultType="long">
+  	SELECT 
+  		NVL(MAX(ROWNUM)+1,1) AS SORT_VALUE 
+  	FROM 
+  		LOCATION 
+  	WHERE 
+  		PID=#{pid}
+  </select>
+ 
+  <!-- 根据地理位置traceIds查询单元信息 -->
+  <select id="getUnitListByTraceIds" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		LOCATION 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		DELETED=0
+		<if test="traceIds!=null and traceIds!=''">
+		AND	TRACE_IDS LIKE concat(#{traceIds},'%')
+		</if>
+		AND LOCAL_NODE_TYPE='UNIT'
+		
+	</where>
+  </select>
+  
+  <!-- 根据地理位置ID集合查询某个节点类型的地理位置信息 -->
+  <select id="getLocation" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		LOCATION 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		DELETED=0
+		<if test="locationIdArr!=null and locationIdArr.length>0">
+			AND	ID IN 
+			<foreach collection="locationIdArr" index="index" item="item" open="(" separator="," close=")">  
+	            #{item}  
+			</foreach>
+		</if>
+		<if test="nodeType!=null and nodeType!=''">
+			AND LOCAL_NODE_TYPE=#{nodeType}
+		</if>
+		
+	</where>
+  </select>
+  
+  <!-- 根据地理位置ID集合查询地理位置名称（小区-楼号-单元-门牌号） -->
+  <select id="getPlace" resultType="string">
+  	SELECT
+		LISTAGG(NAME, '-') WITHIN GROUP(ORDER BY ID) AS LOCATION_NAME 
+	FROM
+		LOCATION 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		DELETED=0
+		<if test="locationIdArr!=null and locationIdArr.length>0">
+			AND	ID IN 
+			<foreach collection="locationIdArr" index="index" item="item" open="(" separator="," close=")">  
+	            #{item}  
+			</foreach>
+		</if>
+		<if test="nodeTypeList!=null and nodeTypeList.size>0">
+			AND	LOCAL_NODE_TYPE IN 
+			<foreach collection="nodeTypeList" index="index" item="item" open="(" separator="," close=")">  
+	            #{item}  
+			</foreach>
+		</if>
+		
+	</where>
+  </select>
+  
+  <!--
+  	根据traceIds获取当前结点及其所有子node 
+  	参数:traceIds:指定结点的traceIds.
+   -->
+  <select id="getLocationByTraceIds" resultMap="BaseResultMap">
+  	 SELECT
+		*　 
+	FROM
+		LOCATION 
+	WHERE
+		TRACE_IDS LIKE CONCAT( #{traceIds}, '%' ) 
+	ORDER BY
+		lengthb ( TRACE_IDS ) - lengthb ( REPLACE ( TRACE_IDS, '-', '' ) ) ASC,	SORT_VALUE ASC	
+  </select>
+  
+  
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterChangeRecepitMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterChangeRecepit">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="NEW_METER_NO" jdbcType="VARCHAR" property="newMeterNo" />
+    <result column="OLD_METER_NO" jdbcType="VARCHAR" property="oldMeterNo" />
+    <result column="CERTIFICATE_NO" jdbcType="VARCHAR" property="certificateNo" />
+    <result column="NEW_METER_BOTTOM" jdbcType="VARCHAR" property="newMeterBottom" />
+    <result column="OLD_METER_BOTTOM" jdbcType="VARCHAR" property="oldMeterBottom" />
+    <result column="END_DATE" jdbcType="TIMESTAMP" property="endDate" />
+    <result column="NEW_CALIBER" jdbcType="VARCHAR" property="newCaliber" />
+    <result column="OPERATOR" jdbcType="VARCHAR" property="operator" />
+    <result column="INSTALL_DATE" jdbcType="TIMESTAMP" property="installDate" />
+    <result column="STOCK_ADMIN_SIGN" jdbcType="VARCHAR" property="stockAdminSign" />
+    <result column="INSTALL_PLACE" jdbcType="VARCHAR" property="installPlace" />
+    <result column="USER_SIGNATURE" jdbcType="VARCHAR" property="userSignature" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="OLD_CALIBER" jdbcType="VARCHAR" property="oldCaliber" />
+    <result column="UNIT_NAME" jdbcType="VARCHAR" property="unitName" />
+    <result column="RECEIVE_METER_PEOPLE" jdbcType="VARCHAR" property="receiveMeterPeople" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, METER_ID, NEW_METER_NO, OLD_METER_NO, CERTIFICATE_NO, NEW_METER_BOTTOM, OLD_METER_BOTTOM, 
+    END_DATE, NEW_CALIBER, OPERATOR, INSTALL_DATE, STOCK_ADMIN_SIGN, INSTALL_PLACE, USER_SIGNATURE, 
+    REMARK, OLD_CALIBER ,UNIT_NAME, RECEIVE_METER_PEOPLE
+  </sql>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchCond" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM METER_CHANGE_RECEIPT M
+		<where>
+			M.METER_ID=#{meterId}
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.NEW_METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.OLD_METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.CERTIFICATE_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.CALIBER LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.INSTALL_PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+</mapper>

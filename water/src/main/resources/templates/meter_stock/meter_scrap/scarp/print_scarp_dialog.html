@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>打印机选择对话框</title>
+
+<style type="text/css">
+	.curr-printer{
+		background-color:lightgray;
+	}
+</style>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+</head>
+<body>
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+			<!-- 当前所编辑的条目ID -->
+				<input type="hidden" id="item-id" name="itemId" th:value="${itemId}" />
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-print-scarp-dialog" role="dialog"
+					aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header"
+								style="background-color: #a5f1b6; height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									选择打印机<i class="fa fa-tags fa-1x" aria-hidden="true"
+										style="color: blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close"
+									data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<table class="table table-bordered table-sm">
+									<thead>
+										<tr>
+											<th>序号</th>
+											<th>名称</th>
+											<th>IP地址</th>
+											<th>打印机名称</th>
+										</tr>
+									</thead>
+									<tbody >
+										<tr th:each="printer,iter:${printerConfigList}"  th:attr="data-bind-id=${printer.id}">
+											<td th:text="${iter.count}">序号</td>
+											<td th:text="${printer.aliasName}">自定义打印机名称</td>
+											<td th:text="${printer.ipAddress}">IP地址</td>
+											<td th:text="${printer.printerName}">打印机名称</td>
+										</tr>
+									</tbody>
+								</table>
+								
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm"	data-dismiss="modal">取消</button>
+								<button type="button" class="btn btn-primary btn-sm"	id="btn-choice-printer">确认</button>
+							</div>
+						</div>  <!-- end of modal cotent -->
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+
+	</th:block>
+
+
+
+
+</body>
+<script type="text/javascript">
+	/*
+		选择第一行:默认打印机
+	*/
+	function selectTheFirstPrinter(){
+		var printerRow="#modal-container-print-scarp-dialog tbody tr";		
+		var currPrinterClass="curr-printer";
+		
+		var firstRow=$(printerRow+":first").get(0);
+		if(firstRow!=null){
+			$(firstRow).addClass(currPrinterClass);
+		}
+	}
+	
+	function setBackGround() {
+		$("#notice-date").css("background-color", "white");
+	}
+
+	$(function(){
+		/*
+			打印机选择对话框:显示事件监听			
+		*/
+		$("#modal-container-print-scarp-dialog").on('shown.bs.modal', function () {
+			//alert('模态框打开了');
+		});
+		
+		/*
+			打印机选择对话框:关闭事件监听.
+		*/
+		$('#modal-container-print-scarp-dialog').on('hide.bs.modal', function () {
+	    	//alert('模态框关闭了');
+	    });
+		
+		/*
+			点击某行时:切换当前选择光条
+		*/
+		$("#modal-container-print-scarp-dialog tbody tr").on('click',function(){
+			var printerRow="#modal-container-print-scarp-dialog tbody tr";
+			var currRowClass="curr-printer";
+			
+			$(printerRow).removeClass(currRowClass);
+			$(this).addClass(currRowClass);
+			
+		});
+		
+		/*
+			选择打印机确认按钮:CLICK事件处理
+		*/
+		$('#btn-choice-printer').on('click',function(){
+			var printerRow="#modal-container-print-scarp-dialog tbody tr";		
+			var currPrinterClass=".curr-printer";
+			var dataBindId='data-bind-id';
+			var itemId = $("#item-id").val();
+			var currPrinter=$(printerRow+currPrinterClass).get(0);
+			if(currPrinter!=null){
+				var printerId=$(currPrinter).attr(dataBindId);
+				closePrintScarpDialog();  //关闭打印机选择对话框.
+				startPrintScarp(itemId, printerId);  //开始打印.
+			}	
+		});
+		
+		//-------------init--------------
+		selectTheFirstPrinter();   //选择第一行作为默认打印机
+		
+	});
+</script>
+</html>

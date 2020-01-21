@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>未使用发票(按份数)-作废发票进度对话框</title>
+</head>
+<body>
+	<th:block th:fragment="dialog(dialogId)">
+	<div class="modal fade" th:id="${dialogId}" role="dialog" style="font-size:1.2em;"	aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<!-- 对话框头 -->
+				<div class="modal-header" style="background-color:darkcyan;height:30px;padding-top:0px;padding-bottom:0px;">
+					<!-- <h5 class="modal-title">Modal title</h5> -->
+					<span style="height:30px; line-height:30px;padding:0px;margin:0px;color:white;">
+						<span class="dialog-title">Modal title</span>
+					</span>
+					<!-- <button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">×</span>
+					</button> -->
+				</div>
+				<!-- 对话框主体 -->
+				<div class="modal-body">
+					<ul style="list-style-type:none;padding-left:0px;margin-left:30px;margin-right:30px;font-size:1.2em;">
+						<li style="margin-bottom:20px;">
+							<span>&nbsp;&nbsp;</span>
+							<span class="dialog-message" style="font-size:1em;">对话框消息</span>
+						</li>
+						<li style="margin-left:0px;margin-bottom:10px;">
+							<!-- 进度条 -->
+							<div class="progress" style="height:25px;">
+  								<div class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%"></div>  								
+							</div>							
+							<span style="font-size:12px;display:inline-block; width:100%; text-align:right;">请等待任务完成</span>
+						</li>
+														
+					</ul>
+				</div>
+				<!-- 对话框底部按钮 -->
+				<div class="modal-footer">
+					<!-- <button type="button" class="btn btn-primary  button-ok" >确认</button>
+					<button type="button" class="btn btn-primary  button-cancel"	data-dismiss="modal">取消</button> -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end of dialog -->
+	</th:block>
+</body>
+</html>

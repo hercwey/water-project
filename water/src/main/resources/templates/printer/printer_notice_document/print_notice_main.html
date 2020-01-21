@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<link rel="stylesheet"	href="/css/billtablebody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	<div id="print-dialog"></div>
+	<div id="single-print-dialog"></div>
+	<!-- 单个预览通知单 -->
+	<div id="single-preview-notice-dialog"></div>
+	
+	<div class="row clearfix">
+		<div class="col-md-12">
+		
+			<div class="tabbable" id="tabs-account-item">
+				<ul class="nav nav-tabs" id="account-item-nav-tabs">
+					<li class="nav-item" id="account-item-tab">
+						<a class="nav-link active" href="#tab-account-item" data-toggle="tab">账单列表</a>
+					</li>
+					<li class="nav-item" id="tab-account-item-detail-li" style="display: none;">
+						<a class="nav-link" href="#tab-account-item-detail" data-toggle="tab">通知单列表</a>
+					</li>
+				</ul>
+				
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab-account-item">
+						<!-- 表计档案信息 -->
+						<!-- 操作面板 -->
+						<div class="" style="display: inline-block" id="div-search">
+							<ul class="extra-l" style="list-style: none;">
+								<li class="input-group-sm">
+									<input type="text" class="form-control btn-sm Wdate" readonly="readonly" style="width: 100px;"
+											id="bill-period" name="period"
+											onClick="WdatePicker({dateFmt:'yyyy-MM',onpicked: setBackGround});"
+											placeholder="期间" title="期间" />
+								</li>
+								<li class="input-group-sm">
+									<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher')" th:remove="tag"></div>
+								</li>
+								<!-- 面板:查询 -->
+								<li class="input-group-sm"><input type="text" class="form-control btn-sm search-cond" id="search-cond" placeholder="请输入客户名称、手机号、编号" title="输入客户名称、手机号、编号查询">
+								</li>
+								<!-- 欠费月份 -->
+								<li class="input-group-sm">
+									<select class="form-control owe-month" id="owe-month">
+										<option value="">—欠费月份—</option>
+										<option value="1">1个月</option>
+										<option value="2">2个月</option>
+										<option value="3">大于2个月</option>
+									</select>
+								</li>
+								<!-- 查询按钮 -->
+								<li>
+									<button type="button" class="btn btn-success btn-sm btn-search"	id="btn-search">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+									<button type="button" class="btn btn-warning btn-sm btn-search-reset"	id="btn-search-reset">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+								</li>
+								<li>
+									<div class="dropdown">
+										<button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+											 操作
+										</button>
+										<div class="dropdown-menu">
+											<a class="dropdown-item btn-sm btn-generate-pdf">
+												<i class="fa fa-print" aria-hidden="true">
+													<span>打印小区</span>
+												</i>
+											</a>
+											<a class="dropdown-item btn-sm batch-print-arrears-notice">
+												<i class="fa fa-print" aria-hidden="true">
+													<span>打印欠费</span>
+												</i>
+											</a>
+											<a class="dropdown-item btn-sm batch-print-water-stop-notice">
+												<i class="fa fa-print" aria-hidden="true">
+													<span>打印停水</span>
+												</i>
+											</a>
+											<a class="dropdown-item btn-sm btn-export-owe-notice-excel">
+												<i class="fa fa-download" aria-hidden="true">
+													<span>导出EXCEL</span>
+												</i>
+											</a>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+						
+						<div class="card">
+							<div  class="role-table table-container" id="bill-table-body" style="padding-left:10px;padding-right:10px;">
+								<!-- 表计列表 -->
+							</div>
+						</div>
+					</div>
+					
+					<div class="tab-pane" id="tab-account-item-detail">
+						<!-- 客户账单详细信息 -->
+					</div>
+					
+				</div>
+			</div>
+				
+		</div>
+			
+	<!-- 地理位置下拉框查询JS -->
+	<script type="text/javascript"	th:src="@{/js/component/districtsearcher/DistrictSearcher.js}"></script>
+	</div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+		//设置通知单类型
+		G_ARREARS_NOTICE=true;
+		/*
+			设置日期选择input背景色
+		*/
+		function setBackGround() {
+			$("#bill-period").css("background-color", "white");
+		}
+		/**
+		 * 	获取期间
+		 */
+		function getPeriod(){
+			return $('#bill-period').val();
+		}
+		
+		/**
+		 * 	获取当前系统月份（表示为抄表记录中的期间）
+		 */
+		function getCurrSysMonth(){
+			var date = new Date();
+			var year = date.getFullYear();    //获取完整的年份(4位,1970-????)
+			var month = date.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+			if(month<10){
+				month = "0"+month
+			}
+			return year+"-"+month;
+		}
+		/**
+		 * 	设置账单期间默认值为系统月份
+		 */
+		function setBillPeriodDefault(){
+			$("#bill-period").val(getCurrSysMonth());
+		}
+		/**
+		 * 	隐藏客户账单详情选项卡和违约金信息选项卡
+		 */
+	 	function hideAccountItemDetailTab(){
+			$("#tab-account-item-detail-li").hide();
+		} 
+		/**
+		 * 	显示客户账单详情选项卡
+		 */
+		function showAccountItemDetailTab(){
+			$("#tab-account-item-detail-li").show();
+			$("#account-item-nav-tabs a[href='#tab-account-item-detail']").tab("show");//跳转到详细信息选项卡
+		}
+		
+		/* 
+			加载客户账单管理页
+		*/
+		function loadCustomerAccountItemList(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/print-notice/table";
+			var callbackFunc = callback;
+			var containerId = "#tab-account-item";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		/* 
+			加载客户账单详情信息
+		*/
+		function loadAccountItemDetailList(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/print-notice/unit-main";
+			var callbackFunc = callback;
+			var containerId = "#tab-account-item-detail";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+	
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function search(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/print-notice/table"
+			$(".role-table").load(url, parms, customerResizeFuncx);
+		}
+		
+		function customerResizeFuncx(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchParams(){
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var traceIds = null;
+			var locaBlockTraceIds = locationSearcher.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationSearcher.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationSearcher.getUnitId();//地理位置-单元traceIds
+			
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			var searchCond=$("#search-cond").val();
+			var period = $("#bill-period").val();//期间
+			var oweMonth = $("#owe-month").val();//欠费月份
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			parms.period=period;
+			parms.oweMonth=oweMonth;
+			return parms;
+		}
+
+		//---------------------------------------------
+		var locationSearcher = new DistrictSearcher("location-searcher", locationSelectSearchCallback); //此处searcher的ID和回调函数
+		/**
+		 * 	地理位置下拉查询组件回调函数
+		 */
+		function locationSelectSearchCallback(){
+			
+			defaultSearch();//查询客户
+		}
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearch() {
+			var pageNum = 0;
+			var pageSize = 0;
+			//获取参数
+			var parms = null;
+			parms = getSearchParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+		
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPageClickPageNum(searchCond,pageNum,pageSize) {
+			var parms = getSearchParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+			
+		}
+		
+		/*
+		btn-del-
+			打印生成pdf
+		*/
+		 $('.btn-generate-pdf').on('click', function() {
+			var period = $("#bill-period").val();//期间
+			var locaBlockTraceIds = locationSearcher.getBlockId();
+			if(period==null || period==""){
+				util.message("请选择期间！",null,"warning");
+				return false;
+			} 
+			if (locaBlockTraceIds==null || locaBlockTraceIds==""){
+				util.message("请选择小区！",null,"warning");
+				return false;
+			} 
+			//加载字典列表页面
+			loadAccountItemDetailList(null, loadItemDetailCallback);
+			
+		}); 
+		//跳转详情信息选项卡
+			function loadItemDetailCallback(){
+				showAccountItemDetailTab();
+			}
+		
+		
+		/*
+		btn-del-
+			批量打印欠费通知单
+		*/
+		 $('.batch-print-arrears-notice').on('click', function() {
+			 G_ARREARS_NOTICE=true;
+			var period = $("#bill-period").val();//期间
+			var parms = new Object();
+			if(period==null || period==""){
+				util.message("请选择期间！",null,"warning");
+				return false;
+			} 
+			var url = BASE_CONTEXT_PATH+"/print-notice/load-single-printer-dialog"; // 需要提交的url
+			$("#single-print-dialog").load(url,parms,function(){
+				if(!G_ARREARS_NOTICE){
+					$('.modal-body #deduct-date-div').hide(); //隐藏id为trid1的元素。
+			        $('.modal-body #end-date-div').show(); //显示id为trid2的元素。
+				} else {
+					$('.modal-body #end-date-div').hide(); //隐藏id为trid1的元素。
+			        $('.modal-body #deduct-date-div').show(); //显示id为trid2的元素。
+				}
+				showSinglePrinterDialog();
+			});		
+			
+		}); 
+		
+		 /*
+			btn-del-
+				批量打印停水通知单
+			*/
+			 $('.batch-print-water-stop-notice').on('click', function() {
+				 G_ARREARS_NOTICE=false;
+				var period = $("#bill-period").val();//期间
+				var parms = new Object();
+				if(period==null || period==""){
+					util.message("请选择期间！",null,"warning");
+					return false;
+				} 
+				var url = BASE_CONTEXT_PATH+"/print-notice/load-single-printer-dialog"; // 需要提交的url
+				$("#single-print-dialog").load(url,parms,function(){
+					if(!G_ARREARS_NOTICE){
+						$('.modal-body #deduct-date-div').hide(); //隐藏id为trid1的元素。
+				        $('.modal-body #end-date-div').show(); //显示id为trid2的元素。
+					} else {
+						$('.modal-body #end-date-div').hide(); //隐藏id为trid1的元素。
+				        $('.modal-body #deduct-date-div').show(); //显示id为trid2的元素。
+					}
+					showSinglePrinterDialog();
+				});	
+				
+			}); 
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//设置账单期间默认值为系统月份
+			setBillPeriodDefault();
+			//地理位置下拉组件初始化
+			locationSearcher.init();
+			//主页:默认查询(加载默认列表)
+			defaultSearch();
+			//---------事件绑定--------------
+			
+			/**
+			 * 	绑定客户信息选项卡的click事件
+			 */
+			$("#account-item-tab").on("click", function(){
+				hideAccountItemDetailTab();//隐藏账单详情信息
+			});
+			/*
+				查询按钮CLICK
+			*/
+			$('#btn-search').on('click', function() {
+				btnSearchClick();
+			});
+			
+			$('#owe-month').on('change', function() {
+				defaultSearch();
+			});
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#div-search .btn-search-reset').on('click', function() {
+				//查询输入框设置为null且获取光标
+				$("#div-search .search-cond").val("");
+				$("#div-search .search-cond").focus();//获得焦点
+				//设置小区-楼号-单元下拉框为未选择
+				$("#div-search .location-block").val("");//设置地理位置-小区值为空
+				$("#div-search .location-building").val("");//设置地理位置-楼号值为空
+				$("#div-search .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$("#div-search .location-unit").val("");//设置地理位置-单元值为空
+				$("#div-search .owe-month").val("0");//设置地理位置-单元值为空
+				$("#div-search .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/**
+			 * 导出欠费通知Excel
+			 */
+			$(".btn-export-owe-notice-excel").on("click", function(){
+				var parms = getSearchParams();
+				if(parms.traceIds == null || parms.traceIds == ""){
+					util.message("请选择一个小区");
+					return false;
+				}
+				var url = BASE_CONTEXT_PATH + "/print-notice/export-owe-notice-excel";
+				location.href = url+"?traceIds="+parms.traceIds+"&period="+parms.period+"&searchCond="+parms.searchCond+"&oweMonth="+parms.oweMonth;
+				console.log("导出完成");
+			});
+		
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

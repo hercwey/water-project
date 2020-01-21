@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.LocationEngineeringMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.LocationEngineering">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="LOCATION_ID" jdbcType="DECIMAL" property="locationId" />
+    <result column="LOCATION_TRACE_IDS" jdbcType="VARCHAR" property="locationTraceIds" />
+    <result column="ENGINEERING_ID" jdbcType="DECIMAL" property="engineeringId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, LOCATION_ID, LOCATION_TRACE_IDS, ENGINEERING_ID
+  </sql>
+</mapper>

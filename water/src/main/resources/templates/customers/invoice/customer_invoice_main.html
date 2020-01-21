@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>开票信息页面</title>
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label bank-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block; width:100%;padding-right:40px;" id="search-customer-invoice-div">
+				<ul class="extra-l" style="list-style: none;">
+				
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入客户名称、开票名称、税号、开户行及账号、地址及电话" title="请输入客户名称、开票名称、税号、开户行及账号、地址及电话" />
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm" id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm" id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+					
+					<li style="float:right;">
+						<button type="button" class="btn btn-default btn-sm"	data-dismiss="modal">关闭</button>
+					</li>
+					<li style="float:right;">
+						<button type="button" class="btn btn-primary btn-sm btn-bank-modify-and-back"	id="btn-bank-modify-and-back">确认</button>
+					</li>
+				</ul>
+			</div>
+
+			<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+
+			<!-- 容器:字典列表 -->
+			<div class="customer-invoice-body table-container" id="customer-invoice-body"></div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+	
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		
+	</script>
+
+</body>
+</html>

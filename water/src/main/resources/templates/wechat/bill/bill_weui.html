@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!-- wechat-用户编号结果列表 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>石家庄高新区供水排水公司</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<meta name="context-path" content="/" />
+
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')"	th:remove="tag"></div> -->
+
+
+<link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+
+<!-- <script src="/weui/js/f2.min.js"></script> -->
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+
+hr.style-self { /*透明渐变水平线*/
+	width: 100%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 0, 0, 1),
+		rgba(0, 0, 255, 1), rgba(255, 0, 0, 1));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+/* 帐单-body不显示 */
+weui-form-preview__bd.hide {
+	display: none;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+
+<body ontouchstart class="container-fluid">
+	<!-- <div class="page"> -->
+		<div class="row">
+			<div class="col-md-12">
+				<div th:include="wechat/public_page/header::header('用户帐单')"	th:remove="tag"></div>
+				<!-- 客户可在此选择不同的客户编号.(微信 -- 1:n -- >客户) -->
+				<div class="weui-cells weui-cells_checkbox rounded">
+					<!-- 注,此处需置labe的样式 -->
+					<label  th:each="customer,iter:${customerList}"
+							class="weui-cell weui-check__label"
+							th:attr="for='customer-no-'+${iter.count}"
+							style="margin-bottom: 0px;">
+						<div class="weui-cell__hd">
+							<input class="weui-check chk-customer"
+								th:attr="id='customer-no-'+${iter.count},data-bind-customer-id=${customer.customerId}"									
+								checked="checked" type="checkbox"> 
+								<i	class="weui-icon-checked"></i>
+						</div>
+						<div class="weui-cell__bd">
+							<span th:text="'客户编号:'+${customer.customerCode}+'('+${customer.location}+')'">客户编号:1234567890</span>
+						</div>
+					</label>
+				</div>
+				
+				<hr class="style-self" style="height:1px;"/>
+				
+				<!-- 用于显示账单的容器 -->
+				<div id="bill-container">
+				
+				
+				</div>
+
+				<!-- 用户选择账单金额 -->
+				<div class="weui-form-preview__hd rounded" data-bind-id="all">
+					<label class="weui-form-preview__label">帐单合计金额</label> 
+					<span id="bill-amount"  class="weui-form-preview__value">¥0.00</span>
+				</div>
+				
+				<!--提交按钮-->
+				<div class="weui-btn-area">
+    				<a class="weui-btn weui-btn_primary bg-blue " href="javascript:" id="btn-goto-pay" name="btn-goto-pay">去交费</a>
+    				<!-- <button type="button" id="btn-goto-pay" name="btn-goto-pay"		class="btn btn-primary  btn-block ">去交费</button> -->
+				</div>
+
+			</div>
+
+		</div>
+
+
+	<div class="weui-footer ">
+		<p class="weui-footer__links" style="margin-bottom: 5px;">
+			<a href="#" class="weui-footer__link">石家庄高新区供水排水公司</a>
+		</p>
+		<p class="weui-footer__links" style="margin-bottom: 5px;">
+			<a href="#" class="weui-footer__link">供水热线:69099838</a>
+		</p>
+		<!-- <p class="weui-footer__text">Copyright &copy; 石家庄高新区供排水公司</p> -->
+	</div>
+
+
+
+	<!-- <div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer(‘温馨提示:高新区供水排水公司供水热线: 69099838 ’)"
+				th:remove="tag"></div>
+		</div> -->
+	<!-- </div> -->	
+</body>
+
+<script type="text/javascript"	src="/jquery/3.3.1/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="/weui/js/zepto.min.js"></script>
+
+<script type="text/javascript">
+			var BASE_CONTEXT_PATH = $('meta[name=context-path]')
+					.attr("content");
+			console.log("BASE_CONTEXT_PATH0:"+BASE_CONTEXT_PATH) ;
+			BASE_CONTEXT_PATH = BASE_CONTEXT_PATH.substr(0,BASE_CONTEXT_PATH.length - 1);
+			console.log("BASE_CONTEXT_PATH1:"+BASE_CONTEXT_PATH) ;
+			
+		</script>
+
+<!-- thymeleaf内联 -->
+<script th:inline="javascript">
+		/*<![CDATA[*/
+			//var waterConsumptionList=[[${waterConsumptionList}]];
+		/*]]>*/
+</script>
+	
+<script type="text/javascript">
+	
+	/*
+		账单处理对象
+	*/
+	function Bill(){		
+		
+		/*
+			功能:
+				获取已经选定的客户id列表
+			返回:
+				客户id数组
+		*/
+		getSelectedCustomer=function(){
+			const chkCustomerClass=".chk-customer";
+			var ids = new Array();
+			$(chkCustomerClass).each(function() {
+				if ($(this).is(":checked")) {
+					//向数组中增加客户的ID
+					ids.push($(this).attr("data-bind-customer-id"));
+				}
+			});
+			console.debug('selected customer ids :'+JSON.stringify(ids));
+			return ids;			
+		}
+		
+		/*
+			增加选择客户-listener
+		*/
+		this.addChkCustomerListener=function(){
+			const chkCustomerClass=".chk-customer";
+			$(chkCustomerClass).on('click',function(){
+				var customerIds=getSelectedCustomer();
+				requestCustomerBill(customerIds);  //请求客户帐单页面
+			});
+		}
+		
+		/*
+			[去缴费]按钮-listener
+		*/
+		this.addGotoPayBtnListener=function(){
+			const btnId='#btn-goto-pay';
+			$(btnId).on('click',function(){
+				console.log("goto pay is clicked!");
+				var parms=customerBill.getSelectedBillIds();  //获取所选择的帐单ID列表
+				if(parms.length<=0){
+					$.toast("没有帐单!");
+				}
+				else{
+					gotoPay(parms);	
+				}				
+			});
+		}
+		
+		/*
+			去缴费-请求
+			加载支付确认页
+		*/
+		gotoPay=function(parms){
+			console.log("request to pay......");
+			var url=BASE_CONTEXT_PATH+'/wechat/pay/gotopay';
+			console.log("去支付-----in  bill_weui.html");
+			console.log("请求地址:"+url);
+			
+			var reqParms=new Object();
+			reqParms.billIds=JSON.stringify(parms);  //账目id列表
+			
+			//console.log("请求参数如下所示:"+reqParms.billIds);
+			
+			var reqUrl=url+"?billIds="+ escape(JSON.stringify(parms));
+			console.log("请求的最终地址为:"+reqUrl);		
+			
+			window.open(reqUrl,"_blank");			
+			
+		}
+			
+		
+		/*
+			功能:
+				根据客户ID获取客户账单
+			参数:
+				customerIds:客户id列表
+		*/
+		requestCustomerBill=function(customerIds){
+			const container="#bill-container";
+			var url=BASE_CONTEXT_PATH+"/wechat/getbill";	
+			
+			console.debug("url is:"+url);
+			
+			var parms=new Object();
+			parms.customerIds=customerIds
+			
+			$(container).load(url,parms,callbackFunc);  //加载客户账单
+			
+		}		
+			
+		/*
+			显示合计金额
+		*/
+		this.displayAmount=function(sum){
+			//设置合计金额显示
+			const billAmountId="#bill-amount";
+			$(billAmountId).text(sum);
+		}
+		
+		/*
+		功能:
+			(1)加载客户账单后回调函数
+			(2)在此回调函数计算所有账单的合计值,而后显示
+		*/
+		callbackFunc=function(){
+			var sum=customerBill.calcSumOfAllCustomerBill();
+			console.debug("the sum is:"+sum);
+			bill.displayAmount(sum);				
+		}
+		
+		/*
+			加载所有客户账单页面.
+		*/
+		this.loadAllCustomerBillPage=function(){
+			//加载所有客户
+			var arr=getSelectedCustomer();
+			requestCustomerBill(arr);	
+		}
+		
+	}
+	
+	/**
+	 * 	初始化滚动条
+	 */
+	function initScroll(){
+		console.log("init scroll");
+		<!-- scroll init -->
+  		$("body").niceScroll();
+  		$("body").getNiceScroll().resize();
+	}
+	
+	function triggerResize(){
+		var myEvent = new Event('resize');
+        window.dispatchEvent(myEvent);
+	}
+	
+	var bill=new Bill();
+
+	//page loaded ready
+	$(function(){
+		
+		bill.addChkCustomerListener();
+		bill.loadAllCustomerBillPage();
+		bill.addGotoPayBtnListener();
+		
+		//initScroll();
+		//triggerResize();
+		
+	});
+
+</script>
+
+
+
+</html>

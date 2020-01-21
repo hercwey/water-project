@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-account-edit" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>客户信息</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+											<tbody>
+											<tr>
+												<td>
+													<!--客户地址 -->
+													<div class="form-group form-inline">
+														<label for="account-address" class="col-sm-4 control-label">客户地址</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="hidden" id="location-id" name="locationId" value="" placeholder="保存地理位置节点">
+															<input type="hidden" id="location-traceids" name="traceIds" value="" placeholder="保存地理位置traceIds">
+															<input type="text" onclick="showHideLocationTree.show(&apos;engineering-address&apos;); return false;" id="engineering-address" name="address" class="form-control" readonly 
+																th:value="${currItem==null ? '' : currItem.address}" placeholder="请选择客户地址" title="请选择地理位置" />
+														</span>
+													</div>
+												</td>	
+																								
+											</tr>
+											<tr>
+												<td>
+													<!-- 业主名称  -->
+													<div class="form-group form-inline">
+														<label for="engineering-organization" class="col-sm-4 control-label">业主名称</label>
+														<span class="input-group-sm col-sm-8">
+														<input type="hidden" id="account-customer-id" name="customerId" value="" placeholder="保存客户ID">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.propName}" 
+																	id="account-prop-name" name="propName" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="业主名称"/>
+														</span>
+													</div>
+												
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 期间-->
+													<div class="form-group form-inline">
+														<label for="" class="control-label col-sm-4" >期间</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  input-sm Wdate" 
+																id="account-period" name="period"		
+																th:value="${currItem==null ? '' : currItem.period}"				
+																onClick="WdatePicker({dateFmt:'yyyy-MM',onpicked: setBackGround});"
+																placeholder="期间" style="background-color: white;" title="期间">
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											
+											
+											<tr>
+												<td>
+													<!-- 账单类型 -->
+													<div class="form-group form-inline">
+														<label for="" class="control-label col-sm-4" >账单类型</label> 
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control " id="account-debit-credit" name="debtCredit" th:value="${currItem==null ? 2 : currItem.debtCredit}">
+																<!-- 默认选择第一个 -->
+																<option value="2" th:attr="selected=( ${currItem!=null && currItem.debtCredit==2} )? 'selcted' ">欠费账单</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.debtCredit==1} )? 'selcted' ">充值账单</option>
+																
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 摘要  -->
+													<div class="form-group form-inline">
+														<label for="engineering-organization" class="col-sm-4 control-label">摘要</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.digest}" 
+																	id="account-digest" name="digest" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="摘要"/>
+														</span>
+													</div>
+												
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 科目  -->
+													<div class="form-group form-inline">
+														<label for="engineering-organization" class="col-sm-4 control-label">科目</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control account-subject" id="account-subject" name="subject" th:value="${currItem==null ? 01 : currItem.subject}">
+																<option value="01" th:attr="selected=( ${currItem!=null && currItem.subject==01} )? 'selcted' ">水费</option>
+																<option value="02" th:attr="selected=( ${currItem!=null && currItem.subject==02} )? 'selcted' ">违约金</option>
+																<option value="11" th:attr="selected=( ${currItem!=null && currItem.subject==11} )? 'selcted' ">退押金</option>
+																<option value="21" th:attr="selected=( ${currItem!=null && currItem.subject==21} )? 'selcted' ">水费分账</option>
+															</select>
+															<!-- <input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.digest}" 
+																	id="account-subject" name="subject" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="科目"/> -->
+														</span>
+													</div>
+												
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 金额-->
+													<div class="form-group form-inline">
+														<label for="engineering-organization" class="col-sm-4 control-label">金额</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.amount}" 
+																	id="account-amount" name="amount" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="金额"/>
+														</span>
+													</div>
+												
+												</td>
+											</tr>
+											
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+		
+		<!-- 选择地理位置页面 -->
+	<div th:include="location/global_location_select_page" th:remove="tag"></div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+	/**
+	 * 	用户点击树节点的回调函数
+	 */
+	function clickZTreeNodeCallback(locationId, traceIds, fullname){
+		
+		$("#location-id").val(locationId);//设置地理位置ID
+		$("#location-traceids").val(traceIds);//设置地理位置traceIds
+		$("#engineering-address").val(fullname);//设置地理位置全名称
+		showHideLocationTree.hide();//隐藏地理位置选择框
+		
+		var url = BASE_CONTEXT_PATH + "/account-item/get-customer-message";
+		var traceIds = $("#location-traceids").val();
+		var parms = new Object();
+		parms.traceIds = traceIds;
+		$.post(url, parms, function(res){
+		 	if(res != null && res != "") {
+		 		setPropNameFn(res.propName);
+		 		setCustomerIdFn(res.id);
+			} else {
+				setPropNameFn("");
+				setCustomerIdFn("");
+				util.message("该地理位置未绑定客户");
+			}
+		});
+	}
+	
+		/**
+		 * 	获取业主名称
+		 */
+		function getPropNameFn(){
+			return $("#account-prop-name").val();
+		}
+		/**
+		 * 	设置业主名称
+		 */
+		function setPropNameFn(propName){
+			return $("#account-prop-name").val(propName);
+		}
+		
+		/**
+		 * 	获取客户ID
+		 */
+		function getCustomerIdFn(){
+			return $("#account-customer-id").val();
+		}
+		/**
+		 * 	设置客户ID
+		 */
+		function setCustomerIdFn(customerId){
+			return $("#account-customer-id").val(customerId);
+		}
+		/*
+			设置日期选择input背景色
+		*/
+		function setBackGround() {
+			$("#account-period").css("background-color", "white");
+		}
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/account-item/insert";
+			
+			var params = new Object();
+			var customerId = getCustomerIdFn();
+			var period = $("#account-period").val();
+			var debitCredit = $("#account-debit-credit").val();
+			var digest = $("#account-digest").val();
+			var subject = $("#account-subject").val();
+			var amount = $("#account-amount").val();
+			
+			params.customerId = customerId;
+			params.period = period;
+			params.debitCredit = debitCredit;
+			params.digest = digest;
+			params.subject = subject;
+			params.amount = amount;
+			
+			$.post(urlStr, params, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeAddDialog();
+						loadPageClickPageNum();
+						util.message(res.result_msg,null,"warning");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				} 
+			});
+			
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+			修改对话框-保存按钮-CLICK
+			保存所修改的条目
+		*/
+		$('#btn-modify-and-back').on('click',function() {
+			modiItem(true);				
+		});
+			
+		/*
+			加载账单类型下拉框同时赋值给科目输入框值
+		*/
+		$('#account-debit-credit').on('change',function() {
+			var debitCredit = $("#account-debit-credit").find("option:selected").val();
+			if(debitCredit == 1){//充值账单
+				var html = "<option value='10'>交水费（综价）</option>";
+				html += "<option value='11'>交水费（基价）</option>";
+				html += "<option value='12'>交污水处理费</option>";
+				html += "<option value='30'>清欠水费（综价）</option>";
+				html += "<option value='31'>清欠水费（基价）</option>";
+				html += "<option value='32'>清欠污水处理费）</option>";
+				html += "<option value='40'>减免水费）</option>";
+				html += "<option value='41'>减免违约金</option>";
+				
+				
+				$("#account-subject").html(html);
+			}else{
+				var html = "<option value='01'>水费</option>";
+					html += "<option value='02'>违约金</option>";
+					html += "<option value='11'>退押金</option>";
+					html += "<option value='21'>水费分账</option>";
+			
+					$("#account-subject").html(html);
+			}
+			
+		});
+		
+
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

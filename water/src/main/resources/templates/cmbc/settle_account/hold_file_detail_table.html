@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style type="text/css">
+
+
+</style>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-sm" id="hold-file-select-table">
+		<thead>
+			<tr>
+				<!-- 条目选择器 -->
+				<th>
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" id="item-selector">
+						<label class="custom-control-label"	for="item-selector"></label>
+					</div> 
+				</th>
+				<th>代扣状态</th>
+				<th>客户名称</th> 
+				<th>账单金额</th>
+				<th>客户卡号</th>
+				<th>代扣失败原因</th>
+				<!-- <th>备注</th> -->
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${withholdDetailList}">
+				
+				<!-- 条目选择器 -->
+				<td>
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:id="'item-selector-'+${iterStat.count}">
+						<label class="custom-control-label"	th:attr="for='item-selector-'+${iterStat.count}"></label>
+					</div> 
+				</td>
+				
+				<!-- 代扣状态 -->
+				<td>
+					<span th:if="${item.WITHHOLDING_STATUS==0}">未代扣</span>
+					<span th:if="${item.WITHHOLDING_STATUS==1}">代扣成功</span>
+					<span th:if="${item.WITHHOLDING_STATUS==2}">代扣失败</span>
+				</td>
+				<!-- 客户名称-->
+				<td th:text="${item.CUSTOMER_NAME}">客户名称</td>
+				<!-- 账单金额 -->
+				<td th:text="${item.ACCOUNT_AMOUNT}">账单金额</td>
+				<!-- 卡号-->
+				<td th:text="${item.CUSTOMER_CARD_NO}">卡号</td>
+				<!-- 失败原因 -->
+				<td th:text="${item.WITHHOLD_FAIL_REASON}">失败原因</td>
+			</tr>
+		</tbody>
+	</table>
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+	<span>
+		代扣总金额：<b th:text="${totalAmount}">代扣总金额</b>
+		代扣成功总金额：<b th:text="${successAmount}">代扣成功总金额</b>
+		代扣成功总笔数：<b th:text="${successNum}">代扣成功总笔数</b>
+		代扣失败总金额：<b th:text="${failAmount}">代扣失败总金额</b>
+		代扣失败总笔数：<b th:text="${failNum}">代扣失败总笔数</b>
+	</span>
+	<!-- 加入分页 -->
+	<!-- <div th:include="common/common_pager_pagesize::pager('pagerHoldFileDeatil')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	 -->
+	<!-- 分页组件JS -->
+	<!-- <script src="/js/pager/Pagers.js" type="text/javascript"></script> -->
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager::pager" class="pagerx" id="hold-file-detail-table"
+		style="float: right; margin-right: 100px;"></div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedHoldFileIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			$('[data-toggle="tooltip"]').tooltip();  
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		
+		//======================分页（页码导航）========================
+
+		/*
+		 	【分页】导航： 当点击页号时读取需要导航到的页码及每页记录数（pageNum,pageSize）
+		 	 data-bind:pageNum-pageSize形式 
+		 	 如果data-bind为空字符串，不做动作 
+		 	 当用户点击某页时，	 则发送请求
+		*/
+		$("#hold-file-detail-table .pagination li a").on('click', function(e) {
+			var dataBind = $(this).attr("data-bind");
+			//当dataBind有数据时处理
+			if (dataBind != "") {
+				var pageArr = new Array();
+				pageArr = dataBind.split("-");
+				// 置分页数据
+				curr_pageNum = pageArr[0];
+				curr_pageSize = pageArr[1];
+				//加载页
+				loadHoldFileDetailItemPage(); 
+			}
+
+		});
+		//创建分页组件实例
+		//var pager=new Pager("pagerHoldFileDeatil");
+		//$(function(){			
+			//pager.init(loadHoldFileDetailItemPage,curr_searchCond);			
+		//});
+	</script>
+</body>
+</html>

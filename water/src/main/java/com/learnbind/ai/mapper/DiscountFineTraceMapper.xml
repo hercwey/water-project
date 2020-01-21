@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.DiscountFineTraceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.DiscountFineTrace">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="DISCOUNT_AMOUNT" jdbcType="DECIMAL" property="discountAmount" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="ACCOUNT_ITEM_ID" jdbcType="DECIMAL" property="accountItemId" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="OVERDUE_FINE_ID" jdbcType="DECIMAL" property="overdueFineId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, DISCOUNT_AMOUNT, CUSTOMER_ID, ACCOUNT_ITEM_ID, OPERATOR_ID, OPERATOR_NAME, OPERATION_TIME, 
+    OVERDUE_FINE_ID
+  </sql>
+  
+  <!-- 查询违约金减免总金额 -->
+  <select id="getDiscountAmountSum" resultType="BigDecimal">
+  	SELECT
+		nvl(sum(DISCOUNT_AMOUNT),0) AS DISCOUNT_AMOUNT_SUM
+	FROM
+		DISCOUNT_FINE_TRACE 
+	WHERE
+		OVERDUE_FINE_ID = #{overdueFineId}
+  </select>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="search" resultMap="BaseResultMap">
+	SELECT
+		d.*,
+		c.prop_name 
+	FROM
+	DISCOUNT_FINE_TRACE d left join customers c ON d.CUSTOMER_ID = c.ID
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY d.id DESC
+  </select>
+</mapper>

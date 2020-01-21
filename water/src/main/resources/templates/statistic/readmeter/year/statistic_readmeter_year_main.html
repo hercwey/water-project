@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<!-- 柱状图-echart -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<div th:include="common/common_head::headx('年统计-main页')" th:remove="tag"></div>
+
+<style type="text/css">
+.extra-l  a {
+	color: black;
+}
+
+/* 时间查询条件样式 */
+.extra-l li {
+	float: left;
+	margin: auto 1px;
+	cursor: pointer;
+}
+
+</style>
+</head>
+<body>
+	<div class="row clearfix medic-label">
+		<!-- <div class="col-md-12 column">
+			<div th:include="statistic/customer/statistic_customer_month_search_panel::searchPanel" th:remove="tag"></div>
+			操作面板
+			<hr style="height:1px;border:none;border-top:1px solid blue;">
+		</div> -->
+		<div class="col-md-12 column">
+			<div class="tabbable" id="tabs-517962">
+				<ul class="nav nav-tabs">
+					<li class="nav-item">
+						<a class="nav-link active show" href="#tab1" data-toggle="tab">数据</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#tab2" data-toggle="tab">图表</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<!-- 选项卡1 -->
+					<div class="tab-pane active" id="tab1">
+						<!-- <p>I'm in Section 1.</p> -->
+						<div th:include="statistic/readmeter/year/statistic_readmeter_year_search_panel::searchPanel" th:remove="tag"></div>
+						<!-- 动态加载查询结果 -->
+						<div  id="table-container"></div>
+					</div>
+					<!-- 选项卡2  图表 -->
+					<div class="tab-pane" id="tab2">						
+						<!-- 统计图表 -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+<!-- 引入echart -->
+<!-- <script type="text/javascript" src="/echart/4.2.1/dist/echarts.js"></script> -->
+
+<!-- 引入显示图表js -->
+<!-- <script type="text/javascript"	src="/statistic/customer/js/StatBarChart.js"></script> -->
+<!-- 地理位置下拉框查询JS -->
+<script type="text/javascript"	src="/js/component/districtsearcher/DistrictSearcher.js"></script>
+<!-- 时间组件 -->
+<script type="text/javascript" src="/calendar/WdatePicker.js"></script>
+<script type="text/javascript" src="/pivas/js/common/dateutil.js"></script>
+
+
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		/* var statData = [[${statData}]];  	//统计数据
+		var period=[[${period}]];   			//期间
+		console.log("所接收到的统计数据为:"+JSON.stringify(statData)); */ 
+	/*]]>*/
+</script>
+
+
+<script type="text/javascript">
+	
+	/*
+		新增客户月统计对象
+	*/
+	function StatisticReadMeterYear() {	
+
+		/*--------------------------------
+			功能:
+				设置时间组件为当前日期
+		----------------------------------*/
+		this.setDefaultDate=function(){
+			var date=new Date();
+			console.log("set default date is:"+date)
+			setDateComponentVal(date);
+		}
+		
+		/*
+			功能:
+				设置日期查询组件的默认值为当前日期
+			参数:
+				datex  Date类型日期
+		 */
+		setDateComponentVal = function(datex) {
+			const dateComponentId = "#search-date";
+			//取得当前日期,并置日期查询组件的值
+			var fmtDate = dateFtt("yyyy", datex);			
+			$(dateComponentId).val(fmtDate);
+		};
+		
+		/* -------------------------------------
+			功能:
+				初始化按钮click之事件监控器
+		 --------------------------------------*/
+		this.initBtnClickListener=function(){
+			const btnSearchId="#btn-search";
+			const btnBtnSearchReset="#btn-search-reset";
+			
+			$(btnSearchId).on('click',function(){
+				search();
+			});
+			
+			$(btnBtnSearchReset).on('click',function(){
+				var date=new Date(); 
+				setDateComponentVal(date);
+				$(".location-block").val("");//设置地理位置-小区值为空
+				$(".location-building").val("");//设置地理位置-楼号值为空
+				$(".location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$(".location-unit").val("");//设置地理位置-单元值为空
+				$(".location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			});			
+		};
+
+		/*
+			功能:
+				根据期间查询新增客户列表.
+		*/
+		search=function(){
+			console.log("into search function();");	
+				
+			//(1)collect search params
+			var parms=collectParams();
+			//(1.1)有效性验证
+			if(parms.period==""){
+				//显示输入错误对话框
+				util.message("日期参数不可以为空...",null,"warning");
+			}
+			else{
+				//(2)send request to server
+				console.log("send request for search");
+				//$(customerTableContainerId).post(url,parms,null);  //发送请求
+				console.log("request parms is:"+parms.period);
+				searchReadRecord(parms.period,0,0);   	//查询数据
+				genBarChart(parms.period);  	//生成图表
+			}			
+		};
+		
+		
+		
+		/*----------------------------------
+			功能:
+				在页面加载完毕后自动查询			
+		-----------------------------------*/
+		 this.defaultSearch=function(){
+			console.log("into defaultSearch function()");
+			search();
+		}
+		
+		/*
+			功能:
+				查询抄表记录(在容器中加载抄表记录)
+			参数:
+				searchCond:	查询条件
+				pageNum:	页号
+				pageSize:	页大小
+			
+		*/
+		searchReadRecord=function(searchCond, pageNum, pageSize) {
+			var url=BASE_CONTEXT_PATH+"/stat/readmeter/year/table";  	//请求地址
+			var customerTableContainerId="#table-container";   //列表加载容器
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var traceIds = null;
+			var locaBlockTraceIds = locationSearcher.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationSearcher.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationSearcher.getUnitId();//地理位置-单元traceIds
+			
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			//初始化请求参数
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			//console.log("parms:"+JSON.stringify(parms));
+			
+			$(customerTableContainerId).load(url,parms,null);  //发送请求
+		}
+		
+		/*
+			功能:
+				生成图表
+			参数:
+				searchCond  查询条件(此处为期间  yyyy-mm格式,即指定年与月份)
+		*/
+		genBarChart=function(searchCond){
+			
+			const chartContainer="#tab2"
+			//请求地址
+			var url=BASE_CONTEXT_PATH+"/stat/readmeter/year/chart";  
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var traceIds = null;
+			var locaBlockTraceIds = locationSearcher.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationSearcher.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationSearcher.getUnitId();//地理位置-单元traceIds
+			
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			//请求参数
+			var parms=new Object();
+			parms.period=searchCond;
+			parms.traceIds=traceIds;
+			//参数结构:
+			//   period
+			
+			//加载图表
+			$(chartContainer).load(url,parms,null);  
+		}
+		
+		
+		/*---------------------------------------
+			功能:
+				分页查询
+			注: 供分页查询时使用
+		----------------------------------------*/		
+		this.pageSearch=function(searchCond, pageNum, pageSize) {
+			searchReadRecord(searchCond, pageNum, pageSize);
+		}
+
+		/*
+			功能:
+				收集查询参数,而后返回查询参数对象
+			返回:
+				查询参数对象
+				结构:
+					period  格式 yyyy-mm
+					
+		*/
+		collectParams=function(){
+			const dateComponentId = "#search-date";
+			var period=$(dateComponentId).val();
+			var parms=new Object();
+			parms.period=period;
+			return parms;
+		};
+	}
+	//---------------------------------------------
+	var locationSearcher = new DistrictSearcher("location-searcher", locationSelectSearchCallback); //此处searcher的ID和回调函数
+	/**
+	 * 	地理位置下拉查询组件回调函数
+	 */
+	function locationSelectSearchCallback(){
+		
+		statisticReadMeterYear.defaultSearch();			//采用当前日期(yyyy)默认查询
+	}
+
+	/*
+		设置日期选择input背景色
+	 */
+	function setBackGround() {
+		$("#search-date").css("background-color", "white");
+	}
+	
+	
+	var statisticReadMeterYear=new StatisticReadMeterYear();
+
+	/*
+		page loaded ready
+	 */
+	$(function() {
+		//地理位置下拉组件初始化
+		locationSearcher.init();
+		statisticReadMeterYear.setDefaultDate();  		//设置默认值
+		statisticReadMeterYear.initBtnClickListener();  //设置查询按钮click事件监听器		
+		statisticReadMeterYear.defaultSearch();		//采用当前日期(yyyy)默认查询
+		
+	});
+</script>
+</html>

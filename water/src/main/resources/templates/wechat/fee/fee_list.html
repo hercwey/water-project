@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<!-- 缴费列表 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<!-- 帐单1 -->
+	<span th:each="customer,iter:${feeList}" th:remove="tag">
+		<div th:each="fee,iter:${customer.fees}" class="weui-form-preview rounded" 	style="background-color: white;">
+			<!-- 需要加入一个特定的标识用于确定body部分.data-bind-id用于区分不同的bill -->
+	
+			<!-- 当点击此处时,打开或收缩帐单BODY -->
+			<div class="weui-form-preview__hd rounded" th:attr="data-bind-id=${fee.ID}">
+				<!-- ${#dates.format(date, 'dd/MMM/yyyy HH:mm')} -->
+				<label class="weui-form-preview__label" th:text="${ #dates.format(fee.ACCOUNT_DATE, 'yyyy-MM-dd HH:mm:ss')}">缴费时间:2019-01-01</label> 
+				<em	class="weui-form-preview__value" style="font-size: 20px;" th:text="${fee.DEBIT_AMOUNT}">¥2400.00</em>
+			</div>
+	
+			<div class="weui-form-preview__bd hide rounded" th:attr="data-bind-id=${fee.ID}">
+				<div class="weui-form-preview__item">
+					<label class="weui-form-preview__label" >缴费时间</label> 
+					<span	class="weui-form-preview__value" th:text="${ #dates.format(fee.ACCOUNT_DATE, 'yyyy-MM-dd HH:mm:ss')}">2019-01-01</span>
+				</div>
+				<div class="weui-form-preview__item">
+					<label class="weui-form-preview__label">缴费人</label> 
+					<span	class="weui-form-preview__value" th:text="${customer.location}">张三</span>
+				</div>
+				<div class="weui-form-preview__item">
+					<label class="weui-form-preview__label">金额</label> 
+					<span	class="weui-form-preview__value" th:text="${fee.DEBIT_AMOUNT}">20</span>
+				</div>
+				<div class="weui-form-preview__item">
+					<label class="weui-form-preview__label">摘要</label> 
+					<span	class="weui-form-preview__value" th:text="${fee.DEBIT_DIGEST}">银行代扣(微信支付)</span>
+				</div>
+	
+			</div>
+		</div>
+	</span>
+</body>
+
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		var feeListx =[[${feeList}]];
+		console.log("自后台传递过来的参数是:"+JSON.stringify(feeListx));
+	/*]]>*/
+</script>
+
+
+<script>
+
+	function FeeList(fList){
+		this.feeList=fList;
+		/*
+			计算所有缴费记录金额合计
+		*/		
+		this.calcSum=function(){
+			var sum=0;
+			for(var i=0;i<this.feeList.length;i++){
+				var customerFee=this.feeList[i]; //获取某个客户账单对象
+				var fees=customerFee.fees;  //客户---水费账单列表对象
+				for(var j=0;j<fees.length;j++){
+					sum=sum+fees[j].DEBIT_AMOUNT;  
+				}
+			}
+			sum = sum.toFixed(2); // 输出结果为四舍五入,保留两位小数
+			return sum;
+		}
+		
+	}
+
+	var feeListObj=new FeeList(feeListx);  //定义对象
+
+	$(function(){
+		
+		/*
+			帐单头点击listener (display or hidden)
+		*/
+		$('.weui-form-preview__hd').click(
+				function() {
+					var HIDE_CLASS = "hide";
+					var dataBindId = $(this).attr("data-bind-id");
+					if (dataBindId == "all") {
+						return;
+					}
+					//查询相应的帐单体.
+					var billBody = $(
+							'.weui-form-preview__bd[data-bind-id='+ dataBindId + ']').eq(0);
+					//console.log(billBody);
+
+					var hasHideClass = billBody.hasClass(HIDE_CLASS);
+					if (hasHideClass) {
+						//如果原来是隐藏状态,则显示
+						billBody.removeClass(HIDE_CLASS);
+					} else {
+						//如果原来是显示状态,则隐藏
+						billBody.addClass(HIDE_CLASS);
+					}
+				});
+	});
+
+</script>
+</html>

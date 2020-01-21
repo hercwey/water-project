@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WorkOrderMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.WorkOrder">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="SERIAL_NUM" jdbcType="DECIMAL" property="serialNum" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+    <result column="TYPE" jdbcType="VARCHAR" property="type" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="START_TIME" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="OPERATOR" jdbcType="VARCHAR" property="operator" />
+    <result column="DEAL_SITUATION" jdbcType="VARCHAR" property="dealSituation" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, SERIAL_NUM, NAME, DESCRIPTION, TYPE, STATUS, START_TIME, END_TIME, REMARK, DELETED, OPERATOR, DEAL_SITUATION
+  </sql>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchWorkOrder" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM work_order 
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			deleted = 0
+			<if test="status!=null">
+				AND STATUS = #{status}
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+				AND 
+  				(
+	  				(NAME LIKE concat(concat('%',#{searchCond}),'%'))
+	  				OR
+	  				(SERIAL_NUM LIKE concat(concat('%',#{searchCond}),'%'))
+	  			)	
+  			</if>
+		</where>
+		ORDER BY id DESC
+  </select>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchWorkOrderSale" resultMap="BaseResultMap">
+		SELECT
+			wo.* 
+		FROM
+			WORK_ORDER wo
+			INNER JOIN WORK_ORDER_SALE wos ON wo.ID = wos.WORD_ORDER_ID 
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			wo.deleted = 0
+			<if test="userId!=null">
+				AND wos.USER_ID = #{userId}
+			</if>
+			<if test="status!=null">
+				AND wo.STATUS = #{status}
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND 
+  				(
+	  				(wo.NAME LIKE concat(concat('%',#{searchCond}),'%'))
+	  				OR
+	  				(wo.SERIAL_NUM LIKE concat(concat('%',#{searchCond}),'%'))
+	  			)
+  			</if>
+		</where>
+		ORDER BY wo.id DESC
+  </select>
+  
+  <!-- 查询所有分组，并返回Map -->
+  <select id="getListAll" resultType="map">
+  	SELECT
+		*
+	FROM
+		work_order
+  </select>
+</mapper>

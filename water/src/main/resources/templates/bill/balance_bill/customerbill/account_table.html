@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>账单列表</title>
+</head>
+<body>
+	
+	<!-- 账单列表 -->
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th>期间</th>
+				<th>科目</th>
+				<th>已消费金额</th>
+				<th>充值金额</th>
+				<th>余额</th>
+				<th>记账日期</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${billMapList}">
+			
+				<!-- 条目选择器 -->
+				<!-- 期间-->
+				<td th:text="${item.period}">期间</td>
+				<!-- 科目 -->
+				<td th:text="${item.creditSubject}">科目</td>
+				<!-- 账单金额 -->
+				<td th:text="${item.creditAmount}">已消费金额</td>
+				<!-- 已充值金额 -->
+				<td th:text="${item.debitAmount}">充值金额</td>
+				<!-- 余额 -->
+				<td th:text="${item.debitAmount-item.creditAmount}">余额</td>
+				<!--记账日期-->
+				<td th:text="${item.accountDateStr}">记账日期</td>
+				<!-- 操作列 -->
+				<td>
+					<div class="dropdown">
+						<button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown" style="font-size:12px;">操作</button>
+						<div class="dropdown-menu">
+							<!-- 结算（缴费） -->
+							<!-- <a class="dropdown-item btn-sm btn-settle-bill-single" th:attr="bind-id=${item.id}">
+								<i class="fa fa-money" aria-hidden="true"></i> <span>缴费</span>
+							</a> -->
+							<!-- 详情 -->
+							<a class="dropdown-item btn-sm account-detail-single" th:attr="bind-id=${item.id}">
+								<i class="fa fa-pencil-square-o" aria-hidden="true"></i><span>详情</span>
+							</a> 
+							<!-- 删除 -->
+							<a class="dropdown-item btn-sm delete-recharge-bill" th:attr="bind-id=${item.id}, data-credit-amount=${item.creditAmount}">
+								<i class="fa fa-trash" aria-hidden="true"></i><span>删除</span>
+							</a> 
+						</div>
+					</div>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('customer-bill-detail-list')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		//-----------------------删除充值记录-----------------------------------------------------------------------------
+		$('.delete-recharge-bill').on('click',function() {
+			var accountItemId = $(this).attr("bind-id"); //条目ID
+			var creditAmount = $(this).attr("data-credit-amount"); //充值记录的贷方金额
+			if(creditAmount !=0){
+				//如果这条充值记录参与了销账，请先撤销账单再来删除充值记录。
+				util.message("此条充值记录参与了销账，请先撤销账单，再进行删除");
+				return false;
+			}
+			util.delConfirm("确认删除此条充值记录?", accountItemId, "deleteSingleAccount");
+			
+		});
+		//确认删除账单
+		function deleteSingleAccount(accountItemId){
+			var url = BASE_CONTEXT_PATH+'/customer-balance-bill/delete-recharge-bill';
+			var parms = new Object(); //参数
+			parms.accountItemId = accountItemId;//充值账单ID
+			$.post(url, parms, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						defaultSearchCustomerBillDetailTable();//重新加载账单列表
+						loadPageClickPageNum();
+						util.message(res.result_msg,null,"successs");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}		
+		//-----------------打开详情选项卡------------------
+	
+		/* 
+			加载客户账单详细信息 
+		*/
+		$('.account-detail-single').on('click',function() {
+			
+			var id = $(this).attr("bind-id"); //条目ID
+			
+			setCurrEditAccountItemId(id);//设置当前编辑账单的ID
+			
+			var parms = new Object(); //参数
+			parms.id = id;
+			loadAccountItemDetailList(parms, loadItemDetailCallback);
+		});
+		//跳转详情信息选项卡
+		function loadItemDetailCallback(){
+			showAccountItemDetailTab();
+		}
+	
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+
+
+		});
+		//创建分页组件实例
+		var pager=new Pager("customer-bill-detail-list");
+		$(function(){
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

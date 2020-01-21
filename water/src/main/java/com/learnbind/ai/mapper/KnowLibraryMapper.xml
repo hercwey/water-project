@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.KnowLibraryMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.KnowLibrary">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="TITLE" jdbcType="VARCHAR" property="title" />
+    <result column="IMG_PATH" jdbcType="VARCHAR" property="imgPath" />
+    <result column="CONTENT" jdbcType="VARCHAR" property="content" />
+    <result column="PUBLIC_DATE" jdbcType="TIMESTAMP" property="publicDate" />
+    <result column="AUTHOR" jdbcType="VARCHAR" property="author" />
+    <result column="LABELS" jdbcType="VARCHAR" property="labels" />
+    <result column="TYPE" jdbcType="VARCHAR" property="type" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, TITLE, IMG_PATH, CONTENT, PUBLIC_DATE, AUTHOR, LABELS
+  </sql>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchKnowLibrary" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM know_library r
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (r.TITLE LIKE concat(concat('%',#{searchCond}),'%'))
+  			</if>
+  			<if test="knowType!=null and knowType!='' ">
+  				AND r.TYPE = #{knowType}
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+  
+  <!--
+  	根据文章类型查询文章列表(但不包括文章内容)
+   -->
+  <select id="searchArticlebyType" resultMap="BaseResultMap">
+		SELECT 
+			r.ID,
+			r.TITLE,
+			r.IMG_PATH,
+			r.PUBLIC_DATE,
+			r.AUTHOR,
+			r.TYPE
+		FROM know_library r
+		<where>
+			1=1			
+  			<if test="knowType!=null and knowType!='' ">
+  				AND r.TYPE = #{knowType}
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchAllKnowLibrary" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM know_library r
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					r.TITLE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR r.AUTHOR LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR r.LABELS LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR r.CONTENT LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="label!=null and label!='' ">
+  				AND r.LABELS = #{label}
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+  
+</mapper>

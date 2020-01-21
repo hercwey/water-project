@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomersTraceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomersTrace">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="CUSTOMER_NAME" jdbcType="VARCHAR" property="customerName" />
+    <result column="OPERATION_TYPE" jdbcType="VARCHAR" property="operationType" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CHANGE_BEFORE" jdbcType="VARCHAR" property="changeBefore" />
+    <result column="CHANGE_AFTER" jdbcType="VARCHAR" property="changeAfter" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, CUSTOMER_NAME, OPERATION_TYPE, OPERATOR_ID, OPERATOR_NAME, OPERATION_TIME, 
+    COMMENT, CHANGE_BEFORE, CHANGE_AFTER
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="search" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM CUSTOMERS_TRACE r
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (r.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%'))
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+  
+   <!-- 查询时间,返回列表 -->
+  <select id="getTraceByOperationTime" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM CUSTOMERS_TRACE 
+		<where>
+			1=1
+			<if test="dateString!=null">
+  				AND to_char(OPERATION_TIME,'yyyy/mm/dd HH24:MI:SS') = #{dateString}
+  			</if>
+		</where>
+		ORDER BY id DESC
+  </select>
+</mapper>

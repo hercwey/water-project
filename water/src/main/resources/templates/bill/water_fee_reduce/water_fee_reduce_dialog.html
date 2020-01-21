@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 输入布局 */
+.table-layout td {
+	border: 0px;
+	padding: 0px;
+}
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-water-dialog"
+					role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+					<div class="modal-dialog modal-lg">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header"
+								style="background-color: #a5f1b6; height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>水费减免</span> <i class="fa fa-tags fa-1x"
+										aria-hidden="true" style="color: blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close"
+									data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+								
+									<!-- 采用表格进行布局 -->
+									<table class="table">
+										<thead>
+											<tr>
+												<th>
+													<!-- <input type="checkbox" class="select-all-toggle"> -->
+
+													<div class="custom-control custom-checkbox">
+														<input type="checkbox" class="custom-control-input"
+															id="select-all-toggle" name="example1"> <label
+															class="custom-control-label" for="select-all-toggle"></label>
+													</div>
+												</th>
+												<th>客户名称</th>
+												<th>期间</th>
+												<th>账单金额</th>
+												<th>已减免金额</th>
+												<th>减免金额</th>
+											</tr>
+										</thead>
+										<tbody id="water-fee-body">
+											<tr th:each="item,iterStat: ${waterFeeList}">
+
+												<!-- 条目选择器 -->
+												<td>
+
+													<div class="custom-control custom-checkbox"
+														style="margin-bottom: -1px !important;">
+														<input type="checkbox"
+															class="custom-control-input item-selector"
+															name="example1"
+															th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+														<label class="custom-control-label"
+															th:attr="for='item-selector'+'-'+${item.id}"></label>
+													</div>
+												</td>
+												<!-- 客户名称 -->
+												<td class="customer-name" th:text="${item.customerName}">客户名称</td>
+												<!-- 期间-->
+												<td class="period" th:text="${item.period}">期间</td>
+												<!-- 违约金金额 -->
+												<td th:text="${item.creditAmount}">账单金额</td>
+												<!-- 已减免金额 -->
+												<td th:text="${item.debitAmount}">已减免金额</td>
+												<td>
+														<input type="text" class="form-control col-sm-6 discount-amount"
+															th:value="${discountAmount}"
+															th:attr=" data-id=${item.id}, data-max-discount-amount=${item.creditAmount-item.discountAmountSum},placeholder='最大值 '+${item.creditAmount-item.discountAmountSum}+' 元',title='最大值 '+${item.creditAmount-item.discountAmountSum}+' 元'"
+															id="overdue-discount-amount" name="discountAmount"
+															maxlength=30 title="请输入1-30个字符" />
+												</td>
+
+											</tr>
+										</tbody>
+									</table>
+
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"
+									id="btn-modify-and-back">保存&返回</button>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+		<script>
+		//------------------业务操作----------------------
+		
+		function getOverdueFineParms(){
+			
+			var isContinue = true;
+			
+			var overdueFineArr = new Array();
+			$("#water-fee-body tr").each(function(){
+				
+				var maxDiscountAmount = $(this).find(".discount-amount").attr("data-max-discount-amount");//输入框可输入的最大值
+				
+				var discountAmount = $(this).find(".discount-amount").val();//减免金额
+				
+				if(parseFloat(discountAmount)>parseFloat(maxDiscountAmount)){
+				
+					var customerName = $(this).find(".customer-name").text();//违约金的客户名称
+					var period = $(this).find(".period").text();//违约金的期间
+					util.message("【"+customerName+" "+period+"】的减免金额大于最大值！",null,"warning");
+					isContinue = false;
+					return false;
+				}
+				
+				//var overdueFineId = $(this).find(".discount-amount").attr("data-id");//违约金ID
+				var obj = new Object();
+				obj.discountAmount = discountAmount;
+				//obj.overdueFineId = overdueFineId;
+				overdueFineArr.push(obj);
+			});
+			
+			if(!isContinue){
+				return false;
+			}
+			
+			var overdueFineJSON = JSON.stringify(overdueFineArr);
+			console.log(overdueFineJSON);
+			
+			
+			var customerId = $("#overdue-customer-id").val();
+			var accountItemId = $("#overdue-account-item-id").val();
+			
+			var parms = new Object();
+			parms.customerId = customerId;
+			parms.accountItemId = accountItemId;
+			parms.overdueFineJSON = overdueFineJSON;
+			console.log(parms);
+			return parms;
+			
+		}
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH + "/water-fee-reduce-bill/save-water-fee-reduce";
+			var parms = getOverdueFineParms();
+			
+			if(!parms){
+				return false;
+			}
+			
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						closeWaterFeeReduceDialog();
+						loadPageClickPageNum();
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+			修改对话框-保存按钮-CLICK
+			保存所修改的条目
+		*/
+		$('#btn-modify-and-back').on('click',function() {
+			modiItem(true);				
+		});
+
+
+		});
+	</script>
+
+
+
+	</th:block>
+
+</body>
+</html>

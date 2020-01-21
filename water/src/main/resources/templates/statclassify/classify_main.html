@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	<!-- 编辑地理位置对话框 -->
+	<div class="container" id="location-edit-dialog" th:include="statclassify/classify_dialog_edit::dialog"></div>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block">
+				<!-- 更新pycode和pylongcode -->
+				<!-- <button type="button" class="btn btn-primary btn-sm"
+					id="btn-generate-pycode" >
+					<i class="fa fa-plus" aria-hidden="true"> 
+						<span>生成</span>
+					</i>
+				</button> -->
+				<span>
+					<button type="button" class="btn btn-primary btn-sm"
+						id="add-btn" onclick="javascript:add(0, '', 0);">
+						<i class="fa fa-plus" aria-hidden="true"> 
+							<span>增加</span>
+						</i>
+					</button>
+					<button type="button" class="btn btn-info btn-sm"
+						id="edit-btn" onclick="javascript:edit(null);">
+						<i class="fa fa-info" aria-hidden="true"> 
+							<span>编辑</span>
+						</i>
+					</button>
+					<button type="button" class="btn btn-danger btn-sm"
+						id="del-btn" onclick="javascript:del(0, '', 0);">
+						<i class="fa fa-remove" aria-hidden="true"> 
+							<span>删除</span>
+						</i>
+					</button>
+				</span>
+			</div>
+			
+		</div>
+	</div>
+	<hr>
+	<div class="row clearfix">
+		<div class="col-md-4">
+			<div class="card">
+				<h5 class="card-header">
+					地理位置树状结构列表
+				</h5>
+				<div class="card-body">
+					<!-- 查询面板 -->
+					<div class="row" id="search-div">
+						<div class="col-md-12 column" style="display:inline-block;">
+							<form id="search-form" style="">
+								<!-- <div class="input-group input-group-sm">
+							      <input type="text" class="form-control" id="search-cond" placeholder="请输入"  style="display:inline-block;" />
+							      <div class="input-group-append">
+							        <button type="button" class="btn btn-success input-group-text" id="search-btn" title="查询" style="height:100%; display:inline-block;">
+										<i class="fa fa-search" aria-hidden="true"></i>
+									</button>
+									<button type="button" class="btn btn-success input-group-text" id="search-clear-btn" title="清除" style="height:100%; display:inline-block;">
+										<i class="fa fa-times" aria-hidden="true"></i>
+									</button>
+									<button type="button" class="btn btn-success input-group-text" id="search-prev-btn" title="上一个" style="height:100%; display:inline-block;">
+										<i class="fa fa-chevron-left" aria-hidden="true"></i>
+									</button>
+									<button type="button" class="btn btn-success input-group-text" id="search-next-btn" title="下一个" style="height:100%; display:inline-block;">
+										<i class="fa fa-chevron-right" aria-hidden="true"></i>
+									</button>
+									
+							      </div>
+							    </div> -->
+								<!-- <input type="text" class="form-control" id="search-cond" placeholder="请输入编码/名称"  style="height:100%; width:60%; display:inline-block;" />
+								<button type="button" class="btn btn-success btn-sm" id="search-btn" style="height:100%; display:inline-block;">
+									<i class="fa fa-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" class="btn btn-success btn-sm" id="search-prev-btn"title="上一个" style="height:100%; display:inline-block;">
+									<i class="fa fa-chevron-left" aria-hidden="true"></i>
+								</button>
+								<button type="button" class="btn btn-success btn-sm" id="search-next-btn" title="下一个" style="height:100%; display:inline-block;">
+									<i class="fa fa-chevron-right" aria-hidden="true"></i>
+								</button> -->
+							</form>
+						</div>
+					</div>
+					<!-- 容器:字典列表 -->
+					<div class="batch-table table-container">
+						<ul id="location-ztree" class="ztree" style="margin-top: 1px"><li id="ztree-loading">正在加载中，请稍等...</li></ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <div class="col-md-8">
+			<div class="tabbable" id="tabs-location">
+				<ul class="nav nav-tabs">
+					<li class="nav-item">
+						<a class="nav-link active" href="#tab-meter-item" data-toggle="tab">表计档案信息</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#tab-customer-item" data-toggle="tab">客户档案信息</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab-meter-item">
+						表计档案信息
+					</div>
+					<div class="tab-pane" id="tab-customer-item">
+						客户档案信息2
+					</div>
+				</div>
+			</div>
+			
+		</div> -->
+			
+		<hr style="height:1px;border:none;border-top:1px solid blue;">
+			
+	</div>
+
+
+	<!-- JS Scripts-->
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.exedit.js}"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			//var zNodes = [[${locationListJson}]];
+		/*]]>*/
+	</script>
+
+	<SCRIPT type="text/javascript">
+		
+		var G_SELECTED_TREE_NODE = null;//用于保存用户选择的当前节点数据
+		var g_is_add = true;//用于保存增加、编辑操作，是增加操作，还是编辑操作
+		
+		var G_SEARCH_MODE_YES=1;  //查询模式
+		var G_SEARCH_MODE_NO=0;  //非查询模式
+		
+		var g_curr_marked_node_id = null;//已经标记的当前Node对象Id
+		var currMarkedNode=null;  	//当前已经标记的节点ID	
+		var searchMode=0;  			//查询模式,主要用于区分是主动加载tree还是在查询时加载Tree node
+		var notFoundNodeIdx=-1;         //未找到的结点索引,在idArr2中的索引.
+		var idArr2=null;  				//结点trace 序列.
+	
+		/**
+		 * 	ztree加载中
+		 */
+		function zTreeLoading(){
+			$("#location-ztree").html("<li id='ztree-loading'>正在加载中，请稍等...</li>");
+		}
+		/**
+		 * 	ztree加载完成
+		 */
+		function zTreeLoaded(){
+			$("#location-ztree #ztree-loading").remove();
+		}
+		
+		var setting = {
+			view: {
+				/* fontCss: {
+					'color': "red",
+					'font-size': "18px",
+				} */
+				/* 设置是否允许同时选中多个节点；默认值: true */
+				selectedMulti: false
+			},
+			async: {
+				enable: true,
+				url: "/stat-classify/get-nodes",
+				autoParam: ["id"]
+			},
+			edit: {
+				enable: true,
+				showRenameBtn: false,
+				showRemoveBtn: false,
+				drag: {
+					autoExpandTrigger: true,
+					isCopy: false,
+					isMove: true,
+					prev: false,
+					next: true,
+					inner: true,
+					borderMax: 20,
+					borderMin: -10,
+					minMoveSize: 10,
+					maxShowNodeNum: 10,
+					autoOpenTime: 0,
+				},
+				
+			},
+			check: {
+				enable: false,
+				chkStyle: "checkbox",
+			},
+			data: {
+				key: {
+					name: "classifyName",
+				},
+				simpleData: {
+					enable:true,
+					idKey: "id",
+					pIdKey: "pid",
+					rootPId: 0
+				}
+			},
+			callback: {
+				onClick: zTreeOnClick,//节点被点击的事件回调函数
+				//beforeDrag: zTreeBeforeDrag,//用于捕获节点被拖拽之前的事件回调函数，并且根据返回值确定是否允许开启拖拽操作
+				//beforeDrop: zTreeBeforeDrop,//用于捕获节点拖拽操作结束之前的事件回调函数，并且根据返回值确定是否允许此拖拽操作
+				//onDrag: zTreeOnDrag,//用于捕获节点被拖拽的事件回调函数
+				beforeDrop: zTreeBeforeDrop,//用于捕获节点拖拽操作结束之前的事件回调函数，并且根据返回值确定是否允许此拖拽操作
+				onDrop: zTreeOnDrop,//用于捕获节点拖拽操作结束的事件回调函数
+				beforeAsync: zTreeBeforeAsync,//用于捕获异步加载之前的事件回调函数
+				onAsyncError: zTreeOnAsyncError,//用于捕获异步加载正常结束的事件回调函数
+				onAsyncSuccess: zTreeOnAsyncSuccess,//用于捕获异步加载出现异常错误的事件回调函数
+			},
+		};
+	
+		/**
+		 * 	异步加载之前的事件回调函数
+		 */
+		function zTreeBeforeAsync(treeId, treeNode) {
+			console.log("tree is is:"+treeId);
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				zTreeLoading();//ztree加载中
+			}
+			
+			return true;
+		};
+		/**
+		 * 	异步加载正常结束的回调函数
+		 */
+		function zTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				zTreeLoaded();//ztree加载完成
+			}
+			
+			//如果是查询模式
+			if(searchMode==G_SEARCH_MODE_YES){
+				markNodeInTree(notFoundNodeIdx);
+			}
+			
+			//console.log("treeId:"+treeId+", treeNode:"+treeNode);
+		  	//console.log(msg);
+		  	/* if(msg!=null){
+				//var treeObj = $.fn.zTree.getZTreeObj("location-ztree");
+				//var newNodes = treeObj.addNodes(treeNode, msg);
+			} */
+		};
+		/**
+		 * 	异步加载出现异常错误的回调函数
+		 */
+		function zTreeOnAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown) {
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				zTreeLoaded();//ztree加载完成
+			}
+			
+			console.log("treeId:"+treeId+", treeNode:"+treeNode);
+			console.log("textStatus:"+textStatus);
+			console.log("errorThrown:"+errorThrown);
+		    console.log("XMLHttpRequest:"+XMLHttpRequest);
+		};
+		
+		/*
+		 * 节点被点击的事件回调函数
+		 */
+		function zTreeOnClick(event, treeId, treeNode) {
+			//console.log("click:"+JSON.stringify(treeNode));
+			//console.log(treeNode.menuId + ", " + treeNode.menuName + ", " + treeNode.parentId);
+		    //$("#add-btn").attr("onclick", "javascript:add(&quot;"+treeNode.id+"&quot;);");
+		    
+		    G_SELECTED_TREE_NODE = treeNode;//用于保存用户选择的当前节点数据
+		    
+		    var params = '"id":'+treeNode.id+', "level":'+treeNode.locationLevel+', "name":'+treeNode.name+', "remark":'+treeNode.remark+', "pid":'+treeNode.pid+', "sort":'+treeNode.sortNo;
+			$("#add-btn").attr("onclick", "javascript:add("+treeNode.id+", '"+treeNode.classifyName+"', '"+treeNode.pid+"');");//修改添加按钮click事件
+			$("#edit-btn").attr("onclick", "javascript:edit("+JSON.stringify(treeNode)+");");//修改编辑按钮click事件
+			$("#del-btn").attr("onclick", "javascript:del("+treeNode.id+", '"+treeNode.classifyName+"', '"+treeNode.pid+"');");//修改删除按钮click事件
+			
+			//getChildNodes(treeNode.id);
+			
+			//getMeterAndCustomerTable(treeNode.id);//加载表计档案和客户档案table
+		}
+		
+		/**
+		 * 	用于捕获节点拖拽操作结束之前的事件回调函数，并且根据返回值确定是否允许此拖拽操作
+		 */
+		function zTreeBeforeDrop(treeId, treeNodes, targetNode, moveType) {
+			//return !(targetNode == null || (moveType != "inner" && !targetNode.parentTId));
+			//console.log("treeNodes:"+JSON.stringify(treeNodes));
+			
+			/* var NODE_TYPE_BUILDING = "BUILDING";
+			var NODE_TYPE_UNIT = "UNIT";
+			var NODE_TYPE_ROOM = "ROOM";
+			
+			var flag = false;
+			
+			if(treeNodes!=null && treeNodes.length>0){
+				var treeNode = treeNodes[0];//因为已设置不可多选 ，所以数据中只有一个对象
+				var nodeType = treeNode.localNodeType;//地理位置节点类型 
+				if(nodeType!=null && (nodeType!=NODE_TYPE_BUILDING && nodeType!=NODE_TYPE_UNIT && nodeType!=NODE_TYPE_ROOM)){
+					console.log("【"+nodeType+"】节点可以被拖拽！");
+					flag = true;
+				}
+			}
+			if(flag){
+				if(targetNodeType==null){
+					return flag;
+				}
+				var targetNodeType = targetNode.localNodeType;//treeNodes 被拖拽放开的目标节点 JSON 数据对象。
+				if(targetNodeType!=null && (targetNodeType!=NODE_TYPE_BUILDING && targetNodeType!=NODE_TYPE_UNIT && targetNodeType!=NODE_TYPE_ROOM)){
+					console.log("【"+nodeType+"】节点可以被拖拽到【"+targetNodeType+"】节点！");
+					flag = true;
+				}else{
+					flag = false;
+				}
+			}
+			
+			return flag; */
+			
+			return updateLocationData(treeNodes, targetNode);//更新地理位置数据
+			
+		};
+		/**
+		 * 	节点拖拽操作结束的事件回调函数
+		 *  treeNodes：被拖拽的节点 JSON 数据集合
+		 * 	targetNode：成为 treeNodes 拖拽结束的目标节点 JSON 数据对象；如果拖拽成为根节点，则 targetNode = null
+		 */
+		function zTreeOnDrop(event, treeId, treeNodes, targetNode, moveType, isCopy){
+			//console.log(treeNodes.length + "," + (targetNode ? (targetNode.tId + ", " + targetNode.name) : "isRoot" ));
+			//console.log("event:"+event);
+			//console.log("treeId:"+treeId);
+			console.log("treeNodes:"+JSON.stringify(treeNodes));
+			console.log("targetNode:"+JSON.stringify(targetNode));
+			//console.log("moveType:"+moveType);
+			//console.log("isCopy:"+isCopy);
+			//var updateDataArr = getUpdateData(treeNodes, targetNode);
+			//var updateDataListJSON = JSON.stringify(updateDataArr);
+			//zTreeOnDropUpdateDB(updateDataListJSON);//更新数据库
+			//updateLocationData(treeNodes, targetNode);//更新地理位置数据
+		}
+		/**
+		 * 	更新拖拽节点的地理位置信息
+		 */
+		function updateLocationData(treeNodes, targetNode){
+			
+			var classifyId = null;//拖拽节点的地理位置ID
+			if(treeNodes!=null && treeNodes.length>0){
+				var treeNode = treeNodes[0];
+				classifyId = treeNode.id;//拖拽节点的地理位置ID
+			}
+			
+			var parentClassifyId = null;//拖拽结束的目标节点ID
+			if(targetNode!=null){
+				parentClassifyId = targetNode.id;//拖拽结束的目标节点ID
+			}
+			console.log("----------classifyId:"+locationId+", parentClassifyId:"+parentLocationId);
+			//if(locationId!=null && locationId!="" && parentLocationId!=null && parentLocationId!=""){
+			if(classifyId!=null && classifyId!=""){
+				return zTreeOnDropUpdateDB(classifyId, parentClassifyId);//更新数据库
+			}else{
+				console.log("----------classifyId:"+locationId+", parentClassifyId:"+parentClassifyId);
+			}
+			return false;
+		}
+		/**
+		 * 	获取需要更新的子节点数据集合（[{"id":1,"pid":0,"level":0},{"id":1,"pid":0,"level":0},...]）
+		 */
+		function getData(updateDataArr, childrenArr){
+			for(var i=0; i<childrenArr.length; i++){
+				var node = childrenArr[i];
+				var id = node.id;
+				var pid = node.pid;
+				var level = node.level;
+
+				var obj = new Object();
+				obj.id = id;
+				obj.pid = pid;
+				obj.level = level;
+				updateDataArr.push(JSON.stringify(obj));
+				
+				var children = node.children;
+				if(children!=null && children.length>0){
+					getData(updateDataArr, children);
+				}
+				
+			}
+		}
+		
+		/**
+		 * 在某个父节点上增加节点数据
+		 */
+		function addNodes(newNodes){
+			//var treeObj = $.fn.zTree.getZTreeObj("location-ztree");
+			var treeObj = G_LOCATION_ZTREE_OBJ;
+			//var newNodes = {name:"newNode1"};
+			var selectedTreeNode = getSelectedTreeNodeFn();//获取当前选择的节点（如果当前节点有子节点则包含子节点信息）
+			newNodes = treeObj.addNodes(selectedTreeNode, newNodes);
+			//console.log("add nodes："+JSON.stringify(newNodes));
+		}
+		/**
+		 * 更新某节点
+		 */
+		function updateNodes(location){
+			//console.log("update nodes");
+			//console.log("location:"+JSON.stringify(location));
+			//var treeObj = $.fn.zTree.getZTreeObj("location-ztree");
+			var treeObj = G_LOCATION_ZTREE_OBJ;
+			var nodes = treeObj.getNodesByParam("id", location.id, null);//获取需要设置的zTree对象节点（集合[{}]）
+			//console.log("nodes"+nodes.length);
+			if (nodes.length>0) {
+				var currNode = nodes[0];
+				//console.log("curr nodes:"+JSON.stringify(currNode));
+				currNode.code = location.code;
+				currNode.name = location.name;
+				currNode.localNodeType = location.localNodeType;
+				currNode.remark = location.remark;
+				currNode.sortNo = location.sortNo;
+				treeObj.updateNode(currNode);
+			}
+		}
+		/**
+		 * 	取消当前选中的节点，并且初始化增加按钮、修改按钮和删除按钮的click事件参数
+		 */
+		function initButtonClickEvent(nodeId){
+			
+			//var treeObj = $.fn.zTree.getZTreeObj("location-ztree");
+			var treeObj = G_LOCATION_ZTREE_OBJ;
+			treeObj.cancelSelectedNode();//取消选中的所有节点
+			
+			$("#add-btn").attr("onclick", "javascript:add(0, '', 0);");//修改添加按钮click事件
+			$("#edit-btn").attr("onclick", "javascript:edit(null);");//修改编辑按钮click事件
+			$("#del-btn").attr("onclick", "javascript:del(0, '', 0);");//修改删除按钮click事件
+		}
+		
+		var G_LOCATION_ZTREE_OBJ = null;//用于保存地理位置ztree初始后的对象
+		$(function(){
+			//console.log("start init");
+			//$.fn.zTree.init($("#location-ztree"), setting, zNodes);
+			G_LOCATION_ZTREE_OBJ = $.fn.zTree.init($("#location-ztree"), setting);
+		});
+		
+	</SCRIPT>
+
+	<script type="text/javascript">
+	
+		/* $("#btn-generate-pycode").on('click',function() {	
+			var url = BASE_CONTEXT_PATH + "/location/generate-pycode";
+			$.post(url, null, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"success");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}); */
+	
+	
+
+		/**
+		 * 	隐藏客户信息、表计信息
+		 */
+		/* function hideOtherTabs(){
+			$("#tabs-location").hide();//隐藏详情信息选项卡
+		}
+		
+		function showOtherTabs(){
+			$("#tabs-location").show();//显示详情信息选项卡
+		} */
+			
+		/**
+		 * 	加载表计档案和客户档案table
+		 */
+		/* function getMeterAndCustomerTable(id){
+			var parms = {"locationId": id};
+			loadMetersList(parms, null);
+			loadCustomersList(parms, null);
+			showOtherTabs(); 
+		} */
+	
+		/* 
+			加载表计档案信息
+		 */
+		/* function loadMetersList(parms, callback) {
+			//加载表计档案详细信息
+			var url = BASE_CONTEXT_PATH + "/location/mmain"
+			var callbackFunc = callback;
+			var containerId = "#tab-meter-item";
+			loadPage(containerId, url, parms, callbackFunc);
+		}  */
+		
+		/* 
+			加载客户档案信息
+		 */
+		/* function loadCustomersList(parms, callback) {
+			var url = BASE_CONTEXT_PATH + "/location/cmain";
+			var callbackFunc = callback;
+			var containerId = "#tab-customer-item";
+			loadPage(containerId, url, parms, callbackFunc);
+		} */
+		
+		$(function(){
+			//hideOtherTabs();
+		});
+		
+	
+		/**
+		 * 	获取当前选择的节点（如果当前节点有子节点则包含子节点信息）
+		 */
+		function getSelectedTreeNodeFn(){
+			return G_SELECTED_TREE_NODE;
+		}
+	
+		/**
+		 * 	节点拖拽操作结束更新数据库
+		 */
+		function zTreeOnDropUpdateDB(classifyId, parentClassifyId){
+			var url = BASE_CONTEXT_PATH + "/stat-classify/update-drop-classify";
+			var params = {"classifyId":classifyId, "parentClassifyId":parentClassifyId};
+			$.ajax({ 
+				url: url, 
+				data: params,
+				async: true,
+				success: function(res){
+					//console.log(res);
+					if(res!=null){
+						var obj = res;//$.parseJSON(res);
+						if(obj.result_code=="success"){
+							//reloadInfoFun();
+							//dialog type: success warning info error,默认为info
+							//util.message(res.result_msg,null,"success");
+							return true;
+						}else{
+							//dialog type: success warning info error,默认为info
+							//util.message(res.result_msg,null,"warning");
+							return false;
+						}
+					}
+		      	},
+		      	error: function(XMLHttpRequest, msg){
+		      		console.log(msg);
+		      	}
+			});
+			/* $.post(url, params, function(res){
+				//console.log(res);
+				if(res!=null){
+					var obj = res;//$.parseJSON(res);
+					if(obj.result_code=="success"){
+						//reloadInfoFun();
+						//dialog type: success warning info error,默认为info
+						//util.message(res.result_msg,null,"success");
+						return true;
+					}else{
+						//dialog type: success warning info error,默认为info
+						//util.message(res.result_msg,null,"warning");
+						return false;
+					}
+				}
+			}); */
+		}
+	
+		/*
+		 * 	点击添加按钮时执行，打开添加选项卡
+		 */
+		function add(id, name, pid){
+			
+			g_is_add = true;//用于保存增加、编辑操作，是增加操作，还是编辑操作
+			
+			//resetFun();
+			
+			var url = BASE_CONTEXT_PATH + "/stat-classify/load-edit-dialog";
+			var parms = {"id":id, "pid":pid, "action":"add"};
+			$("#location-edit-dialog").load(url, parms, function(){
+				//编辑对话框加载完成
+				addCallback(id, name);
+			});
+			
+		}
+		/**
+		 * 增加操作回调函数
+		 */
+		function addCallback(id, name){
+			
+			if(id!=null && id!=0){
+				//$("#location-pid").val(id);//父类型ID
+				//$("#location-pid").trigger("change");
+			}
+			
+			$("#modal-title-span").text("增加：统计分类");
+			
+			setLocationPidDisabled(false);//设置父节点ID（pid）的disabled属性，如果是增加操作可编辑，如果是编辑操作不可编辑
+			
+			$("#location-form #classify-pid").val(id);//设置父节点ID
+			$("#location-form #parent-classify-name").val(name);//设置父节点名称
+			
+			openEditDialog();
+		}
+	
+		/*
+		 * 	点击编辑按钮时执行，打开编辑选项卡
+		 */
+		function edit(location){
+			
+			g_is_add = false;//用于保存增加、编辑操作，是增加操作，还是编辑操作
+			
+			//console.log("---"+JSON.stringify(location));
+			if(location==null || location.id==0){
+				//dialog type: success warning info error,默认为info
+				util.message("请选择要修改的统计分类！",null,"warning");
+				return;
+			}
+			
+			var url = BASE_CONTEXT_PATH + "/stat-classify/load-edit-dialog";
+			//var parms = {"locationId":location.id, "locationPid":location.pid};
+			var parms = {"id":location.id, "pid":location.pid, "action":"edit"};
+			$("#location-edit-dialog").load(url, parms, function(){
+				//编辑对话框加载完成
+				editCallback(location);
+			});
+			
+		}
+		
+		/**
+		 * 编辑操作回调函数
+		 */
+		function editCallback(location){
+			
+			/* var longCode = location.longCode;
+			var lastIndex = longCode.lastIndexOf("-");
+			if(lastIndex==-1){
+				longCode = longCode.substring(0);
+			}else{
+				longCode = longCode.substring(0, lastIndex);
+			} */
+			
+			$("#location-form #classify-id").val(location.id);//ID
+			//$("#location-form #location-level").val(location.locationLevel);//级别
+			//$("#location-form #location-pid").val(location.pid);//设置父节点ID
+			//$("#location-form #location-parent-name").val(longCode);//设置父节点名称
+			//$("#location-form #location-code").val(location.code);//编码
+			$("#location-form #classify-name").val(location.classifyName);//名称
+			$("#location-form #classify-type").val(location.classifyType);//节点类型
+			$("#location-form #classify-location-id").val(location.locationId);//片区分类
+			//$("#location-form #location-remark").val(location.remark);//备注
+			//$("#location-form #location-sortno").val(location.sortNo);//排序
+			
+			var localNodeType = location.localNodeType;
+			if(localNodeType!=null && localNodeType=="BLOCK"){
+				$("#location-form #location-engineering-tr").show();
+			}
+
+			$("#modal-title-span").text("编辑：地理位置");
+			
+			setLocationPidDisabled(true);//设置父节点ID（pid）的disabled属性，如果是增加操作可编辑，如果是编辑操作不可编辑
+			
+			openEditDialog();
+		}
+		
+		/*
+		 * 点击删除按钮时执行，打开删除选项卡
+		 */
+		function del(id, name, pid){
+			
+			if(id==null || id==0){
+				//dialog type: success warning info error,默认为info
+				util.message("请选择要删除的地理位置！",null,"warning");
+				return;
+			}
+			
+			var ok_callback_name = "deleteAjaxRequest";
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录? ", id, ok_callback_name, "");
+			
+		}
+		/**
+		 * 	删除菜单Ajax请求
+		 */
+		function deleteAjaxRequest(id){
+			var url = BASE_CONTEXT_PATH + "/stat-classify/delete";
+			var params = {"id":id};
+			$.post(url, params, function(res){
+				//console.log(res);
+				if(res!=null){
+					var obj = res;//$.parseJSON(res);
+					if(obj.result_code=="success"){
+						//$("#update-menu-modal-div").modal("hide");//隐藏修改菜单对话框
+						//dialog type: success warning info error,默认为info
+						//util.message(res.result_msg,null,"success");
+						//window.location.href="loginSubmit";
+						//操作成功后重新加载当前菜单内容
+						reloadInfoFun();
+					}else{
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		/*
+		 * 重置form表单
+		 */
+		function resetFun(){
+			var pid = $("#location-pid").val();//父类型ID
+			//$("#save-form").data('bootstrapValidator').destroy();//销毁bootstrapValidator验证
+			//bootstrapValidateFun();//启用验证
+			//$('#privilege-form')[0].reset();
+			$(":input","#location-form")  
+				.not(":button, :submit, :reset")  
+				.val("");
+			//.removeAttr("checked")  
+			//.removeAttr("selected");
+			$("#location-pid").val(pid);//父类型ID
+			$("#location-pid").trigger("change");
+		}
+		
+//---------- Dialog 操作 打开/关闭 ------------------------
+		
+		/*
+		 * 	打开(Open) 对话框
+		 */
+		function openEditDialog() {
+			//可拖拽
+			$("#modal-container-location-edit").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$('#modal-container-location-edit').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			关闭(CLOSE) 对话框
+		 */
+		function closeEditDialog() {
+			$("#modal-container-location-edit").modal("hide");
+		}
+		
+		
+		//------------------------------	地理位置查询部分	------------------------------
+		
+		
+		var G_ACTION_SEARCH = 0;//表示开始查询
+		var G_ACTION_PREV = -1;//表示查询上一个
+		var G_ACTION_NEXT = 1;//表示查询下一个
+		
+		
+		/**
+		 * 	绑定查询面板中查询按钮的click事件
+		 */
+		$("#search-form #search-btn").on("click", function(){
+			
+			var searchCond = $("#search-form #search-cond").val();//查询条件
+			if(searchCond==null || searchCond==""){
+				//$.fn.zTree.init($("#location-ztree"), setting);
+				return;
+			}
+			
+			//置查询模式
+			searchMode=G_SEARCH_MODE_YES;
+			
+			
+			//查询条件 
+			var parms = new Object();
+			parms.searchCond = searchCond;
+			parms.id = null;
+			parms.action = G_ACTION_SEARCH;
+			
+			searchLocation(parms);//根据条件查询地理位置并展开对应节点
+			
+		});
+		
+		$("#search-form #search-clear-btn").on("click", function(){
+			$("#search-form #search-cond").val("");
+			$("#search-form #search-cond").focus();
+			g_curr_marked_node_id=null;
+		});
+		
+		/*
+			绑定查询条件输入框的change事件,当查询条件变化时,重新查询.
+		*/
+		$("#search-form #search-cond").on("change", function(){
+			g_curr_marked_node_id=null;
+		});
+		
+		/**
+		 * 	绑定input输入框的键盘事件,键盘上按下回车键时,自动执行click
+		 */
+		/* $("#search-form #search-cond").on('keypress',function(event){
+            if(event.keyCode=="13") {
+            	$("#search-form #search-btn").click();
+            }
+        }); */
+		
+		
+		/**
+		 * 	绑定查询面板中查询上一个按钮的click事件
+		 */
+		$("#search-form #search-prev-btn").on("click", function(){
+			
+			var searchCond = $("#search-form #search-cond").val();//查询条件
+			if(searchCond==null || searchCond==""){
+				//$.fn.zTree.init($("#location-ztree"), setting);
+				return;
+			}
+			
+			//置查询模式
+			searchMode=G_SEARCH_MODE_YES;
+			
+			//查询条件 
+			var parms = new Object();
+			parms.searchCond = searchCond;
+			parms.id = g_curr_marked_node_id;
+			parms.action = G_ACTION_PREV;
+			
+			searchLocation(parms);//根据条件查询地理位置并展开对应节点
+			
+		});
+		
+		/**
+		 * 	绑定查询面板中查询下一个按钮的click事件
+		 */
+		$("#search-form #search-next-btn").on("click", function(){
+			
+			var searchCond = $("#search-form #search-cond").val();//查询条件
+			if(searchCond==null || searchCond==""){
+				//$.fn.zTree.init($("#location-ztree"), setting);
+				return;
+			}
+			
+			//置查询模式
+			searchMode=G_SEARCH_MODE_YES;
+			
+			//查询条件 
+			var parms = new Object();
+			parms.searchCond = searchCond;
+			parms.id = g_curr_marked_node_id;
+			parms.action = G_ACTION_NEXT;
+			
+			searchLocation(parms);//根据条件查询地理位置并展开对应节点
+			
+		});
+		
+		
+		/**
+		 * 	根据条件查询地理位置并展开对应节点
+		 */
+		function searchLocation(parms){
+			//zTreeLoading();//ztree加载中
+			var url = BASE_CONTEXT_PATH + "/stat-classify/search";// 需要提交的url
+			$.post(url, parms, function(res){
+				console.log(res);//由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						var location = res.location;
+						if(location!=null){
+							
+							g_curr_marked_node_id = location.id;	//已经标记的当前Node对象Id
+							
+							var traceIds=location.traceIds;
+							idArr2=parseTraceIds(traceIds);
+							
+							console.log("=======idArr2========="+JSON.stringify(idArr2));
+							
+							markNodeInTree(0);  //在Tree中标记结点		
+							
+							
+						}
+						
+						//reAsyncChildNodes(location.id);//根据地理位置属性ID，异步加载子节点
+						
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		//根据地理位置属性ID，异步加载子节点
+		function reAsyncChildNodes(traceIds){
+			
+			//var treeObj = $.fn.zTree.getZTreeObj("location-ztree");
+			var treeObj = G_LOCATION_ZTREE_OBJ;
+			//var node = treeObj.getNodeByParam("isHidden", true);
+			//treeObj.showNode(node);
+			//异步刷新某节点
+			var nodes = treeObj.getNodesByParam("traceIds", traceIds);
+			console.log(JSON.stringify(nodes));
+			if (nodes.length>0) {
+				var node = nodes[0];
+				treeObj.reAsyncChildNodes(node, "refresh");
+			}
+			//$("#location-ztree_2_switch").click();
+		}
+		
+		//在树中标记结点
+		//startIdx:自路径跟踪数组的哪个节点开始
+		function markNodeInTree(startIndex){
+			
+			//生成traceArr用于保存已经找到的结点索引
+			var traceArr=new Array();
+			
+			var node=null;
+			//var treeObj = $.fn.zTree.getZTreeObj("location-ztree");
+			var treeObj = G_LOCATION_ZTREE_OBJ;
+			
+			for(var i=startIndex;i<idArr2.length;i++){
+				
+					var traceIds=idArr2[i];
+				
+					//find node in tree  
+					
+					var nodes = treeObj.getNodesByParam("traceIds", traceIds);
+					console.log("===========traceIds======="+traceIds);
+					console.log("===========nodes======="+JSON.stringify(nodes));
+					//如果找到且是需要标记的目标节点,标记之
+					if (nodes.length>0) {
+						node = nodes[0];
+						//treeObj.reAsyncChildNodes(node, "refresh");
+						if(i==idArr2.length-1){
+							
+							treeObj.selectNode(node);  //标记结点.change color or select the node?
+							G_SELECTED_TREE_NODE = node;//当前选择的地理位置节点
+							
+							searchMode=0;  				//查询模式结束
+						}
+						else{
+							traceArr[i]=node.traceIds;
+						}
+					}					
+					else{
+						if(traceArr.length>0) {
+							notFoundNodeIdx=i;							
+							reAsyncChildNodes(traceArr[traceArr.length-1]);  //异步加载在Tree中可以找到的最近的父节点的子节点.
+							
+						}
+						else{
+							searchMode=0;  	//查询模式结束,此时说明未在树中查询到最根节点,直接返回即可.
+						}
+						break;
+					}
+					
+				}
+			
+			if(node!=null){
+				treeObj.selectNode(node);  //标记结点.change color or select the node?
+				G_SELECTED_TREE_NODE = node;//当前选择的地理位置节点
+			}
+			
+		}
+		
+		
+		//解析traceIds
+		//返回idArr2
+		function parseTraceIds(traceIds){		
+			//分解traceIds--->idArr1
+			var idArr1=traceIds.split("-");
+			//生成traceArr用于保存已经找到的结点索引
+			var traceArr=new Array();
+			
+			//生成idArr2 用于保存查询到的结点路径.
+			//如果returnNode的traceIds="1-2-3"
+			//此时idArr1中的内容为:  0--->1;  1--->2;  	3--->3
+			//	  idArr2中的内容为:  0--->1;  2--->1-2; 3--->1-2-3						
+			var idArr2=new Array();   //生成用于保存结点路径的数组
+			for(var i=0;i<idArr1.length;i++){
+				var  tempStr="";
+				for(var  j=0;j<=i;j++){
+					if(j==0){tempStr=idArr1[j]}						
+					else{
+						tempStr=tempStr+'-'+idArr1[j];
+					}
+				}
+				idArr2[i]=tempStr   
+			}
+			return idArr2;
+		}
+		
+	</script>
+
+</body>
+</html>

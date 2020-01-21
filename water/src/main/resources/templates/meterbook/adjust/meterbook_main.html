@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- ZTree CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+
+<link rel="stylesheet"	href="/css/meterbookbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="meterbook-dialog-edit"></div>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label meter-book-main">
+		<div class="col-md-12 column">
+		
+			<div class="tabbable" id="tabs-meter-book">
+				<ul class="nav nav-tabs">
+					<li class="nav-item" id="tab-meter-book-item-li">
+						<a class="nav-link active" href="#tab-meter-book-item" data-toggle="tab">表册查询</a>
+					</li>
+					<li class="nav-item" id="tab-meter-book-select-li" style="display: none">
+						<a class="nav-link" href="#tab-meter-book-select" data-toggle="tab">表册调整</a>
+					</li>
+					<li class="nav-item" id="tab-meter-book-bind-meter-li" style="display: none">
+						<a class="nav-link" href="#tab-meter-book-bind-meter" data-toggle="tab">表计列表</a>
+					</li>
+					<li class="nav-item" id="tab-meter-book-meter-detail-li" style="display: none">
+						<a class="nav-link" href="#tab-meter-book-meter-detail" data-toggle="tab">表计详情</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab-meter-book-item">
+						<!-- 操作面板 -->
+						<div class="" style="display: inline-block" id="meter-book-adjust-search-form">
+							<ul class="extra-l" style="list-style: none;padding-inline-start: 20px;">
+								
+								<!-- 地理位置查询条件 -->
+								<li class="input-group-sm">
+									<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher')" th:remove="tag"></div>
+								</li>
+								<!-- 面板:查询 -->
+								<li class="input-group-sm">
+									<input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入表册名称/编码" title="请输入表册名称或编码查询">
+								</li>
+								<!-- 查询按钮 -->
+								<li>
+									<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+									
+									<button type="button" class="btn btn-warning btn-sm btn-general-search-reset" id="btn-general-search-reset">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+									
+									<button type="button" class="btn btn-success btn-sm btn-meter-book-adjust" id="btn-meter-book-adjust">
+										<i class="fa fa-book" aria-hidden="true"> <span>表册调整</span></i>
+									</button>
+								
+								</li>
+							</ul>
+						</div>
+			
+						<!-- 表册管理列表 -->
+						<div class="row clearfix" id="meter-book-item">
+							<div class="col-md-3 column" style="padding-right:1px;">					
+								<div class="card">
+									<div class="card-body" id="location-body" style="padding-top:10px;padding-bottom:10px">
+										<!-- 地理位置列表 -->
+										<!-- 加载方式 -->
+										<div th:include="component/locationtree/location_tree::tree('location-tree')" th:remove="tag"></div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-9 column" style="padding-left:1px;">
+								<div class="card">
+									<div class="card-body meter-book-table" id="meter-book-body" style="padding-left:10px;padding-right:10px;">
+										<!-- 表计列表 -->
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-meter-book-select">
+						<div id="meter-book-select">
+							<!-- 选择表计 -->
+						</div>
+					</div>
+					
+					<div class="tab-pane" id="tab-meter-book-bind-meter">
+						<div id="meter-book-bind-meter">
+						11
+							<!-- 表计列表 -->
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-meter-book-meter-detail">
+						<br>
+						<div id="meter-book-meter-detail">
+							<!-- 表计详情 -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 地理位置treeJS -->
+	<script type="text/javascript"	th:src="@{/js/component/locationtree/LocationTree1.js}"></script>
+	<!-- 地理位置下拉框查询JS -->
+	<script type="text/javascript"	th:src="@{/js/component/districtsearcher/DistrictSearcher.js}"></script>
+	<!-- 地理位置树自适应JS -->
+	<script type="text/javascript"	th:src="@{/js/location_tree_adaptive/location_tree_adaptive.js}"></script>
+	<hr>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+		//记录查询方式，0是普通查询；1是点击地理位置树查询
+		var G_GENERAL_SEARCH = "0";
+		
+		var METER_BOOK_ID_ARR = new Array();
+		/**
+		 * 	隐藏选择表计列表
+		 */
+		function hideMeterBookSelect(){
+			$("#tab-meter-book-select-li").hide();
+		}
+		/**
+		 * 	显示选择表计列表
+		 */
+		function showMeterBookSelect(){
+			$("#tab-meter-book-select-li").show();
+			$("#tabs-meter-book ul a[href='#tab-meter-book-select']").tab("show");//跳转到选择表计列表选项卡
+		}
+		
+	
+		/**
+		 * 	隐藏查看表计列表
+		 */
+		function hideMeterBookBindMeter(){
+			$("#tab-meter-book-bind-meter-li").hide();
+		}
+		/**
+		 * 	显示查看表计列表
+		 */
+		function showMeterBookBindMeter(){
+			$("#tab-meter-book-bind-meter-li").show();
+			$("#tabs-meter-book ul a[href='#tab-meter-book-bind-meter']").tab("show");//跳转到查看表计列表选项卡
+		}
+	
+		/**
+		 * 	隐藏表计详情列表
+		 */
+		function hideMeterBookMeterDetail(){
+			$("#tab-meter-book-meter-detail-li").hide();
+		}
+		/**
+		 * 	显示表册详情列表
+		 */
+		function showMeterBookMeterDetail(){
+			$("#tab-meter-book-meter-detail-li").show();
+			$("#tabs-meter-book ul a[href='#tab-meter-book-meter-detail']").tab("show");//跳转到表计详情选项卡
+		}
+	
+		//--------------------公共查询函数--------------------------
+		
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchMeterBook(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meter-book-adjust/table"
+			$(".meter-book-table").load(url, parms, triggerResize);
+		}
+		
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		//------------------------------	获取查询参数	------------------------------
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchMeterBooKParams(){
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var traceIds = null;
+			var locaBlockTraceIds = locationSearcher.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationSearcher.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationSearcher.getUnitId();//地理位置-单元traceIds
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			var searchCond=$("#meter-book-adjust-search-form #search-cond").val();
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			return parms;
+		}
+		
+		//----------------------------------地理位置tree实例---------------------------------------------------------------------
+		var locationTree = new LocationTree('location-tree');
+		//地理位置下拉框件实例
+		var locationSearcher = new DistrictSearcher("location-searcher", locationSelectSearchCallback); //此处searcher的ID和回调函数
+		
+		/*
+			ztree树click某节点后的回调函数
+		*/
+		function clickZTreeNodeCallback(treeNode) {
+			
+			if(treeNode==null){
+				return false;
+			}
+			var traceIds = treeNode.traceIds;//获取点击节点的traceIds
+			
+			//清除查询条件
+			$('#meter-book-adjust-search-form #btn-general-search-reset').click();
+			var searchCond=$("#meter-book-adjust-search-form #search-cond").val();
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			searchMeterBook(parms);
+			G_GENERAL_SEARCH = "1";//记录是普通查询还是高级查询
+		}
+		
+		function getZTreeSearchParam(){//获取点击地理位置树的traceIds
+			var traceIds = null;
+			if(locationTree.getSelectedTreeNode() != null){
+				traceIds = locationTree.getSelectedTreeNode().traceIds;
+			}
+			
+			var parms = new Object();
+			parms.traceIds = traceIds;
+			return parms;
+		}
+		
+		/**
+		 * 	地理位置下拉查询组件回调函数
+		 */
+		function locationSelectSearchCallback(){
+			G_GENERAL_SEARCH = "0"
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			defaultSearchMeterBook();//查询客户
+		}
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchMeterBook() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			if(G_GENERAL_SEARCH == "0"){
+				parms = getSearchMeterBooKParams();//获取普通查询参数（不包括分页信息）
+			}else{
+				parms = getZTreeSearchParam();//获取ztree查询参数
+			}
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchMeterBook(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchMeterBookClick() {
+			
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchMeterBooKParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchMeterBook(parms);
+		}
+	
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPageClickPageNum(searchCond,pageNum,pageSize) {
+			
+			//获取参数
+			var parms = null;
+			if(G_GENERAL_SEARCH == "0"){
+				parms = getSearchMeterBooKParams();//获取普通查询参数（不包括分页信息）
+			}else{
+				parms = getZTreeSearchParam();//获取ztree查询参数
+			}
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+
+			searchMeterBook(parms);
+		}
+
+
+		
+		//------------------------------	加载地理位置列表	------------------------------
+		/* 
+		 *	加载通用地理位置页面
+		 * 		domId:需要加入此页面的dom节点ID
+		 * 		callback:页面加载完成后的回调
+		 */
+		function loadGlobalLocationPage(domId, callback) {
+			var url = "/location/load-global-location-page";
+			var callbackFunc = callback;
+			var containerId = "#"+domId;
+			loadPage(containerId, url, null, callbackFunc);
+		}
+		/**
+		 * 	加载地理位置后的回调
+		 */
+		function loadLocationListCallback(){
+			//主页:默认查询(加载默认列表)
+			defaultSearchMeterBook();//查询抄表记录
+		}
+		
+		/**
+		*点击表册调整按钮，click事件
+		*/
+		$('#meter-book-adjust-search-form #btn-meter-book-adjust').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/meter-book-adjust/load-meter-book-select-meter-main';
+			var meterBookIds = METER_BOOK_ID_ARR;
+			console.log(meterBookIds);
+			var parms = new Object();
+			if(meterBookIds.length!=2){
+				util.message("调整表册前，请选择两个表册！",null,"warning");
+				return;
+			}
+			parms.meterBookIds = meterBookIds.toString();
+			$("#meter-book-select").load(url, parms,showMeterBookSelect); //加载完毕后显示 
+		});
+		
+		/**
+		 * 	保存条目:自动生成表册
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function saveAutoItem(traceIds) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/meter-book-adjust/insert";
+			var parm = new Object();
+			parm.traceIds = traceIds;
+			$.post(urlStr, parm, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeEditDialog();
+						loadPageClickPageNum();
+						util.message(res.result_msg,null,"warning");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+		
+		
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//---------事件绑定--------------
+			$("#tab-meter-book-item-li").on("click", function(){
+				hideMeterBookSelect();
+				hideMeterBookBindMeter();
+				hideMeterBookMeterDetail();
+				triggerResize();
+			});
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			//------------------初始化ztree--------------------------------------------------
+			locationTree.initTree();  //初始化树.		
+			locationTree.setClickOuterFunction(clickZTreeNodeCallback);  //设置外部业务函数
+			//地理位置下拉组件初始化
+			locationSearcher.init();
+			
+			defaultSearchMeterBook();
+			
+
+			//---------事件绑定--------------
+			
+			/*
+				增加核对类型按钮CLICK
+			*/
+			$('#meter-book-adjust-search-form #btn-add').on('click', function() {
+				loadEditDialog();  //先加载后显示对话框
+			}); 
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#meter-book-adjust-search-form #btn-general-search').on('click', function() {
+				G_GENERAL_SEARCH = "0";//记录是普通查询还是高级查询
+				locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+				defaultSearchMeterBook();//查询抄表记录
+			});
+			/*
+				查询条件复位按钮CLICK
+			 */
+			$('#meter-book-adjust-search-form #btn-general-search-reset').on('click', function() {
+				$("#meter-book-adjust-search-form #search-cond").val("");
+				$("#meter-book-adjust-search-form #search-cond").focus();//获得焦点
+	
+				$("#meter-book-adjust-search-form #location-block").val("");//设置地理位置-小区值为空
+				$("#meter-book-adjust-search-form #location-building").val("");//设置地理位置-楼号值为空
+				$("#meter-book-adjust-search-form #location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$("#meter-book-adjust-search-form #location-unit").val("");//设置地理位置-单元值为空
+				$("#meter-book-adjust-search-form #location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+	
+			});
+			/*
+				查询条件输入框 KEYUP
+			 */
+			$('#meter-book-adjust-search-form #search-cond').on('keyup', function(event) {
+				if (event.keyCode == 13) {
+					$('#meter-book-adjust-search-form #btn-general-search').trigger("click");
+				}
+			});
+			
+			
+			/*
+				btn-del-role
+				批量删除按钮
+			*/
+			$('#meter-book-adjust-search-form #btn-del-role').on('click', function() {
+				var ids=getSelectedIds();  //此函数定义于_table.html中
+				if(ids==null || ids.length<=0){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要删除的条目！",null,"warning");
+					return;
+				}
+				batchDeleteConfirm();  //显示删除确认对话框
+			});
+			
+			/*
+				自动调整树的高度.
+			*/
+			var tableContainerId = "meter-book-body";
+			LocationTreeAdaptive.adaptive(tableContainerId);
+		});
+	</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<html> 
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>
+<style type="text/css" mce_bogus="1">
+.mybodySt{font-family: SimSun;font-size: 11px; padding:0px;margin:0px;}
+.myheadSt,.mycontentSt,.myTheadSt{width:100%;}
+.mytableSt{width:100%;table-layout:fixed;word-break:break-strict;}
+.mytableSt tr{width:100%;height:25px;line-height:25px;font-size: 15px;}
+.mytableSt td{text-align:center;height:25px;line-height:25px;}
+/*.bdLeft {*/
+	/*border-left: 1px solid #4054b3;*/
+	/*border-bottom: 1px solid #4054b3;*/
+	/*padding: 0 5px;*/
+/*}*/
+/*.thRight {*/
+	/*border: 1px solid #4054b3;*/
+/*}*/
+/*.thLeft {*/
+	/*border-bottom: 1px solid #4054b3;*/
+	/*border-top: 1px solid #4054b3;*/
+	/*border-left: 1px solid #4054b3;*/
+	/*padding: 0 5px;*/
+/*}*/
+	.tabel-head-title{
+		background: #5d6ebd;
+	}
+.tabel-head-title td{
+	color:#fff;
+}
+	.table-element tbody tr:nth-child(2n){
+		background: #EDEDED;
+	}
+.table-element tbody tr td{
+	padding: 5px 0 0 5px;
+}
+</style>
+</head>
+<body class="mybodySt">
+<div class="myheadtwo">
+	<div class="myheadSt">
+		<div style="width:100%;height:30px;line-height:30px;font-size:24px;text-align:center;margin-bottom:15px;">配置工作量统计<span style="font-size:14px;color:#9a9494; margin-left:10px;">时间范围（$timeFrame）</span></div>
+		<!--<div style="width:100%;height:26px;line-height:26px;font-size:18px;text-align:center;margin-bottom: 5px;"></div>-->
+	</div>
+	<div class="mycontentSt">
+		<table class="mytableSt table-element" border="0" cellpadding="0" cellspacing="0">
+			<thead class="myTheadSt tabel-head-title">
+				<tr>
+					<td class="thLeft" style="width:19%;">员工</td>
+					<td class="thLeft" style="width:13%;">总数</td>
+					<td class="thLeft" style="width:13%">普通药</td>
+					<td class="thLeft" style="width:13%">抗生素</td>
+					<td class="thLeft" style="width:13%">化疗药</td>
+					<td class="thLeft" style="width:13%">营养药</td>
+					<td class="thRight" style="width:17%">工作量系数汇总</td>
+				</tr>
+			</thead>
+			#foreach($element in $workList)
+				<tr> 
+					<td class="bdLeft" style="text-align:center">
+						#if(${element.workName})
+							${element.workName}
+						#end
+					</td>
+					<td class="bdLeft" style="text-align:center">
+						#if(${element.totalCount})
+							${element.totalCount}
+						#else 
+							0
+						#end
+					</td>
+					<td class="bdLeft">
+						#if(${element.generalCount})
+							${element.generalCount}
+						#else 
+							0
+						#end
+					</td>
+					<td class="bdLeft">
+						#if(${element.antibioticCount})
+							${element.antibioticCount}
+						#else 
+							0
+						#end
+					</td>
+					<td class="bdLeft">
+						#if(${element.chemotherapyCount})
+							${element.chemotherapyCount}
+						#else 
+							0
+						#end
+					</td>
+					<td class="bdLeft">
+						#if(${element.nutritionCount})
+							${element.nutritionCount}
+						#else 
+							0
+						#end
+					</td>
+					<td class="bdRight">${element.workloadStr}</td>
+				</tr>
+			#end
+		</table>
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-sm">
+		<thead>
+			<tr>				
+				<th>水表位置</th>
+				<th>厂家名称</th>
+				<th>水表口径</th>
+				<th>水表型号</th>				
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${meterList}"  draggable="true"  ondragstart="drag(event)"   th:attr="data-bind-id=${item.id},data-bind-place=${item.place}"  >			
+				<!-- 水表位置-->
+				<td th:text="${item.place}">水表位置</td>
+				<!-- 厂家名称-->
+				<td th:text="${item.factoryValue}">厂家名称</td>
+				<!-- 水表口径 -->
+				<td th:text="${item.caliber}">水表口径</td>
+				<!--水表型号-->
+				<td th:text="${item.meterTypeValue}">水表型号</td>
+
+			</tr>
+		</tbody>
+	</table>
+	
+	<!-- <div style="width:300px;height:100px;background:green;" 
+		ondrop="drop(event)" 
+		ondragover="allowDrop(event)">
+		<span id="show-status"></span>
+	</div> -->
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerLocationMeter')" class="pagerx"	style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+	<script type="text/javascript">	
+	
+	 	/*
+		       需要移动的Dom绑定 draggable=true, 然后绑定事件ondragstart=function name() {},记得给id
+		    ondragstart事件负责 存拖拽的Dom信息.然后拖拽后的 容器，需要绑定ondrop 事件，和 ondragover事件，
+		    ondrop事件负责 获取存的Dom 数据，并append到容器中，记得阻止默认事件。ev.preventDefault
+		    ondragover事件负责何处放置数据，并取消默认事件。ev.preventDefault.
+		  */
+		  function drag(ev) {
+		    console.log("meter table-----------start drag");	  
+		    //console.log("drag event object is:"+JSON.stringify(ev));
+		    //console.log("drag event object is:"+JSON.stringify(that));
+		    //console.log("drag event object is:"+this);
+		    
+		    //$(ev.target)  is the draged object   ******
+		    var meterId=$(ev.target).attr("data-bind-id");
+		    var meterPlace=$(ev.target).attr("data-bind-place");
+		    var transferData=genTransferData(meterId,meterPlace);		    
+		    console.log("transferData is:"+JSON.stringify(transferData));
+		    //设置需要传递的数据
+		    ev.dataTransfer.setData('transferData', JSON.stringify(transferData));// 设置数据
+		  }
+		       
+		  /*
+		  	功能:
+		  		生成向meter tree所要传递的数据
+		  	参数:
+		  		meterId:表计id
+		  		meterPlace:表计
+		  	返回:
+		  		{
+		  			meterId:"",
+		  			meterPlace:""
+		  		}
+		  		
+		  */		  
+		  function genTransferData(meterId,meterPlace){
+			  var transferData=new Object();
+			  transferData.meterId=meterId;
+			  transferData.meterPlace=meterPlace;
+			  return transferData;
+		  }     
+		       
+		
+		//创建分页组件实例
+		var pager=new Pager("pagerLocationMeter");
+		
+		$(function(){
+			//$( "tr" ).draggable();
+			pager.init(loadLocationMeterPage,curr_searchCond);
+			
+		});
+		
+		
+		
+	</script>
+</body>
+</html>

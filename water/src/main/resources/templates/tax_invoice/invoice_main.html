@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<style type="text/css">
+.operator-button li {
+	float: right;
+	margin: auto 1px;
+	cursor: pointer;
+}
+</style>
+
+<link rel="stylesheet"	href="/css/meterbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+<!-- 普通发票-样式表 -->
+<link rel="stylesheet"	href="/css/components/invoicenormal/invoicenormal.css" />
+<!-- 专用发票样式表 -->
+<link rel="stylesheet"	href="/css/components/invoicespecial/invoicespecial.css" />
+
+
+
+
+
+</head>
+<body>
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label tax-invoice-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block inline;" id="tax-invoice-search-form">
+				<ul class="extra-l" style="list-style: none;">
+				
+					<li class="input-group-sm">
+						<input type="text" class="form-control Wdate invoice-year" readonly="readonly" style="width: 100px;"
+								id="invoice-year" name="invoiceYear"
+								onClick="WdatePicker({dateFmt:'yyyy',onpicked: taxInvoiceRedFun.setBackGround,isShowClear:false});"
+								placeholder="年份" title="年份" />
+					</li>
+					<li class="input-group-sm">
+						<!-- 月份-->
+						<select class="form-control btn-sm invoice-month" id="invoice-month" name="invoiceMonth">
+							<option value="">—全部月份—</option>
+							<option value="01">1月份</option>
+							<option value="02">2月份</option>
+							<option value="03">3月份</option>
+							<option value="04">4月份</option>
+							<option value="05">5月份</option>
+							<option value="06">6月份</option>
+							<option value="07">7月份</option>
+							<option value="08">8月份</option>
+							<option value="09">9月份</option>
+							<option value="10">10月份</option>
+							<option value="11">11月份</option>
+							<option value="12">12月份</option>
+						</select>
+					</li>
+					<li class="input-group-sm">
+						<!-- 发票种类,固定值：0：专用发票 2：普通发票12：机动车票51：电子发票 -->
+						<select class="form-control btn-sm invoice-fpzl" id="invoice-fpzl" name="invoiceFpzl">
+							<option value="">—发票种类—</option>
+							<option value="0">专用发票</option>
+							<option value="2">普通发票</option>
+							<option value="12">机动车票</option>
+							<option value="51">电子发票</option>
+						</select>
+					</li>
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入检索关键字">
+					</li>
+					<li>
+						<button type="button" class="btn  btn-sm btn-tax-search" id="btn-tax-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					
+					
+				</ul>
+				<ul class="operator-button" style="list-style: none;">
+					<li>
+						<div class="btn-group">
+							<button type="button" class="btn  btn-sm btn-general-search" id="btn-general-search">
+								<i class="fa fa-search-plus" aria-hidden="true"> <span>高级查询</span>	</i>
+							</button>
+							
+							<button type="button" class="btn  btn-sm btn-tax-detail" id="btn-tax-detail">
+								<i class="fa fa-info" aria-hidden="true"> <span>查看明细</span></i>
+							</button>
+							
+							<button type="button" class="btn  btn-sm btn-tax-red" id="btn-tax-red">
+								<i class="fa fa-registered" aria-hidden="true"> <span>冲红</span></i>
+							</button>
+							
+							<button type="button" class="btn  btn-sm btn-destory-invoice" id="btn-destory-invoice">
+								<i class="fa fa-times" aria-hidden="true"> <span>作废</span></i>
+							</button>
+							
+							<button type="button" class="btn  btn-sm btn-print-invoice" id="btn-print-invoice">
+								<i class="fa fa-print" aria-hidden="true"> <span>打印</span></i>
+							</button>
+						</div>
+						
+					</li>
+				</ul>
+			</div>
+			<div class="span12">
+				<!-- 对话框1 -->
+				<span th:include="tax_invoice/batch_query_invoice_cond_dialog::dialog('dialog1')"  th:remove='tag'></span>			
+			</div>
+				<!-- 容器:字典列表 -->
+				<div class="tax-invocie-table table-container" id="meters-body"></div>
+
+		</div>
+	</div>
+	
+	<!-- 作废发票号码确认对话框 -->
+	<div th:include="component/invoicehmconfirmdialog/invoicehm_confirm_dialog::dialog('invoice-confirm-dialog')"></div>
+	<!-- 专用发票冲红对话框 -->
+	<div th:include="tax_invoice/add_invocie_red_dialog::dialog('invoice-red-dialog-1')"></div>
+	
+	<!-- 普通发票显示对话框 -->
+	<div class="">			
+			<span th:include="component/displayinvoicenormal/display_invoice_normal::dialog('display-normal-dialog')"  th:remove='tag'></span>			
+	</div>
+	
+	<!-- 专用发票对话框 -->
+	<div class="">			
+			<span th:include="component/displayinvoicespecial/display_invoice_special::dialog('display-special-dialog')"  th:remove='tag'></span>			
+	</div>
+	
+	
+	<!-- 发票查询组件JS部分 -->
+	<script type="text/javascript" src="/js/component/batchqueryinvoiceconddialog/BatchQueryInvoiceCondDialog.js"></script>
+	<script type="text/javascript" src="/js/tax/TaxInvoiceRed.js"></script>
+	<!-- 日期组件 -->
+	<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+	
+	<!-- 发票冲红对话框JS -->
+	<script type="text/javascript" src="/js/tax/TaxInvoiceRedDialog.js"></script>
+	
+	<!-- 发票号码确认对话框组件JS部分 -->
+	<script type="text/javascript" src="/js/component/invoicehmconfirmdialog/InvoiceHMConfirmDialog.js"></script>
+	
+	<!-- 发票相关实体 -->
+	
+	<!-- 日期工具 -->
+<script src="/pivas/js/common/dateUtil.js"></script>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<!-- jquery popup组件 -->
+<script src="/jquery/jquery-popup/jquery.popupoverlay.js" type="text/javascript"></script>
+
+<!-- 专用发票组件JS -->
+<!-- 发票类型对象,用于定义发票类型常量 -->
+<script src="/js/component/invoicepublic/InvoiceType.js"></script>
+<!-- 发票头对象 -->
+<script src="/js/component/invoicepublic/InvoiceHead.js"></script>
+<!-- 发票附加对象 -->
+<script src="/js/component/invoicepublic/InvoiceAddition.js"></script>
+<!-- 发票中商品条目对象 -->
+<script src="/js/component/invoicepublic/InvoiceDetail.js"></script>
+<!-- 发票对象 -->
+<script src="/js/component/invoicepublic/Invoice.js"></script>
+<!-- 发票打印参数对象 -->
+<script src="/js/component/invoicepublic/PrintParam.js"></script>
+<!-- 发票打印对象 -->
+<script src="/js/component/invoicepublic/InvoicePrint.js"></script>
+<!-- 发票库存对象 -->
+<script type="text/javascript" src="/js/component/invoicepublic/InvoiceInventory.js"></script>
+<!-- 销方,购方开票信息对象 -->
+<script type="text/javascript" src="/js/component/invoicepublic/IssueInvoiceInfo.js"></script>
+
+<!-- 发票业务部分:发票类型 -->
+<script type="text/javascript" src="/js/component/invoicepublic/InvoiceType.js"></script>
+
+<!-- 作废发票对象 -->
+<script src="/js/component/invoicepublic/InvoiceInvalid.js"></script>
+
+<!-- 货币转换对象 -->
+<script src="/js/component/invoicepublic/MoneyTransform.js"></script>
+<!-- 编辑器对象 -->
+<script src="/js/component/invoicepublic/InvoiceFieldEditor.js"></script>
+
+<!-- 增值税专票对象 -->
+<script src="/js/component/invoicespecial/InvoiceSpecial.js"></script>
+<!-- 增值税普票对象 -->
+<script src="/js/component/invoicenormal/InvoiceNormal.js"></script>
+
+<!-- 普通发票显示对话框组件JS部分 -->
+<script src="/js/component/displayinvoicenormal/DisplayInvoiceNormal.js"></script>
+<!-- 专用发票显示对话框组件JS部分 -->
+<script src="/js/component/displayinvoicespecial/DisplayInvoiceSpecial.js"></script>	
+	
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+	var batchQueryInvoiceCondDialog=new BatchQueryInvoiceCondDialog("dialog1");
+	batchQueryInvoiceCondDialog.setButtonOkCallback(buttonOkCallback);
+	batchQueryInvoiceCondDialog.setButtonCancelCallback(buttonCancelCallback);
+	//BUTTON OK,OUTER BUSINESS FUNC
+	function buttonOkCallback(){
+		console.log("button ok callback is executed");
+	}
+	//BUTTON CANCEL,OUTER BUSINESS FUNC
+	function buttonCancelCallback(){
+		console.log("button cancel callback is executed");
+	}
+	
+	var taxInvoiceRedFun=new TaxInvoiceRedFun();
+	
+	/*
+	分页查询(采用所保存的状态)
+	*/
+	var loadPage = function (searchCond, pageNum, pageSize) {
+		var parms = null;
+		if(taxInvoiceRedFun.G_GENERAL_SEARCH == 0){
+			parms = taxInvoiceRedFun.getSearchParams();//获取普通查询参数（不包括分页信息）
+		}else if (taxInvoiceRedFun.G_GENERAL_SEARCH == 1){
+			parms = taxInvoiceRedFun.advancedSearchParams();//获取高级查询参数
+		}
+		parms.pageNum=pageNum;
+		parms.pageSize=pageSize;
+
+		taxInvoiceRedFun.search(parms);
+	}
+	
+	
+	$(function(){
+		taxInvoiceRedFun.init(batchQueryInvoiceCondDialog);
+	});
+	</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,165 @@
+@font-face {
+	font-family: glyphicons;
+	font-size: small;
+	src: url('/font-awesome/4.7.0/fonts/fontawesome-webfont.woff')
+		format('woff');
+	//
+	字体路径
+}
+
+body {
+	font-size: 14px;
+	font-family: glyphicons, "Microsoft YaHei UI";
+	/* background-color:#f0f1ef; */
+}
+
+/* body {
+	font-size: 14px;
+	font-family: 微软雅黑;
+} */
+a {
+	text-decoration: none;
+	color: black;
+}
+
+a:visited {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+.container a:hover {
+	text-decoration: none;
+	color: blue;
+}
+
+/* 操作面板样式 */
+ul.extra-l {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+/*  */
+ul.extra-l li {
+	float: left;
+	margin: auto 1px;
+	cursor: pointer;
+}
+
+/* placeholder color */
+/* chrome浏览器 */
+#search-cond::-webkit-input-placeholder {
+	color: lightblue;
+}
+
+#search-cond:-moz-placeholder {
+	color: lightblue;
+}
+
+#search-cond::-moz-placeholder {
+	color: lightblue;
+}
+
+#search-cond:-ms-input-placeholder {
+	color: lightblue;
+}
+
+/* ---------------医嘱列表------------- */
+
+/* 医嘱表格  容器样式 */
+/* div.table-doctor-advice-sub{
+	height:508px;  	
+}
+*/
+
+/* 医嘱表格样式 scroll-bar */
+table.table-doctor-advice-sub {
+	/* display:block; */
+	width: 100%;
+	/* overflow-x:auto; */
+}
+
+table.table-doctor-advice-sub thead {
+	display: block;
+	/* height:50px; */
+	width: 100%;
+	/* background-color:#ddd; */
+	background-color: lightgray;
+}
+
+table.table-doctor-advice-sub tbody {
+	display: block;
+	height: 330px;
+	overflow-y: scroll;
+	width: 100%;
+}
+
+/* table header color */
+table.table-doctor-advice-sub th {
+	/* background-color:lightgray; */ /* 表头颜色 */
+	font-weight: normal; /* 表头文字样式不再加粗 */
+	text-align: center; /* 文字上下居中 */
+	vertical-align: middle; /* 文字左右居中 */
+}
+
+table.table-doctor-advice-sub td {
+	vertical-align: middle; /* 文字上下居中 */
+}
+
+/* 列表中患者标签背景色 */
+label.label-patient {
+	color: black;
+	background-color: #ddd;
+}
+
+label.label-patient .label-patient-tag { /* 标签图标color */
+	color: green;
+}
+
+/* -----------病区列表样式---------- */
+
+/* 固定表头 */
+table.table-doctor-advice-main {
+	width: 100%;
+}
+
+table.table-doctor-advice-main thead {
+	display: block;
+	width: 100%;
+	background-color: lightgray;
+}
+
+table.table-doctor-advice-main tbody {
+	display: block;
+	width: 100%;
+	height: 570px;
+	overflow-y: scroll;
+}
+
+table.table-doctor-advice-main tr.current {
+	background-color: lightgreen;
+}
+
+table.table-doctor-advice-main th {
+	font-weight: normal; /* 表头文字样式不再加粗 */
+	text-align: center; /* 文字上下居中 */
+	vertical-align: middle; /* 文字左右居中 */
+}
+
+table.table-doctor-advice-main td {
+	vertical-align: middle; /* 文字上下居中 */
+}
+
+/* 卡片样式 */
+/* 分为四列,每列各占25% */
+td.card-col-title, td.card-col-content {
+	width: 25%;
+}
+/* 卡片表格的标题部分样式 */
+td.card-col-title {
+	/* background-color:lightgreen; */
+	
+}
+

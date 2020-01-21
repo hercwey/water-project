@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+<style type="text/css">
+	#general-search-form ul li label{
+		margin-bottom: 0px;
+	}
+	#general-search-form .input-group-text{
+		font-size: .875rem;
+		background-color: #f8f9fa;
+	}
+	#general-search-form .input-group-prepend, .input-group-text {
+		height: 31px;
+	}
+</style>
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-12 column">
+
+			<div class="" style="display: inline-block" id="general-search-form">
+				<ul class="extra-l" style="list-style: none;">
+					<!-- 面板:查询 -->
+					<!-- <li class="input-group-sm">
+						<input type="text" class="form-control Wdate" readonly="readonly" style="width: 100px;"
+								id="bill-period" name="period"
+								onClick="WdatePicker({dateFmt:'yyyy-MM',onpicked: setBackGround});"
+								placeholder="期间" title="期间" />
+					</li> -->
+					<li class="input-group-sm">
+						<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher')" th:remove="tag"></div>
+					</li>
+					<!-- 余额情况-->
+					<li class="input-group-sm">
+						<select class="form-control balance-status" id="balance-status">
+							<option value="">—余额情况—</option>
+							<option value="1">余额大于欠费</option>
+							<option value="2">余额等于欠费</option>
+							<option value="3">余额小于欠费</option>
+						</select>
+					</li>
+					<li class="input-group-sm">
+						<input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入客户名称、手机号、编号" title="输入客户姓名、手机号、编号等查询"/>
+					</li>
+					<li>
+						<div class="input-group-prepend btn-default">
+							<div class="input-group-text">
+								<label><input type="checkbox" class="" id="search-all-customer">&nbsp;查询所有预存客户</label>
+							</div>
+						</div>
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm btn-search-bill" id="btn-search-bill">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm btn-search-bill-reset" id="btn-search-bill-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+					<!-- <li>
+						<button type="button" class="btn btn-success btn-sm btn-auto-settle-bill-batch" id="btn-auto-settle-bill-batch">
+							<i class="fa fa-money" aria-hidden="true"> <span>批量扣费</span></i>
+						</button>
+					</li> -->
+					<li>
+						<div class="dropdown">
+							<button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+								操作
+							</button>
+							<div class="dropdown-menu">
+								<a class="dropdown-item btn-sm btn-auto-settle-bill-batch" id="btn-auto-settle-bill-batch">
+									<i class="fa fa-money" aria-hidden="true">
+										<span>批量扣费</span>
+									</i>
+								</a>
+								<div class="dropdown-divider" style="border-top: 0.8px solid blue;"></div>
+								<a class="dropdown-item btn-sm btn-export-bill-excel">
+									<i class="fa fa-download" aria-hidden="true">
+										<span>导出EXCEL</span>
+									</i>
+								</a>
+							</div>
+						</div>
+					</li>
+			</div>
+
+
+
+
+		</div>
+	</div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+				
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+					
+		});
+	</script>
+
+
+
+</body>
+</html>

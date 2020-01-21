@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户账单页面</title>
+<style type="text/css">
+
+	#search-customer-bill-div ul li label{
+		margin-bottom: 0px;
+	}
+	#search-customer-bill-div .input-group-text{
+		font-size: .875rem;
+		background-color: #f8f9fa;
+	}
+	
+	#dialog-operate-div ul li label{
+		margin-bottom: 0px;
+	}
+	#dialog-operate-div .input-group-text{
+		font-size: .875rem;
+		background-color: #f8f9fa;
+	}
+	#dialog-operate-div .input-group-prepend, .input-group-text {
+		height: 32px;
+	}
+	#dialog-operate-div .input-group-prepend {
+		padding-top: 0px;
+	}
+</style>
+</head>
+<body>
+	<div class="container-fluid" th:id="${containerId}">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="tabbable" id="tabs-selected-customer-bill">
+					<ul class="nav nav-tabs" id="selected-customer-bill-nav">
+						<li class="nav-item" id="invoice-bill-item-li">
+							<a class="nav-link active" href="#customer-bill-item" data-toggle="tab">账单列表</a>
+						</li>
+						<li class="nav-item" id="selected-customer-bill-item-li">
+							<a class="nav-link" href="#selected-customer-bill-item" data-toggle="tab">已选择的账单列表</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="customer-bill-item">
+							<!-- 账单列表 -->
+							<div th:include="customers/invoice/bill/customer_bill_main" th:remove="tag"></div>
+						</div>
+						<div class="tab-pane" id="selected-customer-bill-item">
+							<!-- 已选择的账单列表 -->
+							<div th:include="customers/invoice/bill/selectedbill/customer_bill_main" th:remove="tag"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 选择客户账单JS -->
+	<script type="text/javascript" src="/js/component/selectinvoice/SelectCustomerBill.js"></script>
+</body>
+<!-- 选择客户账单JS -->
+ <script type="text/javascript" src="/js/component/selectinvoice/SelectCustomerBill.js"></script>
+</html>

@@ -1,0 +1,1669 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.StatisticTempTableMapper">
+  <!-- <resultMap id="BaseResultMap" type="com.learnbind.ai.model.StatisticTempTable">    
+    <id column="ID" jdbcType="DECIMAL" property="id" />    
+  </resultMap>
+  <sql id="Base_Column_List">
+    
+      WARNING - @mbg.generated
+   
+    ID
+  </sql> -->
+  
+  <!-- test -->
+  <select id="test" resultType="map">
+  		select * from customers where rownum&lt;=20		
+  </select>
+  
+  <!-- 查询指定月份客户列表 -->  
+  <select id="searchCustomerPerMonth" resultType="map">
+  	SELECT
+		C.* 
+	FROM
+		CUSTOMERS C
+	<if test="traceIds!=null and traceIds!=''">
+		 LEFT JOIN LOCATION_CUSTOMER LC ON C.ID=LC.CUSTOMER_ID
+	</if>
+	<where>
+		C.DELETED = 0  <!-- 未删除 -->
+		AND TO_DATE(TO_CHAR(C.SETTLE_TIME,'YYYY-MM'),'yyyy-mm') =to_date(#{period},'yyyy-mm') 
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+	</where>
+	ORDER BY SETTLE_TIME
+  </select>
+  
+  <!-- 查询指定年份客户列表 -->  
+  <select id="searchCustomerPerYear" resultType="map">
+	SELECT
+		C.* 
+	FROM
+		CUSTOMERS C
+	<if test="traceIds!=null and traceIds!=''">
+		 LEFT JOIN LOCATION_CUSTOMER LC ON C.ID=LC.CUSTOMER_ID
+	</if>
+	<where>
+		C.DELETED = 0  <!-- 未删除 -->
+		AND TO_DATE(TO_CHAR(c.SETTLE_TIME,'YYYY'),'yyyy') =to_date(#{period},'yyyy')  
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+	</where>
+	ORDER BY SETTLE_TIME
+  </select>
+  
+  <!-- 统计某月每天新增客户数 -->
+  <select id="statCustomerPerDay" resultType="map">
+  	SELECT
+		TO_DATE(TO_CHAR(C.SETTLE_TIME,'YYYY-MM-dd'),'yyyy-mm-dd') SETTLE_TIME,  <!-- yyyy-mm-dd -->
+		count(*) CUSTOMERAMOUNT 
+	FROM
+		CUSTOMERS C
+	<if test="traceIds!=null and traceIds!=''">
+		 LEFT JOIN LOCATION_CUSTOMER LC ON C.ID=LC.CUSTOMER_ID
+	</if>
+	<where>
+		C.DELETED = 0  <!-- 未删除 -->
+		AND TO_DATE(TO_CHAR(c.SETTLE_TIME,'YYYY-MM'),'yyyy-mm') =to_date(#{period},'yyyy-mm') 
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+	</where>
+	GROUP BY 
+		TO_DATE(TO_CHAR(c.SETTLE_TIME,'YYYY-MM-dd'),'yyyy-mm-dd')
+  </select>
+  
+  <!-- 统计某年每月新增客户数 -->
+  <select id="statCustomerPerMonth" resultType="map">
+  	SELECT
+		TO_DATE(TO_CHAR(c.SETTLE_TIME,'YYYY-MM'),'yyyy-mm') STATMONTH, <!-- yyyy-mm -->
+		count(*) CUSTOMERAMOUNT 
+	FROM
+		CUSTOMERS C
+	<if test="traceIds!=null and traceIds!=''">
+		 LEFT JOIN LOCATION_CUSTOMER LC ON C.ID=LC.CUSTOMER_ID
+	</if>
+	<where>
+		C.DELETED = 0  <!-- 未删除 -->
+		AND TO_DATE(TO_CHAR(c.SETTLE_TIME,'YYYY'),'yyyy') =to_date(#{period},'yyyy') 
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+	</where>
+	GROUP BY 
+		TO_DATE(TO_CHAR(C.SETTLE_TIME,'YYYY-MM'),'yyyy-mm')
+  </select>
+  
+  <!--
+  		查询抄表记录指定期间的抄表记录   yyyy-mm 
+   -->
+  <select id="searchReadMeterRecordPerMonth" resultType="map">
+  		SELECT
+			C.CUSTOMER_NAME,
+			C.CUSTOMER_TEL,
+			C.CUSTOMER_MOBILE,
+			C.ADDRESS,
+			C.ROOM,
+			C.CUSTOMER_TYPE,
+			R.* 
+		FROM
+			METER_RECORD R
+			LEFT JOIN CUSTOMERS C ON ( R.CUSTOMER_ID = C.ID ) 
+		<if test="traceIds!=null and traceIds!=''">
+			LEFT JOIN LOCATION_METER LM ON ( R.METER_ID = LM.METER_ID )
+		</if> 
+		<where>
+			R.DELETED=0
+			AND TO_DATE(TO_CHAR(R.CURR_DATE,'YYYY-MM'),'yyyy-mm') =to_date(#{period},'yyyy-mm') 
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+		</where>
+		ORDER BY
+			C.CUSTOMER_NAME
+  </select>
+  
+  <!--
+  	 统计批定期间每天的抄表数量 
+  -->
+  <select id="statReadRecordNumPerDay" resultType="map">
+  
+  	SELECT
+		count( * ) READ_NUM,
+		TO_DATE ( TO_CHAR ( R.CURR_DATE, 'YYYY-MM-dd' ), 'yyyy-mm-dd' ) READ_DATE 
+	FROM
+		METER_RECORD R
+		LEFT JOIN CUSTOMERS C ON ( R.CUSTOMER_ID = C.ID ) 
+	<if test="traceIds!=null and traceIds!=''">
+		LEFT JOIN LOCATION_METER LM ON ( R.METER_ID = LM.METER_ID )
+	</if>
+	<where>
+		R.DELETED=0  <!-- 未删除 -->
+		AND TO_DATE(TO_CHAR(R.CURR_DATE,'YYYY-MM'),'yyyy-mm') =to_date(#{period},'yyyy-mm') 
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+	</where>
+	GROUP BY 
+		TO_DATE ( TO_CHAR ( R.CURR_DATE, 'YYYY-MM-dd' ), 'yyyy-mm-dd' )
+  </select>
+   
+   <!--
+  	 统计批定期间每月的抄表数量   月===MAP====>抄表数
+  -->
+  <select id="statReadRecordNumPerMonth" resultType="map">
+  	SELECT
+		count( * ) READ_NUM,
+		TO_DATE ( TO_CHAR ( R.CURR_DATE, 'YYYY-MM' ), 'yyyy-mm' ) READ_DATE 
+	FROM
+		METER_RECORD R
+		LEFT JOIN CUSTOMERS C ON ( R.CUSTOMER_ID = C.ID ) 
+	<if test="traceIds!=null and traceIds!=''">
+		 LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID
+	</if>
+	<where>
+		R.DELETED=0  <!-- 未删除 -->
+		AND TO_DATE(TO_CHAR(R.CURR_DATE,'YYYY'),'yyyy') =to_date(#{period},'yyyy') 
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+	</where>
+	GROUP BY 
+		TO_DATE ( TO_CHAR ( R.CURR_DATE, 'YYYY-MM' ), 'yyyy-mm' )
+  </select>
+  
+  
+  <!--
+  		查询抄表记录指定期间的抄表记录   yyyy 
+   -->
+  <select id="searchReadMeterRecordPerYear" resultType="map">
+		SELECT
+			C.CUSTOMER_NAME,
+			C.CUSTOMER_TEL,
+			C.CUSTOMER_MOBILE,
+			C.ADDRESS,
+			C.ROOM,
+			C.CUSTOMER_TYPE,
+			R.* 
+		FROM
+			METER_RECORD R
+			LEFT JOIN CUSTOMERS C ON ( R.CUSTOMER_ID = C.ID ) 
+		<if test="traceIds!=null and traceIds!=''">
+			LEFT JOIN LOCATION_METER LM ON ( R.METER_ID = LM.METER_ID )
+		</if> 
+		<where>
+			R.DELETED=0
+			AND TO_DATE(TO_CHAR(R.CURR_DATE,'YYYY'),'yyyy') =to_date(#{period},'yyyy') 
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+		</where>
+		ORDER BY
+			C.CUSTOMER_NAME
+  </select>
+  
+  <!--
+  	抄表-月统计汇总    
+  	此处按用户:用水性质(即水价定义)
+   -->
+  <select id="statReadRecordMonthSummary" resultType="map">
+  	SELECT
+		NVL(TO_CHAR(count(*)), 0) READ_NUM,
+		C.WATER_USE 
+	FROM
+		METER_RECORD R
+		LEFT JOIN CUSTOMERS C ON ( R.CUSTOMER_ID = C.ID ) 
+	<if test="traceIds!=null and traceIds!=''">
+		 LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID
+	</if>
+	<where>
+		R.DELETED=0  <!-- 未删除 -->
+		AND TO_DATE(TO_CHAR(R.CURR_DATE,'YYYY-MM'),'yyyy-mm') =to_date(#{period},'yyyy-mm') 
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+	</where>
+	GROUP BY
+		C.WATER_USE  
+  </select>
+  
+   <!--
+  	抄表-年统计汇总    
+  	此处按用户:用水性质(即水价定义)
+   -->
+  <select id="statReadRecordYearSummary" resultType="map">
+  	SELECT
+		count( * ) READ_NUM,
+		C.WATER_USE 
+	FROM
+		METER_RECORD R
+		LEFT JOIN CUSTOMERS C ON ( R.CUSTOMER_ID = C.ID ) 
+	<if test="traceIds!=null and traceIds!=''">
+		 LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID
+	</if>
+	<where>
+		R.DELETED=0  <!-- 未删除 -->
+		AND TO_DATE(TO_CHAR(R.CURR_DATE,'YYYY'),'yyyy') =to_date(#{period},'yyyy') 
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+	</where>
+	GROUP BY
+		C.WATER_USE  
+  </select>
+  
+  <!--
+  	统计应抄表数量 
+   -->
+  <select id="statNeedReadMeterAmount"  resultType="int">
+	  select count(*) 
+	  from METERS M
+	  LEFT JOIN LOCATION_METER LM ON M.ID=LM.METER_ID	
+	   where M.CYCLE_STATUS=3 AND M.DELETED=0	AND LM.DELETED=0
+	   <if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+		</if> 
+  </select>
+  
+  <!--
+  	统计实抄表数量 
+   -->
+  <select id="statHasReadMeterAmount"  resultType="int">
+	  SELECT
+			count( * )			 
+		FROM
+			METER_RECORD R	
+			LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID		 
+		WHERE
+			<!-- TO_DATE(TO_CHAR(R.CURR_DATE,'YYYY-MM'),'yyyy-mm') =to_date(#{period},'yyyy-mm') -->
+			R.DELETED=0	
+			AND LM.DELETED=0
+			AND R.PRE_READ IS NOT NULL 
+			AND R.PERIOD=#{period}
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+			</if> 
+  </select>
+  
+   <!--
+  	按年份统计实抄表数量 
+   -->
+  <select id="statHasReadMeterYearAmount"  resultType="int">
+	  SELECT
+			count( * )			 
+		FROM
+			METER_RECORD R	
+			LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID		 
+		WHERE
+			R.PERIOD LIKE CONCAT(#{period},'%')	
+			AND R.DELETED=0	AND LM.DELETED=0
+			AND R.PRE_READ IS NOT NULL 
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+			</if> 
+  </select>
+  
+  <!-- 
+  		查询指定月售水量列表  	 自分水量中读取
+  	-->
+  <select id="searchPartRecordPerMonth"  resultType="map">
+	  	SELECT
+	  		C.CUSTOMER_NAME,
+			C.CUSTOMER_TEL,
+			C.CUSTOMER_MOBILE,
+			C.ADDRESS,
+			C.ROOM,
+			C.CUSTOMER_TYPE,
+			P.* 
+		FROM
+			PARTITION_WATER P
+			LEFT JOIN CUSTOMERS C ON ( P.CUSTOMER_ID = C.ID )
+			LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID
+		WHERE
+			C.DELETED =0  AND
+			TO_DATE(TO_CHAR(P.END_TIME,'YYYY-MM'),'yyyy-mm') =to_date(#{period},'yyyy-mm')  AND
+			TO_DATE(P.PERIOD,'yyyy-mm') =to_date(#{period},'yyyy-mm') 
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+			</if> 
+					
+  </select>
+  
+  <!--
+  		统计指定月份的售水量  每天的售水量 
+   -->
+  <select id="statWaterAmountPerDay" resultType="map">
+  	 SELECT
+  	 		TO_DATE(TO_CHAR(P.END_TIME,'YYYY-MM-dd'),'yyyy-mm-dd') DAY_DATE,
+			SUM(P.WATER_AMOUNT) WATER_AMOUNT
+			
+	FROM
+		PARTITION_WATER P
+		LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID
+	WHERE
+		P.DELETED =0  AND
+		TO_DATE(TO_CHAR(P.END_TIME,'YYYY-MM'),'yyyy-mm') =to_date(#{period},'yyyy-mm')  AND
+		TO_DATE(P.PERIOD,'yyyy-mm') =to_date(#{period},'yyyy-mm')
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+		</if> 
+	GROUP BY
+		TO_DATE(TO_CHAR(P.END_TIME,'YYYY-MM-dd'),'yyyy-mm-dd')
+  </select>
+  
+  <!-- public List<Map<String, Object>> searchPartRecordPerYear(@Param("period") String period);
+	public List<Map<String, Object>> statWaterAmountPerMonth(@Param("period") String period) ; -->
+  	<!-- 
+  		查询指定年售水量列表  	 自分水量中读取
+  	-->
+  <select id="searchPartRecordPerYear"  resultType="map">
+	  	SELECT
+	  		C.CUSTOMER_NAME,
+			C.CUSTOMER_TEL,
+			C.CUSTOMER_MOBILE,
+			C.ADDRESS,
+			C.ROOM,
+			C.CUSTOMER_TYPE,
+			P.* 
+		FROM
+			PARTITION_WATER P
+			LEFT JOIN CUSTOMERS C ON ( P.CUSTOMER_ID = C.ID )
+			LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID
+		WHERE
+			C.DELETED =0  AND
+			TO_DATE(TO_CHAR(P.END_TIME,'YYYY'),'yyyy') =to_date(#{period},'yyyy')  AND
+			P.PERIOD LIKE CONCAT(#{period},'%')	
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+			</if> 	
+  </select>
+  
+  <!--
+  		统计指定年份的售水量  每月的售水量 
+   -->
+  <select id="statWaterAmountPerMonth" resultType="map">
+  	 SELECT
+  	 		TO_DATE(TO_CHAR(P.END_TIME,'YYYY-MM'),'yyyy-mm') MONTH_DATE,
+			SUM(P.WATER_AMOUNT) WATER_AMOUNT
+	FROM
+		PARTITION_WATER P
+		LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID
+	WHERE
+		P.DELETED =0 AND LM.DELETED=0 AND
+		TO_DATE(TO_CHAR(P.END_TIME,'YYYY'),'yyyy') =to_date(#{period},'yyyy')  AND  
+		P.PERIOD LIKE CONCAT(#{period},'%')	
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+		</if> 	
+	GROUP BY
+		TO_DATE(TO_CHAR(P.END_TIME,'YYYY-MM'),'yyyy-mm')
+  </select>
+  
+  <!--
+  	水量分类汇总 
+   -->
+  <select id="statWaterMonthSummary" resultType="map">
+  	 SELECT
+		T.PRICE_CODE,
+		SUM( P.WATER_AMOUNT ) WATER_AMOUNT 
+	FROM
+		PARTITION_WATER P
+		LEFT JOIN USE_WATER_PRICE_TRACE T ON ( T.PARTITION_WATER_ID = P.ID ) 
+		LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID
+	WHERE
+		P.DELETED = 0 AND LM.DELETED=0
+		AND TO_DATE ( TO_CHAR ( P.END_TIME, 'YYYY-MM' ), 'yyyy-mm' ) = to_date (#{period}, 'yyyy-mm' ) 
+		AND TO_DATE ( P.PERIOD, 'yyyy-mm' ) = to_date (#{period}, 'yyyy-mm' ) 
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+		</if> 
+	GROUP BY
+		T.PRICE_CODE
+  </select>
+  
+  
+  <!--
+  	 获取抄表记录中所有表计的父结点(MeterId)列表
+   -->
+  <select id="getParentNodeListByMonth" resultType="map">
+  	 SELECT
+		Distinct T.PID
+	FROM
+		METER_RECORD R
+		LEFT JOIN METER_TREE T ON ( R.METER_TREE_ID = T.ID ) 
+	WHERE
+		TO_DATE ( TO_CHAR ( R.CURR_DATE, 'YYYY-MM' ), 'yyyy-mm' ) = to_date ( #{period}, 'yyyy-mm' ) 
+		AND R.DELETED = 0 
+  </select>
+  
+  <!-- 
+  	查询非叶节点的水量(己减免后的水量) 
+  -->
+  <select id="getParentNodeAmountListByMonth" resultType="map">
+  		SELECT
+			(NVL(R.CURR_AMOUNT,0) + (
+			
+				(SELECT NVL(SUM( A.COMPENSATION) ,0)  FROM ADD_SUB_WATER A WHERE R.ID = A.METER_RECORD_ID  
+				
+				))) REAL_AMOUNT,
+			R.* 
+		FROM
+			METER_RECORD R 
+  		WHERE
+  			R.PERIOD LIKE CONCAT(#{period},'%') AND
+  			R.METER_ID  IN (  <!-- 所有非叶子结点 -->
+			  	SELECT
+					Distinct T.PID
+				FROM
+					METER_RECORD R
+					LEFT JOIN METER_TREE T ON ( R.METER_TREE_ID = T.ID ) 
+				WHERE
+					TO_DATE ( TO_CHAR ( R.CURR_DATE, 'YYYY-MM' ), 'yyyy-mm' ) = to_date ( #{period}, 'yyyy-mm' ) 
+					AND R.DELETED = 0
+  			)
+
+  </select>
+  
+  <!-- 
+  	统计父结点下各直接子节点的水量和
+  	此处需要进一步的测试. 
+  -->
+  <select id="statChildAmountOfParentNode" resultType="map">
+  	SELECT
+		SUM(S.REAL_AMOUNT) CHILD_SUM,
+		T.PID  NODE_ID						
+	FROM 
+			(
+					SELECT
+						(NVL(R.CURR_AMOUNT,0) + (
+						
+							(SELECT NVL(SUM( A.COMPENSATION) ,0)  FROM ADD_SUB_WATER A WHERE R.ID = A.METER_RECORD_ID  
+							
+							))) REAL_AMOUNT,
+						R.* 
+					FROM
+						METER_RECORD R
+			) S <!-- 计算水量减免后抄表记录列表 -->	
+			LEFT JOIN METER_TREE T ON (S.METER_TREE_ID=T.ID)  <!-- 左连接表计父子关系TREE  -->		
+			
+	WHERE T.PID &lt;&gt; 0 AND S.PERIOD LIKE CONCAT(#{period},'%')   <!--  -->
+	GROUP BY T.PID
+  </select>
+  
+  <!-- 
+  	查询指定期间应收统计数据列表
+   -->
+  <select id="searchReceivableList" resultType="map">
+    SELECT
+		C.CUSTOMER_NAME,
+		C.ADDRESS,
+		C.ROOM,
+		P.START_TIME,
+		P.END_TIME,
+		P.PERIOD,
+		P.BASE_PRICE,
+		P.TREATMENT_FEE,
+		P.WATER_PRICE,
+		P.WATER_AMOUNT,
+		P.WATER_AMOUNT * P.BASE_PRICE BASE_AMOUNT,
+		P.WATER_AMOUNT * P.TREATMENT_FEE TREATMENT_AMOUNT,
+		A.CREDIT_AMOUNT 
+	FROM
+		PARTITION_WATER P
+		LEFT JOIN CUSTOMER_ACCOUNT_ITEM A ON ( P.ACCOUNT_ITEM_ID = A.ID )
+		LEFT JOIN CUSTOMERS C ON ( P.CUSTOMER_ID = C.ID ) 
+		LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID 
+	WHERE
+		TO_DATE ( P.PERIOD, 'yyyy-mm' )     &gt;= TO_DATE ( #{periodStart}, 'yyyy-mm' ) 
+		AND TO_DATE ( P.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{periodEnd}, 'yyyy-mm' ) 
+		AND A.CREDIT_SUBJECT = '201' AND LM.DELETED !=1
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		
+  </select>
+  
+  <!--
+  		查询指定期间应收统计和 
+   -->
+  <select id="statReceivableSum"  resultType="map">
+  	SELECT		
+		SUM(P.WATER_AMOUNT * P.BASE_PRICE) BASE_AMOUNT_SUM,
+		SUM(P.WATER_AMOUNT * P.TREATMENT_FEE) TREATMENT_AMOUNT_SUM,
+		SUM(A.CREDIT_AMOUNT) CREDIT_AMOUNT_SUM 
+	FROM
+		PARTITION_WATER P
+		LEFT JOIN CUSTOMER_ACCOUNT_ITEM A ON ( P.ACCOUNT_ITEM_ID = A.ID )
+		LEFT JOIN CUSTOMERS C ON ( P.CUSTOMER_ID = C.ID ) 
+		LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID 
+	WHERE
+		TO_DATE ( P.PERIOD, 'yyyy-mm' )     &gt;= TO_DATE ( #{periodStart}, 'yyyy-mm' ) 
+		AND TO_DATE ( P.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{periodEnd}, 'yyyy-mm' ) 
+		AND A.CREDIT_SUBJECT = '201' AND LM.DELETED !=1
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+  </select>
+  
+  <!--
+  	实收列表 
+   -->
+	<select id="searchActualReceList" resultType="map">
+		<!-- 单位客户:基价水费,污水处理费水费 -->
+		SELECT
+			C.CUSTOMER_NAME,
+			C.ADDRESS,
+			C.ROOM,
+			C.CUSTOMER_TYPE, 
+			A.PERIOD,
+			A.DEBIT_AMOUNT AMOUNT,  
+			CASE
+				WHEN A.DEBIT_SUBJECT LIKE '112%' THEN '污水处理费'  
+				WHEN A.DEBIT_SUBJECT LIKE '111%' THEN '基础水费'  
+				ELSE '' END AMOUNT_TYPE 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN PARTITION_WATER P ON(A.ID=P.ACCOUNT_ITEM_ID)
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 
+			LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID 
+		WHERE
+			TO_DATE ( A.PERIOD, 'yyyy-mm' ) &gt;= TO_DATE ( #{periodStart}, 'yyyy-mm' ) 
+			AND TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{periodEnd}, 'yyyy-mm' ) 
+			AND (A.DEBIT_SUBJECT LIKE '112%' OR A.DEBIT_SUBJECT LIKE '111%')
+			AND C.CUSTOMER_TYPE=2 AND LM.DELETED !=1
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+		<!-- 个人客户-水费-基价 -->	
+		UNION
+		SELECT
+			C.CUSTOMER_NAME,
+			C.ADDRESS,
+			C.ROOM,	
+			C.CUSTOMER_TYPE, 
+			A.PERIOD,
+			P.WATER_AMOUNT*T.BASE_PRICE AMOUNT,
+			CASE		
+				WHEN 1=1 THEN '基础水费'  
+				ELSE '' 
+			END AMOUNT_TYPE 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 
+			LEFT JOIN PARTITION_WATER P ON(A.ID=P.ACCOUNT_ITEM_ID)
+			LEFT JOIN USE_WATER_PRICE_TRACE T ON(T.PARTITION_WATER_ID=P.ID)
+			LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID 
+		WHERE
+			TO_DATE ( A.PERIOD, 'yyyy-mm' ) &gt;= TO_DATE ( #{periodStart}, 'yyyy-mm' ) 
+			AND TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{periodEnd}, 'yyyy-mm' ) 
+			AND (A.CREDIT_SUBJECT IN ('201', '221'))
+			AND (A.DEBIT_AMOUNT>0)
+			AND C.CUSTOMER_TYPE=1 
+			AND LM.DELETED !=1
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+		
+		<!-- 个人客户-水费-污水处理费 -->
+		UNION
+		SELECT
+			C.CUSTOMER_NAME,
+			C.ADDRESS,
+			C.ROOM,	
+			C.CUSTOMER_TYPE, 
+			A.PERIOD,
+			P.WATER_AMOUNT*T.TREATMENT_FEE AMOUNT,
+			CASE		
+				WHEN 1=1 THEN '污水处理费'  
+				ELSE '' 
+			END AMOUNT_TYPE 									
+			
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 
+			LEFT JOIN PARTITION_WATER P ON(A.ID=P.ACCOUNT_ITEM_ID)
+			LEFT JOIN USE_WATER_PRICE_TRACE T ON(T.PARTITION_WATER_ID=P.ID)
+			LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID 
+		WHERE
+			TO_DATE ( A.PERIOD, 'yyyy-mm' ) &gt;= TO_DATE ( #{periodStart}, 'yyyy-mm' ) 
+			AND TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{periodEnd}, 'yyyy-mm' ) 
+			AND (A.CREDIT_SUBJECT IN ('201', '221'))
+			AND (A.DEBIT_AMOUNT>0)
+			AND C.CUSTOMER_TYPE=1
+			AND LM.DELETED !=1
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+	
+	</select>
+  
+  	<!--
+  		查询欠费用户列表  	 
+  	 -->
+  	<select id="searchDebtDetailList" resultType="map">
+  	
+  		
+  	
+		 SELECT
+			C.CUSTOMER_NAME,
+			C.ADDRESS,
+			C.ROOM,	
+			A.PERIOD,
+			A.CREDIT_AMOUNT-A.DEBIT_AMOUNT DEBT_AMOUNT	  <!-- 欠费金额 -->						
+			
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+			LEFT JOIN PARTITION_WATER P ON(A.ID=P.ACCOUNT_ITEM_ID)	
+			LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID 	
+		WHERE
+			TO_DATE ( A.PERIOD, 'yyyy-mm' )  &gt;= TO_DATE ( #{periodStart}, 'yyyy-mm' ) 
+			AND TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{periodEnd}, 'yyyy-mm' ) 
+			AND (A.CREDIT_SUBJECT in ('201', '221'))
+			AND (A.CREDIT_AMOUNT-A.DEBIT_AMOUNT &gt;0)	
+			AND A.DELETED=0
+			AND C.DELETED=0
+			AND P.DELETED=0
+			AND LM.DELETED!=1
+  			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+  	</select>
+  	
+  	<!--  	
+  		statDebtSum   统计欠费总和 
+  	 -->
+  	<select id="statDebtSum" resultType="map">
+  		SELECT			
+			SUM(A.CREDIT_AMOUNT-A.DEBIT_AMOUNT) DEBT_AMOUNT_SUM	    <!-- 欠费金额合计 -->
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+			LEFT JOIN PARTITION_WATER P ON(A.ID=P.ACCOUNT_ITEM_ID)	
+			LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID 			
+		WHERE
+			TO_DATE ( A.PERIOD, 'yyyy-mm' )  &gt;= TO_DATE ( #{periodStart}, 'yyyy-mm' ) 
+			AND TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{periodEnd}, 'yyyy-mm' ) 
+			AND (A.CREDIT_SUBJECT in ('201', '221'))
+			AND (A.CREDIT_AMOUNT-A.DEBIT_AMOUNT &gt;0)	
+			AND A.DELETED=0
+			AND C.DELETED=0
+			AND P.DELETED=0
+			AND LM.DELETED!=1
+  			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+  	</select>
+  	
+  	
+  	<!-- 	
+  	 	按PRICE_CODE分类统计欠费
+  	 -->
+  	<select id="statDebtSummaryByPriceCode" resultType="map">
+  		SELECT
+  			PT.PRICE_CODE,		<!-- 价格类型 -->
+			SUM(A.CREDIT_AMOUNT-A.DEBIT_AMOUNT) STAT_AMOUNT	  <!-- 分组总金额 -->
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN USE_WATER_PRICE_TRACE PT ON ( PT.ACCOUNT_ITEM_ID = A.ID ) 			
+		WHERE
+			TO_DATE ( A.PERIOD, 'yyyy-mm' )  &gt;= TO_DATE ( #{periodStart}, 'yyyy-mm' ) 
+			AND TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{periodEnd}, 'yyyy-mm' ) 
+			AND (A.CREDIT_SUBJECT ='201')
+			AND (A.DEBIT_AMOUNT&lt;&gt;A.CREDIT_AMOUNT)	
+		GROUP BY
+			PT.PRICE_CODE 
+  	</select>
+  
+  <!-- 查询客户账单，按客户ID分组,返回列表 -->
+	<select id="getListGroupByCustomerId" resultType="map">
+		SELECT
+			I.CUSTOMER_ID,
+			C.CUSTOMER_NAME, 
+			<!-- LISTAGG ( I.ID, ',' ) WITHIN GROUP ( ORDER BY I.ID ) AS BILL_IDS, -->
+			<!-- MAX(I.ID) AS BILL_IDS, -->
+			<!-- LISTAGG ( PW.WATER_USE, ',' ) WITHIN GROUP ( ORDER BY I.ID DESC ) AS WATER_PRICE, -->
+			<!-- MIN(PW.WATER_USE) AS WATER_PRICE, --> 
+			I.PERIOD,
+			SUM(I.CREDIT_AMOUNT) AS BILL_AMOUNT,
+			SUM(I.DEBIT_AMOUNT) AS RECHARGE_AMOUNT,
+			( SUM(I.CREDIT_AMOUNT) - SUM(I.DEBIT_AMOUNT) ) AS OWE_AMOUNT, 
+			LM.TRACE_IDS 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			<!-- LEFT JOIN PARTITION_WATER PW ON I.ID=PW.ACCOUNT_ITEM_ID -->
+			LEFT JOIN CUSTOMER_METER CM ON C.ID=CM.CUSTOMER_ID
+			LEFT JOIN LOCATION_METER LM ON CM.METER_ID=LM.METER_ID
+			
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			I.DELETED = 0 
+			AND C.DELETED = 0
+			AND CM.DELETED = 0 
+			AND CM.DEFAULT_CUSTOMER = 0
+			<!-- AND PW.DELETED = 0 -->
+			AND I.CREDIT_AMOUNT != I.DEBIT_AMOUNT 
+			AND I.CREDIT_AMOUNT &gt; I.DEBIT_AMOUNT 
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<if test="deductMode!=null and deductMode!=''">
+				AND C.DEDUCT_TYPE =#{deductMode}
+			</if>
+		</where>
+		GROUP BY 
+			I.CUSTOMER_ID, C.CUSTOMER_NAME, I.PERIOD, LM.TRACE_IDS
+		ORDER BY 
+			PERIOD DESC
+	</select>
+	
+	<!-- 根据条件查询并按priceCode分组统计 -->
+	<select id="getListGroupByPriceCode" resultType="map">
+		SELECT
+			PW.WATER_USE,
+			MIN(PW_LOG.LADDER_NAME) AS PRICE_NAME,
+			MIN(PW.BASE_PRICE) AS BASE_PRICE,
+			MIN(PW.TREATMENT_FEE) AS TREATMETN_FEE,
+			SUM( I.CREDIT_AMOUNT ) AS PAYABLE_AMOUNT,
+			SUM( I.DEBIT_AMOUNT ) AS PAID_AMOUNT,
+			SUM( I.CREDIT_AMOUNT - I.DEBIT_AMOUNT ) AS OWE_AMOUNT 
+		FROM
+			PARTITION_WATER PW
+			LEFT JOIN USE_WATER_PRICE_TRACE PW_LOG ON PW.ID = PW_LOG.PARTITION_WATER_ID
+			LEFT JOIN CUSTOMER_ACCOUNT_ITEM I ON PW.ACCOUNT_ITEM_ID = I.ID 
+			LEFT JOIN LOCATION_METER LM ON PW.METER_ID=LM.METER_ID 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			
+			PW.DELETED = 0 
+			AND I.DELETED = 0 
+			AND LM.DELETED = 0 
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+		</where>
+		GROUP BY
+			PW.WATER_USE
+	</select>
+	
+	<!--获取欠费账单 -->
+	<select id="getOweBillList" resultType="com.learnbind.ai.model.CustomerAccountItem">
+		SELECT
+			* 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			SETTLEMENT_STATUS != 1
+			AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>	
+	</select>
+	<!--获取欠费金额 -->
+	<select id="getOweTotalAmount" resultType="BigDecimal">
+		SELECT
+			NVL( SUM( CREDIT_AMOUNT - DEBIT_AMOUNT ), 0 ) AS OWE_AMOUNT 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			SETTLEMENT_STATUS != 1
+			AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>	
+	</select>
+	
+	<!--获取往期欠费账单 -->
+	<select id="getPastOweBillList" resultType="com.learnbind.ai.model.CustomerAccountItem">
+		SELECT
+			* 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			SETTLEMENT_STATUS != 1
+			AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			<!-- &gt;表示大于 -->
+			AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- &lt;表示小于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt; #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>	
+	</select>
+	
+	<!--获取往期欠费总金额 -->
+	<select id="getPastOweTotalAmount" resultType="BigDecimal">
+		SELECT
+			NVL( SUM( CREDIT_AMOUNT - DEBIT_AMOUNT ), 0 ) AS OWE_AMOUNT 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			1=1
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- &lt;表示小于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt; #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>	
+	</select>
+	
+	<!--获取水费欠费月份 -->
+	<select id="getWaterFeeOwePeriod" resultType="String">
+		SELECT
+			PERIOD 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			1=1
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- &lt;表示小于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt;= #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where> 
+		GROUP BY PERIOD
+		ORDER BY PERIOD ASC
+	</select>
+	
+	<!--获取违约金欠费月份 -->
+	<select id="getOverdueOwePeriod" resultType="String">
+		SELECT
+			PERIOD 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			1=1
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- &lt;表示小于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt;= #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where> 
+		GROUP BY PERIOD
+		ORDER BY PERIOD ASC
+	</select>
+	
+		<!--
+  		获取营业处统计的欠费信息表	 
+  	 -->
+  	<select id="searchYycArrearsList" resultType="map">
+		 SELECT
+			A.CUSTOMER_ID,	
+			C.CUSTOMER_NAME,
+			LISTAGG ( P.ID, ',' ) WITHIN GROUP ( ORDER BY A.CUSTOMER_ID ) AS PART_WATER_IDS,
+			LISTAGG ( A.PERIOD, ',' ) WITHIN GROUP ( ORDER BY A.CUSTOMER_ID ) AS PERIODS,
+			SUM(A.CREDIT_AMOUNT-A.DEBIT_AMOUNT) AS OWE_AMOUNT,		
+			SUM(A.BASE_WATER_FEE) AS BASE_WATER_FEE,
+			SUM(A.SEWAGE_WATER_FEE) AS SEWAGE_WATER_FEE				
+			
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+			LEFT JOIN PARTITION_WATER P ON P.ACCOUNT_ITEM_ID = A.ID		
+		WHERE
+			 TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{period}, 'yyyy-mm' ) 
+			AND A.DELETED=0 AND P.DELETED=0
+		 	AND A.CREDIT_AMOUNT > A.DEBIT_AMOUNT
+			<if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND A.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		GROUP BY
+			A.CUSTOMER_ID,	
+			C.CUSTOMER_NAME
+  	
+  	</select>
+  	<select id="searchYycArrearsTotal" resultType="BigDecimal">
+		 SELECT
+			SUM(A.BASE_WATER_FEE) AS OWE_AMOUNT			
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+		WHERE
+			 TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{period}, 'yyyy-mm' ) 
+			AND A.DELETED=0 AND C.DELETED=0
+		 	AND A.CREDIT_AMOUNT > A.DEBIT_AMOUNT
+			<if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND A.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+  	
+  	</select>
+  	
+  	<!--
+  		获取营业处统计的欠费信息表（小区） 
+  	 -->
+  	<select id="searchYycBlockArrearsList" resultType="map">
+  		SELECT
+			A.PERIOD,
+			SUM(A.CREDIT_AMOUNT-A.DEBIT_AMOUNT) AS OWE_AMOUNT,
+			SUM(A.BASE_WATER_FEE) AS BASE_WATER_FEE,
+			SUM(A.SEWAGE_WATER_FEE) AS SEWAGE_WATER_FEE	
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+			LEFT JOIN PARTITION_WATER P ON P.ACCOUNT_ITEM_ID = A.ID			
+		WHERE
+			 TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{period}, 'yyyy-mm' ) 
+			AND A.DELETED=0 AND P.DELETED=0
+		 	AND A.CREDIT_AMOUNT > A.DEBIT_AMOUNT
+		 	AND C.WATER_USE='JMSHYS'
+			<if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<if test="debitCredit!=null and debitCredit !=''">
+				AND A.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			GROUP BY 
+			A.PERIOD
+  	</select>
+  	
+  		<!--
+  		获取营业处统计的清欠信息表	 
+  	 -->
+  	<select id="searchYycCleanList" resultType="map">
+		 SELECT
+			A.CUSTOMER_ID,	
+			C.CUSTOMER_NAME,
+			LISTAGG ( P.ID, ',' ) WITHIN GROUP ( ORDER BY A.CUSTOMER_ID ) AS PART_WATER_IDS,
+			LISTAGG ( A.PERIOD, ',' ) WITHIN GROUP ( ORDER BY A.CUSTOMER_ID ) AS PERIODS,
+			SUM(A.CREDIT_AMOUNT-A.DEBIT_AMOUNT) AS OWE_AMOUNT,		
+			SUM(A.BASE_WATER_FEE) AS BASE_WATER_FEE,
+			SUM(A.SEWAGE_WATER_FEE) AS SEWAGE_WATER_FEE				
+			
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+			LEFT JOIN PARTITION_WATER P ON P.ACCOUNT_ITEM_ID = A.ID		
+		WHERE
+			 TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt; TO_DATE ( #{period}, 'yyyy-mm' ) 
+			AND A.DELETED=0 AND P.DELETED=0
+		 	AND A.CREDIT_AMOUNT > A.DEBIT_AMOUNT
+			<if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND A.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		GROUP BY
+			A.CUSTOMER_ID,	
+			C.CUSTOMER_NAME
+  	
+  	</select>
+  	<select id="searchYycCleanTotal" resultType="BigDecimal">
+		 SELECT
+			SUM(A.BASE_WATER_FEE) AS OWE_AMOUNT			
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+		WHERE
+			 TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt; TO_DATE ( #{period}, 'yyyy-mm' ) 
+			AND A.DELETED=0 AND C.DELETED=0
+		 	AND A.CREDIT_AMOUNT > A.DEBIT_AMOUNT
+			<if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND A.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+  	
+  	</select>
+  	
+  	<!--
+  		获取营业处统计的欠费信息表（小区） 
+  	 -->
+  	<select id="searchYycBlockCleanList" resultType="map">
+  		SELECT
+			A.PERIOD,
+			SUM(A.CREDIT_AMOUNT-A.DEBIT_AMOUNT) AS OWE_AMOUNT,
+			SUM(A.BASE_WATER_FEE) AS BASE_WATER_FEE,
+			SUM(A.SEWAGE_WATER_FEE) AS SEWAGE_WATER_FEE	
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+			LEFT JOIN PARTITION_WATER P ON P.ACCOUNT_ITEM_ID = A.ID			
+		WHERE
+			 TO_DATE ( A.PERIOD, 'yyyy-mm' ) &lt; TO_DATE ( #{period}, 'yyyy-mm' ) 
+			AND A.DELETED=0 AND P.DELETED=0
+		 	AND A.CREDIT_AMOUNT > A.DEBIT_AMOUNT
+		 	AND C.WATER_USE='JMSHYS'
+			<if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<if test="debitCredit!=null and debitCredit !=''">
+				AND A.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			GROUP BY 
+			A.PERIOD
+  	</select>
+  	<!-- 获取本月清欠 -->
+  	<select id="getCurrCleanAmount" resultType="BigDecimal">
+		 SELECT
+		 	NVL(SUM(A.DEBIT_AMOUNT), 0) CLEAN_AMOUNT
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+		WHERE
+			 TO_DATE ( A.PERIOD, 'yyyy-mm' ) = TO_DATE ( #{period}, 'yyyy-mm' ) 
+			AND A.DELETED=0 AND C.DELETED=0
+			<if test="customerId!=null and customerId!=''">
+				AND A.CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="customerType!=null and customerType!=''">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+  			AND (A.DEBIT_SUBJECT LIKE concat('130','%')
+  			OR A.DEBIT_SUBJECT LIKE concat('131','%')
+  			OR A.DEBIT_SUBJECT LIKE concat('132','%'))
+  	</select>
+  	
+  	<!-- 获取本月清欠 -->
+  	<select id="getCurrCleanBlockAmount" resultType="BigDecimal">
+		 SELECT
+		 	NVL(SUM(A.DEBIT_AMOUNT), 0) CLEAN_AMOUNT
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+		WHERE
+			 A.DELETED=0 AND C.DELETED=0
+			<if test="period!=null and period!=''">
+				AND A.PERIOD=#{period}
+			</if>
+			<if test="customerType!=null and customerType!=''">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+  			AND (A.DEBIT_SUBJECT LIKE concat('130','%')
+  			OR A.DEBIT_SUBJECT LIKE concat('131','%')
+  			OR A.DEBIT_SUBJECT LIKE concat('132','%'))
+  	</select>
+  	
+  	
+  		<!-- 根据条件查询实收水费并按priceCode分组统计 -->
+	<select id="geActualSummary" resultType="map">
+		SELECT
+			PW.WATER_USE,
+			MIN(PW_LOG.LADDER_NAME) AS PRICE_NAME,
+			MIN(PW.BASE_PRICE) AS BASE_PRICE,
+			MIN(PW.TREATMENT_FEE) AS TREATMETN_FEE,
+			SUM( I.CREDIT_AMOUNT ) AS PAYABLE_AMOUNT,
+			SUM( I.DEBIT_AMOUNT ) AS PAID_AMOUNT
+		FROM
+			PARTITION_WATER PW
+			LEFT JOIN USE_WATER_PRICE_TRACE PW_LOG ON PW.ID = PW_LOG.PARTITION_WATER_ID
+			LEFT JOIN CUSTOMER_ACCOUNT_ITEM I ON PW.ACCOUNT_ITEM_ID = I.ID 
+			LEFT JOIN LOCATION_METER LM ON PW.METER_ID=LM.METER_ID 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			
+			PW.DELETED = 0 
+			AND I.DELETED = 0 
+			AND LM.DELETED = 0 
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="periodStart!=null and periodStart!=''">
+				AND TO_DATE ( I.PERIOD, 'yyyy-mm' )  &gt;= TO_DATE ( #{periodStart}, 'yyyy-mm' )
+			</if>
+			<if test="periodEnd!=null and periodEnd!=''">
+				AND TO_DATE ( I.PERIOD, 'yyyy-mm' ) &lt;= TO_DATE ( #{periodEnd}, 'yyyy-mm' ) 
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+		</where>
+		GROUP BY
+			PW.WATER_USE
+	</select>
+	
+	
+	 <select id="statCompareYearAmount"  resultType="map">
+	  	SELECT
+	  		C.CUSTOMER_NAME,
+			C.CUSTOMER_TEL,
+			C.CUSTOMER_MOBILE,
+			C.ADDRESS,
+			C.ROOM,
+			C.CUSTOMER_TYPE,
+			P.* 
+		FROM
+			PARTITION_WATER P
+			LEFT JOIN CUSTOMERS C ON ( P.CUSTOMER_ID = C.ID )
+			LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID
+		WHERE
+			C.DELETED =0 AND P.DELETED=0 AND LM.DELETED!=1
+			 <if test="periodStart!=null and periodStart!=''">
+				AND TO_DATE(TO_CHAR(P.END_TIME,'YYYY'),'yyyy') &gt;=to_date(#{periodStart},'yyyy')
+			</if>
+			<if test="periodEnd!=null and periodEnd!=''">
+				AND TO_DATE(TO_CHAR(P.END_TIME,'YYYY'),'yyyy')&lt;= to_date(#{periodEnd},'yyyy')
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+			</if> 	
+  </select>
+  
+	<select id="searchCompareYearAmount" resultType="map">
+  	 SELECT
+  	 		TO_DATE(TO_CHAR(P.END_TIME,'YYYY'),'yyyy') YEAR_DATE,
+			SUM(P.WATER_AMOUNT) WATER_AMOUNT
+	FROM
+		PARTITION_WATER P
+		LEFT JOIN LOCATION_METER LM ON P.METER_ID=LM.METER_ID
+	WHERE
+		P.DELETED =0 AND LM.DELETED=0 
+		<if test="periodStart!=null and periodStart!=''">
+			AND TO_DATE(TO_CHAR(P.END_TIME,'YYYY'),'yyyy') &gt;=to_date(#{periodStart},'yyyy')
+		</if>
+		<if test="periodEnd!=null and periodEnd!=''">
+			AND TO_DATE(TO_CHAR(P.END_TIME,'YYYY'),'yyyy')&lt;= to_date(#{periodEnd},'yyyy')
+		</if>
+		
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+		</if> 	
+	GROUP BY
+		TO_DATE(TO_CHAR(P.END_TIME,'YYYY'),'yyyy')
+  </select>
+  
+  
+   <!--
+  	按年份统计应抄表数量 
+   -->
+  <select id="statNeedReadMeterYear"  resultType="int">
+  	SELECT COUNT(*) FROM (
+	  SELECT
+			R.PERIOD	
+		FROM	 
+			METER_RECORD R 
+			LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID		
+				 
+		WHERE
+			 R.DELETED=0 AND LM.DELETED!=1
+			AND R.PRE_DATE IS NOT NULL
+			AND R.PERIOD LIKE CONCAT(#{period},'%')	
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+			</if> 
+			GROUP BY R.PERIOD
+			) 
+  </select>
+  
+  	<!--
+  		获取营业处统计的往年欠费用户登记信息
+  	 -->
+  	<select id="getPastArrearsRecord" resultType="map">
+		 SELECT
+			A.CUSTOMER_ID,	
+			C.CUSTOMER_NAME,
+			LISTAGG ( A.PERIOD, ',' ) WITHIN GROUP ( ORDER BY A.CUSTOMER_ID ) AS PERIODS,
+			SUM(A.CREDIT_AMOUNT-A.DEBIT_AMOUNT) AS OWE_AMOUNT,		
+			SUM(A.BASE_WATER_FEE) AS BASE_WATER_FEE,
+			SUM(A.SEWAGE_WATER_FEE) AS SEWAGE_WATER_FEE				
+			
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+		WHERE
+			A.DELETED=0 AND C.DELETED=0 AND C.CUSTOMER_TYPE=2
+			  <if test="period!=null and period!=''">
+				AND A.PERIOD LIKE CONCAT(#{period},'%')	
+			</if>
+			
+		 	AND A.CREDIT_AMOUNT > A.DEBIT_AMOUNT
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND A.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+		GROUP BY
+			A.CUSTOMER_ID,	
+			C.CUSTOMER_NAME
+  	
+  	</select>
+  	
+  	<!--
+  		获取营业处统计的往年欠费用户登记信息
+  	 -->
+  	<select id="getPastArrearsRecordTotal" resultType="BigDecimal">
+		 SELECT
+			SUM(A.BASE_WATER_FEE) AS OWE_AMOUNT			
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+		WHERE
+			  A.DELETED=0 AND C.DELETED=0 AND C.CUSTOMER_TYPE=2
+			  <if test="period!=null and period!=''">
+				AND A.PERIOD LIKE CONCAT(#{period},'%')	
+			</if>
+		 	AND A.CREDIT_AMOUNT > A.DEBIT_AMOUNT
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND A.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+  	</select>
+  	
+  		<!--
+  		获取营业处统计的往年拖欠水费用户登记（小区） 
+  	 -->
+  	<select id="searchYycBlockRecordList" resultType="map">
+  		SELECT
+			A.PERIOD,
+			SUM(A.CREDIT_AMOUNT-A.DEBIT_AMOUNT) AS OWE_AMOUNT,
+			SUM(A.BASE_WATER_FEE) AS BASE_WATER_FEE,
+			SUM(A.SEWAGE_WATER_FEE) AS SEWAGE_WATER_FEE	
+		FROM
+			CUSTOMER_ACCOUNT_ITEM A
+			LEFT JOIN CUSTOMERS C ON ( A.CUSTOMER_ID = C.ID ) 	
+			LEFT JOIN PARTITION_WATER P ON P.ACCOUNT_ITEM_ID = A.ID			
+		WHERE
+			 A.DELETED=0 AND P.DELETED=0
+			<if test="period!=null and period!=''">
+				AND A.PERIOD LIKE CONCAT(#{period},'%')	
+			</if>
+		 	AND A.CREDIT_AMOUNT > A.DEBIT_AMOUNT
+		 	AND C.WATER_USE='JMSHYS'
+			<if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<if test="debitCredit!=null and debitCredit !=''">
+				AND A.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			GROUP BY 
+			A.PERIOD
+  	</select>
+  	
+  	
+  		<!--
+  		获取营业处统计的水费收缴情况表
+  	 -->
+  	<select id="getWaterFeeCollect" resultType="map">
+		SELECT	
+			WP.LADDER_NAME,
+			WP.BASE_PRICE,
+			WP.PRICE_CODE,
+			SUM( PW.REAL_WATER_AMOUNT ) AS SUM_REAL_WATER_AMOUNT,
+			SUM( I.CREDIT_AMOUNT ) AS SUM_CREDIT_AMOUNT,
+			SUM( I.DEBIT_AMOUNT ) AS SUM_DEBIT_AMOUNT,
+			SUM( I.CREDIT_AMOUNT-I.DEBIT_AMOUNT ) AS SUM_OWE_AMOUNT
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I 
+			LEFT JOIN PARTITION_WATER PW ON I.ID = PW.ACCOUNT_ITEM_ID 
+			LEFT JOIN LOCATION_METER LM ON PW.METER_ID = LM.METER_ID 
+			LEFT JOIN SYS_WATER_PRICE WP ON PW.WATER_USE = WP.PRICE_CODE 
+		WHERE
+			I.DELETED = 0 
+			AND I.CREDIT_AMOUNT > I.DEBIT_AMOUNT
+			AND PW.DELETED = 0 
+			AND LM.DELETED != 1 
+			  <if test="period!=null and period!=''">
+				AND I.PERIOD LIKE CONCAT(#{period},'%')	
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		GROUP BY
+			WP.LADDER_NAME,
+			WP.BASE_PRICE,
+			WP.PRICE_CODE
+  	
+  	</select>
+  
+  <!-- 获取本年清欠金额（等于当前年） -->
+  <select id="getYearCleanAmount" resultType="BigDecimal">
+ 	SELECT
+	 	NVL(SUM(A.DEBIT_AMOUNT), 0) CLEAN_AMOUNT
+	FROM
+		CUSTOMER_ACCOUNT_ITEM A
+	WHERE
+		<!-- &gt;表示大于，&lt;表示小于 -->
+		TO_CHAR( TO_DATE( A.PERIOD, 'yyyy-dd' ), 'yyyy' ) = #{year} 
+		AND A.DELETED=0 
+ 		AND (
+  			A.DEBIT_SUBJECT LIKE concat('130','%')
+  			OR A.DEBIT_SUBJECT LIKE concat('131','%')
+  			OR A.DEBIT_SUBJECT LIKE concat('132','%')
+ 		)
+  	
+  </select>
+  <!-- 获取往年清欠金额（小于当前年） -->
+  <select id="getPastYearCleanAmount" resultType="BigDecimal">
+ 	SELECT
+	 	NVL(SUM(A.DEBIT_AMOUNT), 0) CLEAN_AMOUNT
+	FROM
+		CUSTOMER_ACCOUNT_ITEM A
+	WHERE
+		<!-- &gt;表示大于，&lt;表示小于 -->
+		TO_CHAR( TO_DATE( A.PERIOD, 'yyyy-dd' ), 'yyyy' ) &lt; #{year} 
+		AND A.DELETED=0 
+ 		AND (
+  			A.DEBIT_SUBJECT LIKE concat('130','%')
+  			OR A.DEBIT_SUBJECT LIKE concat('131','%')
+  			OR A.DEBIT_SUBJECT LIKE concat('132','%')
+ 		)
+  	
+  </select>
+  
+  <!-- 获取税务已开票金额 -->
+  <select id="getTaxInvoiceAmount" resultType="BigDecimal">
+  	SELECT
+  		<!-- 个人客户时统计账单金额 -->
+		<if test="customerType!=null and customerType==1">
+			SUM(I.CREDIT_AMOUNT) AS AMOUNT
+		</if>
+		<!-- 单位客户时统计基础水费金额 -->
+		<if test="customerType!=null and customerType==2">
+			SUM(I.BASE_WATER_FEE) AS AMOUNT
+		</if>
+	FROM
+		CUSTOMER_ACCOUNT_ITEM I
+		LEFT JOIN PARTITION_WATER PW ON I.ID = PW.ACCOUNT_ITEM_ID
+		LEFT JOIN METERS M ON PW.METER_ID = M.ID 
+		LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID=C.ID
+	WHERE
+		I.DELETED = 0 
+		AND ( PW.DELETED = 0 OR PW.DELETED IS NULL ) 
+		<if test="period!=null and period!=''">
+			AND I.PERIOD = #{period}
+		</if>
+		<if test="meterType!=null and meterType!=''">
+			AND M.METER_TYPE = #{meterType}
+		</if>
+		<if test="customerType!=null">
+			<!-- 客户类型，1=个人/2=单位 -->
+			AND C.CUSTOMER_TYPE=#{customerType}
+		</if>
+		AND EXISTS (
+			SELECT
+				* 
+			FROM
+				TAX_INVOICE_ACCOUNT_ITEM TI
+				LEFT JOIN TAX_INVOICE T ON TI.INVOICES = T.ID 
+			WHERE
+				<!-- 删除状态，1=已删除，0=未删除（默认） -->
+				<!-- TI.DELETED = 0 --> 
+				T.DELETED = 0 
+				AND T.ZFBZ = 0 
+				AND T.CHBZ = 0 
+				AND TI.COMBIN_ACCOUNT_ITEM LIKE CONCAT( '%', CONCAT( I.ID, '%' ) ) 
+		)
+  
+  </select>
+  
+  <!--
+  		获取营业处统计的城中村水费收缴情况表
+  	 -->
+  	<select id="getCzcRecord" resultType="map">
+		SELECT
+			SUM( I.CREDIT_AMOUNT-I.DEBIT_AMOUNT ) AS OWE_AMOUNT,
+			SUM( PW.REAL_WATER_AMOUNT ) AS WATER_AMOUNT,
+			C.CUSTOMER_NAME
+		FROM
+			PARTITION_WATER PW
+			LEFT JOIN CUSTOMER_ACCOUNT_ITEM I ON PW.ACCOUNT_ITEM_ID = I.ID 
+			LEFT JOIN CUSTOMERS C ON C.ID=PW.CUSTOMER_ID 
+		<where>
+			
+			PW.DELETED = 0 
+			AND I.DELETED = 0 
+			AND C.DELETED=0
+			AND I.CREDIT_AMOUNT >= I.DEBIT_AMOUNT
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="period!=null and period!=''">
+				AND I.PERIOD=#{period}
+			</if>
+			<if test="priceCode!=null and priceCode!=''">
+				AND C.PRICE_CODE=#{priceCode}
+			</if>
+			GROUP BY
+				C.CUSTOMER_NAME
+  	</where>
+  	</select>
+  	
+  	<!-- 按期间查询应收水费金额（已开票） -->
+	<select id="getActualWaterFeeAmount" resultType="BigDecimal">
+		SELECT
+			SUM( I.CREDIT_AMOUNT ) AS actualAmount
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			AND I.DELETED = 0
+			<!-- 借/贷，1=借；2=贷 -->
+			AND I.DEBIT_CREDIT = 2 
+			AND EXISTS (
+				SELECT
+					* 
+				FROM
+					TAX_INVOICE_ACCOUNT_ITEM TI
+					LEFT JOIN TAX_INVOICE T ON TI.INVOICES = T.ID 
+				WHERE
+					<!-- TI.DELETED = 0 --> 
+					T.DELETED = 0 
+					AND T.ZFBZ = 0 
+					AND T.CHBZ = 0 
+					AND TI.COMBIN_ACCOUNT_ITEM LIKE CONCAT( '%', CONCAT( I.ID, '%' ) ) 
+				)
+			<if test="customerId!=null">
+				AND I.CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+	</select>
+	<!-- 按期间统计实收水费金额（未开票） -->
+	<select id="getReceiveWaterFeeAmount" resultType="BigDecimal">
+		SELECT
+			SUM( I.DEBIT_AMOUNT ) AS receiveAmount
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			AND I.DELETED = 0
+			<!-- 借/贷，1=借；2=贷 -->
+			AND I.DEBIT_CREDIT = 2 
+			AND EXISTS (
+				SELECT
+					* 
+				FROM
+					TAX_INVOICE_ACCOUNT_ITEM TI
+					LEFT JOIN TAX_INVOICE T ON TI.INVOICES = T.ID 
+				WHERE
+					<!-- TI.DELETED = 0 --> 
+					T.DELETED = 0 
+					AND T.ZFBZ = 0 
+					AND T.CHBZ = 0 
+					AND TI.COMBIN_ACCOUNT_ITEM LIKE CONCAT( '%', CONCAT( I.ID, '%' ) ) 
+				)
+			<if test="customerId!=null">
+				AND I.CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+	</select>
+  
+</mapper>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>通知单模板</title>
+<!-- .pdf文件下载  download -->
+ <script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+ <script src="https://cdn.bootcss.com/jspdf/1.3.4/jspdf.debug.js"></script>
+<!-- jQuery 2.2.3 -->
+<script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!-- <link href="src/main/resources/static/font-awesome/4.7.0/css/font-awesome.css"  rel="stylesheet" /> -->
+
+<style>
+	/* 横线的样式  */
+	
+	/* 页大小 */	
+	@page{
+		size:70mm 90mm portrait;
+	}
+	
+	/* 横线样式 */
+	hr{
+		background-color:red;height: 1px;width:100%;border: none;
+	}
+	table#meter-record-item{
+		border-collapse:collapse;
+		width: 100%;
+		text-align:center;
+	}
+	table#meter-record-item tr td{
+		border:1px solid black;
+	}
+	
+	/* 
+	@font-face {
+    font-family: glyphicons;
+    font-size: small;    
+    src: url('src/main/resources/static/font-awesome/4.7.0/fonts/fontawesome-webfont.woff') format('woff');
+	} 
+	*/
+	th{
+		text-align:center;
+	}	
+	td{
+		text-align:center;
+	} 	
+</style>
+
+<!-- <link href="src/main/resources/static/font-awesome/4.7.0/css/font-awesome.css"  rel="stylesheet" /> -->
+
+</head>
+<body style = "font-family: SimSun;" >
+	<div class="container-fluid">
+
+		<!-- 标题信息 -->
+		<div class="row">
+			<div class="col-md-12">
+				<p></p>
+				<div class="row">
+					<div class="col-md-12" style="text-align:center;font-size:25px;font-weight:bold;">
+						<span>水费通知单</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 分隔线1 -->
+		<hr/>
+
+		<!-- 患者信息 -->
+		<div class="row">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-12">
+						<span class="" style="font-size:18px;font-weight:bold;" th:text="${locationName}+'各位业主：'">长久花园小区各位业主</span> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span th:text="'&nbsp;&nbsp;1.	以下为'+${nextPeriod}+'将从用户卡上扣除的水费，请提前向卡内存入足够金额，避免扣费失败形成欠费。（连续2个月扣费失败的用户，根据供水协议我们将暂停供水 ）'"></span> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span>&nbsp;&nbsp;2.	扣费时间：每月11-15日间首次扣费；21-25日间补扣首次失败金额。（节假日提前）</span> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span>&nbsp;&nbsp;3.	请未能收到欠费短信提醒的业主，致电营业处更换电话号码。69099838</span> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span>&nbsp;&nbsp;4.	连续欠费超过两个月的用户，用户将不能通过卡内存款扣费，请到营业厅缴纳现金，清账后用户卡可恢复正常使用。 </span> 
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- 分隔线2 -->
+		<hr/>
+
+		<!-- 用药信息 -->
+		<div class="row">
+			<div class="col-md-12">
+				<table class="table-layout:fixed table ;" id="meter-record-item">
+				<!-- <table class="table table-sm"> -->
+					<thead>
+						<tr >
+							<th>户名</th> 
+							<th th:text="${preDate}+'表底'">上期表底</th>
+							<th th:text="${currDate}+'表底'">本期表底</th>
+							<th>本期水量(吨)</th>
+							<th>当月费用(元)</th>
+							<th>往期欠费(元)</th>
+							<th>扣费合计(元)</th>
+						</tr>
+					</thead>
+					<tbody  th:each="item,iterStat: ${textData}">
+						
+						<tr>
+							<!-- 地理位置 -->
+							<td th:text="${item.place}"></td>
+							<td th:text="${item.preRead}"></td>
+							<td th:text="${item.currRead}"></td>
+							<!-- 本期水量 -->
+							<td th:text="${item.waterAmount}"></td>
+							<td th:text="${item.oweAmount}"></td>
+							<td th:text="${item.pastOweAmount}"></td>
+							<td th:text="${item.totalOweAmount}"></td>
+							<!-- 操作列 -->
+						</tr>
+						<!-- 第一页35条记录，其他页45条记录 -->
+						
+						<!-- <span th:if="${iterStat.count==35}">
+							<tr>
+								<td style="text-align:center;" colspan="8">第1页</td>
+							</tr>
+						</span>
+						<span th:if="${iterStat.count>35 && ((iterStat.count-35)%45==0 || iterStat.last)}">
+							<span th:if="${iterStat.last && (iterStat.count-35)%45!=0}">
+								<span th:each="i, stat:${#numbers.sequence(5, (47-(iterStat.count-35)%45))}">
+									<tr>
+										<td style="text-align:center;" colspan="8">&nbsp;</td>
+									</tr>
+								</span>
+							</span>
+							<tr>
+								<td style="text-align:center;" colspan="8" th:text="'第'+${(iterStat.count-35)%45==0 ? #numbers.formatInteger((iterStat.count-35)/45+1,0) : #numbers.formatInteger((iterStat.count-35)/45+2,0)}+'页'">第2页</td>
+							</tr>
+						</span> -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+	
+</body>
+
+</html>

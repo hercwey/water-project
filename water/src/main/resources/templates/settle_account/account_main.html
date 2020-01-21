@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+<style>
+
+.extra-l  a {
+	color: black;
+}
+
+/* 时间查询条件样式 */
+.extra-l li {
+	float: left;
+	margin: auto 5px;
+	cursor: pointer;
+}
+
+/* placeholder color */
+/* chrome浏览器 */
+#search-cond::-webkit-input-placeholder{
+ color: lightblue; 
+}
+#search-cond:-moz-placeholder{
+color: lightblue;
+}
+#search-cond::-moz-placeholder{
+color: lightblue;
+}
+#search-cond:-ms-input-placeholder{
+color: lightblue;
+}
+
+</style>
+
+</head>
+<body>
+	<!-- 减免违约金对话框 -->
+	<div id="overdue-reduce-dialog" ></div>
+	<!-- 减免违约金对话框 -->
+	<div id="settle-account-dialog" ></div>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label account-main">
+		<div class="col-md-12 column">
+			<div class="tabbable" id="tabs-account-item">
+				<ul class="nav nav-tabs" id="account-item-nav-tabs">
+					<li class="nav-item" id="account-item-tab">
+						<a class="nav-link active" href="#tab-account-item" data-toggle="tab">账单列表</a>
+					</li>
+					<li class="nav-item" id="tab-account-item-detail-li" style="display: none;">
+						<a class="nav-link" href="#tab-account-item-detail" data-toggle="tab">账单详细信息</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab-account-item">
+						<!-- 表计档案信息 -->
+						<!-- 操作面板 -->
+						<div class="" style="display: inline-block">
+							<ul class="extra-l" style="list-style: none;">
+								<!-- 面板:查询 -->
+								<li>
+									<input type="text" class="form-control Wdate" readonly="readonly"
+											id="bill-period" name="period"
+											onClick="WdatePicker({dateFmt:'yyyy-MM',onpicked: setBackGround});"
+											placeholder="期间" style="width: 100px;" title="期间" />
+								</li>
+								<li>
+									<select class="form-control" id="location-block" name="locationBlockId" data-location-curr-node-type="BLOCK" data-location-next-node-type="BUILDING">
+										<option value="">小区</option>
+										<span th:each="item,iterStat: ${locationList}" th:remove="tag">
+											<option th:value="${item.code}" th:attr="data-location-id=${item.id},data-location-code=${item.code},data-location-name=${item.name}"
+													th:text="${item.name}">小区名称</option>
+										</span>
+									</select>
+								</li>
+								<li>
+									<select class="form-control" id="settlement-status" name="settlementStatus">
+										<option value="">结算状态</option>
+											<option value="1">交易成功</option>
+											<option value="2">交易失败</option>
+									</select>
+								</li>
+								<li>
+									<input type="text" class="form-control" id="search-cond" placeholder="请输入客户名称">
+								</li>
+								<!-- 查询按钮 -->
+								<li>
+									<button type="button" class="btn btn-success"	id="btn-search-overdue">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+									
+									<button type="button" class="btn btn-warning"	id="btn-search-overdue-reset">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+								
+								</li>
+							</ul>
+						</div>
+			
+						<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+			
+						<!-- 容器:字典列表 -->
+						<div class="account-table table-container"></div>
+					</div>
+					
+					<div class="tab-pane" id="tab-account-item-detail">
+						<!-- 客户账单详细信息 -->
+					</div>
+					
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+
+	<!--  -->
+	<script th:inline="javascript">
+	</script>
+
+	<script>
+	
+		/*
+			设置日期选择input背景色
+		*/
+		function setBackGround() {
+			$("#bill-period").css("background-color", "white");
+		}
+		
+		/**
+		 * 	获取当前系统月份（表示为抄表记录中的期间）
+		 */
+		function getCurrSysMonth(){
+			var date = new Date();
+			var year = date.getFullYear();    //获取完整的年份(4位,1970-????)
+			var month = date.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+			if(month<10){
+				month = "0"+month
+			}
+			return year+"-"+month;
+		}
+		/**
+		 * 	设置账单期间默认值为系统月份
+		 */
+		function setBillPeriodDefault(){
+			$("#bill-period").val(getCurrSysMonth());
+		}
+		/**
+		 * 	隐藏客户账单详情选项卡和违约金信息选项卡
+		 */
+	 	function hideAccountItemDetailTab(){
+			$("#tab-account-item-detail-li").hide();
+		} 
+		/**
+		 * 	显示客户账单详情选项卡
+		 */
+		function showAccountItemDetailTab(){
+			$("#tab-account-item-detail-li").show();
+			$("#account-item-nav-tabs a[href='#tab-account-item-detail']").tab("show");//跳转到详细信息选项卡
+		}
+		
+		/* 
+			加载客户账单管理页
+		*/
+		function loadCustomerAccountItemList(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/settle-account/table";
+			var callbackFunc = callback;
+			var containerId = "#tab-account-item";
+			loadAccountItemPage(containerId, url, parms, callbackFunc);
+		}
+		/* 
+			加载客户账单详情信息
+		*/
+		function loadAccountItemDetailList(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/settle-account/detail-table";
+			var callbackFunc = callback;
+			var containerId = "#tab-account-item-detail";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchAccountItem(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/settle-account/table"
+			$(".account-table").load(url, parms, null);
+		}
+
+		function getParms(){
+			var pageNum = curr_pageNum;
+			var pageSize = curr_pageSize;
+			var period = $("#bill-period").val();//期间
+			var locationCode = $("#location-block").val();//地理位置-小区
+			var settlementStatus = $("#settlement-status").val();//结算状态
+			var searchCond = $("#search-cond").val();//查询条件
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			parms.period=period;
+			parms.locationCode=locationCode;
+			parms.settlementStatus=settlementStatus;
+			parms.searchCond=searchCond;
+			return parms;
+		}
+		
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchAccountItem() {
+			var pageNum = 0;
+			var pageSize = 0;
+			var period = $("#bill-period").val();//期间
+			var locationCode = $("#location-block").val();//地理位置-小区
+			var settlementStatus = $("#settlement-status").val();//结算状态
+			var searchCond = $("#search-cond").val();//查询条件
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			parms.period=period;
+			parms.locationCode=locationCode;
+			parms.settlementStatus=settlementStatus;
+			parms.searchCond=searchCond;
+			
+			searchAccountItem(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchAccountItemClick() {
+
+			var parms = getParms();
+			searchAccountItem(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadAccountItemPage() {
+			
+			var pageNum = curr_pageNum;
+			var pageSize = curr_pageSize;
+			var period = $("#bill-period").val();//期间
+			var locationCode = $("#location-block").val();//地理位置-小区
+			var settlementStatus = $("#settlement-status").val();//结算状态
+			var searchCond = $("#search-cond").val();//查询条件
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			parms.period=period;
+			parms.locationCode=locationCode;
+			parms.settlementStatus=settlementStatus;
+			parms.searchCond=searchCond;
+			
+			searchAccountItem(parms);
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//设置账单期间默认值为系统月份
+			setBillPeriodDefault();
+			//主页:默认查询(加载默认列表)
+			defaultSearchAccountItem();
+			/**
+			 * 	绑定客户信息选项卡的click事件
+			 */
+			$("#account-item-tab").on("click", function(){
+				hideAccountItemDetailTab();//隐藏账单详情信息
+			});
+
+			//---------事件绑定--------------
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#btn-search-overdue').on('click', function() {
+				btnSearchAccountItemClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#btn-search-overdue-reset').on('click', function() {
+				$("#search-cond").val("");
+				$("#search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#btn-search-overdue').trigger("click");	                
+	            }	
+			});
+			
+		});
+	</script>
+
+
+
+</body>
+</html>

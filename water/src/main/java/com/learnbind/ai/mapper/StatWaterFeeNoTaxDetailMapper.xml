@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.StatWaterFeeNoTaxDetailMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.StatWaterFeeNoTaxDetail">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="STAT_JSON" jdbcType="VARCHAR" property="statJson" />
+    <result column="TOTAL_AMOUNT" jdbcType="DECIMAL" property="totalAmount" />
+    <result column="NOT_TAX_TOTAL_AMOUNT" jdbcType="DECIMAL" property="notTaxTotalAmount" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, PERIOD, STAT_JSON, TOTAL_AMOUNT, NOT_TAX_TOTAL_AMOUNT, CREATE_TIME
+  </sql>
+</mapper>

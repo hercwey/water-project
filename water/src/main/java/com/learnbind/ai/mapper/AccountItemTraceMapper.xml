@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.AccountItemTraceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.AccountItemTrace">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PRIMARY_ID" jdbcType="DECIMAL" property="primaryId" />
+    <result column="PRIMARY_SUBJECT" jdbcType="VARCHAR" property="primarySubject" />
+    <result column="SECONDARY_ID" jdbcType="DECIMAL" property="secondaryId" />
+    <result column="SECONDARY_SUBJECT" jdbcType="VARCHAR" property="secondarySubject" />
+    <result column="OPERATE" jdbcType="VARCHAR" property="operate" />
+    <result column="AMOUNT" jdbcType="DECIMAL" property="amount" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, PRIMARY_ID, PRIMARY_SUBJECT, SECONDARY_ID, SECONDARY_SUBJECT, OPERATE, AMOUNT, 
+    CREATE_TIME
+  </sql>
+</mapper>

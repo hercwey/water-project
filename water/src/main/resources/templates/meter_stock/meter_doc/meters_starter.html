@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('单据管理')" th:remove="tag"></div>
+<!-- 页面正在加载loading-->
+<script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>
+</head>
+<body>
+	<!-- 参数配置主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		$(function() {
+			/* 
+				加载用户框架页
+			*/
+			function loadTabsList(parms, callback) {
+				var url = "/meter-doc/tabs";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			loadTabsList(null, null);
+		})
+	</script>
+
+</body>
+</html>

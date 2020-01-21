@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('专用发票开具')" th:remove="tag"></div>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+
+<style>
+</style>
+
+<title>发票开具-页面(用于测试发票对象)</title>
+
+<!-- 专用发票组件CSS -->
+<link rel="stylesheet"	href="/css/issueinvoice/issueinvoice.css" />  
+<link rel="stylesheet"	href="/css/components/invoicespecial/invoicespecial.css" />
+
+</head>
+<body>	
+	<div class="container-fluid">	
+	
+	<div class="row-fluid" style="margin-top:10px;" >		  		
+		<!-- 操作面板 -->
+		<div  th:include="tax/issueinvoice/public/issue_invoice_panel::panel"  th:remove='tag'></div>
+		
+		<!-- 发票号码确认对话框组件 -->
+		<div class="col-12">
+			<span th:include="component/invoicehmconfirmdialog/invoicehm_confirm_dialog::dialog('invoicehm-confirm-dialog-1')"  th:remove='tag'></span>
+		</div>
+		
+		<!-- 选择客户开票信息对话框组件 -->
+		<div class="col-12">
+			<div th:include="customers/invoice/invoice_select_customer_dialog::dialog('invoice-dialog-1')"></div>
+		</div>
+		
+		<!-- 选择客户账单对话框 -->
+		<div class="col-12">
+			<!-- 选择开票账单对话框 -->
+			<div th:include="customers/invoice/selectinvoicebill/select_invoice_bill_dialog::dialog('select-invoice-bill-dialog-1')"></div>			
+		</div>
+
+		<!-- 打印对话框 -->
+		<div class="col-12">
+			<span th:include="component/invoiceprintdialog/invoice_print_dialog::dialog('print-dialog1')"  th:remove='tag'></span>
+		</div>
+		
+		<div class="col-12">			
+			<!-- 专用发票组件 -->		
+			<div id="invoice-special-container" >
+				<div th:include="tax/components/invoice_special::invoice('invoice-special-1')"  th:remove="tag"></div>			
+			</div>								
+		</div>
+		
+		<!-- 测试面板 -->
+		<div class="col-12 issue-invoice-test-panel">
+			<!-- <a href="#tooltip" class="initialism tooltip_open btn btn-success" id="tooltip_open">Tooltip</a> -->
+			<!-- <button type="button" class="btn btn-sm btn-primary" id="btn-disp-tootip"  >显示TOOLTIP</button>			
+			<button type="button" class="btn btn-sm btn-primary" id="btn-disp-waiting-dialog"  >显示等待对话框</button>
+			<button type="button" class="btn btn-sm btn-primary" id="btn-close-waiting-dialog"  >关闭等待对话框</button>			
+			<button type="button" class="btn btn-sm btn-primary" id="btn-disp-result-dialog"  >显示处理结果对话框</button>
+			
+			<button type="button" class="btn btn-sm btn-primary" id="btn-open-customer-dialog">打开客户开票信息对话框</button>
+			<button type="button" class="btn btn-sm btn-primary" id="btn-set-invoice-detail">加入并显示发票详情条目</button>
+			<button type="button" class="btn btn-sm btn-primary" id="btn-issue-invoice">发票开具-测试webservice时使用</button>
+						
+			<button type="button" class="btn btn-sm btn-primary" id="btn-set-invoice-head">显示发票头</button>
+			<button type="button" class="btn btn-sm btn-primary" id="btn-set-invoice-addition">显示发票附加</button>			
+			<button type="button" class="btn btn-sm btn-primary" id="btn-disp-invoice">显示发票</button>
+			
+			新加入测试
+			<button type="button" class="btn btn-sm btn-primary" id="btn-hide-pre-invoice">隐藏预生成发票列表及操作面板</button>			
+			<button type="button" class="btn btn-sm btn-primary" id="btn-set-pre-invoice-list">设置预生成发票列表及操作面板</button>			
+			<button type="button" class="btn btn-sm btn-primary" id="btn-show-pre-invoice">显示预生成发票列表及操作面板</button> -->
+
+		</div>
+		 
+	</div>
+	<div class="row-fluid">
+		<div class="col-12">
+			<!-- 发票开具结果容器 -->
+			<div id="issue-invoice-result-container">
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- 显示发票备注编辑对话框 -->
+	<div id="tooltip"
+		class="well well--tooltip rounded  border border-secondary"
+		style="padding: 10px;">
+		<h5>发票号码:<strong><span class="tooltip-pre-invoice-fphm"></span></strong></h5>
+		<!-- <div>
+			发票代码、发票号码
+			发票代码、发票号码			
+		</div> -->
+		<div>
+			<!-- <p>发票备注</p> -->
+			<textarea class="pre-invoice-remark-input" placeholder="请输入备注信息" 
+				style="width: 278px; height: 80px;" autofocus="autofocus"></textarea>
+		</div>
+		<!-- <button class="tooltip_close fall_open btn btn-sm btn-primary" style="float:right;">确定</button> -->
+		<button class="fall_open btn btn-sm btn-warning get-pre-invoice-remark" style="float: right">上次备注</button>
+		<button class="fall_open btn btn-sm btn-warning clear-pre-invoice-remark" style="float: right">清除</button>
+	</div>
+	<!-- 处理结果显示对话框 -->
+	<div id="tooltip-dialog"	class="well rounded  border border-secondary"  style="padding: 10px;">
+		<br>
+		<div style="display:inline-block">					
+			<div style="float:left;"><i class="fa fa-info-circle" aria-hidden="true" style="color:green;font-size:48px;"></i></div>
+			<div style="float:right;padding-top:16px;"><span class="tooltip-dialog-message" style="font-size:16px; margin:16px 0"></span></div>
+			
+		</div>		
+		<br>
+		<!-- <button class="tooltip_close fall_open btn btn-sm btn-primary" style="float:right;">确定</button> -->
+		<!-- <button class="basic_close closebutton_close   btn btn-sm btn-default" style="float: right">Close1</button> -->
+		
+	</div>
+	
+	<!-- 等待对话框 -->
+	<div id="waiting-dialog"	class="well rounded  border border-secondary"  style="padding: 10px;">
+		<br>
+		<img src="/images/loading.gif">
+		<span style="font-size:16px;"><span class="waiting-dialog-message"></span></span>		
+		<br>	
+		<!-- 注,此按钮的class有相应的约定  组件ID_close -->
+		<!-- <button class="waiting-dialog_close btn btn-sm btn-default" style="float: right">Close1</button> -->
+	</div>
+	
+</body>
+
+<!-- 日期工具 -->
+<script src="/pivas/js/common/dateUtil.js"></script>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<!-- jquery popup组件 -->
+<script src="/jquery/jquery-popup/jquery.popupoverlay.js" type="text/javascript"></script>
+
+<!-- 专用发票组件JS -->
+<!-- 发票类型对象,用于定义发票类型常量 -->
+<script src="/js/component/invoicepublic/InvoiceType.js"></script>
+<!-- 发票头对象 -->
+<script src="/js/component/invoicepublic/InvoiceHead.js"></script>
+<!-- 发票附加对象 -->
+<script src="/js/component/invoicepublic/InvoiceAddition.js"></script>
+<!-- 发票中商品条目对象 -->
+<script src="/js/component/invoicepublic/InvoiceDetail.js"></script>
+<!-- 发票对象 -->
+<script src="/js/component/invoicepublic/Invoice.js"></script>
+<!-- 发票打印参数对象 -->
+<script src="/js/component/invoicepublic/PrintParam.js"></script>
+<!-- 发票打印对象 -->
+<script src="/js/component/invoicepublic/InvoicePrint.js"></script>
+<!-- 发票库存对象 -->
+<script type="text/javascript" src="/js/component/invoicepublic/InvoiceInventory.js"></script>
+<!-- 销方,购方开票信息对象 -->
+<script type="text/javascript" src="/js/component/invoicepublic/IssueInvoiceInfo.js"></script>
+
+
+<!-- 发票业务部分:发票类型 -->
+<script type="text/javascript" src="/js/component/invoicepublic/InvoiceType.js"></script>
+
+<!-- 作废发票对象 -->
+<!-- <script src="/js/component/invoicepublic/InvoiceInvalid.js"></script> -->
+
+<!-- 货币转换对象 -->
+<script src="/js/component/invoicepublic/MoneyTransform.js"></script>
+<!-- 编辑器对象 -->
+<script src="/js/component/invoicepublic/InvoiceFieldEditor.js"></script>
+
+<!-- 增值税专票对象 -->
+<script src="/js/component/invoicespecial/InvoiceSpecial.js"></script>
+
+
+<!-- 通用对话框工具JS -->
+<script type="text/javascript"	src="/js/component/dialogutil/DialogUtil.js"></script>
+<!-- 发票号码确认对话框组件 -->
+<script type="text/javascript" src="/js/component/invoicehmconfirmdialog/InvoiceHMConfirmDialog.js"></script>
+
+<!-- 打印对话框组件JS部分 -->
+<script type="text/javascript" src="/js/component/invoiceprintdialog/InvoicePrintDialog.js"></script>
+
+
+<!-- 选择客户开票信息JS -->
+<script type="text/javascript" src="/js/component/selectinvoice/SelectCustomerInvoice.js"></script>
+
+<!-- 发票开具前端对象 added by hz  2019/12/02 -->
+<script type="text/javascript" src="/js/tax/issueinvoicespecial/IssueInvoiceSpecial.js"></script>
+
+<!-- 客户账单选择对象   added by hz 2019/12/03 -->
+<!-- 选择开票账单JS -->
+<script type="text/javascript" src="/js/component/selectinvoice/SelectInvoiceBillDialog.js"></script>
+
+
+
+<!-- 嵌入式脚本,用于thymeleaf数据传递(json格式) -->
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		//后台向前端直接传递数据
+		/* salerInvoiceInfo  销方默认开票信息,结构如下所示:
+			{
+				    private String shortCode;  //暂未使用
+				    private String companyName;  //公司名称
+				    private String regAddress;	//地址
+				    private String telephone;	//电话
+				    private String accountBank;	//银行名称		
+				    private String accountNo;	//账号		
+				    private String taxNo;		//税号				    
+				    private Integer enabled;	//是否有效.
+			} */
+		var salerInvoiceInfo = [[${salerInvoiceInfo}]];   	//销方默认开票信息	
+		console.log("自服务器获取到的销方信息格式如下："+JSON.stringify(salerInvoiceInfo));
+		var loginUserName=[[${loginUserName}]];   			//操作员姓名 字符串类型
+	/*]]>*/
+</script>
+
+<script type="text/javascript">
+	//create instance of front operation object 	
+	var issueInvoice= new IssueInvoice(salerInvoiceInfo,loginUserName);
+	/* 
+		page loaded ready 
+	*/
+	$(function(){	
+		issueInvoice.queryInventory(InvoiceType.FPZL_SPECIAL_INVOICE);  // 查询专用发票库存
+		
+		//隐藏测试按钮,隐藏测试返回的结果容器
+		$(".issue-invoice-test-panel").hide();
+		$("#issue-invoice-result-container").hide();
+		
+		//test code
+		//--------------------result dialog------------------
+		
+		//display result dialog
+		/* $("#btn-disp-result-dialog").on('click',function(){			
+			issueInvoice.showPopupDialog("test dialog,此对话框用于显示处理结果.",null);	
+		}) */
+		
+		//--------------------waiting dialog--------------------
+		//display waiting dialog
+		/* $("#btn-disp-waiting-dialog").on('click',function(){
+			var waitingDialog = "#waiting-dialog";
+			//waiting-dialog-message
+			var message="#waiting-dialog .waiting-dialog-message";			
+					
+			$(waitingDialog).popup({
+				closebutton: false,
+				blur:false,  //点击区域外时,不要关闭.
+				onclose: function () {
+					if(closeCallback!=null){
+						closeCallback();
+					}			
+				}
+			});
+
+			$(message).html("测试等待对话框!");
+
+			$(waitingDialog).popup('show');	
+			
+			function closeCallback(){
+				alert("callback called");
+			}
+		}); */
+		
+		//close waiting dialog
+		//此处暂时没有执行的机会
+		/* $("#btn-close-waiting-dialog").on('click',function(){
+			var waitingDialog = "#waiting-dialog";
+			$(waitingDialog).hide();
+		}); */
+		
+		
+	});
+
+</script>
+
+
+</html>

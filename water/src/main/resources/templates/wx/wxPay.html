@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<!--页面容器-->
+	<div id="wrapper" class="headpadding">
+		<header>
+			<nav class="head_title border_shadow1">
+				<div class="row">
+					<div class="small-3 medium-3 columns title_l">
+						<span class=" icon iconfont" style="font-size:2rem" onclick="history.go(-1)">&#xe603;</span> 
+					</div>
+					<div class="small-6 medium-6 columns title_c">订单支付</div>
+					<div class="small-3 medium-3 columns title_r" >
+						<span class="textr icon iconfont"></span> 
+					</div>
+				</div> 
+			</nav>
+		</header>
+		<h3 class="order_h3">订单详情</h3>
+		<div class="main">
+			<div class="itembox border_shadow2">
+
+				<div class="row order_detail">
+
+					<div class="small-4 medium-4 large-4 columns">
+						<ul class="text-right item_name">
+							<li>订单类型：</li>
+							<li>订单编号：</li>
+							<li>姓名：</li>
+							<c:if test="${order.ordertype==0 }">
+								<li>上机号：</li>
+								<li class="food">商品名称：</li>
+								<c:if test="${not empty order.cardid }">
+									<li>购物券：</li>
+								</c:if>
+							</c:if>
+							<c:if test="${order.ordertype==2 }">
+								<li>充值网费：</li>
+							</c:if>
+							<li>消耗积分：</li>
+							<li>实际支付：</li>
+						</ul>
+					</div>
+					<div class="small-8 medium-8 large-8 columns">
+						<ul class="text-left item_value">
+							<li>${order.ordertypestr}</li>
+							<li>${order.id}</li>
+							<li>${order.username}</li>
+							<c:if test="${order.ordertype==0 }">
+								<li>${order.addressid}</li>
+								<li class="food"><c:forEach items="${order.productdetailList}" var="top">
+										<p>${top.name }(${top.catalog})<span style="float:right">× ${top.productnum }</span>
+										</p>
+									</c:forEach></li>
+								<li>${order.pointprice}</li>
+								<c:if test="${not empty order.cardid }">
+									<li>${memberCard.cardType.cardname}</li>
+								</c:if>
+							</c:if>
+							<c:if test="${order.ordertype==2 }">
+								<li>${order.totalprice/100}元</li>
+							</c:if>
+							<li>${order.pointprice}（积分抵现&nbsp;${order.pointprice/100}&nbsp;元）</li>
+							<li>${order.payprice/100}元</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<p class="text-center">
+				<!-- <button type="button" class="button radius small">放弃订单</button> -->
+				<button type="button" class="button radius small btn_orange" onclick="onBridgeReady();">确认支付</button>
+			</p>
+		</div>
+	</div>
+
+	<!-- 微信支付 -->
+	<script type="text/javascript">
+		wx.config({
+			debug : false,
+			appId : '${jsAppId}',
+			timestamp : ${jsTimestamp},
+			nonceStr : '${jsNonceStr}',
+			signature : '${jsSignature}',
+			jsApiList : [ 'chooseWXPay' ]
+		});
+		wx.ready(function(){
+			wx.chooseWXPay({
+				timestamp : ${timeStamp}, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+				nonceStr : '${nonceStr}', // 支付签名随机串，不长于 32 位
+				package : '${prepayId}', // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
+				signType : '${signType}', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+				paySign : '${paySign}', // 支付签名
+				success : function(res) {
+					//location.href = "./pay/success?orderid=${order.id}";
+				}
+			});
+		});
+	</script>
+
+</body>
+</html>

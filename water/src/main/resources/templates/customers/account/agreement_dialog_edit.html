@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户-协议对话框</title>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+		<div class="modal fade" id="modal-container-agreement-upload" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="myModalLabel">
+							编辑：客户-电子档
+						</h5> 
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<!-- 协议上传 -->
+						<form class="form-horizontal " role="form" id="agreement-upload-form">
+							<!-- 采用表格进行布局 -->
+							<table class="table-layout table">
+								<tbody>
+									<tr>
+										<td>
+											<!--描述-->
+											<div class="form-group form-inline">
+												<label for="agreement-name" class="col-sm-4 control-label">描述</label>
+												<span class="input-group-sm col-sm-8">
+													<input type="text" class="form-control" id="agreement-name" name="agreementName" placeholder="描述" />
+												</span>
+											</div>
+										</td>
+									</tr>
+									<tr>	
+										<td>
+											<!-- 类型 -->
+											<div class="form-group form-inline">
+												<label for="agreement-type" class="col-sm-4 control-label">类型</label>
+												<span class="input-group-sm col-sm-8">
+													<select class="form-control" id="agreement-type" name="agreementType">
+														<option value="">——请选择——</option>
+														<option value="0">立户单</option>
+														<option value="1">供水协议</option>
+														<option value="2">代扣协议</option>
+														<option value="3">过户单</option>
+														<option value="4">销户单</option>
+														<option value="5">销户恢复单</option>
+														<option value="6">用水性质调整单</option>
+														<option value="7">人口调整单</option>
+														<option value="8">更名单</option>
+														
+													</select>
+												</span>
+											</div>
+										</td>												
+									</tr>
+									<tr>											
+										<td>
+											<!-- 选择文件 -->
+											<div class="form-group form-inline">
+												<label for="agreement-file" class="col-sm-4 control-label">选择文件</label>
+												<span class="input-group-sm col-sm-8">
+													<input type="file" class="form-control-file" id="agreement-file" name="agreementFile" 
+														onchange="javascript:validateImgFileSizeFun(this);"
+														accept="image/*" multiple="multiple" />
+												</span>
+											</div>
+										</td>
+									</tr>
+									<tr>											
+										<td>
+											<!-- 缩略图 -->
+											<div class="form-group form-inline">
+												<label for="customers-description" class="col-sm-4 control-label">&nbsp;</label>
+												<span class="input-group-sm col-sm-8">
+													<input type="hidden" class="form-control" id="agreement-path" name="path" placeholder="缩略图" />
+													<!-- <img alt="AGREEMENT FILE" title="" id="thumbnail-portrait" name="" src=""> -->
+													<div id="thumbnail-portrait"></div>
+												</span>
+											</div>
+										</td>
+									</tr>
+									<tr>											
+										<td>
+											<!-- 备注 -->
+											<div class="form-group form-inline">
+												<label for="agreement-remark" class="col-sm-4 control-label">备注</label>
+												<span class="input-group-sm col-sm-8">
+													<input type="text" class="form-control" id="agreement-remark" name="remark" placeholder="备注" />
+												</span>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" id="upload-save-submit-btn">保存</button> 
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+				
+			</div>
+			
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+	<script>
+	
+	/*
+	 * 	验证图片文件大小
+	 */
+	function validateImgFileSizeFun(file){
+		if(isAllowUploadFile(file, 5120, '上传轮播图不能大于5M！')){
+			showPreview(file, 'thumbnail-portrait');
+			$("#upload-save-submit-btn").attr("disabled", false);
+		}else{
+			$("#upload-save-submit-btn").attr("disabled", true);
+		}
+	}
+	
+	/**
+	 * 	获取协议参数
+	 */
+	function getAgreementParams(){
+		
+		var customerId = getCustomerIdFn();//获取客户ID
+		var agreementName = $("#agreement-upload-form #agreement-name").val();//协议名称
+		var agreementType = $("#agreement-upload-form #agreement-type").val();//协议类型
+		var remark = $("#agreement-upload-form #agreement-remark").val();//备注
+		
+		var params = new Object();
+		params.fileType = "img";
+		params.inputName = "agreementFile";
+		params.customerId = customerId;
+		params.agreementName = agreementName;
+		params.agreementType = agreementType;
+		params.remark = remark;
+		return params;
+	}
+	
+	$(function(){
+		
+		/**
+		 * 	绑定类型的change事件
+		 */
+		$("#agreement-upload-form #agreement-type").on("change", function(){
+			var name = $(this).find("option:selected").text();
+			$("#agreement-upload-form #agreement-name").val(name);//协议名称
+		});
+		/**
+		 * 	上传协议保存按钮的click事件
+		 */
+		$("#upload-save-submit-btn").on("click", function() {
+			var url = BASE_CONTEXT_PATH + "/customer-agreement/agreement-upload";
+			var params = getAgreementParams();//获取参数
+			$.ajaxFileUpload({
+				url: url, //用于文件上传的服务器端请求地址
+			    secureuri: false, //一般设置为false
+			    fileElementId: "agreement-file", //文件上传空间的id属性  <input type="file" id="file" name="file" />
+			    dataType: "json", //返回值类型 一般设置为json
+			    data: params,
+			    success: function (res){  //服务器成功响应处理函数
+			    	//console.log("success:"+res);
+			    	if(res!=null){
+						if(res.result_code=="success"){
+							closeAgreementUploadDialog();//关闭协议上传对话框
+							//对话框关闭事件，当对话框完全对用户隐藏时调用
+							$('#modal-container-agreement-upload').on('hidden.bs.modal', function () {
+								//重新加载协议列表
+								loadAgreementItem();//加载客户-协议列表
+						   });
+							
+						}else{
+							util.message(res.result_msg);
+						}
+					}
+			    },
+			    error: function (data, status, e){//服务器响应失败处理函数
+			    	console.log("error:"+data);
+			    }
+			});
+		});
+	});
+	
+	//------------------------------	打开/关闭对话框	------------------------------
+	/*
+	 * 	打开(Open) 协议上传对话框
+	 */
+	function openAgreementUploadDialog() {
+		//可拖拽
+		$("#modal-container-agreement-upload").draggable({
+			cursor : "move",
+			handle : '.modal-header'
+		});
+		//点击对话框外部,不关闭对话框 
+		$('#modal-container-agreement-upload').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+	}
+
+	/* 
+		关闭(CLOSE) 协议上传对话框
+	 */
+	function closeAgreementUploadDialog() {
+		$("#modal-container-agreement-upload").modal("hide");
+	}
+	
+	</script>	
+	
+	</th:block>
+	
+</body>
+</html>

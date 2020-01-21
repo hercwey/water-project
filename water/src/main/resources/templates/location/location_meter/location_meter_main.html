@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<style type="text/css">
+.card {
+	height:100%;
+}
+</style>
+
+<!-- ZTree CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.exedit.js}"></script> -->
+
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block">
+				<button type="button" class="btn btn-primary" id="btn-bind">
+					<i class="fa fa-lock" aria-hidden="true">
+						<span>绑定</span>
+					</i>
+				</button>
+				<button type="button" class="btn btn-warning" id="btn-unbind">
+					<i class="fa fa-unlock-alt" aria-hidden="true"> 
+						<span>解绑</span>
+					</i>
+				</button>
+			</div>
+			<br>
+			<!-- 操作面板 -->
+			<!-- <div class="" style="display: inline-block">
+				<button type="button" class="btn btn-primary" id="btn-bind">
+					<i class="fa fa-lock" aria-hidden="true">
+						<span>绑定</span>
+					</i>
+				</button>
+				<button type="button" class="btn btn-warning" id="btn-unbind">
+					<i class="fa fa-unlock-alt" aria-hidden="true"> 
+						<span>解绑</span>
+					</i>
+				</button>
+			</div> -->
+		</div>
+	</div>
+	<hr>
+	<div class="row clearfix">
+		<div class="col-md-6 column">
+			<div class="card">
+				<h5 class="card-header">
+					地理位置
+				</h5>
+				<div class="card-body" id="location-body">
+					<!-- 地理位置列表 -->
+				</div>
+				<!-- <div class="card-footer">
+					Card footer
+				</div> -->
+			</div>
+		</div>
+		<div class="col-md-6 column">
+			<div class="card">
+				<h5 class="card-header">
+					表计
+				</h5>
+				<div class="card-body" id="meters-body">
+					<!-- 表计列表 -->
+				</div>
+				<!-- <div class="card-footer">
+					Card footer
+				</div> -->
+			</div>
+		</div>
+		
+	</div>
+
+	<script type="text/javascript">
+	
+		var G_SELECTED_LOCATION_NODE = null;//保存当前选择的地理位置节点
+		var G_SELECTED_METER_NODE = null;//保存当前选择的表计节点
+		
+		/**
+		 * 	初始化
+		 */
+		function initLoad(){
+			loadLocationList(null, null);//加载地理位置列表
+			loadMeterList(null, null);//加载表计列表
+		}
+	
+		/* 
+		 *	加载地理位置列表
+		 */
+		function loadLocationList(parms, callback) {
+			var url = "/location-meter/location-table";
+			var callbackFunc = callback;
+			var containerId = "#location-body";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		/* 
+		 *	加载表计列表
+		 */
+		function loadMeterList(parms, callback) {
+			var url = "/location-meter/meter-main";
+			var callbackFunc = callback;
+			var containerId = "#meters-body";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		/**
+		 * 	ajax请求绑定或解绑操作
+		 */
+		function ajaxReqBindOrUnbind(url){
+			
+			//console.log("G_LOCATION_ID:"+G_SELECTED_LOCATION_NODE.id+",G_METER_ID:"+G_SELECTED_METER_NODE.id);
+			
+			var params = new Object();
+			params.locationId = G_SELECTED_LOCATION_NODE.id;
+			params.meterId = G_SELECTED_METER_NODE.id;
+			$.post(url, params, function(res){
+				//请求完成后在此处理业务
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						
+						//cancelLocationCurrSelectedNode();//取消地理位置当前选中的节点
+						//cancelMeterCurrSelectedNode();//取消表计当前选中的节点
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"success");
+						
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+	
+		//---------- Dialog 操作 打开/关闭 ------------------------
+		
+		/*
+		 * 	打开(Open) 对话框
+		 */
+		function openEditDialog(dialogId) {
+			//可拖拽
+			$("#"+dialogId).draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$("#"+dialogId).modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			关闭(CLOSE) 对话框
+		 */
+		function closeEditDialog(dialogId) {
+			$("#"+dialogId).modal("hide");
+		}
+	</script>
+	<script type="text/javascript">
+		$(function(){
+			
+			initLoad();//页面加载完成后执行
+			
+			//--------------------绑定事件--------------------
+			/**
+			 * 	绑定按钮的click事件
+			 */
+			$("#btn-bind").on("click", function(){
+				
+				//如果当前选中的地理位置ID<=0 或 当前选中的表计ID<=0
+				if(G_SELECTED_LOCATION_NODE==null || G_SELECTED_METER_NODE==null || G_SELECTED_LOCATION_NODE.id<=0 || G_SELECTED_METER_NODE.id<=0){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要绑定的地理位置或表计！",null,"error");
+					return;
+				}
+				var url = BASE_CONTEXT_PATH + "/location-meter/bind";
+				ajaxReqBindOrUnbind(url);//ajax请求绑定或解绑操作
+				
+			});
+			/**
+			 * 	解绑按钮的click事件
+			 */
+			$("#btn-unbind").on("click", function(){
+				
+				//如果当前选中的地理位置ID<=0 或 当前选中的表计ID<=0
+				if(G_SELECTED_LOCATION_NODE==null || G_SELECTED_METER_NODE==null || G_SELECTED_LOCATION_NODE.id<=0 || G_SELECTED_METER_NODE.id<=0){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要解绑的地理位置或表计！",null,"error");
+					return;
+				}
+				var url = BASE_CONTEXT_PATH + "/location-meter/unbind";
+				ajaxReqBindOrUnbind(url);//ajax请求绑定或解绑操作
+				
+			});
+			
+		});
+	</script>
+
+</body>
+</html>

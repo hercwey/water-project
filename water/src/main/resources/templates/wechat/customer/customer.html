@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<!-- wechat-用户绑定,解绑,查询主界面-使用中 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 通用css及JS lib -->
+<title>石家庄高新区供水排水公司</title>
+
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')" 	th:remove="tag"></div> -->
+
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<meta name="context-path" content="/" />
+
+<link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+
+hr.style-self { /*透明渐变水平线*/
+	width: 100%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 0, 0, 1),
+		rgba(0, 0, 255, 1), rgba(255, 0, 0, 1));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+/* 帐单-body不显示 */
+weui-form-preview__bd.hide {
+	display: none;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body ontouchstart>
+	<div class="">
+		<div class="">
+			<div class="col-md-12">
+				<div th:include="wechat/public_page/header::header('用户关联')"	th:remove="tag"></div>
+				<div class="weui-tab" id="t1" style="height:44px;">
+			        <div class="weui-navbar" >
+			            <div class="weui-navbar__item" id="div-bind-customer">
+			                	用户绑定
+			            </div>
+			            <div class="weui-navbar__item" id="div-unbind-customer">
+			                	用户解绑
+			            </div>
+			            <div class="weui-navbar__item">
+			                	查询编号
+			            </div>
+			        </div>
+			
+			    </div>
+			</div>
+
+		</div>
+		
+		<!-- 用于存放用户关联的不同状态 : 用户绑定,解绑,查询编号    -->
+		<div class="row" id="customer-container">
+		</div>
+
+		<!-- <div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')"
+				th:remove="tag"></div>
+		</div> -->
+		
+		
+		<div class="weui-footer ">
+				<p class="weui-footer__links" style="margin-bottom:5px;">
+					<a href="#" class="weui-footer__link">石家庄高新区供水排水公司</a>
+				</p>
+				<p class="weui-footer__links" style="margin-bottom:5px;">
+					<a href="#" class="weui-footer__link">供水热线:69099838</a>
+				</p>
+				<!-- <p class="weui-footer__text">Copyright &copy; 石家庄高新区供排水公司</p> -->
+			</div>
+		
+	</div>
+	
+	<script type="text/javascript"	src="/jquery/3.3.1/jquery-3.3.1.js"></script>	
+	<script type="text/javascript" src="/weui/js/zepto.min.js"></script>
+	<script src="/weui/js/zepto.weui.js"></script>
+	<script src="/weui/js/iscroll-lite.js"></script>
+	
+	<!-- 对话框拖拽 -->
+	<script src="/jquery-ui/1.12.1/jquery-ui.min.js"></script>
+	
+	<script type="text/javascript">
+			var BASE_CONTEXT_PATH = $('meta[name=context-path]')
+					.attr("content");
+			console.log("BASE_CONTEXT_PATH0:"+BASE_CONTEXT_PATH) ;
+			BASE_CONTEXT_PATH = BASE_CONTEXT_PATH.substr(0,BASE_CONTEXT_PATH.length - 1);
+			console.log("BASE_CONTEXT_PATH1:"+BASE_CONTEXT_PATH) ;
+			
+	</script>
+	
+
+	<script>
+		
+		//客户关系管理对象
+		function CustomerRelation() {
+			
+			parms=null;
+			
+			/*
+			public method
+			在指定的容器中加载页面
+			 */
+			this.loadPagex = function(containerId,url) {
+				//var parms = null
+				//var callbackFunc = null
+				console.log("parms in loadPagex is:"+JSON.stringify(parms));
+				$(containerId).load(url, parms, callbackFunc);
+			};
+			
+			/*
+				当页面加载完成后,reset向后台传递的参数
+			*/
+			callbackFunc=function(){
+				console.log("reset params  ok");
+				parms=null;
+				console.log("parms in loadPagex is:"+JSON.stringify(parms));
+			}
+			
+			/*
+				加载客户关联相关页面
+				参数:index 页面索引号
+			 */
+			this.loadCustomerPage = function(containerId, index) {
+
+				var pagex = "";
+				switch (index) {
+				case 0:
+					pagex = BASE_CONTEXT_PATH + "/wechat/bindcustomer" //绑定页面
+					break;
+				case 1:
+					pagex = BASE_CONTEXT_PATH + "/wechat/unbindcustomer" //解绑页面
+					break;
+				case 2:
+					pagex = BASE_CONTEXT_PATH + "/wechat/searchcustomerno" //查询用户编号页面
+					break;
+				default:
+					break;
+				}
+				this.loadPagex(containerId,pagex);
+			};
+			/*
+				加载默认页面
+			 */
+			this.loadDefaultPage = function(containerId) {
+				this.loadCustomerPage(containerId, 0);
+			};
+			
+			/*
+				触发用户绑定
+			*/
+			this.triggerCustomerBind=function(parmx){
+				var pageId='#div-bind-customer';
+				parms=parmx;
+				console.log("自查询页面传递过来的参数是:"+JSON.stringify(parmx));
+				$(pageId).trigger('click');
+			}
+			
+			/*
+				加载解绑页
+			*/
+			this.refreshUnbindCustomer=function(){
+				var pageId='#div-unbind-customer';
+				$(pageId).trigger('click');
+			}
+			
+			
+
+		};
+		
+		var customerRelation = new CustomerRelation();
+
+		// page loaded ready
+		$(function() {
+			//var customerRelation = new CustomerRelation();
+			var containerId="#customer-container";
+
+			//customerRelation.loadDefaultPage(containerId); //加载默认页面;
+
+			/*
+				导航条CLICK处理
+				defaultIndex:0   自动加载此页
+			 */
+			$('#t1').tab({
+				defaultIndex : 0,
+				activeClass : 'tab-green',
+				onToggle : function(index) { //点击的回调函数
+					//console.log('index' + index);					
+					customerRelation.loadCustomerPage(containerId,index); //动态加载页面
+				}
+			});
+
+		});
+	</script>
+
+</body>
+</html>

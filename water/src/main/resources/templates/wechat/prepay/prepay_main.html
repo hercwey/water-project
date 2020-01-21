@@ -1,0 +1,343 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- <title>预付水费</title> -->    
+    <!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')"	th:remove="tag"></div> -->
+	<title>石家庄高新区供水排水公司</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta name="context-path" content="/" />
+    
+    <link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+	<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+    
+    
+    <style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+
+hr.style-self { /*透明渐变水平线*/
+	width: 100%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 0, 0, 1),
+		rgba(0, 0, 255, 1), rgba(255, 0, 0, 1));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+/* 帐单-body不显示 */
+weui-form-preview__bd.hide {
+	display: none;
+}
+</style>
+    
+    
+    
+</head>
+
+<body ontouchstart>
+<div class="">
+    <!-- <h1 class="page-hd-title">预付水费-选择账户</h1> -->
+    <div th:include="wechat/public_page/header::header('预付水费')"	th:remove="tag"></div>
+    <h1 class="weui-payselect-title">选择账户</h1>
+    <div class="weui-cells weui-cells_radio">
+	    <label class="weui-cell weui-check__label" 
+	    		th:each="customer,iter:${customerList}" 
+	    		th:attr="for='customer-no-'+${iter.count}" 
+	    		style="margin-bottom:0px;">
+	        <div class="weui-cell__bd">
+	            <p style="margin-bottom:0px;">
+	            	<span th:text="'客户编号:'+${customer.customerCode}+'('+${customer.location}+')'">客户编号:1234567890</span>
+	            </p>
+	        </div>
+	        <div class="weui-cell__ft">
+	            <input class="weui-check check-customer" name="radio1" 
+	            	th:attr="id='customer-no-'+${iter.count},
+	            			data-bind-customer-id=${customer.customerId},
+	            			data-bind-customer-location='客户编号:'+${customer.customerCode}+'('+${customer.location}+')'"	
+	            	 
+	            	type="radio">
+	            <span class="weui-icon-checked"></span>
+	        </div>
+	    </label>
+	</div>    
+</div>
+
+<div class="weui-pay" style="padding-bottom:0px;padding-top:0px;">
+    <h1 class="weui-payselect-title">选择金额</h1>
+    <!-- <p class="weui-payselect-info">支付金额给商户</p> -->
+    <ul class="weui-payselect-ul">
+        <li class="weui-payselect-li">
+            <a href="javascript:;" class="weui-payselect-a weui-payselect-on" bind-money-amount="20">20元</a>
+        </li>
+        <li class="weui-payselect-li">
+            <a href="javascript:;" class="weui-payselect-a" bind-money-amount="50">50元</a>
+        </li>
+        <li class="weui-payselect-li">
+            <a href="javascript:;" class="weui-payselect-a" bind-money-amount="100">100元</a>
+        </li>
+        <li class="weui-payselect-li">
+            <a href="javascript:;" class="weui-payselect-a" bind-money-amount="200">200元</a>
+        </li>
+        <li class="weui-payselect-li">
+            <a href="javascript:;" class="weui-payselect-a" bind-money-amount="300">300元</a>
+        </li>
+        <li class="weui-payselect-li">
+            <a href="javascript:;" class="weui-payselect-a" bind-money-amount="500">500元</a>
+        </li>
+    </ul>
+
+</div>
+<div class="weui-pay" style="padding-bottom:0px;padding-top:0px;">
+    <div class="weui-pay-inner">
+        <h1 class="weui-pay-title">付款金额(元)</h1>
+        <div class="weui-pay-input"> <strong class="weui-pay-strong">￥</strong>
+            <input type="number" name="money" class="weui-pay-inputs" placeholder="请输入1~1000整数金额"  
+            onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" 
+            onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"></div>
+        <div class="weui-pay-intro">最多可输入金额1000元</div>
+    </div>
+    <!-- <p class="weui-pay-info">支付金额给商户</p> -->
+    <div class="weui-pay-btn">        
+        <a href="javascript:;" class="weui-btn weui-btn_primary"  id="btn-goto-prepay">去付款</a>
+    </div>
+</div>
+
+
+<br>
+<!-- weui-footer_fixed-bottom -->
+<div class="weui-footer ">
+    <p class="weui-footer__links" style="margin-bottom:5px;">
+        <a href="#" class="weui-footer__link">石家庄高新区供水排水公司</a>
+    </p>
+    <p class="weui-footer__links" style="margin-bottom:5px;">
+        <a href="#" class="weui-footer__link">供水热线:69099838</a>
+    </p>
+    <!-- <p class="weui-footer__text">Copyright &copy; 石家庄高新区供排水公司</p> -->
+</div>
+
+	<script type="text/javascript"	src="/jquery/3.3.1/jquery-3.3.1.js"></script>
+	<!-- <script type="text/javascript" src="/jquery/jquery.form.js"></script> -->
+	
+	<!-- <script src="/jquery-ui/1.12.1/jquery-ui.min.js"></script> -->
+
+	<script src="/weui/js/zepto.weui.js"></script>
+
+
+<script type="text/javascript">
+			var BASE_CONTEXT_PATH = $('meta[name=context-path]')
+					.attr("content");
+			console.log("BASE_CONTEXT_PATH0:"+BASE_CONTEXT_PATH) ;
+			BASE_CONTEXT_PATH = BASE_CONTEXT_PATH.substr(0,BASE_CONTEXT_PATH.length - 1);
+			console.log("BASE_CONTEXT_PATH1:"+BASE_CONTEXT_PATH) ;
+</script>
+
+<script>
+        $(function(){
+            $(".weui-payselect-li").on('click',function(){
+                $(this).children().addClass("weui-payselect-on");
+                $(this).siblings().children().removeClass("weui-payselect-on");
+                return false;
+            })
+
+        });
+
+    </script>
+
+<script>
+
+	//预支付前端对象
+	function PrePay(){
+		
+	}
+	
+	//初始化"去支付按钮" click event listener
+	PrePay.prototype.initListener=function(){
+		const PREPAY_BTN="#btn-goto-prepay";
+		
+		var self=this;	
+		
+		$(PREPAY_BTN).on('click',validateAmount);
+		
+		//对用户所输入的数据进行校验.
+		//如果校验通过时,则返回true,否则返回false
+		function validateAmount(){
+			const INPUT_SELECTOR=".weui-pay-inputs";  //输入框选择器.
+			const MAX_AMOUNT=1000;  //最大金额(手工录入)
+			var valid=false;
+			
+			var amount=$(INPUT_SELECTOR).val();
+			if(amount==""){  //用户未输入时数据有效
+				valid=true;
+			}
+			else{  //用户有录入数据时,需要校验数字的大小即可.
+				var amountInt=parseInt(amount);
+				if(amountInt>MAX_AMOUNT){
+					$.toptip('不可超过'+MAX_AMOUNT+"元",'warning');
+					valid=false;
+				}
+				else{
+					valid=true;
+				}
+			}
+			
+			//如果验证通过后,则进入到支付页面.
+			if(valid){
+				self.gotoPrepay();
+			}
+		}
+	}
+	
+	//在页面加载完毕后,默认选择一个客户	
+	PrePay.prototype.choiceDefaultCustomer=function(){
+		const CUSTOMER_SELECTOR="input.check-customer";
+		$(CUSTOMER_SELECTOR+':first').prop("checked",true);  //选定第一个客户为当前
+	}
+	
+	
+	//预支付-立即支付页面
+	PrePay.prototype.gotoPrepay=function(parms){
+		var self=this;
+		
+		requestPay();  
+		
+		//请求支付
+		//请求支付的参数有两个:  (1)金额amount (2)客户ID  customerId		
+		function requestPay(){
+			console.log("request to pay......");
+			var url=BASE_CONTEXT_PATH+'/wechat/pay/gotoprepay';
+			console.log("去支付-----in  prepay_main.html");
+			console.log("请求地址:"+url);
+			
+			var amount=getAmount();  //获取用户所输入或是选择的金额			
+			var currCustomerId=getCurrCustomerId();  //获取所选定的默认客户ID(此处的客户为营收系统中的客户)
+			var currCustomerLocation=getCurrCustomerLocation();  //获取所选定的默认客户Location(此处的客户为营收系统中的客户)
+			
+			var reqParms=new Object();
+			reqParms.amount=amount;  //用户预付金额
+			
+			//console.log("请求参数如下所示:"+reqParms.billIds);
+			
+			var reqUrl=url+"?amount="+ amount+"&customerId="+currCustomerId+"&customerLocation="+currCustomerLocation;
+			console.log("请求的最终地址为:"+reqUrl);
+			
+			window.open(reqUrl,"_blank");	
+		}
+		
+		//获取当前客户的ID
+		function getCurrCustomerId(){
+			const CUSTOMER_SELECTOR="input.check-customer";
+			const DATA_BIND_KEY="data-bind-customer-id";  //客户ID KEY
+			
+			var currCustomer=$.find(CUSTOMER_SELECTOR+':checked');
+			
+			var currCustomerId=$(currCustomer).attr(DATA_BIND_KEY);
+			
+			console.log("默认客户的ID是"+currCustomerId);
+			
+			return currCustomerId;
+			
+		}
+		
+		//获取当前客户的LOCATION
+		function getCurrCustomerLocation(){
+			const CUSTOMER_SELECTOR="input.check-customer";
+			const DATA_BIND_KEY="data-bind-customer-location";  //客户LOCATION  KEY
+			
+			var currCustomer=$.find(CUSTOMER_SELECTOR+':checked');			
+			var currCustomerLocation=$(currCustomer).attr(DATA_BIND_KEY);
+			
+			console.log("默认客户的地址是"+currCustomerLocation);
+			
+			return currCustomerLocation;
+		}
+		
+		
+		
+		
+		//获取用户所选择或是输入的金额
+		//在经过验证后才调用些函数,所以其中一定有可以被选择的值
+		function getAmount(){
+			const INPUT_SELECTOR=".weui-pay-inputs";  //输入框选择器.
+			const MAX_AMOUNT=1000;
+			
+			//用户所输入的金额		
+			var inputAmount=$(INPUT_SELECTOR).val();
+			if(inputAmount==""){
+				inputAmount="0";
+			}
+			var inputAmountInt=parseInt(inputAmount);
+			
+			//默认选项金额.
+			const CURR_CHOICE_SELECTOR=".weui-payselect-on";
+			var choiceAmount=$(CURR_CHOICE_SELECTOR).attr("bind-money-amount");
+			console.log("用户选择金额是:"+choiceAmount);
+			//var choiceAmountInt=parseInt(choiceAmount);
+			
+			
+			var result=0;
+			if(inputAmountInt>0){
+				result=inputAmountInt;
+			}
+			else{
+				result=choiceAmount;
+			}
+				
+			return result;
+		}
+		
+		
+	}
+	
+	var prePayObj=new PrePay();  //声明前端操作对象.
+	
+	//page loaded ready
+	$(function(){
+		//---------------初始化--------------
+		prePayObj.initListener();  
+		prePayObj.choiceDefaultCustomer();  //选择默认客户
+		
+		//----------------辅助功能:页面回弹-----------------
+		//解决表单控件不能回弹 只有微信ios有这个问题
+        $("input,select,textarea").blur(function(){
+				setTimeout(() => {
+				const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+				window.scrollTo(0, Math.max(scrollHeight - 1, 0));
+				}, 100);
+		});
+		
+	});
+
+
+</script>
+
+
+</body>
+</html>

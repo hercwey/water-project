@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发票库存查询结果列表</title>
+</head>
+<body>
+<table class="table table-bordered table-condensed" contenteditable="false">
+	<thead>
+		<tr>
+		<!-- private String RETCODE; //	错误代码	字符	100	是	
+			private String RETMSG;	 //错误信息	字符	100	是
+			private String FPDM;	//发票代码	字符	20
+			private String FPHM; 	//	发票号码	字符	20					
+			private String KCFPSL;	//	库存发票数量	数值			
+			private String JSSBRQ; //	金税设备日期	日期	19		格式yyyy-MM-dd hh:mm:ss	
+									//	年月日的格式以本地短时间格式为准
+			private String XFSH;  //	销方税号	字符	20		
+			private String SCFS;	//	上传方式	字符	2		固定值
+										//	0：手动上传
+										//		1：自动上传
+			private String  KPDH;	//开票点号	字符	3		
+			private String  CSQBZ;  //	是否已到抄税期(抄税期备注)	字符	2		固定值
+									//		0：未到抄税期
+									//		1：已到抄税期
+			private String  SSQBZ;	//是否已到锁死期(锁死期备注)	字符	2		固定值
+										//	0：未到抄税期
+										//	1：已到锁死期
+			private String KPFS;	//开票方式	字符	2		固定值
+									//		0：单机开票
+									//		1：服务器开票
+			private String  KPFWQH;  //	开票服务器号	字符	3		
+			private String  JSPH;  	//	金税盘号	字符	20		
+			private String XFMC; 	//	销方名称	字符	100 -->
+		
+			<th>返回代码</th>
+			<th>代码含义</th>
+			<th>发票类型</th>
+			<th>发票代码</th>
+			<th>发票号码</th>			
+			<th>库存数量</th>
+			<th>金税设备日期</th>
+			<th>销方税号</th>
+			<th>上传方式</th>
+			<th>开票点号</th>
+			<th>是否己到抄税期</th>
+			<th>是否己到锁死期</th>
+			<th>开票方式</th>
+			<th>开票服务器号</th>
+			<th>金税盘号</th>
+			<th>销方名称</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr th:each="item,itor:${resultList}">
+			<td th:text="${item.inventory.RETCODE}">返回代码 </td>  <!-- 返回代码 -->
+			<td th:text="${item.inventory.RETMSG}">代码含义</td>  <!-- 代码含义 -->
+			<td th:text="${item.invoiceType}">发票类型</td>  	
+			<td th:text="${item.inventory.FPDM}">发票代码</td>  			
+			<td th:text="${item.inventory.FPHM}">发票号码</td>  			
+			<td th:text="${item.inventory.KCFPSL}">库存数量</td>
+			<td th:text="${item.inventory.JSSBRQ}">金税设备日期</td>
+			<td th:text="${item.inventory.XFSH}">销方税号</td>
+			<td th:text="${item.inventory.SCFS}">上传方式</td>
+			<td th:text="${item.inventory.KPDH}">开票点号</td>
+			<td th:text="${item.inventory.CSQBZ}">是否己到抄税期</td>
+			<td th:text="${item.inventory.SSQBZ}">是否己到锁死期</td>
+			<td th:text="${item.inventory.KPFS}">开票方式</td>
+			<td th:text="${item.inventory.KPFWQH}">开票服务器号</td>
+			<td th:text="${item.inventory.JSPH}">金税盘号</td>
+			<td th:text="${item.inventory.XFMC}">销方名称</td>			
+			<!-- <td ></td>
+			<td ></td> -->		
+		</tr>		
+	</tbody>
+</table>
+
+</body>
+</html>

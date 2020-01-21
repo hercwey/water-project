@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<!-- 客户帐单-页面 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<!-- 帐单1 -->
+	<span th:each="customer,iter:${billList}" th:remove="tag"> 
+		<span th:each="bill,itor:${customer.bills}" th:remove="tag">
+			<div class="weui-form-preview rounded"	style="background-color: white;">
+				<!-- 需要加入一个特定的标识用于确定body部分.
+				data-bind-id用于区分不同的bill
+			 -->
+			 	<!--  -->
+				<div class="weui-cells weui-cells_checkbox rounded"
+					style="background-color: lightgreen;">
+					<!-- 注,此处需置labe的样式 -->
+					<label class="weui-cell weui-check__label"																	
+						th:attr="for='check-bill-'+${bill.ID}"									
+						style="margin-bottom: 0px;">
+						<div class="weui-cell__hd">
+							<input class="weui-check check-bill" 
+								th:attr="id='check-bill-'+${bill.ID},data-bind-bill-id=${bill.ID}" 
+								name="check-bill" 
+								checked="checked"
+								type="checkbox"> 
+								<i class="weui-icon-checked"></i>
+						</div>
+						<div class="weui-cell__bd">
+							<span>
+								帐单ID:<span th:text="${bill.ID}" th:remove="tag"></span>
+								&nbsp;&nbsp; 
+								客户编号:	<span th:text="${customer.customerCode}">1234567890</span> 
+							</span>
+						</div>
+				</div>
+
+				<!-- 当点击此处时,header部分,打开或收缩帐单BODY -->
+				<!-- data-bind-id:用于标识账单的ID -->
+				<div class="weui-form-preview__hd rounded"							
+					th:attr="data-bind-id=${bill.ID}">								
+					<label class="weui-form-preview__label">金额</label> <em
+						class="weui-form-preview__value" style="font-size: 20px;" th:text="'¥'+${bill.CREDIT_AMOUNT}">¥2400.00</em>
+				</div>
+
+				<!-- data-bind-id用于区分不同的bill -->
+				<div class="weui-form-preview__bd hide rounded"
+					 th:attr="data-bind-id=${bill.ID}" >
+					<div class="weui-form-preview__item">
+						<label class="weui-form-preview__label">上次抄见</label> <span
+							class="weui-form-preview__value" th:text="''">10</span>
+					</div>
+					<div class="weui-form-preview__item">
+						<label class="weui-form-preview__label">上次抄表时间</label> <span
+							class="weui-form-preview__value" th:text="${bill.START_TIME}">2018年07月01日</span>
+					</div>
+					<div class="weui-form-preview__item">
+						<label class="weui-form-preview__label">本次抄见</label> 
+						<span	class="weui-form-preview__value" th:text="''">20</span>
+					</div>
+					<div class="weui-form-preview__item">
+						<label class="weui-form-preview__label">本次抄表时间</label> 
+						<span	class="weui-form-preview__value" th:text="${bill.END_TIME}">2018年07月10日</span>
+					</div>
+					<div class="weui-form-preview__item">
+						<label class="weui-form-preview__label">水量</label> <span
+							class="weui-form-preview__value" th:text="${bill.WATER_AMOUNT}">10</span>
+					</div>
+					<div class="weui-form-preview__item">
+						<label class="weui-form-preview__label">水价</label> <span
+							class="weui-form-preview__value" th:text="${bill.WATER_PRICE}">2.5元</span>
+					</div>
+					<div class="weui-form-preview__item">
+						<label class="weui-form-preview__label">水费金额</label> 
+						<span	class="weui-form-preview__value" th:text="${bill.CREDIT_AMOUNT}">25元</span>
+					</div>
+					<div class="weui-form-preview__item">
+						<label class="weui-form-preview__label">违约金</label> <span
+							class="weui-form-preview__value" th:text="''">10元</span>
+					</div>
+					<!-- 合计金额=水费金额+违约金 -->
+					<div class="weui-form-preview__item">
+						<label class="weui-form-preview__label">合计金额</label> 
+						<span class="weui-form-preview__value" th:text='${bill.CREDIT_AMOUNT}'>2018年07月10日</span>
+					</div>
+				</div>
+
+
+				<!-- <div class="weui-form-preview__ft">
+				<button type="submit"
+					class="weui-form-preview__btn weui-form-preview__btn_primary unselect-bill"
+					href="javascript:">取消选择</button>
+
+				<button type="submit"
+					class="weui-form-preview__btn weui-form-preview__btn_primary select-bill"
+					href="javascript:">选择帐单</button>
+			</div> -->						
+			</div>
+			
+		</span>
+	</span>
+</body>
+
+<script th:inline="javascript">
+	/*<![CDATA[*/		
+		var customerBillList=[[${billList}]];  //客户账单对象
+	/*]]>*/
+</script>
+
+<script>
+
+	/*
+		客户帐单对象
+		构造参数:客户账单对象
+	*/
+	function CustomerBill(customerBillList){		
+		
+		console.log("customerBillList is:"+ JSON.stringify(customerBillList));	
+		this.billList=customerBillList;  //客户帐单对象
+		
+		/*
+			点击账单头部点击Listener
+		*/
+		this.addBillHeaderListener=function(){
+			const HEADER_CLASS=".weui-form-preview__hd";  //账单头部
+			$(HEADER_CLASS)	.click(
+					function() {
+						var HIDE_CLASS = "hide";
+						var dataBindId = $(this).attr("data-bind-id");
+						if(dataBindId=="all"){
+							return;
+						}
+						//查询相应的帐单体.
+						var billBody = $('.weui-form-preview__bd[data-bind-id='	+ dataBindId + ']').eq(0);
+						//console.log(billBody);
+
+						var hasHideClass = billBody	.hasClass(HIDE_CLASS);
+						if (hasHideClass) {
+							//如果原来是隐藏状态,则显示
+							billBody.removeClass(HIDE_CLASS);
+						} else {
+							//如果原来是显示状态,则隐藏
+							billBody.addClass(HIDE_CLASS);
+						}
+					});
+		}
+		
+		
+		
+		/*
+			功能:
+				根据帐目的ID计算合计
+			参数:
+				账目ID列表
+		*/
+		this.calcSumOfSelectedBill=function(ids,selectedBills){			
+			var sum=0;
+			var billList=selectedBills;
+			console.debug("bill list length:"+JSON.stringify(billList));
+			for(var i=0;i<billList.length;i++){  //客户
+				var customerBill=billList[i]; //获取某个客户账单对象
+				var bills=customerBill.bills;  //客户---水费账目列表对象
+				for(var j=0;j<bills.length;j++){  //客户-账目
+					var billId=bills[j].ID;
+					for(var k=0;k<ids.length;k++){  //需要统计的帐目
+						var currId=ids[k];
+						if(billId==currId){
+							sum=sum+bills[j].CREDIT_AMOUNT;  //未加入违约金,后续加入		
+						}
+					}
+					
+				}
+			}
+			
+			sum=sum.toFixed(2);  //保留两位小数
+			
+			return sum;
+		}
+		
+		/*
+			获取已经选定的bill 的ID列表(账目ID)
+		*/
+		this.getSelectedBillIds=function(){
+			const className=".check-bill";
+			var ids = new Array();
+			$(className).each(function() {
+				if ($(this).is(":checked")) {
+					//向数组中ID
+					ids.push($(this).attr("data-bind-bill-id"));
+				}
+			});
+			console.debug('selected bill ids :'+JSON.stringify(ids));
+			return ids;			
+		}
+		
+		/*
+		功能:
+			计算账单的sum
+		参数:
+			customerBillList 客户账单,来自于 customer_bill.html(动态加载的账单页面)
+		返回
+			(1)所有客户(可能多个)(2) 所有账单的
+		*/
+		this.calcSumOfAllCustomerBill=function(){
+			var sum=0;
+			for(var i=0;i<this.billList.length;i++){
+				var customerBill=this.billList[i]; //获取某个客户账单对象
+				var bills=customerBill.bills;  //客户---水费账单列表对象
+				for(var j=0;j<bills.length;j++){
+					sum=sum+bills[j].CREDIT_AMOUNT;  //未加入违约金,后续加入
+				}
+			}
+			sum=sum.toFixed(2);  //保留两位小数
+			return sum;
+		}
+		
+		/*
+			功能:
+				计算指定客户的所有水费账单金额合计
+			参数:
+				customerIds: 客户ID数组
+			注:此函数暂时未用到
+			
+		*/
+		calcSumOfSingleCustomerBill=function(customerIds){
+			var sum=0;
+			
+			for(var i=0;i<customerIds.length;i++){
+				var customerId=customerIds[i];
+				var idx=findCustomerBillIdx(customerId);
+				
+				var customerBill=this.billList[i];  //获取某个客户账单对象
+				var bills=customerBill.bills;  //客户---水费账单列表对象
+				for(var j=0;j<bills.length;j++){
+					sum=sum+bills[j].CREDIT_AMOUNT;  //未加入违约金,后续加入
+				}
+			}
+			sum=sum.toFixed(2);  //保留两位小数
+			return sum;
+		}
+		
+		/*
+			功能:
+				查询指定客户对象的帐单索引
+			参数:
+				customerId:客户ID
+			返回:
+				客户对象索引,未找到返回-1,找到则返回索引号
+			
+		*/
+		findCustomerBillIdx=function(customerId){
+			var idx=-1;
+			for(var i=0;i<this.billList.length;i++){
+				var customerBill=this.billList[i];  //获取某个客户账单对象
+				if(customerBill.customerId==customerId){
+					idx=i;
+					break;
+				}
+			}
+			return idx;
+		}		
+		
+		
+		
+	}
+	
+	var customerBill=new CustomerBill(customerBillList);
+
+	//page loaded ready
+	$(function() {
+		/*
+		选择某个帐单Listener
+		当选择或取消选择某个账单时,重新计算合计值,而后显示
+		*/
+		
+		const checkBillClass='.check-bill';
+		$(checkBillClass).on('click',function(){				
+			var ids=customerBill.getSelectedBillIds();
+			sum=customerBill.calcSumOfSelectedBill(ids,customerBill.billList);
+			bill.displayAmount(sum);
+		});
+			
+		customerBill.addBillHeaderListener();
+		
+		//customerBill.addCheckBillListener();
+	});
+	</script>
+
+</html>

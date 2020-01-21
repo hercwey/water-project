@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style type="text/css">
+/* 输入布局 */
+.table-layout td{
+	border:0px;
+	/* padding:0px; */
+}
+
+</style>
+
+</head>
+<body>
+	
+	<div class="card">
+		<h5 class="card-header">
+			<button type="button" class="btn btn-info btn-sm" id="people-adjust-save-btn">
+				<i class="fa fa-cloud-upload" aria-hidden="true">&nbsp;保存</i>
+			</button>
+		</h5>
+		<div class="card-body">
+			<form class="form-horizontal " role="form" id="people-adjust-form">
+									
+				<!-- 当前所编辑的条目ID -->
+				<input type="hidden" id="people-adjust-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+				
+				<!-- 采用表格进行布局 -->
+				<!-- 配置部分 -->
+				<table class="table table-sm table-layout" style="width:80%;margin:auto;">
+					<tbody>
+						<tr>
+							<td>水量：</td>
+							<td>
+								<input type="text" style="display:inline-block;"
+											th:value="${currItem==null ? '' : currItem.waterAmount}" 
+											class="form-control col-sm-6 " 
+											id="people-adjust-water-amount" name="waterAmount" 
+											maxlength=10 title="请输入1-10位字符" placeholder="水量" />
+									<b>t/年</b>
+								<br>
+								<b>注：</b>此处配置每增加一人所增加的水量，石家庄现有政策是36t/年。
+							</td>
+						</tr>
+						<tr>
+							<td>备注：</td>
+							<td>
+								<textarea rows="3" cols="20" class="form-control col-sm-6" 
+										id="people-adjust-remark" name="remark" 
+										th:text="${currItem==null ? '' : currItem.remark}" 
+										maxlength=100 title="请输入1-100位字符" placeholder="备注"></textarea>
+							</td>
+						</tr>
+						
+					</tbody>
+					
+				</table>
+																						
+			</form>
+		</div>
+		<!-- <div class="card-footer">
+			Card footer
+		</div> -->
+	</div>
+
+	<script type="text/javascript">
+		
+		/**
+		 * 保存配置信息到DB
+		 */
+		function saveFn(){
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/people-adjust/insert";
+			
+			var id = $("#people-adjust-id").val();
+			if(id!=null && id!=""){
+				urlStr = BASE_CONTEXT_PATH + "/people-adjust/update";
+			}
+			var form=new FormData($("#people-adjust-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), */
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							
+							var peopleAdjustId = res.peopleAdjustId;
+							$("#people-adjust-id").val(peopleAdjustId);
+							
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"success");
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+	
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/**
+			 * 绑定多人口调整配置的保存按钮的click事件
+			 */
+			$("#people-adjust-save-btn").on("click", function(){
+				saveFn();
+			});
+		});
+	</script>
+</body>
+</html>

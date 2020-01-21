@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<th:block th:fragment="table">
+	<!-- 表计列表 -->
+	<table class="table table-bordered table-sm" id="meter-table">
+		<thead>
+			<tr>
+				<th>水表口径</th>
+				<th>水表厂家</th>
+				<th>水表类型</th>
+				<th>数量</th>
+			</tr>
+		</thead>
+		<tbody >
+			<span th:each="item,iterStat: ${meterMapList}">
+				<tr>
+					<td th:text="${item.CALIBER}">口径</td>
+					<td th:text="${item.factoryValue}">厂家</td>
+					<td th:text="${item.meterTypeStr}">水表类型</td>
+					<td th:text="${item.NUM}">数量</td>
+				</tr>
+			</span>
+		</tbody>
+		
+	</table>
+	</th:block>
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			
+
+		});
+	</script>
+</body>
+</html>

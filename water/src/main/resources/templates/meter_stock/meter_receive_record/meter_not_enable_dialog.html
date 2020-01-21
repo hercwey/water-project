@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+
+</script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-meter-not-enable-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>接收水表</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="meter-receive-modi-form">
+									
+									<!-- 当前所编辑表计的条目ID -->
+									<input type="hidden" id="meters-id" name="id" th:value="${meterId==null ? '' : meterId}" />									
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!--描述-->
+													<div class="form-group form-inline">
+														<label for="erecord-comment" class="col-sm-4 control-label">描述</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" id="erecord-comment" name="erecordComment" placeholder="描述" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>	
+												<td>
+													<!-- 类型 -->
+													<div class="form-group form-inline">
+														<label for="erecord-type" class="col-sm-4 control-label">类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="erecord-type" name="erecordType">
+																<option value="7">施工单</option>
+																<!-- <option value="1">入库单</option>
+																<option value="2">安装领用单</option>
+																<option value="3">更换领用单</option>
+																<option value="4">检测单</option>
+																<option value="5">报废单</option>
+																<option value="6">退库单</option> 
+																<option value="7">施工单</option>-->
+															</select>
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>											
+												<td>
+													<!-- 选择文件 -->
+													<div class="form-group form-inline">
+														<label for="erecord-file" class="col-sm-4 control-label">选择文件&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<input type="file" class="form-control-file" id="erecord-file" name="erecordFile" 
+																onchange="javascript:validateImgFileSizeFun(this);"
+																accept="image/*" multiple="multiple" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>											
+												<td>
+													<!-- 缩略图 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-4 control-label">&nbsp;</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="hidden" class="form-control" id="erecord-path" name="erecordPath" placeholder="缩略图" />
+															<div id="thumbnail-portrait"></div>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>											
+												<td>
+													<!-- 文件类型 -->
+													<div class="form-group form-inline">
+														<label for="erecord-file" class="col-sm-4 control-label">文件类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="erecord-file-type" name="fileType">
+																<option value="1">图片</option>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>											
+												<td>
+													<!-- 备注 -->
+													<div class="form-group form-inline">
+														<label for="erecord-remark" class="col-sm-4 control-label">备注</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" id="erecord-remark" name="remark" placeholder="备注" />
+														</span>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-meter-receive-save">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//------------------验证图片大小----------------------
+		/*
+		 * 	验证图片文件大小
+		 */
+		function validateImgFileSizeFun(file){
+			if(isAllowUploadFile(file, 5120, '上传电子文件不能大于5M！')){
+				showPreview(file, 'thumbnail-portrait');
+				$("#btn-meter-receive-save").attr("disabled", false);
+			}else{
+				$("#btn-meter-receive-save").attr("disabled", true);
+			}
+		}
+		
+		//------------------业务操作----------------------
+		/**
+		 * 	获取工程单据参数
+		 */
+		function getMeterReceiveParams(){
+			
+			var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+			var erecordComment = $("#meter-receive-modi-form #erecord-comment").val();//描述
+			var erecordType = $("#meter-receive-modi-form #erecord-type").val();//类型
+			var fileType = $("#meter-receive-modi-form #erecord-file-type").val();//文件类型
+			var remark = $("#meter-receive-modi-form #erecord-remark").val();//备注
+			
+			var params = new Object();
+			params.fileDir = "erecord_img";
+			params.inputName = "erecordFile";
+			params.meterId = meterId;
+			params.erecordComment = erecordComment;
+			params.erecordType = erecordType;
+			params.fileType = fileType;
+			params.remark = remark;
+			return params;
+		}
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		 $("#btn-meter-receive-save").on("click", function() {
+				var url = BASE_CONTEXT_PATH + "/meter-receive/insert";
+				var params = getMeterReceiveParams();//获取参数
+				$.ajaxFileUpload({
+					url: url, //用于文件上传的服务器端请求地址
+				    secureuri: false, //一般设置为false
+				    fileElementId: "erecord-file", //文件上传空间的id属性  <input type="file" id="file" name="file" />
+				    dataType: "json", //返回值类型 一般设置为json
+				    data: params,
+				    success: function (res){  //服务器成功响应处理函数
+				    	if(res!=null){
+							if(res.result_code=="success"){
+								loadReceiveRecordPageClickPageNum();
+								loadPageClickPageNum();
+								closeMeterNotEnableDialog();//关闭上传对话框
+								util.message(res.result_msg);
+							}else{
+								util.message(res.result_msg);
+							}
+						}
+				    
+				    },
+				    error: function (data, status, e){//服务器响应失败处理函数
+				    	console.log("error:"+data);
+				    }
+				});
+			});
+		
+		 /* 
+			关闭(CLOSE) 对话框
+		 */
+		function closeMeterNotEnableDialog() {
+			$("#modal-container-meter-not-enable-dialog").modal("hide");
+		}
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

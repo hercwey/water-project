@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.DiscountWaterFeeTraceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.DiscountWaterFeeTrace">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="DISCOUNT_AMOUNT" jdbcType="DECIMAL" property="discountAmount" />
+    <result column="ACCOUNT_ITEM_ID" jdbcType="DECIMAL" property="accountItemId" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, DISCOUNT_AMOUNT, ACCOUNT_ITEM_ID, OPERATOR_ID, OPERATOR_NAME, OPERATION_TIME
+  </sql>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="search" resultMap="BaseResultMap">
+		SELECT 
+			r.*,c.PROP_NAME 
+		FROM DISCOUNT_WATER_FEE_TRACE r left join CUSTOMERS c on r.CUSTOMER_ID = c.id
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+</mapper>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+
+<!-- 图片查看器 CSS,JS -->
+<link rel="stylesheet" th:href="@{/viewer/css/viewer.min.css}" />
+<script type="text/javascript" th:src="@{/viewer/js/viewer-jquery.min.js}"></script>
+
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-hover table-sm" id="check-result-doc-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-check-result-doc-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-check-result-doc-all-toggle"></label>
+					</div>
+				</th>
+				<th>电子档类型</th>
+				<th>描述</th>
+				<th>文件类型</th>
+				<th>备注</th>
+				
+				
+				<th>照片</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${docList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-check-result-doc-selector" name="example1" th:attr="id='item-check-result-doc-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-check-result-doc-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<td>
+					<span th:if="${item.erecordType==1}">检测单</span>
+					<span th:if="${item.erecordType==2}">检修单</span>
+				</td>
+				<!-- 单据说明 -->
+				<td th:text="${item.description}">描述/td>
+				<!-- 文件类型 1：图片；2：其他 -->
+				<td>
+					<span th:if="${item.fileType==1}">图片</span>
+					<span th:if="${item.fileType==2}">其他</span>
+				</td>
+				<td th:text="${item.remark}">备注</td>
+				<!-- 电子档案照片 -->
+				<td class="read-td">
+					<span th:if="${item.filePath==null}">
+						<i class="fa fa-exclamation-triangle" aria-hidden="true" title="此记录无照片"></i>
+					</span>
+					<span th:if="${item.filePath!=null}">
+						<img style="display:none;" class="read-img" th:attr="data-original=${item.filePath},title=${item.filePath},alt=${item.description}" src="" />
+						<i class="fa fa-picture-o" aria-hidden="true"></i>
+					</span>
+				</td>
+				
+				<!-- 操作列 -->
+				<td>
+					<!-- 修改 -->
+					<button type="button" class="modi-check-result-doc-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>编辑</span>
+					</button> 
+					<!-- 删除 -->
+					<button type="button" class="del-check-result-doc-single btn btn-secondary btn-sm"
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>删除</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerCheckResultDoc')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_ed_pageNum=[[${pageNum}]];
+		var curr_ed_pageSize=[[${pageSize}]];
+		var curr_ed_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function delBatchCheckResultDocItem(ids) {
+			var urlStr = BASE_CONTEXT_PATH+"/check-result-doc/delete"; // 需要提交的url
+			
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							clickPagerLoadPage();
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+	
+		//--------------批量删除-----------------
+		
+		/*
+			批量删除确认
+		*/
+		function deleteCheckResultDocConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录? ", "xxx", "ok_callback_engineering_doc", "cancel_callback_name")			
+		}
+		
+		/*
+			批量删除确认:确认(回调)
+		*/
+		function ok_callback_engineering_doc(id){
+			var ids=getCheckResultDocSelectedIds();  //此函数定义于_table.html中
+			delBatchChexkResultDocItem(ids);
+		}
+		
+		/*
+			批量删除确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getCheckResultDocSelectedIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$("#check-result-doc-table .item-check-result-doc-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.del-check-result-doc-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //分录ID
+			//console.log("itemId:" + itemId);
+			util.delConfirm("确认删除此条目?", itemId, "deleteCheckResultDocSingle");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteCheckResultDocSingle(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delBatchCheckResultDocItem(idsArr);
+		}
+				
+		//--------单个修改---------
+		/* 
+			加载修改批次对话框 
+		*/
+		$('.modi-check-result-doc-single').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/check-result-doc/load-edit-dialog';
+
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+
+			$("#check-result-doc-dialog-edit").load(url, parms,openCheckResultDocDialog); //加载完毕后显示 
+			
+		});
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/**
+			 * 	初始化协议图片查看器插件
+			 */
+			var $imageViewer = $("#check-result-doc-table");
+			$imageViewer.viewer({
+				url: 'data-original',
+				navbar: false,//不显示缩略图导航
+			});
+			/**
+			 * 绑定图片logo的click事件，点击的可查看抄表照片
+			 */
+			$("#check-result-doc-table .read-td i.fa-picture-o").on("click", function(){
+				var viewer = $imageViewer.data('viewer');
+				viewer.show();
+			});
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#check-result-doc-table #select-check-result-doc-all-toggle").on('click', function(e) {
+				console.log("abc");
+				var prefix = "item-check-result-doc-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$("#check-result-doc-table .item-check-result-doc-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#check-result-doc-table #' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$("#check-result-doc-table .item-check-result-doc-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#check-result-doc-table #' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+		});
+		//创建分页组件实例
+		var pager=new Pager("pagerCheckResultDoc");
+		$(function(){			
+			pager.init(clickPagerLoadPage,curr_ed_searchCond);			
+		});
+	</script>
+</body>
+</html>

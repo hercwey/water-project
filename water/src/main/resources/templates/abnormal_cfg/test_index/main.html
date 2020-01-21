@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+</head>
+<body>
+	
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-9 card">
+						<div class="row">
+							<div class="col-md-4">
+								<div id="chart-container-1" style="width: 200px; height: 250px; margin:0 auto;"></div>
+							</div>
+							<div class="col-md-4">
+								<div id="chart-container-2" style="width: 200px; height: 250px; margin:0 auto;"></div>
+							</div>
+							<div class="col-md-4">
+								<div id="chart-container-3" style="width: 200px; height: 250px; margin:0 auto;"></div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 card">
+						<div class="row">
+							<div class="col-md-12">
+								<div id="chart-container-4" style="width: 300px; height: 250px; margin:0 auto;"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-9 card">
+						<div class="row">
+							<div class="col-md-12">
+								<div id="chart-container-5" style="width: 1000px; height: 350px; margin-left:0 auto;"></div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 card">
+						<div class="row">
+							<div class="col-md-12">
+								<div id="chart-container-6" style="width: 300px; height: 350px; margin:0 auto;"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!-- 引入echart -->
+<script type="text/javascript" src="/echart/4.2.1/dist/echarts.js"></script>
+
+<!-- 引入显示图表js -->
+<script type="text/javascript" src="/statistic/customer/js/test/StatLineChart.js"></script>
+<script type="text/javascript" src="/statistic/customer/js/test/StatBarChart.js"></script>
+<script type="text/javascript" src="/statistic/customer/js/test/StatPieChart.js"></script>
+
+<script type="text/javascript" src="/statistic/customer/js/test/StatLineChart4.js"></script>
+<script type="text/javascript" src="/statistic/customer/js/test/StatBarChart5.js"></script>
+<script type="text/javascript" src="/statistic/customer/js/test/StatPieChart6.js"></script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			
+			var chartContainer="chart-container-1";
+			var statLineChart=new StatLineChart(null,chartContainer);
+			statLineChart.setTitle('统计1:');
+			statLineChart.displayChart();
+			
+			var chartContainer="chart-container-2";
+			var statBarChart=new StatBarChart(null,chartContainer);
+			statBarChart.setTitle('统计2:');
+			statBarChart.displayChart();
+			
+			var chartContainer="chart-container-3";
+			var statPieChart=new StatPieChart(null,chartContainer);
+			statPieChart.setTitle('统计3:');
+			statPieChart.displayChart();
+			
+			var chartContainer="chart-container-4";
+			var statLineChart4=new StatLineChart4(null,chartContainer);
+			statLineChart4.setTitle('统计4:');
+			statLineChart4.displayChart();
+			
+			var chartContainer="chart-container-5";
+			var statBarChart5=new StatBarChart5(null,chartContainer);
+			statBarChart5.setTitle('统计5:');
+			statBarChart5.displayChart();
+			
+			var chartContainer="chart-container-6";
+			var statPieChart6=new StatPieChart6(null,chartContainer);
+			statPieChart6.setTitle('统计6:');
+			statPieChart6.displayChart();
+			//------------init-------------
+
+			//---------事件绑定--------------
+			
+		});
+	</script>
+
+
+
+</body>
+</html>

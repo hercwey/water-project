@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<!-- 普通发票组件UI部分 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<!-- 普通发票组件前端UI部分 -->
+	<th:block th:fragment="invoice(invoiceId)">
+
+		<div  style="text-align:center;margin:auto; font-family:'FangSong' ; font-size:1.2em;" class="invoice-normal"  th:id="${invoiceId}">
+			
+			<!-- invoice header -->
+			<!-- 发票标题 -->
+			<p style="padding:0px; font-size:24px; margin-right:100px;margin-left:100px;" ><span><b>河北增值税普通发票</b></span></p>
+			<!-- 发票编码及号码 -->		
+			<p style="padding:0px; margin-bottom:-5px; margin-top:-15px; font-size:22px;">
+				
+				<span class="invoice-dm">1300141140</span>
+				<span style="margin-left:220px;margin-right:220px;"></span>
+				<span style="margin-right:5px;"><b>No</b></span><span class="invoice-hm">14907748</span>
+				
+				<!-- 可根据发票的不同状态显示不同的图示 稍后加入此特性 -->
+				<img  class="img-invoice-status" src="/images/obsolete.bmp" style="display:none;float:right;">
+				
+			</p>
+			<!-- 下划线 -->
+			<hr  width="30%" >
+			<!-- 普通发票无以下行 -->
+			<!-- <p><strong>此联不作报销、扣税凭证使用</strong></p> -->
+			<p><strong></strong></p>	
+			<p style="text-align:right; margin-bottom:3px;margin-top:-10px; padding-right:50px;"> <span>开票日期：</span><span class="issue-invoice-date">YYYY年MM日DD日</span></p>
+			
+			<!-- invoice body -->
+			
+			<table cellspacing="0" cellpadding="0" width="0"  style="border-collapse: collapse; border: none">
+				<tbody>
+					<tr>
+						<td width="25" rowspan="4"	style="width: 18px; padding: 0;  display: table-cell; ">
+							<p  align="center"	style="margin-top: 0px; margin-right: 5px; margin-bottom: 0px; margin-left: 5px; margin-bottom: 0px; text-align: center;vertical-align: middle;">
+								<span>购<br><br>买<br><br>方</span>
+							</p>
+						</td>
+						<td width="89"	style="width: 66px;  border-left: none; padding:0px; ">
+							<p style="text-align:center;">
+								<span>名<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>称：</span>
+							</p>
+						</td>
+						<td width="240" valign="top" style="width: 180px;  border-left: none; border-bottom:none; padding: 0px;" class="buyer-name-col">
+							<p align="left" style="text-align: left;" >
+								<span class="buyer-name" style="font-weight: 400; font-family: Song; font-size: 0.9em; ">购方名称-购方公司</span>
+								<div class="input-group mb-3  buyer-name-editor" style="margin-bottom:0px !important;display:none;" >
+										<input type="text" class="form-control buyer-name-input"    placeholder="请输入购方名称">
+										<div class="input-group-append">
+											<button class="btn btn-outline-primary btn-sm btn-buyer-name-edit" type="button"><i class="fa fa-user-circle" aria-hidden="true" ></i></button>
+											<button class="btn btn-outline-primary btn-sm btn-buyer-name-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button>
+										</div>
+								</div>			
+							</p>
+							
+						</td>
+						<td width="25" rowspan="4"	style="width: 18px;  border-left: none; padding: 0px; vertical-align: middle;">
+							<p  align="center"	style="margin-top: 0px; margin-right: 5px; margin-bottom: 0cm; margin-left: 5px; margin-bottom: 0px; text-align: center">
+								<span>密<br><br>码<br><br>区</span>
+							</p>
+						</td> 
+						<td width="271" colspan="4" rowspan="4" valign="top"  style="width: 203px;  border-left: none; padding: 0px;">
+							<p  align="left" style="text-align: left">
+								<span>&nbsp;</span>
+							</p>
+						</td>
+						<td width="22" rowspan="11" 	style="width: 16.5px; border: none; padding: 0px;">
+							<p  align="center"	style="margin-top: 0cm; margin-right: 5px; margin-bottom: 0cm; margin-left: 5px; margin-bottom: 0px; text-align: center">
+								<span>第<br>一<br>联<br>：<br>记<br>帐<br>联<br>   <br>销<br>货<br>方<br>记<br>帐<br>凭<br>证</span>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td width="89"	style="width: 66px; border-top: none; border-left: none;  padding: 0px; display: table-cell; ">
+							<p align="center" style="margin-bottom: 0px;  text-align: center; vertical-align: middle;">
+								<span >纳税人识别号：</span>
+							</p>
+						</td>
+						<td width="240" valign="top" style="width: 180px; border-top: none; border-left: none; border-bottom:none;  padding:0px" class="buyer-tax-no-col" >
+							<p  align="left" style="text-align: left">
+								<span style="font-weight:400;font-family:Song;font-size:0.9em;" class="buyer-tax-no">购买方纳税人识别号-555555</span>
+								<div class="input-group mb-3  buyer-tax-no-editor" style="margin-bottom:0px !important;display:none;" >
+										<input type="text" class="form-control buyer-tax-no-input" placeholder="请输入购方纳税人识别号">
+										<div class="input-group-append">
+											<button class="btn btn-outline-primary btn-sm btn-buyer-tax-no-edit" type="button"><i class="fa fa-edit" aria-hidden="true"></i></button>
+											<button class="btn btn-outline-primary btn-sm btn-buyer-tax-no-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button>
+										</div>
+								</div>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td width="89"	style="width: 66px; border-top: none; border-left: none;  padding:0px;">
+							<p  align="center" style="text-align: center">
+								<span >地 址、电 话：</span>
+							</p>
+						</td>
+						<td width="240" valign="top"
+							style="width:180px; border-top: none; border-left: none; border-bottom:none;  padding:0px;" class="buyer-address-tel-col">
+							<p  align="left" style="text-align: left">
+								<span style="font-weight:400;font-family:Song;font-size:0.9em;" class="buyer-address-tel">地址及电话0311-12345678</span>
+								<div class="input-group mb-3  buyer-address-tel-editor" style="margin-bottom:0px !important;display:none;" >
+										<input type="text" class="form-control buyer-address-tel-input" placeholder="请输入购方地址及电话">
+										<div class="input-group-append">
+											<button class="btn btn-outline-primary btn-sm btn-buyer-address-tel-edit" type="button"><i class="fa fa-edit" aria-hidden="true"></i></button>
+											<button class="btn btn-outline-primary btn-sm btn-buyer-address-tel-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button>
+										</div>
+								</div>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td width="89"
+							style="width: 66.5pt; border-top: none; border-left: none;  padding:0px;">
+							<p  style="text-align: center">
+								<span >开户行及账号：</span>
+							</p>
+						</td>
+						<td width="240" valign="top"
+							style="width:180px; border-top: none; border-left: none;  padding:0px;" class="buyer-bank-account-no-col">
+							<p  align="left" style="text-align: left">
+								<span style="font-weight:400;font-family:Song;font-size:0.9em;" class="buyer-bank-account-no">中国银行12369548</span>
+								<div class="input-group mb-3  buyer-bank-account-no-editor" style="margin-bottom:0px !important;display:none;" >
+										<input type="text" class="form-control buyer-bank-account-no-input" placeholder="请输入购方开户行及账号">
+										<div class="input-group-append">
+											<button class="btn btn-outline-primary btn-sm btn-buyer-bank-account-no-edit" type="button"><i class="fa fa-edit" aria-hidden="true"></i></button>
+											<button class="btn btn-outline-primary btn-sm btn-buyer-bank-account-no-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button>
+										</div>
+								</div>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td width="100%" colspan="8" valign="top"  style="height:185px;  border-top: none; padding:0px;vertical-align: top !important;">
+							<table  border="1" cellspacing="0"	cellpadding="0" width="0"	style="border-collapse: collapse; border: none;width:100%;" class="invoice-detail">
+								<thead>
+									<tr>
+										<!-- 行选择器 -->
+										<td width="19" valign="top" 	style="width: 14.2pt;  padding: 0cm 5.4pt 0cm 5.4pt">
+											<p  align="left" style="margin-top: 0cm; margin-right: -7.25pt; margin-bottom: 0cm; margin-left: -.1pt; margin-bottom: .0001pt; text-align: left">
+												<span style="">&nbsp;</span>
+											</p>
+										</td>
+										<td width="169" valign="top"
+											style="width: 126.75pt;  border-left: none; padding: 0cm 5.4pt 0cm 5.4pt">
+											<p  align="center"	style="margin-right: -7.25pt; text-align: center">
+												<span style="">货物或应税劳务、服务名称</span>
+											</p>
+										</td>
+										<td width="66" valign="top"		style="width: 49.65pt;  border-left: none; padding: 0cm 5.4pt 0cm 5.4pt">
+											<p  align="center" style="text-align: center">
+												<span style="">规则型号</span>
+											</p>
+										</td>
+										<td width="47" valign="top"	style="width: 35.4pt;  border-left: none; padding: 0cm 5.4pt 0cm 5.4pt">
+											<p  align="center" style="text-align: center">
+												<span style="">单位</span>
+											</p>
+										</td>
+										<td width="47" valign="top" style="width: 35.45pt;  border-left: none; padding: 0cm 5.4pt 0cm 5.4pt">
+											<p  align="center" style="text-align: center">
+												<span style="">数量</span>
+											</p>
+										</td>
+										<td width="95" valign="top"	style="width: 70.9pt;  border-left: none; padding: 0cm 5.4pt 0cm 5.4pt">
+											<p  align="center" style="text-align: center">
+												<span style="">单价<span>(</span>含税<span lang="EN-US">)</span></span>
+											</p>
+										</td>
+										<td width="94" valign="top"	style="width: 70.85pt; border-left: none; padding: 0cm 5.4pt 0cm 5.4pt">
+											<p  align="center" style="text-align: center">
+												<span style="">金额<span>(</span>含税<span lang="EN-US">)</span></span>
+											</p>
+										</td>
+										<td width="39" valign="top"	style="width: 29.4pt;  border-left: none; padding: 0cm 5.4pt 0cm 5.4pt">
+											<p  align="center" style="text-align: center">
+												<span style="">税率</span>
+											</p>
+										</td>
+										<td width="65" valign="top"	style="width: 49.1pt;  border-left: none; padding: 0cm 5.4pt 0cm 5.4pt">
+											<p  align="center" style="text-align: center">
+												<span style="">税额</span>
+											</p>
+										</td>
+									</tr>
+								</thead>
+								<!-- 发票详情部分 -->
+								<tbody>
+								</tbody>
+							</table>
+							<p  align="left" style="text-align: left"></p>
+						</td>
+					</tr>
+					<tr>
+						<td width="113" colspan="2" valign="top" style="width: 84.65pt;  border-top: none; padding:0px;">
+							<p  align="center" style="text-align: center">
+								<span >合 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>计
+								</span>
+							</p>
+						</td>
+						<!-- 占位列 -->
+						<td width="282" colspan="3"	style="width: 211.2pt; border-left: none; border-right:none;  padding:0px;">
+							<p  align="right" style="text-align: right">
+								<span >&nbsp;</span>
+							</p>
+						</td>
+						<td width="138"
+							style="width: 103.3pt; padding:0px; border-left:none;border-right:none;border-top:none;" class="invoice-amount-sum-col">
+							<p  style="text-indent: 36.0pt">
+								<span >￥</span><span class="invoice-amount-sum">0.00</span>
+							</p>
+						</td>
+						<!-- 占位列 -->
+						<td width="37" valign="top"
+							style="width: 27.95pt; border-left:none;border-right:none;border-top:none; padding:0px;">
+							<p  align="left" style="text-align: left">
+								<span >&nbsp;</span>
+							</p>
+						</td>
+						<td width="79"
+							style="width: 59.4pt; border-top: none; border-left: none;  padding:0px;" class="invoice-tax-sum-col">
+							<p  align="center" style="text-align: center">
+								<span>￥</span><span class="invoice-tax-sum">0.00</span>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td width="113" colspan="2"
+							style="width: 84.65pt;  border-top: none; padding:0px;">
+							<p  align="center" style="text-align: center">
+								<span style="">价税合计（大写）</span>
+							</p>
+						</td>
+						<td width="240" valign="top"
+							style="width:180px; border-top: none; border-left: none; border-right:none;  padding:0px;" class="invoice-price-tax-sum-chinese-col">
+							<p  align="left" style="text-align: left;margin-left:3px;">
+								<span style="font-weight:400;font-family:Song;	font-size:0.9em;" class="invoice-price-tax-sum-chinese">零圆整</span>
+							</p>
+						</td>
+						<td width="296" colspan="5" valign="top"
+							style="width: 221.9pt; border-top: none; border-left: none;  padding:0px;" class="invoice-price-tax-sum-number-col">
+							<p  align="left" style="text-align: left">
+								<span style="">（小写）￥</span><span class="invoice-price-tax-sum-number">0.00</span>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td width="24" rowspan="4"
+							style="width: 18.15pt;  border-top: none; padding:0px;; layout-flow: vertical-ideographic">
+							<p  align="center"
+								style="margin-top: 0cm; margin-right: 5.65pt; margin-bottom: 0cm; margin-left: 5.65pt; margin-bottom: .0001pt; text-align: center">
+								<span style="">销<br><br>售<br><br>方</span>
+							</p>
+						</td>
+						<td width="89" valign="top"
+							style="width: 66.5pt; border-top: none; border-left: none;  padding:0px;">
+							<p >
+								<span style="">名<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>称：
+								</span>
+							</p>
+						</td>
+						<td width="240" valign="top"
+							style="width:180px; border-top: none; border-left: none; border-bottom:none;  padding:0px;" class="saler-name-col">
+							<p  align="left" style="text-align: left">
+								<span class="saler-name" style="font-weight:400;font-family:Song;font-size:0.9em;">销售方名称.....</span>
+								<div class="input-group mb-3  saler-name-editor" style="margin-bottom:0px !important;display:none;" >
+										<input type="text" class="form-control saler-name-input" placeholder="请输入销方名称">
+										<div class="input-group-append">
+											<button class="btn btn-outline-primary btn-sm btn-saler-name-edit" type="button"><i class="fa fa-user-circle" aria-hidden="true" ></i></button>
+											<button class="btn btn-outline-primary btn-sm btn-saler-name-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button>
+										</div>
+								</div>
+							</p>
+						</td>
+						<td width="25" rowspan="4"
+							style="width: 18.5pt; border-top: none; border-left: none;  padding:0px; display:table-cell;">
+							<p  style="margin-top: 0cm; margin-right: 5px; margin-bottom: 0cm; margin-left: 5px; margin-bottom: 0px; text-align: center;vertical-align:middle;">
+								<span style="">备<br><br><br>注</span>
+							</p>
+						</td>
+						<td width="271" colspan="4" rowspan="4" valign="top"
+							style="width: 203.4pt; border-top: none; border-left: none;  padding:0px;">
+							<p  align="center" style="text-align: center">
+								<span class="invoice-remark">				
+									<textarea class="invoice-remark-input" placeholder="                   请输入备注信息"></textarea>
+								</span>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td width="89" valign="top"  style="width: 66.5pt; border-top: none; border-left: none;  padding:0px;">
+							<p  align="left" style="text-align: center;">
+								<span style="">纳税人识别号：</span>
+							</p>
+						</td>
+						<td width="240" valign="top"
+							style="width:180px; border-top: none; border-left: none;border-bottom:none;  padding:0px;" class="saler-tax-no-col">
+							<p  align="left" style="text-align: left">
+								<span class="saler-tax-no" style="font-weight:400;font-family:Song;font-size:0.9em;">纳税人识别号value</span>
+								<div class="input-group mb-3  saler-tax-no-editor" style="margin-bottom:0px !important;display:none;" >
+										<input type="text" class="form-control saler-tax-no-input" placeholder="请输入销方纳税人识别号">
+										<div class="input-group-append">
+											<button class="btn btn-outline-primary btn-sm btn-saler-tax-no-edit" type="button"><i class="fa fa-edit" aria-hidden="true" ></i></button>
+											<button class="btn btn-outline-primary btn-sm btn-saler-tax-no-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button>
+										</div>
+								</div>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td width="89" valign="top"
+							style="width: 66.5pt; border-top: none; border-left: none; padding:0px;">
+							<p  align="left" style="text-align: center;">
+								<span style="">地 址、电 话：</span>
+							</p>
+						</td>
+						<td width="240" valign="top"
+							style="width:180px; border-top: none; border-left: none; border-bottom:none;  padding:0px;" class="saler-address-tel-col">
+							<p  align="left" style="text-align: left">
+								<span class="saler-address-tel" style="font-weight:400;font-family:Song;font-size:0.9em;">0311-87654321</span>
+								<div class="input-group mb-3  saler-address-tel-editor" style="margin-bottom:0px !important;display:none;" >
+										<input type="text" class="form-control saler-address-tel-input" placeholder="请输入销方地址及电话">
+										<div class="input-group-append">
+											<button class="btn btn-outline-primary btn-sm btn-saler-address-tel-edit" type="button"><i class="fa fa-edit" aria-hidden="true" ></i></button>
+											<button class="btn btn-outline-primary btn-sm btn-saler-address-tel-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button>
+										</div>
+								</div>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<td width="89" valign="top"
+							style="width: 66.5pt; border-top: none; border-left: none;  padding:0px;">
+							<p  align="left" style="text-align: center;">
+								<span style="">开户行及帐号：</span>
+							</p>
+						</td>
+						<td width="240" valign="top"
+							style="width:180px; border-top: none; border-left: none;  padding:0px;" class="saler-bank-account-no-col">
+							<p  align="left" style="text-align: left">
+								<span class="saler-bank-account-no" style="font-weight:400;font-family:Song;font-size:0.9em;">农行-1234567890</span>
+								<div class="input-group mb-3  saler-bank-account-no-editor" style="margin-bottom:0px !important;display:none;" >
+										<input type="text" class="form-control saler-bank-account-no-input" placeholder="请输入销方地址及电话">
+										<div class="input-group-append">
+											<button class="btn btn-outline-primary btn-sm btn-saler-bank-account-no-edit" type="button"><i class="fa fa-edit" aria-hidden="true" ></i></button>
+											<button class="btn btn-outline-primary btn-sm btn-saler-bank-account-no-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button>
+										</div>
+								</div>
+							</p>
+						</td>						
+					</tr>
+					<!-- <tr height="0" style="height:0px;">
+						<td width="24" style="border: none"></td>
+						<td width="89" style="border: none"></td>
+						<td width="240" style="border: none"></td>
+						<td width="25" style="border: none"></td>
+						<td width="17" style="border: none"></td>
+						<td width="138" style="border: none"></td>
+						<td width="37" style="border: none"></td>
+						<td width="79" style="border: none"></td>
+						<td width="22" style="border: none"></td>
+					</tr> -->
+				</tbody>
+			</table>
+			<p  align=center style='text-align:left;margin-top:10px;'>
+				<span style="margin-left:20px;" class="invoice-skr-label" >收款人：</span>
+				<span  class="invoice-skr" style="font-weight:400;font-family:Song;font-size:0.9em;">
+					<input type="text" class="invoice-skr-input" style="width:60px;border:0px" placeholder="收款人">
+				</span> 
+				<span style="margin-left:100px;" class="invoice-fhr-label"> 复核：</span>
+				<span class="invoice-fhr" style="font-weight:400;font-family:Song;font-size:0.9em;">
+					<input type="text" class="invoice-fhr-input" style="width:60px;border:0px;" placeholder="复核人">
+				</span>
+				<span style="margin-left:100px;" class="invoice-kpr-label">开票人：</span>
+				<span class="invoice-kpr" style="font-weight:400;font-family:Song;font-size:0.9em;">
+					<input type="text" class="invoice-kpr-input" style="width:60px;border:0px;" placeholder="开票人">
+				</span>
+				<span style="margin-left:100px;">销&nbsp;售&nbsp;方&nbsp;:&nbsp;(章)</span>				
+			</p>
+			<p style="text-align:left;margin-top:0px;margin-bottom:0px;font-size:12px;">
+				<span style="color:#999;">税收分类编码版本号:33.0</span>
+			</p>
+			
+		</div>
+	
+	</th:block>
+
+</body>
+</html>

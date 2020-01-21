@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>配置分水量规则对话框</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+<!-- 数字计算工具类 -->
+<script type="text/javascript"	th:src="@{/commons/calculateutil.js}"></script>
+
+<style>
+
+/* placeholder color */
+/* chrome浏览器 */
+#search-cond::-webkit-input-placeholder{
+ color: lightblue; 
+}
+#search-cond:-moz-placeholder{
+color: lightblue;
+}
+#search-cond::-moz-placeholder{
+color: lightblue;
+}
+#search-cond:-ms-input-placeholder{
+color: lightblue;
+}
+
+</style>
+
+</head>
+<body>
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+
+			<div class="modal fade" id="modal-container-setting-part-water-rule-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			
+				<div class="modal-dialog modal-lg">
+				
+					<div class="modal-content">
+					
+						<!-- 头部 -->
+						<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+							<h5 class="modal-title" id="myModalLabel">
+								<span id="part-water-rule-meter-place">配置表计规则</span>
+							</h5>
+							<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+						</div>
+
+						<!-- 主体(用于展示表单) -->
+						<div class="modal-body" >
+							<!-- 分水量规则 -->
+							<div th:include="part_water_rule/part_water_rule_table" th:remove="tag"></div>
+							<!-- 表计列表 -->
+							<div id="load-meter-item"></div>
+						</div>
+
+						<!-- 尾部 -->
+						<div class="modal-footer">
+							<button type="button" class="btn btn-info" id="btn-add-meter-part-water"><i class="fa fa-plus" aria-hidden="true"></i></button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+							<button type="button" class="btn btn-primary" id="btn-save-and-back">保存</button>
+						</div>
+						
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var g_waterPriceList = [[${waterPriceList}]];
+			var g_partWaterRuleList=[[${ruleList}]];
+		/*]]>*/
+	</script>
+	<script type="text/javascript">
+	
+		$(function(){
+			console.log("已配置的规则："+g_partWaterRuleList);
+			if(g_partWaterRuleList!=null){
+				console.log("已配置的规则："+g_partWaterRuleList);
+				loadMeterRuleRowFunc(g_partWaterRuleList);//显示当前的规则
+			}
+		});
+	
+		/**
+		 * 	保存格式：
+		 		{
+					"rowId": rowId,
+					"ruleConfig": ruleConfig,
+		 		}
+		 */
+		var g_rule_row_arr = new Array();//保存规则每行的实例变量名称
+		var g_rule_row_id = null;//保存当前选择表计的规则ID，用于选择表计后设置对应的值
+	
+		$("#btn-save-and-back").on("click",function(){
+			var meterId = getPartWaterMeterId();//获取需要分水量的表计ID
+			console.log("----------meterId:"+meterId);
+			
+			var isSave = true;//是否保存
+			var meterPartWaterArr = new Array();
+			$("#setting-meter-part-water-table tbody tr").each(function(i){
+				
+				var ruleRowId = $(this).attr("id");
+				var waterPriceId = $(this).find(".water-price-id").val();
+				
+				var ruleConfig = getRuleConfigFunc(ruleRowId);//获取规则组件对象
+				//var ruleReal = ruleConfig.getInputItems();//获取规则内容
+				//console.log("第 "+(i+1)+" 行规则items:"+ruleReal);
+				var ruleRealArr = ruleConfig.getInputItemsText();//获取规则内容
+				console.log("第 "+(i+1)+" 行规则itemsText:"+ruleRealArr);
+				var valid = ruleConfig.getValid();//获取规则的有效性
+				console.log("第 "+(i+1)+" 行规则有效性:"+valid);
+				var isNull = checkPartWaterRuleIsBlank(ruleRealArr);
+				if(isNull || ruleRealArr.length <= 0){
+					util.message("规则不允许为空！",null,"warning");
+					isSave = false;
+					return false;
+				}
+				if(!valid){
+					util.message("请检查配置规则的正确性！",null,"warning");
+					isSave = false;
+					return false;
+				}
+				if(waterPriceId==null || waterPriceId==""){
+					
+					//dialog type: success warning info error,默认为info
+					util.message("请选择水价！",null,"warning");
+					isSave = false;
+					return false;
+				}
+				
+				var ruleRealStr = "";
+				if(ruleRealArr!=null && ruleRealArr.length>0){
+					for(var i=0; i<ruleRealArr.length; i++){
+						var ruleStr = ruleRealArr[i];
+						if(i!=0){
+							ruleRealStr = ruleRealStr+",";
+						}
+						ruleRealStr = ruleRealStr+ruleStr;
+					}
+				}
+				
+				var obj = new Object();
+				obj.meterId = meterId;//表计ID
+				obj.ruleReal = ruleRealStr;//实际使用的规则
+				obj.waterPriceId = waterPriceId;//水价ID
+				obj.isDefault = 0;//是否默认，0=是；1=否；
+				
+				meterPartWaterArr.push(obj);
+				console.log("规则："+meterPartWaterArr);
+			});
+			console.log("是否保存:"+isSave);
+			if(!isSave){
+				return false;
+			}
+			//return false;
+			
+			//判断百分之总和是否是百分之百，如果非百分之百时提示用户
+			//console.log("配置分水量百分比之和："+currPercent);
+			//if(currPercent!=PERCENT){
+				//dialog type: success warning info error,默认为info
+				//util.message("百分比之和必须等于百分之百！",null,"warning");
+				//return false;
+			//}
+			
+			var meterPartWaterJson = JSON.stringify(meterPartWaterArr);
+			console.log("save:"+meterPartWaterJson);
+			saveMeterPartWater(meterId, meterPartWaterJson);//保存表计分水量配置信息
+		});
+		
+		
+		function checkPartWaterRuleIsBlank(ruleRealArr){
+			var isNull = false;
+			if(ruleRealArr!=null && ruleRealArr.length>0){
+				for(var i=0; i<ruleRealArr.length; i++){
+					var ruleStr = ruleRealArr[i];
+					ruleStr = ruleStr.replace(/\s+/g, "");
+					if(ruleStr==null || ruleStr==""){
+						isNull = true;
+						return false;
+					}
+					
+				}
+				
+			}
+			return isNull;
+		}
+		
+		/**
+		 * 	保存表计分水量配置
+		 */
+		function saveMeterPartWater(meterId, meterPartWaterJson){
+			
+			var url = BASE_CONTEXT_PATH + "/meter-part-water-rule/save";// 需要提交的url
+			var parms = {"meterId":meterId, "meterPartWaterJson":meterPartWaterJson};
+			$.post(url, parms, function(res){
+				//console.log(res);//由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						closeDialogFn("modal-container-setting-part-water-rule-dialog");
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"success");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		/**
+		 * 	增加配置分水量记录分水量
+		 */
+		$("#btn-add-meter-part-water").on("click", function(){
+			
+			var meterId = getPartWaterMeterId();//获取需要分水量的表计ID
+			console.log("meterId:"+meterId);
+			
+			//var trLength = $("#setting-meter-part-water-table tbody tr").length;
+			//trLength = trLength+1;
+			loadMeterRuleRowFn(null);//增加一条规则记录
+			
+			//var html = getSettingMeterPartWaterHtml(meterId);
+			//$("#setting-meter-part-water-table").append(html);
+		});
+		/**
+		 * 	增加一条规则记录
+		 */
+		function loadMeterRuleRowFunc(ruleList){
+			
+			console.log("规则："+ruleList);
+			
+			if(ruleList!=null){
+				for(var i=0; i<ruleList.length; i++){
+					var rule = ruleList[i];
+					loadMeterRuleRowFn(rule);
+				}
+			}
+			
+		}
+		/**
+		 * 	增加一条规则记录
+		 */
+		function loadMeterRuleRowFn(rule){
+			
+			var timestamp=new Date().getTime();
+			var rowId = "rule-"+timestamp;
+			console.log("rowId:"+rowId);
+			
+			var html = "<tr class='rule-row' id='"+rowId+"'></tr>";
+			$("#setting-meter-part-water-table tbody").append(html)
+			loadMeterRuleRow(rowId, rule);
+			
+		}
+		/**
+		 * 	增加一条规则记录load page
+		 */
+		function loadMeterRuleRow(rowId, rule){
+			
+			var url = BASE_CONTEXT_PATH + "/meter-part-water-rule/load-part-water-rule";// 需要提交的url
+			var parms = {"ruleId":rowId};
+			$("#setting-meter-part-water-table #"+rowId).load(url, parms, function(){
+				console.log("规则行加载完成。。。。。。");
+				loadMeterRuleRowCallback(rowId, rule);//加载表计规则一行内容页面回调函数
+			});	
+		}
+		/**
+		 * 	加载表计规则一行内容页面回调函数
+		 */
+		function loadMeterRuleRowCallback(rowId, rule){
+			console.log("load meter rule row callback");
+			//var ruleConfig=new RuleConfig("rule-"+rowId);
+			var ruleConfig=new RuleConfig(rowId);
+			ruleConfig.init();  //(1)初始化
+			
+			ruleConfig.setSearchMeterFunc(searchMeterCallbackFunc);  //设置外部函数
+			
+			var obj = new Object();
+			obj.rowId = rowId;
+			obj.ruleConfig = ruleConfig;
+			
+			g_rule_row_arr.push(obj);
+			console.log("所有规则数组："+g_rule_row_arr);
+			
+			if(rule!=null){
+				var ruleId = rule.id;//规则ID
+				var ruleReal = rule.ruleReal;//规则
+				var waterPriceId = rule.waterPriceId;//水价ID
+				$("#rule-id-"+rowId).val(ruleId);//获取当前编辑的规则ID
+				ruleConfig.setRule(ruleReal);//设置规则
+				$("#"+rowId).find(".water-price-id").val(waterPriceId);//设置水价ID
+			}
+			
+		}
+		
+		/**
+		 * 	查询表计的回调函数
+		 */
+		function searchMeterCallbackFunc(editorId){
+			console.log("editorId:"+editorId);
+			g_rule_row_id = editorId;//设置当前选择表计的规则行ID
+			
+			var url = BASE_CONTEXT_PATH + "/meter-part-water-rule/load-meter-main";// 需要提交的url
+			var parms = null;
+			$("#load-meter-item").load(url, parms, function(){
+				console.log("表计主页面加载完成。。。。。。");
+				
+			});
+			
+		}
+		
+		/**
+		 * 	选择表计后的回调函数，选择的页面是bind_bigmeter_table.html
+		 */
+		function selectedMeterCallbackFunc(meterId, meterNo){
+			
+			//alert("meterId:"+meterId+",meterNo:"+meterNo);
+			
+			var ruleRowId = g_rule_row_id;//当前选择表计的规则行ID
+			if(ruleRowId==null || ruleRowId==""){
+				//dialog type: success warning info error,默认为info
+				util.message("编辑的规则为空！",null,"warning");
+				return false;
+			}
+			
+			var ruleConfig = getRuleConfigFunc(ruleRowId);//获取规则组件对象
+			//console.log("规则对象："+JSON.stringify(ruleConfig));
+			var mInput = $("#rule-input-"+ruleRowId);
+			var rule="meter_"+meterId;
+			//ruleConfig.setRule(rule);//移除全部表达式，设置新的表达式
+			ruleConfig.displayRule(rule, mInput);//往表达式中增加某元素
+			
+			$("#load-meter-item").empty();//清空表计列表
+		}
+		
+		/**
+		 * 	获取规则组件对象
+		 */
+		function getRuleConfigFunc(ruleRowId){
+			console.log("----------开始获取规则对象");
+			
+			var ruleConfig = null;
+			var ruleArr = g_rule_row_arr;
+			for(var i=0; i<ruleArr.length; i++){
+				var obj = ruleArr[i];
+				var currRuleRowId = obj.rowId;
+				//var currRuleConfig = obj.ruleConfig;
+				if(currRuleRowId==ruleRowId){
+					//console.log("获取规则对象："+JSON.stringify(obj));
+					ruleConfig = obj.ruleConfig;
+					//ruleConfig = obj;
+					//ruleConfig = currRuleConfig;
+					break;
+				}
+			}
+			return ruleConfig;
+		}
+		
+	</script>
+
+</body>
+</html>

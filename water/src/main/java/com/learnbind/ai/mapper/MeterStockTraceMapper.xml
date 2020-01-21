@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterStockTraceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterStockTrace">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="METER_NO" jdbcType="VARCHAR" property="meterNo" />
+    <result column="CALIBER" jdbcType="VARCHAR" property="caliber" />
+    <result column="FACTORY" jdbcType="VARCHAR" property="factory" />
+    <result column="OPERATION_TYPE" jdbcType="DECIMAL" property="operationType" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATOR_TIME" jdbcType="TIMESTAMP" property="operatorTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, METER_ID, METER_NO, CALIBER, FACTORY, OPERATION_TYPE, OPERATOR_ID, OPERATOR_TIME, 
+    REMARK, OPERATOR_NAME
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchCond" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM METER_STOCK_TRACE M
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.CALIBER LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.OPERATOR_NAME LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="operationType!=null">
+  				AND M.OPERATION_TYPE = #{operationType}
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+</mapper>

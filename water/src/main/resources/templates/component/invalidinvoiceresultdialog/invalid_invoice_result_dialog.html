@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>未使用发票(按份数)-作废发票进度对话框</title>
+</head>
+<body>
+	<th:block th:fragment="dialog(dialogId)">
+	<div class="modal fade" th:id="${dialogId}" role="dialog" style="font-size:1.0em;"	aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document" style="width:380px;">
+			<div class="modal-content">
+				<!-- 对话框头 -->
+				<div class="modal-header" style="background-color:darkcyan;height:30px;padding-top:0px;padding-bottom:0px;">
+					<!-- <h5 class="modal-title">Modal title</h5> -->
+					<span style="height:30px; line-height:30px;padding:0px;margin:0px;color:white;">
+						<span style="color:orange;"><i class="fa fa-flag" aria-hidden="true"></i> </span>
+						 <span class="dialog-title">Modal title</span>
+					</span>
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<!-- 对话框主体 -->
+				<div class="modal-body">
+					<ul style="list-style-type:none;padding-left:0px;margin-left:30px;margin-right:30px;font-size:1.2em;">						
+						<li style="margin-left:0px;margin-bottom:10px;">
+							<div class="col-12">
+								<div class="row">
+									<div class="col-2" style="height:60px;">
+										<span style="line-height:60px;color:green;font-size:32px;"> <i class="fa fa-exclamation-circle" aria-hidden="true"></i></span>
+									</div>
+									<div class="col-10">										
+										<span class="dialog-message" style="font-size:1em;">对话框消息</span>
+									</div>
+								</div>
+							</div>							
+						</li>
+														
+					</ul>
+				</div>
+				<!-- 对话框底部按钮 -->
+				<div class="modal-footer" style="background-color:#F2F2F2;height:50px;">
+					<button type="button" class="btn btn-primary btn-sm  button-ok" data-dismiss="modal" >确认</button>
+					<!-- <button type="button" class="btn btn-primary  button-cancel"	data-dismiss="modal">取消</button> -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end of dialog -->
+	</th:block>
+</body>
+</html>

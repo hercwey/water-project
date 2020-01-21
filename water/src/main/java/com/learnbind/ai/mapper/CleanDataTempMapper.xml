@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CleanDataTempMapper">
+
+  
+ <delete id="deleteBank">
+    delete from CUSTOMER_BANKS where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deleteBillInfo">
+    delete from CUSTOMER_BILL_INFO where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deletePledge">
+    delete from CUSTOMER_PLEDGE where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deletePeople">
+    delete from CUSTOMER_PEOPLE_ADJUST where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deletdAgreeMent">
+    delete from CUSTOMER_AGREEMENT where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deletdOverdueFine">
+    delete from CUSTOMER_OVERDUE_FINE where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deleteAccount">
+    delete from CUSTOMER_ACCOUNT where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deleteAccountItem">
+    delete from CUSTOMER_ACCOUNT_ITEM where CUSTOMER_ID = #{customerId} AND PERIOD='2019-11'
+</delete>
+
+<delete id="deleteTrace">
+    delete from CUSTOMERS_TRACE where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deleteMeter">
+    delete from CUSTOMER_METER where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deleteLocation">
+    delete from LOCATION_CUSTOMER where CUSTOMER_ID = #{customerId}
+</delete>
+
+<delete id="deletedPartWater">
+    delete from PARTITION_WATER where CUSTOMER_ID = #{customerId} AND PERIOD='2019-11'
+</delete>
+
+
+
+<delete id="deleteMeterBookMeter">
+    delete from METER_BOOK_METER where METER_ID = #{meterId}
+</delete>
+  
+<delete id="deletedMeterRecordTemp">
+    delete from METER_RECORD_TEMP where METER_ID = #{meterId} 
+</delete>
+
+<delete id="deletedMeterRecordTempPhoto">
+    delete from METER_RECORD_TEMP_PHOTO where METER_ID = #{meterId}
+</delete>
+
+<delete id="deletedMeterRecordPhoto">
+    delete from METER_RECORD_PHOTO where METER_ID = #{meterId}
+</delete>
+
+<delete id="deletedMeterRecord">
+    delete from METER_RECORD where METER_ID = #{meterId} AND PERIOD='2019-11'
+</delete>
+
+
+<delete id="deletedPartWaterRule">
+    delete from METER_PART_WATER_RULE where METER_ID = #{meterId}
+</delete>
+
+<delete id="deletedPartWaterRuleTrace">
+    delete from METER_PART_WATER_RULE_TRACE where METER_ID = #{meterId}
+</delete>
+
+<delete id="deletedMeterTree">
+    delete from METER_TREE where METER_ID = #{meterId}
+</delete>
+
+<delete id="deletedMeterLocation">
+    delete from LOCATION_METER where METER_ID = #{meterId}
+</delete>
+</mapper>

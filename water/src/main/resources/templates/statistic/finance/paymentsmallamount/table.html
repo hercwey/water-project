@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="text-center">
+				2019-03小额
+			</h3>
+			<!-- <h5 class="text-center">
+				（集中汇缴明细表）
+			</h5> -->
+			<!-- <p>
+				<span style="float: left;"></span>
+				<span style="float: right;">2018年11月1日</span>
+			</p> -->
+			<!-- <div class="page-header">
+				<h4>
+					<small style="float: left;">填报单位：营业处</small>
+					<small style="float: right;">单位：石家庄高新技术产业开发区供水排水公司</small>
+				</h4>
+			</div> -->
+			<table class="table table-bordered table-sm">
+				<thead>
+					<tr>
+						<th>
+							序号
+						</th>
+						<th>
+							名称
+						</th>
+						<th>
+							金额
+						</th>
+						<th>
+							水费
+						</th>
+						<th>
+							污水
+						</th>
+						<th>
+							水资
+						</th>
+						<th>
+							备注
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							1
+						</td>
+						<td>
+							xxx单位
+						</td>
+						<td>
+							xxx
+						</td>
+						<td>
+							xxx
+						</td>
+						<td>
+							xxx
+						</td>
+						<td>
+							
+						</td>
+						<td>
+							
+						</td>
+					</tr>
+					<tr>
+						<td>
+							2
+						</td>
+						<td>
+							xxx单位
+						</td>
+						<td>
+							xxx
+						</td>
+						<td>
+							xxx
+						</td>
+						<td>
+							xxx
+						</td>
+						<td>
+							
+						</td>
+						<td>
+							
+						</td>
+					</tr>
+					<tr>
+						<td>
+							合计
+						</td>
+						<td>
+							
+						</td>
+						<td>
+							xxx
+						</td>
+						<td>
+							xxx
+						</td>
+						<td>
+							xxx
+						</td>
+						<td>
+							
+						</td>
+						<td>
+							
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- <p>
+				<span style="float: left;">主管经理：</span>
+				<span style="float: right;">部门负责人：</span>
+			</p> -->
+		</div>
+	</div>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<!-- <div th:include="common/common_pager_pagesize::pager('pagerPrice')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div> -->	
+	<!-- 分页组件JS -->
+	<!-- <script src="/js/pager/Pagers.js" type="text/javascript"></script> -->
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function delBatchItem(ids) {
+			var urlStr = BASE_CONTEXT_PATH+"/water-price/delete"; // 需要提交的url
+			
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadPage();
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+	
+		//--------------批量删除-----------------
+		
+		/*
+			批量删除确认
+		*/
+		function deleteConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录? ", "xxx", "ok_callback_name", "cancel_callback_name")			
+		}
+		
+		/*
+			批量删除确认:确认(回调)
+		*/
+		function ok_callback_name(id){
+			var ids=getSelectedIds();  //此函数定义于_table.html中
+			delBatchItem(ids);
+		}
+		
+		/*
+			批量删除确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.del-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //分录ID
+			//console.log("itemId:" + itemId);
+			util.delConfirm("确认删除此条目?", itemId, "deleteSingle");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteSingle(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delBatchItem(idsArr);
+		}
+				
+		
+		//--------单个修改---------
+		/* 
+			加载修改批次对话框 
+		*/
+		$('.modi-single').on('click',function() {
+			//改变标签名称
+			//$("#add-edit-title").find('span').text("编辑");
+			var url = BASE_CONTEXT_PATH+'/water-price/loadmodidialog';
+
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+
+			$("#setting-dialog-edit").load(url, parms,openModiDialog); //加载完毕后显示 
+			
+		});
+		
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openModiDialog() {
+			//	可拖拽
+			$("#modal-container-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeModiDialog() {
+			$("#modal-container-dialog").modal("hide");
+		}
+				
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+		});
+		
+		//创建分页组件实例
+		/* var pager=new Pager("pagerPrice");
+		$(function(){			
+			pager.init(loadPage,curr_searchCond);			
+		}); */
+	</script>
+</body>
+</html>

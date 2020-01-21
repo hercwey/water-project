@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterPartWaterRuleTraceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterPartWaterRuleTrace">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="RULE_TYPE" jdbcType="DECIMAL" property="ruleType" />
+    <result column="RULE_SHOW" jdbcType="VARCHAR" property="ruleShow" />
+    <result column="RULE_REAL" jdbcType="VARCHAR" property="ruleReal" />
+    <result column="WATER_PRICE_ID" jdbcType="DECIMAL" property="waterPriceId" />
+    <result column="IS_DEFAULT" jdbcType="DECIMAL" property="isDefault" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="METER_RECORD_ID" jdbcType="DECIMAL" property="meterRecordId" />
+    <result column="PART_WATER_ID" jdbcType="DECIMAL" property="partWaterId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, RULE_TYPE, RULE_SHOW, RULE_REAL, WATER_PRICE_ID, IS_DEFAULT, METER_ID, METER_RECORD_ID, 
+    PART_WATER_ID
+  </sql>
+</mapper>

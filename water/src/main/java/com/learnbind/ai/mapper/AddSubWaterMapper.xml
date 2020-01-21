@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.AddSubWaterMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.AddSubWater">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="METER_ID" jdbcType="VARCHAR" property="meterId" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="WATER_BEFORE" jdbcType="DECIMAL" property="waterBefore" />
+    <result column="WATER_AFTER" jdbcType="DECIMAL" property="waterAfter" />
+    <result column="COMPENSATION" jdbcType="DECIMAL" property="compensation" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="PARTITION_WATER_ID" jdbcType="DECIMAL" property="partitionWaterId" />
+    <result column="METER_RECORD_ID" jdbcType="DECIMAL" property="meterRecordId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, METER_ID, PERIOD, WATER_BEFORE, WATER_AFTER, COMPENSATION, REMARK, 
+    OPERATOR_NAME, OPERATOR_ID, OPERATION_TIME, PARTITION_WATER_ID, METER_RECORD_ID 
+  </sql>
+</mapper>

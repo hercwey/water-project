@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发票批量查询-对话框</title>
+</head>
+<body>
+	<th:block th:fragment="dialog(dialogId)">
+		<div class="modal fade batch-query-invoice-cond-dialog" th:id="${dialogId}" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true" >
+			<div class="modal-dialog" role="document" style="width:450px;">
+				<div class="modal-content">
+					<!-- 对话框头 -->
+					<div class="modal-header"
+						style="background-color: darkcyan; height: 30px; padding-top: 0px; padding-bottom: 0px;">
+						<!-- <h5 class="modal-title">Modal title</h5> -->
+						<span
+							style="height: 30px; line-height: 30px; padding: 0px; margin: 0px; color: white;">
+							<span class="dialog-title">Modal title</span>
+						</span>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<!-- 对话框主体 -->
+					<div class="modal-body" style="height:320px;">
+						<div class="row" >
+							<!-- 左侧栏 -->
+						    <div class="col-md-6" style="padding-right:5px;">
+						      <ul
+									style="list-style-type: none; padding-left: 0px; margin-left: 0px; margin-right: 0px;">
+									<li style="margin-bottom: 10px;">
+										<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+											<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">按购方信息查询</legend>
+											<p style="margin-bottom:5px;">购方名称: <input type="text" class="buyer-name"	style="width: 120px;" ></p>
+											<p style="margin-bottom:5px;">购买税号: <input type="text" class="buyer-tax-no"	style="width: 120px;" ></p>					
+										</fieldset>
+									</li>
+									
+									<li style="margin-bottom: 10px;">
+										<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+											<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">按发票代码及号码查询</legend>
+											<p style="margin-bottom:5px;">发票代码: <input type="text" class="invoice-code"	style="width: 120px;" ></p>
+											<p style="margin-bottom:5px;">发票号码: <input type="text" class="invoice-no"	style="width: 120px;" ></p>					
+										</fieldset>
+									</li>
+									
+									<li style="margin-bottom: 10px;">
+										<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+											<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">按开票信息查询</legend>
+											<p style="margin-bottom:5px;">开始日期:
+												<input type="text" class="Wdate query-date-start" readonly="readonly" style="width: 120px;"										
+												onClick="WdatePicker({dateFmt:'yyyy-MM-dd'});"
+												placeholder="开始日期" title="开始日期" />
+											</p>
+												
+											<p style="margin-bottom:5px;">结束日期:
+												<input type="text" class="Wdate query-date-end" readonly="readonly" style="width: 120px;"											
+													onClick="WdatePicker({dateFmt:'yyyy-MM-dd'});"
+													placeholder="结束日期" title="结束日期" /></p>
+										</fieldset>
+									</li>
+									
+								</ul>
+						    </div>
+						    <!-- 右侧栏 -->
+						    <div class="col-md-6" style="padding-left:5px;">
+						      	<ul	style="list-style-type: none; padding-left: 0px; margin-left: 0px; margin-right: 0px;">
+						      		<!-- 发票种类 -->
+						      		<li style="margin-bottom: 10px;">
+										<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+											<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">按发票种类查询</legend>
+											 <p style="margin-bottom:5px;">
+											 	发票种类
+											 	<select style="width: 120px;" class="invoice-type">
+											 	  <option value="">全部发票</option>	
+												  <option value="0">专用发票</option>
+												  <option value="2">普通发票</option>
+												  <option value="12">机动发票</option>
+												  <option value="15">电子发票</option>
+												</select>
+											 </p>											 									
+										</fieldset>
+									</li>
+						      	
+						      	
+						      		<!-- 打印状态 -->
+						      		<li style="margin-bottom: 10px;">
+										<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+											<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">
+												打印状态												
+											</legend>
+											<ul style="list-style: none; padding-left:10px;">
+							      				<li style="display: block;float: left; width:80px;">
+							      					<input type="checkbox" class="check-print-no" th:id="${dialogId}+'-print-no'"   >
+							      					<label th:attr="for=${dialogId}+'-print-no'" style="margin-bottom:0px;">未打印</label>									 			
+							      				</li>
+							      				<li style="display: block;float: left; width:80px;">
+							      					<input type="checkbox" class="check-print-yes" th:id="${dialogId}+'-print-yes'"   >
+							      					<label th:attr="for=${dialogId}+'-print-yes'" style="margin-bottom:0px;">己打印</label>									 			
+							      				</li>
+							      			</ul>											 												 									
+										</fieldset>
+									</li>
+									<!-- 作废标志 -->
+									<li style="margin-bottom: 10px;">
+										<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+											<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">
+												作废状态												
+											</legend>
+											<ul style="list-style: none; padding-left:10px;">
+							      				<li style="display: block;float: left; width:80px;">
+							      					<input type="checkbox" class="check-invalid-no" th:id="${dialogId}+'-invalid-no'"   >
+							      					<label th:attr="for=${dialogId}+'-invalid-no'" style="margin-bottom:0px;">未作废</label>									 			
+							      				</li>
+							      				<li style="display: block;float: left; width:80px;">
+							      					<input type="checkbox" class="check-invalid-yes" th:id="${dialogId}+'-invalid-yes'"   >
+							      					<label th:attr="for=${dialogId}+'-invalid-yes'" style="margin-bottom:0px;">己作废</label>									 			
+							      				</li>
+							      			</ul>											 												 									
+										</fieldset>
+									</li>
+						      		
+						      		<!-- 报送状态 -->
+						      		<li>
+						      			<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+											<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">
+												报送状态  
+												<button type="button" class="btn btn-outline-secondary  btn-sm button-send-status-select-all">全选</button>
+												<button type="button" class="btn btn-outline-secondary  btn-sm button-send-status-deselect-all">全取消</button>																						
+											</legend>
+							      			<ul style="list-style: none; padding-left:10px;">
+							      				<li style="display: block;float: left; width:80px;">
+							      					<input type="checkbox" class="check-send-no"  th:id="${dialogId}+'-send-no'" >
+							      					<label th:attr="for=${dialogId}+'-send-no'" style="margin-bottom:0px;">未报送</label>									 			
+							      				</li>
+							      				<li style="display: block;float: left;width:80px;">
+							      					<input type="checkbox" class="check-send-yes"  th:id="${dialogId}+'-send-yes'"  >
+							      					<label th:attr="for=${dialogId}+'-send-yes'" style="margin-bottom:0px;">己报送</label>									 			
+							      				</li>
+							      				<li style="display: block;float: left;width:80px;">
+							      					<input type="checkbox" class="check-valid-fail"  th:id="${dialogId}+'-valid-fail'"  >
+							      					<label th:attr="for=${dialogId}+'-valid-fail'" style="margin-bottom:0px;">验签失败</label>									 			
+							      				</li>
+							      				<li style="display: block;float: left;width:80px;">
+							      					<input type="checkbox" class="check-sending"  th:id="${dialogId}+'-sending'"  >
+							      					<label th:attr="for=${dialogId}+'-sending'" style="margin-bottom:0px;">报送中</label>									 			
+							      				</li>
+							      				<li style="display: block;float: left;width:80px;">
+							      					<input type="checkbox" class="check-send-fail"  th:id="${dialogId}+'-send-fail'"  >
+							      					<label th:attr="for=${dialogId}+'-send-fail'" style="margin-bottom:0px;">报送失败</label>									 			
+							      				</li>
+							      			</ul>
+						      			</fieldset>
+						      		</li>
+								</ul>
+						    </div>
+					  	</div>
+
+					</div>
+					<!-- 对话框底部按钮 -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary  button-ok">确定</button>
+						<button type="button" class="btn btn-primary  button-cancel" data-dismiss="modal">取消</button>						
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<script>
+	
+		function advancedSearchParams(){
+			//初始化请求参数
+			var obj = new Object();
+			var gfmc = $(".buyer-name").val();//购方名称
+			var gmsh = $(".buyer-tax-no").val();//购方税号
+			var fpdm = $(".invoice-code").val();//发票代码
+			var fphm = $(".invoice-no").val();//发票号码
+			var startDate = $(".query-date-start").val();//开始日期
+			var endDate = $(".query-date-end").val();//截止日期
+			var fpzl = $(".invoice-type").val();//发票种类
+			
+			var dybzArr = new Array();//打印状态
+			if ($('.check-print-no').prop('checked')) {//如果选中未打印状态
+				console.log("checkbox checked");
+				dybzArr.push("0");
+			}
+			if ($('.check-print-yes').prop('checked')) {//如果选中打印状态
+				dybzArr.push("1");
+			}
+			
+			var zfbzArr = new Array();//作废标志
+			if ($('.check-invalid-no').prop('checked')) {//如果选中未作废状态
+				zfbzArr.push("0");
+			}
+			if ($('.check-invalid-yes').prop('checked')) {//如果选中作废状态
+				zfbzArr.push("1");
+			}
+			
+			var bsbzArr = new Array();//报送状态
+			if ($('.check-send-no').prop('checked')) {//如果选中未报送状态
+				bsbzArr.push("0");
+			}
+			if ($('.check-send-yes').prop('checked')) {//如果选中已报送状态
+				bsbzArr.push("1");
+			}
+			if ($('.check-valid-fail').prop('checked')) {//如果选中验签失败状态
+				bsbzArr.push("4");
+			}
+			if ($('.check-sending').prop('checked')) {//如果选中报送中状态
+				bsbzArr.push("3");
+			}
+			if ($('.check-send-fail').prop('checked')) {//如果选中报送失败状态
+				bsbzArr.push("2");
+			}
+			
+			obj.gfmc = gfmc;
+			obj.gmsh = gmsh;
+			obj.fpdm = fpdm;
+			obj.fphm = fphm;
+			obj.startDate = startDate;
+			obj.endDate = endDate;
+			
+			obj.dybzArr = dybzArr.toString();
+			obj.zfbzArr = zfbzArr.toString();
+			obj.bsbzArr = bsbzArr.toString();
+			return obj;
+		}
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			//---------------click event process binding---------------
+			
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('.button-ok').on('click',function() {
+				G_GENERAL_SEARCH = "1";
+				loadPage();
+				
+			});
+		});
+	</script>
+		<!-- end of dialog -->
+	</th:block>
+</body>
+</html>

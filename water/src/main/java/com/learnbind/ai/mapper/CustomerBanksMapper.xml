@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerBanksMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerBanks">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="BANK_CODE" jdbcType="VARCHAR" property="bankCode" />
+    <result column="BANK_NAME" jdbcType="VARCHAR" property="bankName" />
+    <result column="CARD_NO" jdbcType="VARCHAR" property="cardNo" />
+    <result column="ACCOUNT_BANK" jdbcType="VARCHAR" property="accountBank" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="ENABLED" jdbcType="DECIMAL" property="enabled" />
+    <result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, BANK_CODE, BANK_NAME, CARD_NO, ACCOUNT_BANK, REMARK, ENABLED, ACCOUNT_NAME
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchCustomerBanks" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM customer_banks b
+		<where>
+			b.customer_id=#{customerId}
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					b.bank_code LIKE concat(concat('%',#{searchCond}),'%')
+  					OR b.bank_name LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY b.id DESC
+  </select>
+  
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="getCustomerBanks" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM customer_banks b
+		<where>
+			<!-- 是否有效：0=有效（默认）；1=无效 -->
+			b.ENABLED=0
+			AND b.customer_id=#{customerId}
+			
+		</where>
+		ORDER BY b.id DESC
+  </select>
+</mapper>

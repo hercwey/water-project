@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- ZTree CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+<!-- 引入通用对话框工具 -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 正则表达式验证 -->
+<script src="/jquery/jquery-validation/jquery.validate.min.js"></script>
+<script src="/jquery/jquery-validation/messages_zh.js"></script>
+<link rel="stylesheet"	href="/css/meterbookbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="notify-group-dialog-edit"></div>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label notify-group-main">
+		<div class="col-md-12 column">
+		
+			<div class="tabbable" id="tabs-notify-group">
+				<ul class="nav nav-tabs">
+					<li class="nav-item" id="tab-notify-group-item-li">
+						<a class="nav-link active" href="#tab-notify-group-item" data-toggle="tab">分组列表</a>
+					</li>
+					<li class="nav-item" id="tab-notify-group-add-li" style="display: none">
+						<a class="nav-link" href="#tab-notify-group-add" data-toggle="tab">增加</a>
+					</li>
+					<li class="nav-item" id="tab-notify-group-select-li" style="display: none">
+						<a class="nav-link" href="#tab-notify-group-select" data-toggle="tab">选择表计</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab-notify-group-item">
+						<!-- 操作面板 -->
+						<div class="" style="display: inline-block" id="notify-group-search-form">
+							<ul class="extra-l" style="list-style: none; padding-inline-start: 20px;">
+							
+								<!-- 面板:增加/删除 -->
+								<li>
+									<button type="button" class="btn btn-primary btn-sm"
+										id="btn-add">
+										<i class="fa fa-plus" aria-hidden="true"> 
+											<span>增加</span>
+										</i>
+									</button>
+								</li>
+								<li>
+									<button type="button" class="btn btn-danger btn-sm"
+										id="btn-del">
+										<i class="fa fa-remove" aria-hidden="true"><span>删除</span>
+										</i>
+									</button>
+								</li>
+								<!-- 包含关系 -->
+								<li class="input-group-sm">
+									<select class="form-control include-flag" id="include-flag">
+										<option value="">—包含关系—</option>
+										<span th:each="item,iterStat: ${groupIncludeFlagList}" th:remove="tag">
+											<option th:value="${item.value}" th:text="${item.name}">名称</option>
+										</span>
+									</select>
+								</li>
+								<!-- 面板:查询 -->
+								<li class="input-group-sm">
+									<input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入分组名称/客户名称" title="请输入分组名称、客户名称查询">
+								</li>
+								<!-- 查询按钮 -->
+								<li>
+									<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+									
+									<button type="button" class="btn btn-warning btn-sm btn-general-search-reset" id="btn-general-search-reset">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+								</li>
+							</ul>
+						</div>
+						<div class="card">
+							<div class="card-body notify-group-table" id="meter-book-body" style="padding-left:10px;padding-right:10px;">
+								<!-- 表计列表 -->
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-notify-group-add">
+						<div id="insert-notify-group">
+							编辑客户
+							<!-- 编辑客户 -->
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-notify-group-select">
+						<div id="notify-group-select">
+							选择表计
+							<!-- 选择表计 -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+		//调整表册中表计顺序对话框
+		const DIALOG_EDIT_NOTIFY_GROUP="modal-container-edit-notify-group-dialog";
+		
+		/**
+		 * 	设置选择表计选项卡的名称
+		 */
+		function setSelectMeterTabName(groupName){
+			$("#tab-notify-group-select-li a").text(groupName+" 分组规则选择表计");
+		}
+		
+		/**
+		 * 	隐藏选择表计列表
+		 */
+		function hideNotifyGroupSelect(){
+			$("#tab-notify-group-select-li").hide();
+		}
+		/**
+		 * 	显示选择表计列表
+		 */
+		function showNotifyGroupSelect(){
+			$("#tab-notify-group-select-li").show();
+			$("#tabs-notify-group ul a[href='#tab-notify-group-select']").tab("show");//跳转到选择表计列表选项卡
+		}
+		
+		/**
+		 * 	隐藏增加分组选项卡
+		 */
+		function hideNotifyGroupAdd(){
+			$("#tab-notify-group-add-li").hide();
+			$("#tabs-notify-group ul a[href='#tab-notify-group-item']").tab("show");//跳转到分组列表选项卡
+		}
+		/**
+		 * 	显示增加分组选项卡
+		 */
+		function showNotifyGroupAdd(){
+			$("#tab-notify-group-add-li").show();
+			$("#tabs-notify-group ul a[href='#tab-notify-group-add']").tab("show");//跳转到选择表计列表选项卡
+		}
+		
+		
+		/**
+		 * 	显示分组列表
+		 */
+		function showNotifyGroupItem(){
+			$("#tab-notify-group-add-li").hide();
+			$("#tabs-notify-group ul a[href='#tab-notify-group-item']").tab("show");//跳转到抄表记录列表选项卡
+			$("#insert-notify-group").empty();//清空增加分组内容
+		}
+		
+		//--------------------公共查询函数--------------------------
+		
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchNotifyGroup(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/water-notify-group/table"
+			$(".notify-group-table").load(url, parms, triggerResize);
+		}
+		
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		//------------------------------	获取查询参数	------------------------------
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchNotifyGroupParams(){
+			var searchCond=$("#notify-group-search-form .search-cond").val();
+			var includeFlag=$("#notify-group-search-form .include-flag").val();
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.includeFlag=includeFlag;
+			return parms;
+		}
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchNotifyGroup() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = getSearchNotifyGroupParams();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchNotifyGroup(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchMeterBookClick() {
+			
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchNotifyGroupParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchNotifyGroup(parms);
+		}
+	
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPageClickPageNum(searchCond,pageNum,pageSize) {
+			//获取参数
+			var parms = getSearchNotifyGroupParams();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+
+			searchNotifyGroup(parms);
+		}
+		
+		
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		/*		
+			加载(Load): 增加/编辑对话框
+			将对话框内容加载到指定的容器中
+		 */
+		function loadEditDialog() {
+			var url = BASE_CONTEXT_PATH + '/water-notify-group/load-edit-dialog';
+			$("#notify-group-dialog-edit").load(url, null, openEditDialog); //加载完毕后显示
+		}
+		
+		
+		/*
+		 * 	打开(Open) 对话框
+		 */
+		function openEditDialog() {
+			DialogUtil.openDialogFn(DIALOG_EDIT_NOTIFY_GROUP);
+		}
+		/* 
+			关闭(CLOSE) 对话框
+		 */
+		function closeEditDialog() {
+			DialogUtil.closeDialogFn(DIALOG_EDIT_NOTIFY_GROUP);
+		}
+		
+		//--------增加分组---------
+		/* 
+			绑定增加抄表记录按钮
+		*/
+		$("#notify-group-search-form #btn-add").on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/water-notify-group/load-insert-notify-group-item';
+			$("#insert-notify-group").load(url, null,showNotifyGroupAdd); //加载完毕后显示 
+			
+		});
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//---------事件绑定--------------
+			$("#tab-notify-group-item-li").on("click", function(){
+				hideNotifyGroupSelect();
+				hideNotifyGroupAdd();
+				triggerResize();
+			});
+			//------------init-------------
+			
+			//主页:默认查询(加载默认列表)
+			defaultSearchNotifyGroup();
+		
+
+			//---------事件绑定--------------
+			
+			/*
+				增加核对类型按钮CLICK
+			*/
+			/* $('#notify-group-search-form #btn-add').on('click', function() {
+				loadEditDialog();  //先加载后显示对话框
+			});  */
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#notify-group-search-form .btn-general-search').on('click', function() {
+				defaultSearchNotifyGroup();//查询抄表记录
+			});
+			/*
+				查询条件复位按钮CLICK
+			 */
+			$('#notify-group-search-form .btn-general-search-reset').on('click', function() {
+				$("#notify-group-search-form .search-cond").val("");
+				$("#notify-group-search-form .search-cond").focus();//获得焦点
+	
+			});
+			/*
+				查询条件输入框 KEYUP
+			 */
+			$('#notify-group-search-form .search-cond').on('keyup', function(event) {
+				if (event.keyCode == 13) {
+					$('#notify-group-search-form .btn-general-search').trigger("click");
+				}
+			});
+			
+			
+			
+			/*
+				btn-del-role
+				批量删除按钮
+			*/
+			$('#notify-group-search-form #btn-del').on('click', function() {
+				var ids=getSelectedIds();  //此函数定义于_table.html中
+				if(ids==null || ids.length<=0){
+					util.message("请选择需要删除的条目！",null,"warning");
+					return;
+				}
+				batchDeleteConfirm();  //显示删除确认对话框
+			});
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

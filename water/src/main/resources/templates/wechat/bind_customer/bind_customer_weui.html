@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<!-- wechat-用户绑定页-使用中 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')"
+	th:remove="tag"></div> -->
+
+<!-- <link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+<script type="text/javascript" src="/weui/js/zepto.min.js"></script> -->
+
+
+<style>
+hr.style-one { /*内嵌水平线*/
+	width: 70%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 0;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+	border: 0;
+}
+
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+hr.style-three { /*渐变*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background: #333;
+	background-image: linear-gradient(to right, #ccc, #333, #ccc);
+}
+</style>
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h5 style="text-align: center; margin-top: 10px;">用户绑定</h5>
+				<hr class="style-two" /> -->
+				<!-- <div th:include="wechat/public_page/header::header('用户绑定')"
+					th:remove="tag"></div> -->
+
+				<div class="weui-cells weui-cells_form">
+					<div class="weui-cell">
+						<div class="weui-cell__hd">
+							<label class="weui-label">用户编号</label>
+						</div>
+						<div class="weui-cell__bd">
+							<input class="weui-input" pattern="[0-9]*"  id="bind-customer-code" th:value="${customerCode}"
+								placeholder="请输入开户时的用户编号" type="number">
+						</div>
+					</div>
+
+					<div class="weui-cell">
+						<div class="weui-cell__hd">
+							<label class="weui-label">姓名</label>
+						</div>
+						<div class="weui-cell__bd">
+							<input class="weui-input" pattern="" id="bind-customer-name"  th:value="${customerName}"
+								placeholder="请输入开户时的用户姓名" type="text">
+						</div>
+					</div>
+
+					<div class="weui-cell">
+						<div class="weui-cell__hd">
+							<label class="weui-label">手机号</label>
+						</div>
+						<div class="weui-cell__bd">
+							<input class="weui-input" placeholder="请输入手机号" type="tel"  id="bind-telno"  th:value="${telNo}">
+						</div>
+					</div>
+					<!-- <div class="weui-cell weui-cell_vcode">
+						<div class="weui-cell__hd">
+							<label class="weui-label">验证码</label>
+						</div>
+						<div class="weui-cell__bd">
+							<input class="weui-input" placeholder="验证码" type="number">
+						</div>
+						<div class="weui-cell__ft">
+							<button class="weui-vcode-btn" onclick="settime(this)">获取验证码</button>
+						</div>
+					</div> -->
+
+
+				</div>
+				<!--提交按钮-->
+				<div class="weui-btn-area">
+					<!-- class设置为 bg-blue 即为blue色背景 -->
+					<!-- weui-btn_primary -->
+    				<a class="weui-btn  bg-blue" href="javascript:" id="btnBind">提交绑定</a>
+    				<!-- <button type="button" id="btnBind" name="btnBind"	class="btn btn-primary  btn-block">提交绑定</button> -->
+				</div>
+			</div>
+		</div>
+
+		<!-- <div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')"
+				th:remove="tag"></div>
+		</div> -->
+		
+	</div>
+
+	<script>
+		//用户绑定业务对象
+		function BindCustomer(){
+			//绑定用户请求URL
+			var url=BASE_CONTEXT_PATH+'/wechat/bind';   
+			
+			/*
+				功能:
+					对所输入的内容进行验证
+				返回:
+					如果所校验通过,则返回true,否则返回false;
+			*/
+			this.verifyInput=function(){
+				var verifyResult=true;
+				
+				//校验用户编号
+				var customerCode = $("#bind-customer-code").val();
+                if(customerCode==""){
+                    $.toptip("用户编号不能为空","error");
+                    verifyResult=false;                    
+                }
+                
+                //校验用户姓名
+                var customerName=$("#bind-customer-name").val();
+                if(customerName==""){
+                    $.toptip("用户姓名不能为空","error");
+                    verifyResult=false;                    
+                }
+                
+                //校验用户电话号码
+                var telNo=$("#bind-telno").val();
+                if(telNo==""){
+                    $.toptip("手机号码不能为空","error");
+                    verifyResult=false;                    
+                }
+                
+                return verifyResult;
+			}
+			
+			/*
+				绑定成功-回调函数
+			*/
+			this.bindSuccess=function(response,status,xhr){
+				//请求结果常量(业务层面成功与失败) 
+				const REQUEST_SUCCESS="success";  //绑定成功
+				const REQUEST_FAIL="fail";  //已经绑定,无此用户等情况均返回fail
+				
+				var resultCode=response.result_code;   //success, fail
+				var resultMsg=response.result_msg;			
+				console.log("result:"+response);
+				
+				//$.toast(resultMsg, 2000);
+				
+				if(resultCode==REQUEST_SUCCESS){  //绑定成功
+					$.toptip(resultMsg,'success')
+					clearInput();
+				}
+				else{  //绑定失败
+					$.toptip(resultMsg,'warning');
+				}
+
+			}
+			
+			/*
+				功能:
+					绑定客户的微信号与营业系统中的账号
+				参数说明:
+					
+			*/
+			this.requestBind=function(){
+				console.log("start bind!")
+				var parms=this.getRequestParms();  //读取参数				
+				$.post(url,parms,this.bindSuccess);
+				$.toptip("提交成功,等待处理.",'success');
+			}
+			
+			/*
+				功能:
+					获取请求参数(自页面中收集请求参数)
+				返回:parms
+						customerNo
+						customerName
+						telNo
+			*/
+			this.getRequestParms=function(){
+				//用户编号
+				var customerCode = $("#bind-customer-code").val();
+                //用户姓名
+                var customerName=$("#bind-customer-name").val();
+                //用户电话号码                 
+                var telNo=$("#bind-telno").val();
+                
+                var parms=new Object();
+                parms.customerCode=customerCode;
+                parms.customerName=customerName;
+                parms.telNo=telNo;
+                
+                return parms;
+                
+			}
+				
+			/*
+				清除输入框中的内容
+			*/
+			clearInput=function(){
+				//用户编号
+				$("#bind-customer-code").val("");
+                //用户姓名
+                $("#bind-customer-name").val("");
+                //用户电话号码                 
+                $("#bind-telno").val("");
+			}		
+					
+			
+		}
+	
+		//page loaded ready
+        $(function(){
+        	var bindCustomer=new BindCustomer();
+        	
+        	//绑定按钮CLICK 事件处理 
+            /* $(document).on("click","#btnBind",function(){
+            	var verifyResult=bindCustomer.verifyInput();
+            	console.log("verifyResult:"+verifyResult);
+            	if(verifyResult==true){  //如果校验通过发送请求
+            		//bindCustomer.requestBind();  //发送绑定请求.
+            	}            	
+            }); */
+        	
+        	$("#btnBind").on('click',function(){
+        		var verifyResult=bindCustomer.verifyInput();
+            	console.log("verifyResult:"+verifyResult);
+            	if(verifyResult==true){  //如果校验通过发送请求
+            		bindCustomer.requestBind();  //发送绑定请求.
+            	}
+        	});           
+            
+            
+          //解决表单控件不能回弹 只有微信ios有这个问题
+            $("input,select,textarea").blur(function(){
+ 				setTimeout(() => {
+ 				const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+ 				window.scrollTo(0, Math.max(scrollHeight - 1, 0));
+ 				}, 100);
+ 			});
+            
+            
+        });
+        
+
+    </script>
+
+</body>
+</html>

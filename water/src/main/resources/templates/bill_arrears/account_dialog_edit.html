@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 输入布局 */
+.table-layout td{
+	border:0px;
+	padding:0px;
+}
+
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-account-edit" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>客户信息</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="account-item-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table-sm">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 客户id -->
+													<div class="form-group form-inline">
+														<label for="customers-name" class="col-sm-6 control-label">客户id</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.customerName}" 
+																id="customers-customer-name" name="customerName" 
+																maxlength=30 title="请输入1-30个字符" placeholder="客户名称"/>
+													</div>
+												</td>
+														
+			
+												<td>
+													<!--业主名称-->
+													<div class="form-group form-inline">
+														<label for="customers-name" class="col-sm-6 control-label">业主名称</label>
+														<input type="text"
+																th:value="${currItem==null ? '' : currItem.propName}" 
+																class="form-control col-sm-6 " 
+																id="customers-prop_name" name="propName" 
+																maxlength=32 title="请输入1-30" placeholder="业主名称"/>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<!-- 业主电话 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-6 control-label">业主电话</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.propTel}" 
+																id="customers-prop_tel" name="propTel" 
+																maxlength=20 title="请输入1-20个字符" placeholder="业主电话"/>
+													</div>
+												</td>
+											
+												<td>
+													<!-- 业主手机 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-6 control-label">业主手机</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.propMobile}" 
+																id="customers-prop_mobile" name="propMobile" 
+																maxlength=20 title="请输入1-20位字符" placeholder="业主手机"/>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 业主邮件 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-6 control-label">业主邮件</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.propEmail}" 
+																id="customers-prop_email" name="propEmail" 
+																maxlength=30 title="请输入1-30个字符" placeholder="业主邮件"/>
+													</div>          
+ 												</td>
+ 												<td>
+													<!-- 地址 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-6 control-label">地址</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.address}" 
+																id="customers-address" name="address" 
+																maxlength=50 title="请输入1-50个字符" placeholder="地址"/>
+													</div>
+												</td>
+											</tr>
+											
+											
+											
+											<tr>
+												<td>
+													<!-- 客户编号 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-6 control-label">客户编号</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.customerCode}" 
+																id="customers-customer_mode" name="customerCode" 
+																maxlength=20 title="请输入1-20个字符" placeholder="客户编号"/>
+													</div>
+												</td>
+												<td>
+													<!-- 客户电子邮件 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-6 control-label">客户电子邮件</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.customerEmail}" 
+																id="customers-customer_email" name="customerEmail" 
+																maxlength=25 title="请输入1-25个字符" placeholder="客户电子邮件"/>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 客户电话 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-6 control-label">客户电话</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.customerTel}" 
+																id="customers-customer_tel" name="customerTel" 
+																maxlength=15 title="请输入1-15个字符" placeholder="客户电话"/>
+													</div>
+												</td>
+												<td>
+													<!-- 客户手机 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-6 control-label">客户手机</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.customerMobile}" 
+																id="customers-customer_mobile" name="customerMobile" 
+																maxlength=15 title="请输入1-15个字符" placeholder="客户手机"/>
+													</div>
+												</td>
+											</tr>
+											
+											
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/rename/insert";
+			
+			var customersId= $("#customers-id").val();
+			if(customersId!=null && customersId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/rename/update";
+			}
+			var form=new FormData($("#dialog-modi-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), */
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeRenameDialog();
+							}
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+			修改对话框-保存按钮-CLICK
+			保存所修改的条目
+		*/
+		$('#btn-modify-and-back').on('click',function() {
+			modiItem(true);				
+		});
+
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/meterbookbody.css" />
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="all-meter-book-search" style="display: inline-block">
+				<ul class="extra-l" style="list-style: none;">
+					<!-- 地理位置查询条件 -->
+					<li class="input-group-sm">
+						<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher-all')" th:remove="tag"></div>
+					</li>
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入编码/名称">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm" id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						<button type="button" class="btn btn-warning btn-sm" id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+						<button type="button" class="btn btn-success btn-sm" id="btn-allot-meter-book" title="添加到我的表册">
+							<i class="fa fa-arrow-left" aria-hidden="true"></i>
+						</button>
+						<button type="button" class="btn btn-success btn-sm" id="btn-allot-all-meter-book" title="添加到我的表册">
+							<i class="fa fa-arrow-left" aria-hidden="true"> <span>批量添加表册</span></i>
+						</button>
+					</li>
+				</ul>
+			</div>
+
+			<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+
+			<!-- 容器:字典列表 -->
+			<div class="all-meter-book-table table-container" id="meter-book-body"></div>
+
+		</div>
+	</div>
+
+	<!-- 地理位置下拉框查询JS -->
+	<script type="text/javascript"	th:src="@{/js/component/districtsearcher/DistrictSearcher.js}"></script>
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+	//------------------------------	获取查询参数	------------------------------
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchNotAllotParams(){
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var traceIds = null;
+			var locaBlockTraceIds = locationSearcher.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationSearcher.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationSearcher.getUnitId();//地理位置-单元traceIds
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			var searchCond=$(".all-meter-book-search #search-cond").val();
+			var readerId = getMeterReaderId();
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			parms.readerId = readerId;
+			return parms;
+		}
+	
+		//地理位置下拉框件实例
+		var locationSearcher = new DistrictSearcher("location-searcher-all", locationSelectSearchAllCallback); //此处searcher的ID和回调函数
+		
+		/**
+		 * 	地理位置下拉查询组件回调函数
+		 */
+		function locationSelectSearchAllCallback(){
+			defaultSearchAllMeterBook();//查询客户
+		}
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+
+		function searchAllMeterBook(parms) {
+
+			var url = BASE_CONTEXT_PATH + "/meter-book-allot/all-meter-book-table";
+			$(".all-meter-book-table").load(url, parms, triggerResize);
+		}
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchAllMeterBook() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchNotAllotParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchAllMeterBook(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchAllMeterBookClick() {
+			
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchNotAllotParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchAllMeterBook(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadAllMeterBookPage(searchCond,pageNum,pageSize) {
+	
+			//获取参数
+			var parms = null;
+			var parms = getSearchNotAllotParams();//获取查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchAllMeterBook(parms);
+		}
+		
+		
+		/**
+		 *  	分配全部表册
+		 */
+		$("#btn-allot-all-meter-book").on("click", function(){
+			batchAddMeterBookConfirm();
+			
+		});
+		/*
+			批量添加表册确认
+		*/
+		function batchAddMeterBookConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("确定添加查询出的所有表册? ", "xxx", "ok_callback_add_book_name", "cancel_callback_add_book_name")			
+		}
+		/*
+			批量添加表册确认:确认(回调)
+		*/
+		function ok_callback_add_book_name(id){
+			batchAddMeterBook();	
+		}
+		/*
+			批量添加表册确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_add_book_name(){
+			console.log('cancel!');
+		}
+		
+		function batchAddMeterBook(){//批量添加表册
+			var parms = getSearchNotAllotParams();
+			var url = BASE_CONTEXT_PATH + "/meter-book-allot/all-meter-add";
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						defaultSearchReaderMeterBook();//加载我的表册
+						defaultSearchAllMeterBook();
+						util.message(res.result_msg,null,"success");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//地理位置下拉组件初始化
+			locationSearcher.init();
+			//主页:默认查询(加载默认列表)
+			defaultSearchAllMeterBook();
+
+			//---------事件绑定--------------
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('.all-meter-book-search #btn-search').on('click', function() {
+				btnSearchAllMeterBookClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('.all-meter-book-search #btn-search-reset').on('click', function() {
+				$(".all-meter-book-search .search-cond").val("");
+				$(".all-meter-book-search .search-cond").focus();  //	获得焦点
+				
+				$(".all-meter-book-search .location-block").val("");//设置地理位置-小区值为空
+				$(".all-meter-book-search .location-building").val("");//设置地理位置-楼号值为空
+				$(".all-meter-book-search .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$(".all-meter-book-search .location-unit").val("");//设置地理位置-单元值为空
+				$(".all-meter-book-search .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('.all-meter-book-search #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('.all-meter-book-search #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			
+			/**
+			 * 	分配表册，添加到我的表册
+			 */
+			$("#btn-allot-meter-book").on("click", function(){
+				var meterBookIds = getAllMeterBookSelectedIds();
+				if(meterBookIds==null || meterBookIds.length<=0){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择表册！",null,"warning");
+					return;
+				}
+				
+				var readerId = getMeterReaderId();
+				
+				//初始化请求参数
+				var params = new Object();
+				params.userId=readerId;
+				params.meterBookIds=meterBookIds.toString();
+
+				//加载字典列表页面
+				var url = BASE_CONTEXT_PATH + "/meter-book-allot/add";
+				$.post(url, params, function(res){
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							defaultSearchReaderMeterBook();//加载我的表册
+							defaultSearchAllMeterBook();
+							util.message(res.result_msg,null,"warning");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				});
+				
+			});
+			
+		});
+	</script>
+
+
+
+</body>
+</html>

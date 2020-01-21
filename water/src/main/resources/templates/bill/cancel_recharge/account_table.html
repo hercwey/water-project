@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>账单列表</title>
+</head>
+<body>
+	
+	<!-- 当前所编辑的客户ID -->
+	<input type="hidden" id="overdue-customer-id" name="" value="" />
+	<!-- 当前所编辑的账单ID -->
+	<input type="hidden" id="overdue-account-item-id" name="" value="" />
+	<!-- 账单列表 -->
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>地理位置</th> 
+				<th>客户名称</th>
+				<th>期间</th>
+				<th>科目</th>
+				<th>账单金额</th>
+				<th>违约金总金额</th>
+				<th>已充值金额</th>
+				<th>欠费金额</th>
+				<th>记账日期</th>
+				<th>结算状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${accountItemList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.ID},data-bind=${item.ID}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.ID}"></label>
+					</div> 
+				</td>
+				<!-- 地理位置 -->
+				<td th:text="${item.place}">地理位置</td>
+				<!-- 客户名称 -->
+				<td th:id="'customer-name-'+${item.CUSTOMER_ID}" th:text="${item.meterPlace}">客户名称</td>
+				<!-- 期间-->
+				<td th:text="${item.PERIOD}">期间</td>
+				<!-- 科目 -->
+				<td th:text="${item.creditSubject}">科目</td>
+				<!-- 账单金额 -->
+				<td th:text="${item.CREDIT_AMOUNT}">账单金额</td>
+				<!-- 违约金总金额 -->
+				<td th:text="${item.overdueValue}">违约金总金额</td>
+				<!-- 已充值金额 -->
+				<td th:text="${item.DEBIT_AMOUNT}">已充值金额</td>
+				<!-- 欠费金额 -->
+				<td th:text="${item.totalOweAmount}">欠费金额</td>
+				<!--记账日期-->
+				<td th:text="${item.ACCOUNT_DATE_STR}">记账日期</td>
+				<!--结算状态-->
+				<td th:attr="title=${item.SETTLEMENT_STATUS==2 ? item.SETTLEMENT_ERR_MSG : ''}">
+					<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算 -->
+					<span th:if="${item.SETTLEMENT_STATUS==0}">
+						<span class="badge badge-secondary">未结算</span>
+					</span>
+					<span th:if="${item.SETTLEMENT_STATUS==1}">
+						<!-- <span class="badge badge-success">交易成功</span> -->
+						<span class="badge badge-success">全部结算</span>
+					</span>
+					<span th:if="${item.SETTLEMENT_STATUS==2}">
+						<!-- <span class="badge badge-danger">交易失败</span> -->
+						<span class="badge badge-danger">结算失败</span>
+					</span>
+					<span th:if="${item.SETTLEMENT_STATUS==3}">
+						<span class="badge badge-warning">部分结算</span>
+					</span>
+				</td>
+				<!-- 操作列 -->
+				<td>
+					<div class="dropdown">
+						<button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">操作</button>
+						<div class="dropdown-menu">
+						<!-- 账单明细 -->
+							<a class="dropdown-item btn-sm btn-customer-bill-detail-list" th:attr="account-item-id=${item.ID},bind-id=${item.CUSTOMER_ID}">
+								<i class="fa fa-list" aria-hidden="true"></i> <span>充值记录</span>
+							</a> 
+						</div>
+					</div>
+				</td>
+
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td style="font-weight: bold;">统计：</td>
+				<td style="font-weight: bold;" th:text="${billTotalPrice}">账单总金额</td>
+				<td></td>
+				<td style="font-weight: bold;" th:text="${rechargeTotalPrice}">充值总金额</td>
+				<td style="font-weight: bold;" th:text="${oweTotalPrice}">欠费总金额</td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedAccountItemIds(){
+			var idArr = new Array();
+		
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		//翻页时保存之前选中的数据
+		function setCheckBoxSelected(){
+			$("#account-item-select-table .item-selector").each(function(){
+				
+				var surfix = $(this).attr("data-bind");  //item'id
+				for (var i=0; i<CUSOTMER_ID_ARR.length; i++) {
+					var id = CUSOTMER_ID_ARR[i];
+					if(id==surfix){
+						$("#account-item-select-table #item-selector-"+id).prop("checked", true);
+					}
+			    }
+			});
+			
+		}
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			setCheckBoxSelected();
+			
+			/**
+			 * 	查看账单明细
+			 */
+			$(".btn-customer-bill-detail-list").on('click', function(e) {
+				
+				var customerId = $(this).attr("bind-id");
+				var accountItemId = $(this).attr("account-item-id");
+				setCurrEditCustomerId(customerId);//设置当前编辑的账单的客户ID
+				setCurrEditAccountItemId(accountItemId);
+				
+				var parms = {"customerId": customerId};
+				loadCustomerAccountItemDetailList(parms, function(){
+					console.log("客户账单明细查询成功");
+					var customerName = $("#customer-name-"+customerId).text();//客户名称
+					showCustomerBillDetailListTab(customerName);
+				});
+			});
+			
+			
+			
+			/*
+				选择/取消选择  当前页记录
+				选择单个		 	
+			*/
+			$("#account-item-select-table .item-selector").on('click', function(e) {
+		
+				var surfix = $(this).attr("data-bind");  //item'id
+				if (this.checked) {			
+					CUSOTMER_ID_ARR.push(surfix);
+				} 
+				else{
+					removeSelectSurfix(surfix);
+				} 
+					
+			});
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+						CUSOTMER_ID_ARR.push(surfix);
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+						removeSelectSurfix(surfix);
+					});
+				} // end of else
+			});
+
+		});
+		function removeSelectSurfix(withholdId){
+			for (var i=0; i<CUSOTMER_ID_ARR.length; i++) {
+				var id = CUSOTMER_ID_ARR[i];
+				if(id==withholdId){
+					CUSOTMER_ID_ARR.splice(i,1);//执行后aa.length会减一	
+					break;
+				}
+		    }
+		}
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.SysCheckMeterResultMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.SysCheckMeterResult">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="METER_NO" jdbcType="VARCHAR" property="meterNo" />
+    <result column="FACTORY" jdbcType="VARCHAR" property="factory" />
+    <result column="STEEL_SEAL_NO" jdbcType="VARCHAR" property="steelSealNo" />
+    <result column="METER_BOTTOM" jdbcType="VARCHAR" property="meterBottom" />
+    <result column="CHECK_RESULT" jdbcType="VARCHAR" property="checkResult" />
+    <result column="CHECK_FACTORY" jdbcType="VARCHAR" property="checkFactory" />
+    <result column="CHECK_TIME" jdbcType="TIMESTAMP" property="checkTime" />
+    <result column="CHECK_PEOPLE" jdbcType="VARCHAR" property="checkPeople" />
+     <result column="METER_PLACE" jdbcType="VARCHAR" property="meterPlace" />
+      <result column="CHECK_TYPE" jdbcType="VARCHAR" property="checkType" />
+       <result column="CHECK_RESULT_TYPE" jdbcType="VARCHAR" property="checkResultType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, METER_ID, METER_NO, FACTORY, STEEL_SEAL_NO, METER_BOTTOM, CHECK_RESULT, CHECK_FACTORY, 
+    CHECK_TIME, CHECK_PEOPLE, METER_PLACE, CHECK_TYPE, CHECK_RESULT_TYPE
+  </sql>
+  
+  <!-- 根据条件查询,返回列表 -->
+  <select id="searchCond" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM sys_check_meter_result M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.CHECK_FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  
+  <!-- 根据条件查询,返回列表 -->
+  <select id="getList" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM sys_check_meter_result M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.CHECK_FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="meterId!=null and meterId!='' ">
+  				AND M.METER_ID = #{meterId}
+  			</if>
+  			<if test="checkType!=null">
+  				AND M.CHECK_TYPE = #{checkType}
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+</mapper>

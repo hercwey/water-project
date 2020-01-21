@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>表计-电子档案对话框</title>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+		<div class="modal fade" id="modal-container-erecord-upload" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="myModalLabel">
+							编辑：表计-电子档
+						</h5> 
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<!-- 协议上传 -->
+						<form class="form-horizontal " role="form" id="erecord-upload-form">
+							<!-- 采用表格进行布局 -->
+							<table class="table-layout table">
+								<tbody>
+									<tr>
+										<td>
+											<!--描述-->
+											<div class="form-group form-inline">
+												<label for="erecord-comment" class="col-sm-4 control-label">描述</label>
+												<span class="input-group-sm col-sm-8">
+													<input type="text" class="form-control" id="erecord-comment" name="erecordComment" placeholder="描述" />
+												</span>
+											</div>
+										</td>
+									</tr>
+									<tr>	
+										<td>
+											<!-- 类型 -->
+											<div class="form-group form-inline">
+												<label for="erecord-type" class="col-sm-4 control-label">类型</label>
+												<span class="input-group-sm col-sm-8">
+													<select class="form-control" id="erecord-type" name="erecordType">
+														<option value="">——请选择——</option>
+														<option value="1">入库单</option>
+														<option value="2">安装领用单</option>
+														<option value="3">更换领用单</option>
+														<option value="4">检测单</option>
+														<option value="5">报废单</option>
+														<option value="6">退库单单</option>
+													</select>
+												</span>
+											</div>
+										</td>												
+									</tr>
+									<tr>											
+										<td>
+											<!-- 选择文件 -->
+											<div class="form-group form-inline">
+												<label for="erecord-file" class="col-sm-4 control-label">选择文件</label>
+												<span class="input-group-sm col-sm-8">
+													<input type="file" class="form-control-file" id="erecord-file" name="erecordFile" 
+														onchange="javascript:validateImgFileSizeFun(this);"
+														accept="image/*" multiple="multiple" />
+												</span>
+											</div>
+										</td>
+									</tr>
+									<tr>											
+										<td>
+											<!-- 缩略图 -->
+											<div class="form-group form-inline">
+												<label for="customers-description" class="col-sm-4 control-label">&nbsp;</label>
+												<span class="input-group-sm col-sm-8">
+													<input type="hidden" class="form-control" id="erecord-path" name="erecordPath" placeholder="缩略图" />
+													<!-- <img alt="AGREEMENT FILE" title="" id="thumbnail-portrait" name="" src=""> -->
+													<div id="thumbnail-portrait"></div>
+												</span>
+											</div>
+										</td>
+									</tr>
+									<tr>											
+										<td>
+											<!-- 文件类型 -->
+											<div class="form-group form-inline">
+												<label for="erecord-file" class="col-sm-4 control-label">文件类型</label>
+												<span class="input-group-sm col-sm-8">
+													<select class="form-control" id="erecord-file-type" name="fileType">
+														<option value="1">图片</option>
+														<!-- <option value="2">其他</option> -->
+													</select>
+												</span>
+											</div>
+										</td>
+									</tr>
+									<tr>											
+										<td>
+											<!-- 备注 -->
+											<div class="form-group form-inline">
+												<label for="erecord-remark" class="col-sm-4 control-label">备注</label>
+												<span class="input-group-sm col-sm-8">
+													<input type="text" class="form-control" id="erecord-remark" name="remark" placeholder="备注" />
+												</span>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" id="upload-save-submit-btn">保存</button> 
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+				
+			</div>
+			
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+	<script>
+	
+	/*
+	 * 	验证图片文件大小
+	 */
+	function validateImgFileSizeFun(file){
+		if(isAllowUploadFile(file, 5120, '上传电子文件不能大于5M！')){
+			showPreview(file, 'thumbnail-portrait');
+			$("#upload-save-submit-btn").attr("disabled", false);
+		}else{
+			$("#upload-save-submit-btn").attr("disabled", true);
+		}
+	}
+	
+	/**
+	 * 	获取参数
+	 */
+	function getAgreementParams(){
+		
+		var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+		var erecordComment = $("#erecord-upload-form #erecord-comment").val();//描述
+		var erecordType = $("#erecord-upload-form #erecord-type").val();//类型
+		var fileType = $("#erecord-upload-form #erecord-file-type").val();//文件类型
+		var remark = $("#erecord-upload-form #erecord-remark").val();//备注
+		
+		var params = new Object();
+		params.fileDir = "erecord_img";
+		params.inputName = "erecordFile";
+		params.meterId = meterId;
+		params.erecordComment = erecordComment;
+		params.erecordType = erecordType;
+		params.fileType = fileType;
+		params.remark = remark;
+		return params;
+	}
+	
+	$(function(){
+		
+		/**
+		 * 	绑定类型的change事件
+		 */
+		$("#erecord-upload-form #erecord-type").on("change", function(){
+			var name = $(this).find("option:selected").text();
+			$("#erecord-upload-form #erecord-comment").val(name);//协议名称
+		});
+		/**
+		 * 	上传协议保存按钮的click事件
+		 */
+		$("#upload-save-submit-btn").on("click", function() {
+			var url = BASE_CONTEXT_PATH + "/meter-erecord/erecord-upload";
+			var params = getAgreementParams();//获取参数
+			$.ajaxFileUpload({
+				url: url, //用于文件上传的服务器端请求地址
+			    secureuri: false, //一般设置为false
+			    fileElementId: "erecord-file", //文件上传空间的id属性  <input type="file" id="file" name="file" />
+			    dataType: "json", //返回值类型 一般设置为json
+			    data: params,
+			    success: function (res){  //服务器成功响应处理函数
+			    	//console.log("success:"+res);
+			    	if(res!=null){
+						if(res.result_code=="success"){
+							closeERecordUploadDialog();//关闭上传对话框
+							//对话框关闭事件，当对话框完全对用户隐藏时调用
+							$('#modal-container-erecord-upload').on('hidden.bs.modal', function () {
+								//重新加载电子档案列表
+								reLoadMeterERecordItemList();//重新加载表计电子档案列表
+						   });
+							
+						}else{
+							util.message(res.result_msg);
+						}
+					}
+			    },
+			    error: function (data, status, e){//服务器响应失败处理函数
+			    	console.log("error:"+data);
+			    }
+			});
+		});
+	});
+	
+	//------------------------------	打开/关闭对话框	------------------------------
+	/*
+	 * 	打开(Open) 上传对话框
+	 */
+	function openERecordUploadDialog() {
+		//可拖拽
+		$("#modal-container-erecord-upload").draggable({
+			cursor : "move",
+			handle : '.modal-header'
+		});
+		//点击对话框外部,不关闭对话框 
+		$('#modal-container-erecord-upload').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+	}
+
+	/* 
+		关闭(CLOSE) 上传对话框
+	 */
+	function closeERecordUploadDialog() {
+		$("#modal-container-erecord-upload").modal("hide");
+	}
+	
+	</script>	
+	
+	</th:block>
+	
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+
+<!-- 正则表达式验证 -->
+<script src="/jquery/jquery-validation/jquery.validate.min.js"></script>
+<script src="/jquery/jquery-validation/messages_zh.js"></script>
+<!-- 文件上传验证JS -->
+<script src="/commons/file-upload-validate.js" type="text/javascript"></script>
+<!-- ajax file upload js -->
+<script src="/jquery/ajaxFileUpload.js" type="text/javascript"></script>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<link rel="stylesheet"	href="/css/meterbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+</head>
+<body>
+	<input type="hidden" id="change-meter-id" th:value="${meterId}" />
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block" id="scarp-search">
+				<ul class="extra-l" style="list-style: none; padding-inline-start: 20px;">
+					<li>
+						<button type="button" class="btn btn-danger btn-sm"
+							id="btn-del-scarp">
+							<i class="fa fa-remove" aria-hidden="true"> <span>删除</span></i>
+						</button>
+					</li>
+					<!-- 面板:查询 -->
+					<li class="input-group-sm">
+						<input type="text" class="form-control search-cond" id="search-cond" placeholder="水表编号、检验证号、口径、单位名称等" title="请输入水表编号、检验证号、口径、单位名称、施工单位、安装地点等查询">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm btn-search"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm btn-search-reset"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-success btn-sm btn-print-template"	id="btn-print-template">
+							<i class="fa fa-print" aria-hidden="true"> <span>打印模板</span></i>
+						</button>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-md-12">
+		
+			<div class="row clearfix">
+				<div class="col-md-12 column" style="padding-left:1px;">
+					<div class="card">
+						<!-- <h5 class="card-header">
+							客户档案
+						</h5> -->
+						<div class="card-body scarp-table" id="meters-body" style="padding-left:10px;padding-right:10px;">
+							<!-- 表计列表 -->
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+			
+		<hr style="height:1px;border:none;border-top:1px solid blue;">
+			
+	</div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var meter_id=[[${meterId}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		
+		
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchScarp(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meter-scrap/meter-scarp-table"
+			$(".scarp-table").load(url, parms, triggerResize);
+		}
+		
+		function triggerResize(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchScarpParams(){
+			var searchCond=$("#scarp-search .search-cond").val();
+			var meterId = $("#change-meter-id").val();
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.meterId=meterId;
+			return parms;
+		}
+		
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchScarp() {
+			
+			var pageNum = 0;
+			var pageSize = 0;
+			//获取参数
+			var parms = null;
+			parms = getSearchScarpParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchScarp(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchScarpClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchScarpParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchScarp(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPageScarp(searchCond,pageNum,pageSize) {
+			var parms = null;
+			parms = getSearchScarpParams();//获取普通查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchScarp(parms);
+			
+		}
+		
+		
+		$(function(){
+			
+			
+			//主页:默认查询(加载默认列表)
+			defaultSearchScarp();
+		
+			$('#scarp-search .btn-print-template').on('click', function() {	
+				printScarpBatchConfirm();  //显示确认打印对话框
+			});
+			
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#scarp-search .btn-search').on('click', function() {
+				defaultSearchScarp();//查询客户账单
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#scarp-search .btn-search-reset').on('click', function() {
+				//查询输入框设置为null且获取光标
+				$("#scarp-search .search-cond").val("");
+				$("#scarp-search .search-cond").focus();//获得焦点
+				
+			});
+			
+			/**
+			 * 	绑定批量删除按钮的click事件
+			 */
+			$("#btn-del-scarp").on("click", function(){
+				var scarpIdArr = getSelectedScarpIds();
+				if(scarpIdArr==null || scarpIdArr.length<=0){
+					util.message("请选择要删除的报废单！",null,"warning");
+					return;
+				}
+				
+				deleteScarpConfirm();//批量删除确认框
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#scarp-search .search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#scarp-search .btn-search').trigger("click");	                
+	            }	
+			});
+			
+			
+		});
+	</script>
+
+</body>
+</html>

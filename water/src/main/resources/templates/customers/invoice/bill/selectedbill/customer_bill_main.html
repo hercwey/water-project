@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户账单页面</title>
+<!-- 数字计算工具类 -->
+<script type="text/javascript"	th:src="@{/commons/calculateutil.js}"></script>
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label bank-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block; width:100%;padding-right:40px;" id="dialog-operate-div">
+				<ul class="extra-l" style="list-style: none;">
+					
+					<!-- <li style="float:right;">
+						<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+					</li> -->
+					<li style="float:right;">
+						<button type="button" class="btn btn-primary btn-sm btn-bank-modify-and-back" id="btn-bank-modify-and-back" data-dismiss="modal">确认</button>
+					</li>
+					<li style="float:right;">
+						<div class="input-group-prepend" id="invoice-fee-type">
+							<div class="input-group-text">
+								<label><input type="radio" name="waterFee" value="1" checked="checked">基础水费</label>
+								&nbsp;&nbsp;
+								<label><input type="radio" name="waterFee" value="2">污水处理水费</label>
+								&nbsp;&nbsp;
+								<label><input type="radio" name="waterFee" value="3">总水费</label>
+							</div>
+						</div>
+					</li>
+					<li style="float:right;">
+						<div class="input-group-prepend btn-default">
+							<div class="input-group-text">
+								<label><input type="checkbox" id="is-merge-bill">合并账单</label>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+
+			<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+
+			<!-- 容器:字典列表 -->
+			<div class="table-container">
+				<div th:include="customers/invoice/bill/selectedbill/customer_bill_table" th:remove="tag"></div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+	<!-- 此JS可自页面移出. -->
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+		
+	</script>
+
+</body>
+</html>

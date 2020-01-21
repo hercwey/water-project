@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+
+</script>
+
+
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>编辑:打印机配置</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="printer-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 自定义名称 -->
+													<div class="form-group form-inline">
+														<label for="printer-name" class="col-sm-4 control-label">自定义名称</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.aliasName}" 
+																	id="printer-alias_name" name="aliasName" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="自定义名称"/>
+														</span>
+													</div>
+												</td>
+														
+			
+												<td>
+													<!--打印机名称-->
+													<div class="form-group form-inline">
+														<label for="printer-name" class="col-sm-4 control-label">打印机名称</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control  " id="printer-printer_name" name="printerName" th:value="${currItem==null ? '' : currItem.printerName}">
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${printerList}" th:remove="tag">
+																	<option th:value="${item.printerName}"  th:attr="selected=${currItem!=null && item.printerName==currItem.printerName ? 'true':'false'}"
+																			th:text="${item.printerName}">获取本地打印机</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<!-- IP地址 -->
+													<div class="form-group form-inline">
+														<label for="printer-description" class="col-sm-4 control-label">IP地址</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.ipAddress}" 
+																	id="printer-ip_address" name="ipAddress" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="IP地址"/>
+														</span>
+													</div>
+												</td>
+											
+											
+												<td>
+												</td>
+											
+											</tr>
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/printer/insert";
+			
+			var printerId= $("#printer-id").val();
+			if(printerId!=null && printerId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/printer/update";
+			}
+			var form=new FormData($("#dialog-modi-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), */
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeModiDialog();
+							}
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				modiItem(true);				
+			});
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

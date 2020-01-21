@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!-- wechat-消息通知方式 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, height=device-height, initial-scale=1">
+<!-- 通用css及JS lib -->
+<div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')" th:remove="tag"></div>
+
+<link rel="stylesheet" type="text/css" href="/bootstrap-switcher/css/bootstrap4/bootstrap-switch.min.css" />
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body>
+
+	<div id="confirm-dialog-container">	
+	</div>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h5 style="text-align: center; margin-top: 10px;">用户编号</h5>
+				<hr class="style-two" /> -->
+				<div th:include="wechat/public_page/header::header('通知方式')"
+					th:remove="tag"></div>
+
+				<!-- <div class="form-horizontal " role="form" id="bind-customer-form"> -->
+				<!-- 用户编号-->
+				<div class="" style="text-align: center;">
+					<ul class="customer-no-list " style="list-sytle-type: none;">
+						<li>
+							<div class="input-group">								
+								<div class="bootstrap-switch-container center" style="display:inline-block;">									
+									<span class="">微信方式</span>
+									<input id="notify-mode-wechat" type="checkbox" checked="checked" data-on-color="info" >
+								</div>									
+								
+							</div>
+						</li>
+						
+						<li class="">
+							<div class="input-group">								
+								<div class="bootstrap-switch-container center" style="display:inline-block;">									
+									<span class="">短信方式</span>
+									<input id="notify-mode-sm" type="checkbox" checked="checked" data-on-color="info" >
+								</div>									
+							</div>						
+						</li>
+						
+						<li>
+							<button type="button" id="btnReturn" name="btnReturn"	class="btn btn-primary btn-lg btn-block">返回</button>
+						</li>
+
+					</ul>
+
+				</div>
+				<!--提交按钮-->
+				<!-- <div class="form-group form-inline">
+						<button type="button" id="btnReturn" name="btnReturn"
+							class="btn btn-primary btn-lg btn-block">返回</button>
+					</div> -->
+				<!-- </div> -->
+			</div>
+		</div>
+		<div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')"
+				th:remove="tag">
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="/bootstrap-switcher/js/bootstrap-switch.min.js"></script>
+	
+	<script type="text/javascript">		
+		
+		function initCheckBox(){
+			//微信方式
+			$("#notify-mode-wechat").bootstrapSwitch();
+			//短信方式
+			$("#notify-mode-sm").bootstrapSwitch();
+		}	
+	
+		//page loaded ready
+		$(function(){			
+			//绑定事件			
+			/* $('.unbind').on('click',function(){
+				console.debug("clicked");
+				openDialog();
+			}); */
+			
+			//初始化部分
+			initCheckBox();
+		});
+	
+	</script>
+
+
+</body>
+</html>

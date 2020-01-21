@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 保存抄表员ID -->
+	<input type="hidden" id="meter-book-id" value="0" />
+	<!-- 批次列表 -->
+	<table class="table table-striped table-hover table-sm" id="meter-book-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>ID</th>
+				<th>编码</th>
+				<th>名称</th>
+				<th>厂家</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${meterBookList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<td th:text="${item.id}">ID</td>
+				<td th:text="${item.code}">编码</td>
+				<td th:text="${item.name}">名称</td>
+				<td th:text="${item.factoryValue}">厂家</td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 查看表计列表 -->
+					<button type="button" class="btn-meter-book-meter btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i>
+						<span>查看表计列表</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager::pager" class="pagerx" id="meter-book-pager"
+		style="float: right;"></div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var meterBook_pageNum=[[${pageNum}]];
+		var meterBook_pageSize=[[${pageSize}]];
+		var meterBook_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		/**
+		 * 	设置表册ID
+		 */
+		function setMeterBookId(meterBookId){
+			$("#meter-book-id").val(meterBookId);
+		}
+		/**
+		 * 	获取表册ID
+		 */
+		function getMeterBookId(){
+			return $("#meter-book-id").val();
+		}
+	
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getMyMeterBookSelectedIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$("#meter-book-table .item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//--------查看表册的表计列表---------
+		/* 
+			绑定查看表册按钮的click事件
+		*/
+		$(".btn-meter-book-meter").on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/meter-book-allot/load-meter-book-meter-main';
+
+			var meterBookId = $(this).attr("bind-id"); //条目ID
+			setMeterBookId(meterBookId);
+			var parms = {"meterBookId":meterBookId};
+			$("#meter-book-meter").load(url, parms,showMeterBookMeter); //加载完毕后显示 
+			
+		});
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#meter-book-table #select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$("#meter-book-table .item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#meter-book-table #' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$("#meter-book-table .item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#meter-book-table #' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+			//======================分页（页码导航）========================
+
+			/*
+			 	【分页】导航： 当点击页号时读取需要导航到的页码及每页记录数（pageNum,pageSize）
+			 	 data-bind:pageNum-pageSize形式 
+			 	 如果data-bind为空字符串，不做动作 
+			 	 当用户点击某页时，	 则发送请求
+			*/
+			$("#meter-book-pager .pagination li a").on('click', function(e) {
+				var dataBind = $(this).attr("data-bind");
+				//当dataBind有数据时处理
+				if (dataBind != "") {
+					var pageArr = new Array();
+					pageArr = dataBind.split("-");
+					// 置分页数据
+					meterBook_pageNum = pageArr[0];
+					meterBook_pageSize = pageArr[1];
+					//加载页
+					loadMeterBookPage(); 
+				}
+
+			});
+
+		});
+	</script>
+</body>
+</html>

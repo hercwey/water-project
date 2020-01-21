@@ -1,0 +1,2527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerAccountItemMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerAccountItem">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="ACCOUNT_ID" jdbcType="DECIMAL" property="accountId" />
+    <result column="DEBIT_DIGEST" jdbcType="VARCHAR" property="debitDigest" />
+    <result column="DEBIT_SUBJECT" jdbcType="VARCHAR" property="debitSubject" />
+    <result column="DEBIT_ASSISTANT" jdbcType="VARCHAR" property="debitAssistant" />
+    <result column="DEBIT_AMOUNT" jdbcType="DECIMAL" property="debitAmount" />
+    <result column="CREDIT_DIGEST" jdbcType="VARCHAR" property="creditDigest" />
+    <result column="CREDIT_SUBJECT" jdbcType="VARCHAR" property="creditSubject" />
+    <result column="CREDIT_ASSISTANT" jdbcType="VARCHAR" property="creditAssistant" />
+    <result column="CREDIT_AMOUNT" jdbcType="DECIMAL" property="creditAmount" />
+    <result column="ACCOUNT_DATE" jdbcType="TIMESTAMP" property="accountDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="ACCOUNTER" jdbcType="VARCHAR" property="accounter" />
+    <result column="DEBIT_CREDIT" jdbcType="VARCHAR" property="debitCredit" />
+    <result column="OVERDUE_DATE" jdbcType="TIMESTAMP" property="overdueDate" />
+    <result column="START_TIME" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="SETTLEMENT_STATUS" jdbcType="DECIMAL" property="settlementStatus" />
+    <result column="SETTLEMENT_ERR_MSG" jdbcType="VARCHAR" property="settlementErrMsg" />
+    <result column="ACCOUNT_STATUS" jdbcType="DECIMAL" property="accountStatus" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="PID" jdbcType="DECIMAL" property="pid" />
+    <result column="BASE_WATER_FEE" jdbcType="DECIMAL" property="baseWaterFee" />
+    <result column="SEWAGE_WATER_FEE" jdbcType="DECIMAL" property="sewageWaterFee" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, ACCOUNT_ID, DEBIT_DIGEST, DEBIT_SUBJECT, DEBIT_ASSISTANT, DEBIT_AMOUNT, 
+    CREDIT_DIGEST, CREDIT_SUBJECT, CREDIT_ASSISTANT, CREDIT_AMOUNT, ACCOUNT_DATE, REMARK, 
+    ACCOUNTER, DEBIT_CREDIT, OVERDUE_DATE, START_TIME, END_TIME, PERIOD, SETTLEMENT_STATUS, SETTLEMENT_ERR_MSG,
+    ACCOUNT_STATUS, DELETED, PARTITION_WATER_ID, PID, BASE_WATER_FEE, SEWAGE_WATER_FEE 
+  </sql>
+
+	<!-- 查询客户账目,返回列表 -->
+	<select id="searchCustomerAccountItem" resultType="map">
+	
+		SELECT
+			DISTINCT 
+			I.*,
+			( I.CREDIT_AMOUNT - I.DEBIT_AMOUNT ) OWE_AMOUNT,
+			C.PROP_NAME,
+			C.CUSTOMER_TYPE,
+			C.CUSTOMER_NAME
+			<!-- LM.TRACE_IDS --> 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			<!-- LEFT JOIN PARTITION_WATER PW ON I.ID=PW.ACCOUNT_ITEM_ID -->
+			LEFT JOIN CUSTOMER_METER CM ON C.ID=CM.CUSTOMER_ID
+			LEFT JOIN LOCATION_METER LM ON CM.METER_ID=LM.METER_ID
+			
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			I.DELETED = 0 
+			AND C.DELETED = 0
+			AND CM.DELETED = 0 
+			<!-- AND CM.DEFAULT_CUSTOMER = 0 -->
+			<!-- AND PW.DELETED = 0 -->
+			<!-- modified by srd on 2019/10/23 -->
+			AND LM.DELETED != 1 
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="settlementStatus!=null">
+				AND I.SETTLEMENT_STATUS = #{settlementStatus}
+			</if>
+			<if test="accountStatus!=null">
+				AND I.ACCOUNT_STATUS = #{accountStatus}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE concat(#{traceIds}, '%')
+			</if>
+			<if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if>
+			<!-- <if test="customerId!=null">
+				AND I.CUSTOMER_ID = ${customerId}
+			</if> -->
+		</where>
+		ORDER BY 
+			I.PERIOD DESC, 
+			<!-- LM.TRACE_IDS, --> 
+			C.CUSTOMER_NAME DESC
+		<!-- SELECT
+			I.*,
+			(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) OWE_AMOUNT, 
+			C.PROP_NAME,
+			C.CUSTOMER_NAME,
+			LC.TRACE_IDS 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_CUSTOMER LC ON I.CUSTOMER_ID = LC.CUSTOMER_ID
+			LEFT JOIN LOCATION L ON LC.LOCATION_ID = L.ID
+		<where>
+			删除状态，1=已删除，0=未删除（默认）
+			LC.DELETED=0 AND I.DELETED=0
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="settlementStatus!=null">
+				AND I.SETTLEMENT_STATUS = #{settlementStatus}
+			</if>
+			<if test="accountStatus!=null">
+				AND I.ACCOUNT_STATUS = #{accountStatus}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			按时间查询账单日期
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE concat(#{traceIds}, '%')
+			</if>
+			<if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,LC.TRACE_IDS ,C.CUSTOMER_NAME DESC -->
+	</select>
+	
+	
+	<!-- 查询客户账目,返回列表 -->
+	<select id="searchCustomerArrearsAccountItem" resultType="map">
+		SELECT
+			DISTINCT 
+			I.*,
+			(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) OWE_AMOUNT, 
+			C.CUSTOMER_NAME,
+			LC.TRACE_IDS 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			<!-- LEFT JOIN PARTITION_WATER PW ON I.ID=PW.ACCOUNT_ITEM_ID -->
+			LEFT JOIN CUSTOMER_METER CM ON C.ID=CM.CUSTOMER_ID
+			LEFT JOIN LOCATION_METER LC ON CM.METER_ID=LC.METER_ID
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			LC.DELETED!=1  AND I.DELETED=0
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			AND (I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) !=0
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="settlementStatus!=null">
+				AND I.SETTLEMENT_STATUS = #{settlementStatus}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE concat(#{traceIds}, '%')
+			</if>
+			<if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+	</select>
+	
+	<!-- 查询客户账目,返回列表 -->
+	<select id="searchAutoCustomerAccountItem" resultType="map">
+		SELECT
+			I.*,
+			(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) OWE_AMOUNT, 
+			C.PROP_NAME,
+			C.CUSTOMER_NAME,
+			LC.TRACE_IDS 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_CUSTOMER LC ON I.CUSTOMER_ID = LC.CUSTOMER_ID
+			LEFT JOIN LOCATION L ON LC.LOCATION_ID = L.ID
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			LC.DELETED=0 AND I.DELETED=0
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			AND I.SETTLEMENT_STATUS!=1
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="settlementStatus!=null">
+				AND I.SETTLEMENT_STATUS = #{settlementStatus}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE concat(#{traceIds}, '%')
+			</if>
+			<if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+	</select>
+	
+	<!-- 获取科目总金额之和 -->
+  <select id="getSubjectCreditAmountSum" resultType="BigDecimal">
+  	SELECT
+		nvl(sum(CREDIT_AMOUNT),0) AS DISCOUNT_AMOUNT_SUM
+	FROM
+		customer_account_item 
+	WHERE
+		1=1 
+		<if test="accountItemId!=null and accountItemId!=''">
+			AND PID = #{accountItemId}
+		</if>
+		<!-- 贷方科目 -->
+		<if test="creditSubjectList!=null and creditSubjectList.size>0">
+			AND CREDIT_SUBJECT IN 
+			<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+	             #{item}
+	        </foreach>
+		</if>
+  </select>
+  
+  <!-- 获取科目已充值金额之和 -->
+  <select id="getSubjectDebitAmountSum" resultType="BigDecimal">
+  	SELECT
+		nvl(sum(DEBIT_AMOUNT),0) AS DISCOUNT_AMOUNT_SUM
+	FROM
+		customer_account_item 
+	WHERE
+		1=1 
+		<if test="accountItemId!=null and accountItemId!=''">
+			AND PID = #{accountItemId}
+		</if>
+		<!-- 贷方科目 -->
+		<if test="creditSubjectList!=null and creditSubjectList.size>0">
+			AND CREDIT_SUBJECT IN 
+			<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+	             #{item}
+	        </foreach>
+		</if>
+  </select>
+  
+  <!-- 获取科目欠费金额之和 -->
+  <select id="getSubjectOweAmountSum" resultType="BigDecimal">
+  	SELECT
+		nvl(sum(CREDIT_AMOUNT-DEBIT_AMOUNT),0) AS DISCOUNT_AMOUNT_SUM
+	FROM
+		customer_account_item 
+	WHERE
+		1=1 
+		<if test="accountItemId!=null and accountItemId!=''">
+			AND PID = #{accountItemId}
+		</if>
+		<!-- 贷方科目 -->
+		<if test="creditSubjectList!=null and creditSubjectList.size>0">
+			AND CREDIT_SUBJECT IN 
+			<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+	             #{item}
+	        </foreach>
+		</if>
+  </select>
+  
+  
+  <!-- 查询充值账单总金额 -->
+  <select id="getDebitAmountSum" resultType="BigDecimal">
+  	SELECT
+		nvl(sum(DEBIT_AMOUNT),0) AS DISCOUNT_AMOUNT_SUM
+	FROM
+		customer_account_item 
+	WHERE
+		1=1 
+		<if test="debitSubject!=null and debitSubject!=''">
+			AND DEBIT_SUBJECT = #{debitSubject}
+		</if>
+		<if test="debitCredit!=null and debitCredit!=''">
+			AND DEBIT_CREDIT = #{debitCredit}
+		</if>
+		AND CUSTOMER_ID = #{customerId}
+		AND PERIOD = #{period}
+  </select>
+  
+  
+  <!-- 获取某客户科目集合中的欠费金额之和 -->
+  <select id="getSubjectListOwedAmountSum" resultType="BigDecimal">
+  	SELECT
+		nvl(sum(CREDIT_AMOUNT-DEBIT_AMOUNT),0) AS DISCOUNT_AMOUNT_SUM
+	FROM
+		customer_account_item 
+	WHERE
+		1=1 
+		<if test="customerId!=null and customerId!=''">
+			AND CUSTOMER_ID = #{customerId}
+		</if>
+		<!-- 贷方科目集合 -->
+		<if test="creditSubjectList!=null and creditSubjectList.size()>0">
+			AND CREDIT_SUBJECT IN 
+			<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">  
+		　　　　#{item}  
+		　　</foreach>
+		</if>
+  </select>
+  
+  <!-- 根据条件查询欠费账单 -->
+  <select id="getBillArrearsList" resultMap="BaseResultMap">
+  	SELECT
+		BILL.*,
+		C.PROP_NAME 
+	FROM
+		(
+			SELECT
+				I1.* 
+			FROM
+				( SELECT * FROM CUSTOMER_ACCOUNT_ITEM WHERE CREDIT_SUBJECT = '费用/水费' ) I1
+				LEFT JOIN (
+					SELECT
+						CUSTOMER_ID,
+						PERIOD,
+						SUM( CREDIT_AMOUNT ) AS CREDIT_AMOUNT_SUM,
+						SUM( DEBIT_AMOUNT ) AS DEBIT_AMOUNT_SUM 
+					FROM
+						CUSTOMER_ACCOUNT_ITEM 
+					WHERE
+						CREDIT_SUBJECT = '费用/违约金' 
+					GROUP BY
+						CUSTOMER_ID,
+						ACCOUNT_ID,
+						PERIOD 
+				) I2 ON I1.CUSTOMER_ID = I2.CUSTOMER_ID 
+				AND I1.PERIOD = I2.PERIOD 
+			WHERE
+				I1.CREDIT_AMOUNT - I1.DEBIT_AMOUNT > 0 
+				OR I2.CREDIT_AMOUNT_SUM - I2.DEBIT_AMOUNT_SUM > 0 
+		) BILL
+		LEFT JOIN CUSTOMERS C ON BILL.CUSTOMER_ID = C.ID
+	<where>
+		1=1 
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+		</if>
+		<if test="operatorId!=null">
+			AND BILL.ACCOUNTER = ${operatorId}
+		</if>
+	</where>
+  </select>
+  
+    <!-- 查询客户充值账单,返回列表 -->
+	<select id="searchCustomerRecharge" resultMap="BaseResultMap">
+		select 
+			ca.*,c.PROP_NAME FROM CUSTOMER_ACCOUNT_ITEM ca left join CUSTOMERS c on
+				ca.CUSTOMER_ID = c.ID
+		<where>
+			1=1 
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND ca.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			
+		</where>
+		ORDER BY ca.id DESC
+	</select>
+	
+	<!-- 查询分账单产生的新账单 -->
+	<select id="selectNewCustomerAccountItem" resultMap="BaseResultMap">
+		SELECT
+			newCMI.* 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM newCMI INNER join (
+		SELECT
+			cm.* 
+		FROM
+			CUSTOMER_METER CM 
+		where
+			DELETED = 0 
+			AND CM.METER_ID = ( SELECT CM1.METER_ID FROM CUSTOMER_METER CM1 where DELETED = 0 AND CM1.CUSTOMER_ID = #{customerId})
+			) oldCMI ON newCMI.CUSTOMER_ID = oldCMI.CUSTOMER_ID 
+		<where>
+			1=1 AND newCMI.DELETED=0
+			<if test="period!=null and period!=''">
+		 	AND newCMI.PERIOD = #{period} 
+		 	</if>
+		 	<if test="debitCredit!=null and debitCredit!=''">
+			AND newCMI.DEBIT_CREDIT = #{debitCredit}
+			</if>
+		</where>
+		ORDER BY newCMI.id ASC
+	</select>
+	
+	<!--
+		查询客户账单 
+		查询条件:
+			查询客户所有欠费水费帐单
+	 -->
+	 <select id="getCustomerBillList" resultType="map">
+	 	SELECT 
+	 		C.*,
+	 		P.START_TIME,
+	 		P.END_TIME,
+	 		P.WATER_AMOUNT,
+	 		P.WATER_PRICE,
+	 		P.METER_ID,
+	 		P.RECORD_ID
+	 	FROM CUSTOMER_ACCOUNT_ITEM C
+	 	LEFT JOIN PARTITION_WATER P ON C.ID =P.ACCOUNT_ITEM_ID  
+	 	<where>
+	 		1=1
+		 	<if test="customerId!=null">
+				AND C.CUSTOMER_ID = #{customerId}
+			</if>
+			AND C.credit_amount&lt;&gt;C.debit_amount		 
+			AND C.credit_amount-C.debit_amount&gt;0 
+			AND C.credit_subject IN ('201', '221')
+			AND C.debit_credit='2'
+			AND C.DELETED=0 
+			AND (P.DELETED=0 OR P.DELETED IS NULL)
+		</where>		
+	 </select>	
+	 
+	 <!-- 
+	 	查询客户缴费记录
+	 	查询条件:
+	 		客户ID
+	 		开始时间
+	 		结束时间	 		
+	  -->
+	 <select id="getCustomerFeeList" resultType="map">
+	 	select * from CUSTOMER_ACCOUNT_ITEM 
+	 	<where>
+	 		1=1
+		 	<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="startDate!=null and startDate!=''">
+				AND to_date(TO_CHAR(ACCOUNT_DATE,'YYYY-MM-DD'),'yyyy-mm-dd') &gt;=to_date(#{startDate},'yyyy-mm-dd')     
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND to_date(TO_CHAR(ACCOUNT_DATE,'YYYY-MM-DD'),'yyyy-mm-dd') &lt;=to_date(#{endDate},'yyyy-mm-dd')
+			</if>						
+			and debit_credit='1'
+			AND DELETED=0			
+		</where>
+		ORDER BY ACCOUNT_DATE DESC 	
+	 </select>
+	 
+  
+  <!-- 查询客户账目,返回列表 -->
+	<select id="searchCustomerAccountItemErrorFee" resultType="map">
+		SELECT
+			I.*,
+			(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) OWE_AMOUNT, 
+			C.CUSTOMER_NAME,
+			LC.TRACE_IDS 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_CUSTOMER LC ON I.CUSTOMER_ID = LC.CUSTOMER_ID
+			LEFT JOIN LOCATION L ON LC.LOCATION_ID = L.ID
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			LC.DELETED=0 AND I.DELETED=0
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="settlementStatus!=null">
+				AND I.SETTLEMENT_STATUS = #{settlementStatus}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE concat(#{traceIds}, '%')
+			</if>
+			<if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if>
+			AND (I.CREDIT_AMOUNT <![CDATA[> ]]> (select upper_bound from ABNORMAL_QUANTITY where type=1 ) or I.CREDIT_AMOUNT <![CDATA[< ]]>(select lower_bound from ABNORMAL_FEE where type=1))
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+	</select>
+	
+		
+	<!-- 查询客户账目,返回列表 -->
+	<select id="getCustomersListByLocation" resultType="map">
+		SELECT
+			I.*,
+			(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) OWE_AMOUNT, 
+			C.PROP_NAME,
+			C.CUSTOMER_NAME,
+			LC.TRACE_IDS 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_CUSTOMER LC ON I.CUSTOMER_ID = LC.CUSTOMER_ID
+			LEFT JOIN CUSTOMER_METER CM ON CM.CUSTOMER_ID = LC.CUSTOMER_ID
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			LC.DELETED=0 AND I.DELETED=0 AND CM.DEFAULT_CUSTOMER=0
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<!-- <if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if> -->
+			<if test="customerType!=null and customerType!=''">
+				AND C.CUSTOMER_TYPE = ${customerType}
+			</if>
+			<!-- AND NOT EXISTS (SELECT 1 FROM CUSTOMER_ACCOUNT_ITEM C WHERE C.ID=I.ID AND C.SETTLEMENT_STATUS=#{settlementStatus}) -->
+			
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+	</select>
+	
+	<!-- 查询客户账目,返回列表 -->
+	<select id="getwaterFeeArrears" resultType="java.math.BigDecimal">
+		SELECT
+			sum( ac.CREDIT_AMOUNT - ac.DEBIT_AMOUNT ) 
+		FROM
+			( 
+				SELECT * FROM customer_account_item 
+				WHERE 
+					customer_id =#{customerId}  
+					AND DEBIT_CREDIT = #{debitCredit} 
+					<!-- AND CREDIT_SUBJECT = #{creditSubject} -->
+					<if test="creditSubjectList!=null and creditSubjectList.size>0">
+						AND CREDIT_SUBJECT IN 
+						<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+				             #{item}
+				        </foreach>
+					</if>
+			) ac 
+		WHERE
+			<![CDATA[ to_date( ac.period, 'YYYY-MM' ) < to_date( #{period}, 'YYYY-MM' )]]>
+			
+	</select>
+	
+	
+	<!-- 查询客户所有水费账单 -->
+	<select id="getAllCustomerAccountItemByPeriod" resultMap="BaseResultMap">
+		select 
+			* FROM CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			1=1 and deleted=0
+			<!-- 条件=欠费账单，贷方金额!=借方金额 -->
+				AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			<!-- 条件=欠费账单，贷方金额-借方金额>0 -->
+				AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null and customerId!=''">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			
+		</where>
+		ORDER BY id DESC
+	</select>
+	
+	<!-- 查询CCB代扣客户账目,返回列表 -->
+	<select id="searchCcbCustomerAccountItem" resultType="map">
+		SELECT
+			I.*,
+			(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) OWE_AMOUNT, 
+			C.PROP_NAME,
+			C.CUSTOMER_NAME,
+			L.LONG_CODE ,
+			L.TRACE_IDS
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_CUSTOMER LC ON I.CUSTOMER_ID = LC.CUSTOMER_ID
+			LEFT JOIN LOCATION L ON LC.LOCATION_ID = L.ID
+			
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			LC.DELETED=0 AND I.DELETED=0
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND L.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<if test="deductMode!=null and deductMode!=''">
+				AND C.DEDUCT_TYPE =#{deductMode}
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+	</select>
+	
+	<!-- 查询客户账单，按客户ID分组,返回列表 -->
+	<select id="getListGroupByCustomerId" resultType="map">
+		SELECT 
+			DISTINCT T.* 
+		FROM (
+			SELECT
+				I.CUSTOMER_ID,
+				C.CUSTOMER_NAME, 
+				<!-- LISTAGG ( I.ID, ',' ) WITHIN GROUP ( ORDER BY I.ID ) AS BILL_IDS, -->
+				<!-- MAX(I.ID) AS BILL_IDS, -->
+				<!-- LISTAGG ( PW.WATER_USE, ',' ) WITHIN GROUP ( ORDER BY I.ID DESC ) AS WATER_PRICE, -->
+				<!-- MIN(PW.WATER_USE) AS WATER_PRICE, --> 
+				I.PERIOD,
+				SUM(I.CREDIT_AMOUNT) AS BILL_AMOUNT,
+				SUM(I.DEBIT_AMOUNT) AS RECHARGE_AMOUNT,
+				( SUM(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) ) AS OWE_AMOUNT, 
+				LM.TRACE_IDS 
+			FROM
+				CUSTOMER_ACCOUNT_ITEM I
+				LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+				<!-- LEFT JOIN PARTITION_WATER PW ON I.ID=PW.ACCOUNT_ITEM_ID -->
+				LEFT JOIN CUSTOMER_METER CM ON C.ID=CM.CUSTOMER_ID
+				LEFT JOIN LOCATION_METER LM ON CM.METER_ID=LM.METER_ID
+				
+			<where>
+				<!-- 删除状态，1=已删除，0=未删除（默认） -->
+				I.DELETED = 0 
+				AND C.DELETED = 0
+				AND CM.DELETED = 0 
+				AND LM.DELETED!=1
+				<!-- AND CM.DEFAULT_CUSTOMER = 0 -->
+				<!-- AND PW.DELETED = 0 -->
+				<if test="period!=null and period!=''">
+					AND I.PERIOD = #{period}
+				</if>
+				<if test="creditSubjectList!=null and creditSubjectList.size>0">
+					AND I.CREDIT_SUBJECT IN 
+					<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+			             #{item}
+			        </foreach>
+				</if>
+				<if test="debitCredit!=null and debitCredit!=''">
+					AND I.DEBIT_CREDIT = #{debitCredit}
+				</if>
+				<if test="searchCond!=null and searchCond!=''">
+					AND (
+	  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+	  				)
+				</if>
+				<!-- 按时间查询账单日期 -->
+				<if test="startDate!=null and startDate!=''">
+					AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="endDate!=null and endDate!=''">
+					AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="traceIds!=null and traceIds!=''">
+					AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+				</if>
+				<if test="deductMode!=null">
+					AND C.DEDUCT_TYPE =#{deductMode}
+				</if>
+				<if test="settleStatusList!=null and settleStatusList.size>0">
+						AND I.SETTLEMENT_STATUS IN 
+					<foreach item="item" index="index" collection="settleStatusList" open="(" separator="," close=")">
+			             #{item}
+			        </foreach>
+				</if>
+			</where>
+			GROUP BY I.CUSTOMER_ID, C.CUSTOMER_NAME, I.PERIOD, LM.TRACE_IDS, CM.METER_ID 
+			ORDER BY PERIOD DESC
+		) T
+	</select>
+	
+	<!-- 查询客户余额,返回列表 -->
+	<select id="getCustomerBalanceList" resultType="map">
+		
+		SELECT
+			I.CUSTOMER_ID,
+			C.CUSTOMER_NAME,
+			SUM( I.DEBIT_AMOUNT - I.CREDIT_AMOUNT ) AS BALANCE
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I 
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID 
+		WHERE
+			EXISTS(
+				SELECT 
+					* 
+				FROM 
+					LOCATION_CUSTOMER LC 
+				WHERE 
+					LC.DELETED=0 
+					AND C.ID=LC.CUSTOMER_ID 
+					<if test="traceIds!=null and traceIds!=''">
+						AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+					</if>
+				)
+			AND I.DELETED = 0 
+			AND C.DELETED = 0 
+			AND I.DEBIT_AMOUNT != I.CREDIT_AMOUNT 
+			<!-- &gt;表示大于 -->
+			AND I.DEBIT_AMOUNT &gt; I.CREDIT_AMOUNT
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+		GROUP BY
+			I.CUSTOMER_ID,
+			C.CUSTOMER_NAME
+		ORDER BY
+			BALANCE,
+			I.CUSTOMER_ID
+			
+		<!-- SELECT
+			I.CUSTOMER_ID,
+			C.CUSTOMER_NAME, 
+			SUM( I.DEBIT_AMOUNT - I.CREDIT_AMOUNT ) AS BALANCE, 
+			LM.TRACE_IDS 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN CUSTOMER_METER CM ON C.ID=CM.CUSTOMER_ID
+			LEFT JOIN LOCATION_METER LM ON CM.METER_ID=LM.METER_ID
+			
+		<where>
+			删除状态，1=已删除，0=未删除（默认）
+			I.DELETED = 0 
+			AND C.DELETED = 0
+			AND CM.DELETED = 0 
+			AND CM.DEFAULT_CUSTOMER = 0
+			AND LM.DELETED!=1
+			AND I.DEBIT_AMOUNT != I.CREDIT_AMOUNT
+			&gt;表示大于
+			AND I.DEBIT_AMOUNT &gt; I.CREDIT_AMOUNT
+			
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+		</where>
+		GROUP BY I.CUSTOMER_ID, C.CUSTOMER_NAME, LM.TRACE_IDS
+		ORDER BY BALANCE, I.CUSTOMER_ID -->
+	</select>
+	
+	<!-- 查询中国建设银行批量代扣账单，按客户查询 -->
+	<select id="getCcbWithholdBill" resultMap="BaseResultMap">
+	
+		SELECT
+			I.*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			I.DELETED=0
+			<!-- AND NOT EXISTS (SELECT * FROM CCB_BATCH_CUSTOMER_ACCOUNT CCB_I WHERE I.ID=CCB_I.ACCOUNT_ITEM_ID) -->
+			<!-- WITHHOLDING_STATUS 代扣状态；0=未代扣，1=代扣成功，2=代扣失败 -->
+			<!-- SETTLE_ACCOUNT_STATUS 销账状态；0=未销账，1=销账成功，2=销账失败 -->
+			AND NOT EXISTS (SELECT * FROM CCB_BATCH_CUSTOMER_ACCOUNT CCB_I WHERE I.ID=CCB_I.ACCOUNT_ITEM_ID AND (CCB_I.WITHHOLDING_STATUS=0 OR CCB_I.WITHHOLDING_STATUS=1) )
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+				AND I.SETTLEMENT_STATUS!=1
+			<!-- 扣费方式，1=其他/2=建行自动扣费/3=民生银行自动扣费 -->
+				<!-- AND C.DEDUCT_TYPE=2 -->
+			<!-- 贷方金额!=借方金额 -->
+				AND I.CREDIT_AMOUNT!=I.DEBIT_AMOUNT 
+			<!-- 条件=欠费账单，贷方金额>借方金额 -->
+				AND I.CREDIT_AMOUNT &gt; I.DEBIT_AMOUNT 
+			<if test="customerId!=null">
+				AND I.CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- 期间<=用户选择的期间 -->
+			<if test="period!=null and period!=''">
+				AND I.PERIOD &lt;= #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+		
+		<!-- SELECT
+			I.*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_CUSTOMER LC ON I.CUSTOMER_ID = LC.CUSTOMER_ID
+		<where>
+			删除状态，1=已删除，0=未删除（默认）
+			LC.DELETED=0 AND I.DELETED=0
+			AND NOT EXISTS (SELECT * FROM CCB_BATCH_CUSTOMER_ACCOUNT CCB_I WHERE I.ID=CCB_I.ACCOUNT_ITEM_ID)
+			WITHHOLDING_STATUS 代扣状态；0=未代扣，1=代扣成功，2=代扣失败
+			SETTLE_ACCOUNT_STATUS 销账状态；0=未销账，1=销账成功，2=销账失败
+			AND NOT EXISTS (SELECT * FROM CCB_BATCH_CUSTOMER_ACCOUNT CCB_I WHERE I.ID=CCB_I.ACCOUNT_ITEM_ID AND (CCB_I.WITHHOLDING_STATUS=0 OR CCB_I.WITHHOLDING_STATUS=1) )
+			结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算；
+				AND I.SETTLEMENT_STATUS!=1
+			扣费方式，1=其他/2=建行自动扣费/3=民生银行自动扣费
+				AND C.DEDUCT_TYPE=2
+			条件=欠费账单，贷方金额-借方金额>0
+				AND I.CREDIT_AMOUNT-I.DEBIT_AMOUNT>0
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE concat(#{traceIds}, '%')
+			</if>
+			<if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC -->
+	
+	</select>
+	
+	<!-- 查询中国民生银行批量代扣账单 -->
+	<select id="getCmbcWithholdBill" resultMap="BaseResultMap">
+	
+		SELECT
+			I.*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			I.DELETED=0
+			<!-- AND NOT EXISTS (SELECT * FROM CCB_BATCH_CUSTOMER_ACCOUNT CCB_I WHERE I.ID=CCB_I.ACCOUNT_ITEM_ID) -->
+			<!-- WITHHOLDING_STATUS 代扣状态；0=未代扣，1=代扣成功，2=代扣失败 -->
+			<!-- SETTLE_ACCOUNT_STATUS 销账状态；0=未销账，1=销账成功，2=销账失败 -->
+			AND NOT EXISTS (SELECT * FROM CMBC_BATCH_CUSTOMER_ACCOUNT CMBC_I WHERE I.ID=CMBC_I.ACCOUNT_ITEM_ID AND (CMBC_I.WITHHOLDING_STATUS=0 OR CMBC_I.WITHHOLDING_STATUS=1) )
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+				AND I.SETTLEMENT_STATUS!=1
+			<!-- 扣费方式，1=其他/2=建行自动扣费/3=民生银行自动扣费 -->
+				<!-- AND C.DEDUCT_TYPE=3 -->
+			<!-- 贷方金额!=借方金额 -->
+				AND I.CREDIT_AMOUNT!=I.DEBIT_AMOUNT 
+			<!-- 条件=欠费账单，贷方金额>借方金额 -->
+				AND I.CREDIT_AMOUNT &gt; I.DEBIT_AMOUNT 
+			<if test="customerId!=null">
+				AND I.CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- 期间<=用户选择的期间 -->
+			<if test="period!=null and period!=''">
+				AND I.PERIOD &lt;= #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+	
+		<!-- SELECT
+			I.*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_CUSTOMER LC ON I.CUSTOMER_ID = LC.CUSTOMER_ID
+		<where>
+			删除状态，1=已删除，0=未删除（默认）
+			LC.DELETED=0 AND I.DELETED=0
+			结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算；
+				AND I.SETTLEMENT_STATUS != 1
+			扣费方式，1=其他/2=建行自动扣费/3=民生银行自动扣费
+				AND C.DEDUCT_TYPE = 3
+			条件=欠费账单，贷方金额!=借方金额
+				AND I.CREDIT_AMOUNT != I.DEBIT_AMOUNT
+			条件=欠费账单，贷方金额-借方金额>0
+				AND I.CREDIT_AMOUNT &gt; I.DEBIT_AMOUNT
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE concat(#{traceIds}, '%')
+			</if>
+			<if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC -->
+	
+	</select>
+	
+	<!-- 查询某客户有余额的充值账单
+	 			借/贷状态为借
+	 			借方金额!=贷方金额
+	 			借方金额-贷方金额>0 -->
+	<select id="getHaveBalanceRechargeBill" resultMap="BaseResultMap">
+		SELECT
+			*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			I.DELETED = 0 
+			
+			AND I.DEBIT_AMOUNT != I.CREDIT_AMOUNT
+			<!-- &gt;表示大于 -->
+			AND I.DEBIT_AMOUNT &gt; I.CREDIT_AMOUNT
+			
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND I.CUSTOMER_ID = #{customerId}
+			</if>
+		</where>
+		ORDER BY I.PERIOD ASC 
+			
+	</select>
+	
+	<!-- 查询客户余额,返回客户余额 -->
+	<select id="getCustomerBalance" resultType="BigDecimal">
+		SELECT
+			NVL(SUM( I.DEBIT_AMOUNT - I.CREDIT_AMOUNT ), 0) AS BALANCE
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			I.DELETED = 0 
+			
+			AND I.DEBIT_AMOUNT != I.CREDIT_AMOUNT
+			<!-- &gt;表示大于 -->
+			AND I.DEBIT_AMOUNT &gt; I.CREDIT_AMOUNT
+			
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND I.CUSTOMER_ID = #{customerId}
+			</if>
+		</where>
+		GROUP BY I.CUSTOMER_ID
+		ORDER BY BALANCE
+	</select>
+	
+	<!-- 查询某客户有余额的水费账单（不包含分账账单）
+	 		借/贷状态为贷
+	 		贷方科目为 201（其中第一位表示借/贷，第二、三位表示水费；不包含分账账单）
+	 		贷方金额!=借方金额
+	 		贷方金额-借方金额<0 -->
+	<select id="getHaveBalanceWaterFeeBill" resultMap="BaseResultMap">
+		SELECT
+			* 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		WHERE
+			<!-- deleted 删除状态，0=未删除（默认）；1=已删除 -->
+			DELETED=0 
+			AND DEBIT_AMOUNT != CREDIT_AMOUNT 
+			AND CREDIT_AMOUNT - DEBIT_AMOUNT &lt; 0
+			AND CUSTOMER_ID = #{customerId}
+			AND DEBIT_CREDIT = #{debitCredit} 
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+	</select>
+	
+	
+	<!-- 查询客户账目,返回列表 -->
+	<select id="getCustomerAccountItemList" resultMap="BaseResultMap">
+		SELECT
+			*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			AND CREDIT_AMOUNT - DEBIT_AMOUNT &gt; 0  
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			
+		</where>
+		ORDER BY PERIOD DESC,ID DESC
+		
+		<!-- SELECT
+			I.*,
+			(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) OWE_AMOUNT
+			
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+		<where>
+			删除状态，1=已删除，0=未删除（默认）
+			I.DELETED=0
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND I.CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			AND NOT EXISTS (SELECT 1 FROM CUSTOMER_ACCOUNT_ITEM C WHERE C.ID=I.ID AND C.SETTLEMENT_STATUS=#{settlementStatus})
+			
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC -->
+	</select>
+	
+	
+	<!-- 查询客户账目,返回列表 -->
+	<select id="searchSettleAccountItem" resultType="map">
+		SELECT
+			I.*,
+			(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) OWE_AMOUNT, 
+			C.PROP_NAME,
+			C.CUSTOMER_NAME,
+			LC.TRACE_IDS 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_CUSTOMER LC ON I.CUSTOMER_ID = LC.CUSTOMER_ID
+			LEFT JOIN LOCATION L ON LC.LOCATION_ID = L.ID
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			LC.DELETED=0 AND I.DELETED=0
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="settlementStatus!=null">
+				AND I.SETTLEMENT_STATUS = #{settlementStatus}
+			</if>
+			<if test="deductType!=null">
+				AND C.DEDUCT_TYPE = #{deductType}
+			</if>
+			<if test="accountStatus!=null">
+				AND I.ACCOUNT_STATUS = #{accountStatus}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE concat(#{traceIds}, '%')
+			</if>
+			<if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if>
+		</where>
+		ORDER BY I.PERIOD DESC,I.ID DESC
+	</select>
+	
+	
+	<select id="getExportCustomerBillData" resultType="map">
+		SELECT
+			DISTINCT 
+				I.*,
+				(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) OWE_AMOUNT, 
+				C.CUSTOMER_NAME,
+				LC.TRACE_IDS 
+			FROM
+				CUSTOMER_ACCOUNT_ITEM I
+				LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+				LEFT JOIN PARTITION_WATER PW ON I.ID=PW.ACCOUNT_ITEM_ID
+				LEFT JOIN LOCATION_METER LC ON PW.METER_ID=LC.METER_ID
+			<where>
+				<!-- 删除状态，1=已删除，0=未删除（默认） -->
+				LC.DELETED!=1 AND I.DELETED=0 
+				<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+				<if test="period!=null and period!=''">
+					AND I.PERIOD = #{period}
+				</if>
+				<if test="creditSubjectList!=null and creditSubjectList.size>0">
+					AND I.CREDIT_SUBJECT IN 
+					<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+			             #{item}
+			        </foreach>
+				</if>
+				<if test="settlementStatus!=null">
+					AND I.SETTLEMENT_STATUS = #{settlementStatus}
+				</if>
+				<if test="accountStatus!=null">
+					AND I.ACCOUNT_STATUS = #{accountStatus}
+				</if>
+				<if test="searchCond!=null and searchCond!=''">
+					AND (
+	  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+	  				)
+				</if>
+				<!-- 按时间查询账单日期 -->
+				<if test="startDate!=null and startDate!=''">
+					AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="endDate!=null and endDate!=''">
+					AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				
+				<if test="traceIds!=null and traceIds!=''">
+					AND LC.TRACE_IDS LIKE concat(#{traceIds}, '%')
+				</if>
+			</where>
+			ORDER BY 
+				I.PERIOD DESC,
+				<!-- C.ROOM, -->
+				C.CUSTOMER_NAME DESC
+	
+	</select>
+	
+	<select id="getCustomerIdList" resultType="Long">
+		SELECT
+			A.CUSTOMER_ID 
+		FROM
+			customer_account_item A
+			LEFT JOIN CUSTOMERS C ON C.ID = A.CUSTOMER_ID 
+			LEFT JOIN LOCATION_CUSTOMER LC ON LC.CUSTOMER_ID = A.CUSTOMER_ID 
+		<where>
+			a.DELETED = 0 
+			AND LC.DELETED = 0 
+			<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%' ) 
+			</if>
+			<if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+					AND (
+	  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+	  				)
+				</if>
+			</where>
+		GROUP BY
+			A.CUSTOMER_ID
+	
+	
+	</select>
+	
+	<select id="getCustomerAccountItemStatistic" resultType="map">
+	
+		SELECT
+			sum( I.CREDIT_AMOUNT - I.DEBIT_AMOUNT ) as  TOTAL_OWE_AMOUNT,
+			sum(I.CREDIT_AMOUNT) as TOTAL_CREDIT_AMOUNT,
+			sum(I.DEBIT_AMOUNT) as TOTAL_DEBIT_AMOUNT
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+			LEFT JOIN PARTITION_WATER PW ON I.ID=PW.ACCOUNT_ITEM_ID
+			LEFT JOIN LOCATION_METER LM ON PW.METER_ID=LM.METER_ID
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			I.DELETED = 0 
+			AND C.DELETED = 0
+			<!-- AND PW.DELETED = 0 -->
+			AND LM.DELETED!=1 
+			<if test="period!=null and period!=''">
+				AND I.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND I.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="settlementStatus!=null">
+				AND I.SETTLEMENT_STATUS = #{settlementStatus}
+			</if>
+			<if test="accountStatus!=null">
+				AND I.ACCOUNT_STATUS = #{accountStatus}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE concat(#{traceIds}, '%')
+			</if>
+			<if test="operatorId!=null">
+				AND I.ACCOUNTER = ${operatorId}
+			</if>
+		</where>
+	</select>
+	
+	<!--查询往期欠费 -->
+	<select id="getPastOweAmount" resultMap="BaseResultMap">
+		SELECT
+			ac.*
+		FROM
+			( SELECT * FROM customer_account_item WHERE deleted=0 and customer_id =#{customerId} 
+				AND DEBIT_AMOUNT != CREDIT_AMOUNT 
+				AND CREDIT_AMOUNT - DEBIT_AMOUNT &gt; 0
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			) ac 
+		WHERE
+			<![CDATA[ to_date( ac.period, 'YYYY-MM' ) < to_date( #{period}, 'YYYY-MM' )]]>
+			
+	</select>
+	
+	
+	<!-- 查询客户这个表的水费账单 -->
+	<select id="getAllCustomerAccountItemByMeter" resultMap="BaseResultMap">
+		SELECT
+			* 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM CA 
+			LEFT JOIN PARTITION_WATER P ON P.ACCOUNT_ITEM_ID = CA.ID
+		<where>
+			1=1 and CA.deleted=0
+			<if test="meterId!=null and meterId!=''">
+				AND P.METER_ID = #{meterId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND CA.PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CA.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+		ORDER BY CA.id DESC
+	</select>
+	
+	<!--查询水表往期欠费 -->
+	<select id="getPastOweAmountByMeter" resultMap="BaseResultMap">
+		SELECT
+			*
+		FROM
+			( SELECT
+				CA.* 
+			FROM
+				CUSTOMER_ACCOUNT_ITEM CA 
+				LEFT JOIN PARTITION_WATER P ON P.ACCOUNT_ITEM_ID = CA.ID
+			where 
+				CA.DELETED=0 
+				AND P.METER_ID = #{meterId} 
+				AND DEBIT_AMOUNT != CREDIT_AMOUNT 
+				AND CREDIT_AMOUNT - DEBIT_AMOUNT &gt; 0
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CA.CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			) 
+		WHERE
+			<![CDATA[ to_date( period, 'YYYY-MM' ) < to_date( #{period}, 'YYYY-MM' )]]>
+			
+	</select>
+	
+	<!--获取水费账单 -->
+	<select id="getWaterFeeBillList" resultMap="BaseResultMap">
+		SELECT
+			* 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			<if test="settlementStatus!=null">
+				AND SETTLEMENT_STATUS = #{settlementStatus}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+		ORDER BY PERIOD ASC	
+	</select>
+	<!--获取欠费账单 -->
+	<select id="getOweBillList" resultMap="BaseResultMap">
+		SELECT
+			* 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			AND SETTLEMENT_STATUS != 1
+			AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+		ORDER BY PERIOD ASC	
+	</select>
+	<!--获取欠费金额 -->
+	<select id="getOweTotalAmount" resultType="BigDecimal">
+		SELECT
+			NVL( SUM( CREDIT_AMOUNT - DEBIT_AMOUNT ), 0 ) AS OWE_AMOUNT 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			AND SETTLEMENT_STATUS != 1
+			AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>	
+	</select>
+	
+	<!--获取往期欠费账单 -->
+	<select id="getPastOweBillList" resultMap="BaseResultMap">
+		SELECT
+			* 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			AND SETTLEMENT_STATUS != 1
+			AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			<!-- &gt;表示大于 -->
+			AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- &lt;表示小于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt; #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+		ORDER BY PERIOD ASC
+	</select>
+	
+	<!--获取往期欠费总金额 -->
+	<select id="getPastOweTotalAmount" resultType="BigDecimal">
+		SELECT
+			NVL( SUM( CREDIT_AMOUNT - DEBIT_AMOUNT ), 0 ) AS OWE_AMOUNT 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			AND SETTLEMENT_STATUS != 1
+			AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			<!-- &gt;表示大于 -->
+			AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- &lt;表示小于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt; #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>	
+	</select>
+	
+	<!--获取水费欠费月份 -->
+	<select id="getWaterFeeOwePeriod" resultType="String">
+		SELECT
+			PERIOD 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			AND SETTLEMENT_STATUS != 1
+			AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			<!-- &gt;表示大于 -->
+			AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- &lt;表示小于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt;= #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where> 
+		GROUP BY PERIOD
+		ORDER BY PERIOD ASC
+	</select>
+	
+	<!--获取违约金欠费月份 -->
+	<select id="getOverdueOwePeriod" resultType="String">
+		SELECT
+			PERIOD 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败；3=部分结算； -->
+			AND SETTLEMENT_STATUS != 1
+			AND CREDIT_AMOUNT != DEBIT_AMOUNT
+			<!-- &gt;表示大于 -->
+			AND CREDIT_AMOUNT &gt; DEBIT_AMOUNT
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- &lt;表示小于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt;= #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where> 
+		GROUP BY PERIOD
+		ORDER BY PERIOD ASC
+	</select>
+	
+	<!-- 查询客户所有的充值账单 -->
+	<select id="getAllRechargeBill" resultMap="BaseResultMap">
+		SELECT
+			*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			I.DELETED = 0 
+
+			
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND I.CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+		</where>
+		ORDER BY I.PERIOD ASC 
+			
+	</select>
+	<!-- 查询客户有余额的充值账单 -->
+	<select id="getBalanceRechargeBill" resultMap="BaseResultMap">
+		SELECT
+			*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			I.DELETED = 0 
+			
+			AND I.DEBIT_AMOUNT != I.CREDIT_AMOUNT
+			<!-- &gt;表示大于 -->
+			AND I.DEBIT_AMOUNT &gt; I.CREDIT_AMOUNT
+			
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND I.CUSTOMER_ID = #{customerId}
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+		</where>
+		ORDER BY I.PERIOD ASC 
+			
+	</select>
+	
+	<!-- 查询税务开票账单集合（水费账单，且金额>0或预存账单，且金额>0）,返回列表 -->
+	<select id="getTaxInvoiceBillList" resultMap="BaseResultMap">
+		SELECT
+			*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<!-- &lt;表示小于，&gt;表示大于 -->
+			<if test="periodStart!=null and periodStart!=''">
+				AND PERIOD &gt;= #{periodStart}
+			</if>
+			<if test="periodEnd!=null and periodEnd!=''">
+				AND PERIOD &lt;= #{periodEnd}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="settlementStatus!=null">
+				AND SETTLEMENT_STATUS = #{settlementStatus}
+			</if>
+			<if test="(creditSubjectList!=null and creditSubjectList.size>0) or (debitSubject!=null and debitSubject!='')">
+				AND 
+				(
+					<if test="creditSubjectList!=null and creditSubjectList.size>0">
+						(
+							CREDIT_SUBJECT IN 
+							<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+					             #{item}
+					        </foreach>
+					        AND CREDIT_AMOUNT &gt; 0
+				        )
+					</if>
+					<if test="(creditSubjectList!=null and creditSubjectList.size>0) and (debitSubject!=null and debitSubject!='')">
+						OR 
+					</if>
+					<if test="debitSubject!=null and debitSubject!=''">
+						(
+							DEBIT_SUBJECT LIKE concat(#{debitSubject}, '%')
+							AND DEBIT_AMOUNT &gt; 0
+						)
+					</if>
+				)
+			</if>
+			
+		</where>
+		ORDER BY 
+			PERIOD DESC, 
+			ID DESC
+	</select>
+	
+	<!-- 查询本期充值账单,返回列表 -->
+	<select id="getRechargeBillList" resultMap="BaseResultMap">
+		SELECT
+			*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<!-- 借/贷;1:借;2:贷 -->
+			AND DEBIT_CREDIT='1'
+			<!-- &lt;表示小于，&gt;表示大于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<if test="debitSubjectPayment!=null and debitSubjectPayment!=''">
+				<!-- AND DEBIT_SUBJECT LIKE CONCAT('%', CONCAT(#{debitSubjectPayment}, '%') -->
+				AND DEBIT_SUBJECT LIKE CONCAT('%', #{debitSubjectPayment})
+			</if>
+		</where>
+		ORDER BY 
+			PERIOD DESC, 
+			ID DESC
+	</select>
+	
+	<!-- 查询往期充值账单,返回列表 -->
+	<select id="getPastRechargeBillList" resultMap="BaseResultMap">
+		SELECT
+			*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			<!-- 借/贷;1:借;2:贷 -->
+			AND DEBIT_CREDIT='1'
+			<!-- &lt;表示小于，&gt;表示大于 -->
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt; #{period}
+			</if>
+			<if test="debitSubjectPayment!=null and debitSubjectPayment!=''">
+				<!-- AND DEBIT_SUBJECT LIKE CONCAT('%', CONCAT(#{debitSubjectPayment}, '%') -->
+				AND DEBIT_SUBJECT LIKE CONCAT('%', #{debitSubjectPayment})
+			</if>
+		</where>
+		ORDER BY 
+			PERIOD DESC, 
+			ID DESC
+	</select>
+	
+	<!-- 查询本期已结算或部分结算的水费账单 -->
+	<select id="getStatSettlementBillList" resultType="map">
+		SELECT
+			<!-- MAX( PW.ID ), -->
+			COUNT(1) AS COUNT,
+			SUM( PW.REAL_WATER_AMOUNT ) AS SUM_REAL_WATER_AMOUNT,
+			MAX( PW.BASE_PRICE ) AS BASE_PRICE,
+			MAX( PW.TREATMENT_FEE ) AS SEWAGE_FEE,
+			SUM( PW.WATER_FEE ) AS SUM_WATER_FEE,
+			SUM( I.DEBIT_AMOUNT ) AS SUM_DEBIT_AMOUNT
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I 
+			LEFT JOIN PARTITION_WATER PW ON I.ID = PW.ACCOUNT_ITEM_ID 
+			LEFT JOIN LOCATION_METER LM ON PW.METER_ID = LM.METER_ID 
+			LEFT JOIN METERS M ON PW.METER_ID = M.ID 
+		WHERE
+			I.DELETED = 0 
+			AND I.SETTLEMENT_STATUS IN ( 1, 3 ) 
+			AND PW.DELETED = 0 
+			AND LM.DELETED != 1 
+			AND M.METER_USE='CHARGE_METER'
+			<if test="debitSubject!=null and debitSubject!=''">
+				AND I.DEBIT_ASSISTANT LIKE CONCAT('%',CONCAT(#{debitSubject}, '%')) 
+			</if>
+			<!-- &lt;表示小于，&gt;表示大于 -->
+			<if test="period!=null and period!=''">
+				AND I.PERIOD=#{period}
+			</if>
+			<if test="traceIdsList!=null and traceIdsList.size>0">
+				AND (
+				<!-- <foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")"> -->
+				<foreach item="item" index="index" collection="traceIdsList">
+					<if test="index!=0">
+						OR 
+					</if>
+		            LM.TRACE_IDS LIKE CONCAT( #{item}, '%' ) 
+		        </foreach>
+		        )
+			</if>
+			
+		GROUP BY
+			<!-- LM.TRACE_IDS, -->
+			PW.WATER_PRICE
+	</select>
+	
+	<!-- 查询往期已结算或部分结算的水费账单 -->
+	<select id="getStatPastSettlementBillList" resultType="map">
+		SELECT
+			<!-- MAX( PW.ID ), -->
+			COUNT(1) AS COUNT,
+			SUM( PW.REAL_WATER_AMOUNT ) AS SUM_REAL_WATER_AMOUNT,
+			MAX( PW.BASE_PRICE ) AS BASE_PRICE,
+			MAX( PW.TREATMENT_FEE ) AS SEWAGE_FEE,
+			SUM( PW.WATER_FEE ) AS SUM_WATER_FEE,
+			SUM( I.DEBIT_AMOUNT ) AS SUM_DEBIT_AMOUNT
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I 
+			LEFT JOIN PARTITION_WATER PW ON I.ID = PW.ACCOUNT_ITEM_ID 
+			LEFT JOIN LOCATION_METER LM ON PW.METER_ID = LM.METER_ID 
+			LEFT JOIN METERS M ON PW.METER_ID = M.ID 
+		WHERE
+			I.DELETED = 0 
+			AND I.SETTLEMENT_STATUS IN ( 1, 3 ) 
+			AND PW.DELETED = 0 
+			AND LM.DELETED != 1 
+			AND M.METER_USE='CHARGE_METER'
+			<if test="debitSubject!=null and debitSubject!=''">
+				AND I.DEBIT_ASSISTANT LIKE CONCAT('%',CONCAT(#{debitSubject}, '%')) 
+			</if>
+			<!-- &lt;表示小于，&gt;表示大于 -->
+			<if test="period!=null and period!=''">
+				AND I.PERIOD &lt; #{period}
+			</if>
+			<if test="traceIdsList!=null and traceIdsList.size>0">
+				AND (
+					1=1
+				<!-- <foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")"> -->
+				<foreach item="item" index="index" collection="traceIdsList">
+		             OR LM.TRACE_IDS LIKE CONCAT( #{item}, '%' ) 
+		        </foreach>
+		        )
+			</if>
+			
+		GROUP BY
+			<!-- LM.TRACE_IDS, -->
+			PW.WATER_PRICE
+	</select>
+	<!-- 按期间查询应收水费金额 -->
+	<select id="getActualWaterFeeAmount" resultType="BigDecimal">
+		SELECT
+			SUM( CREDIT_AMOUNT ) AS actualAmount
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			AND DELETED = 0
+			<!-- 借/贷，1=借；2=贷 -->
+			AND DEBIT_CREDIT = 2 
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+	</select>
+	<!-- 按期间统计实收水费金额 -->
+	<select id="getReceiveWaterFeeAmount" resultType="BigDecimal">
+		SELECT
+			SUM( DEBIT_AMOUNT ) AS receiveAmount
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			AND DELETED = 0
+			<!-- 借/贷，1=借；2=贷 -->
+			AND DEBIT_CREDIT = 2 
+			<if test="customerId!=null">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="period!=null and period!=''">
+				AND PERIOD = #{period}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+	</select>
+	
+	<!-- 统计欠费单位大表 -->
+	<select id="getStatOweCompanyMeter" resultType="map">
+		SELECT 
+			DISTINCT T.* 
+		FROM (
+			SELECT
+				I.CUSTOMER_ID,
+				C.CUSTOMER_NAME, 
+				I.PERIOD,
+				SUM(I.CREDIT_AMOUNT) AS BILL_AMOUNT,
+				SUM(I.DEBIT_AMOUNT) AS RECHARGE_AMOUNT,
+				( SUM(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) ) AS OWE_AMOUNT, 
+				SUM(PW.BASE_PRICE*PW.REAL_WATER_AMOUNT) AS SUM_BASE_WATER_FEE, 
+				SUM(PW.TREATMENT_FEE*PW.REAL_WATER_AMOUNT) AS SUM_SEWAGE_WATER_FEE, 
+				LM.TRACE_IDS 
+			FROM
+				CUSTOMER_ACCOUNT_ITEM I
+				LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+				LEFT JOIN PARTITION_WATER PW ON I.ID=PW.ACCOUNT_ITEM_ID
+				<!-- LEFT JOIN CUSTOMER_METER CM ON C.ID=CM.CUSTOMER_ID -->
+				LEFT JOIN LOCATION_METER LM ON PW.METER_ID=LM.METER_ID
+				
+			<where>
+				<!-- 删除状态，1=已删除，0=未删除（默认） -->
+				I.DELETED = 0 
+				AND C.DELETED = 0
+				<!-- 客户类型，1=个人/2=单位 -->
+				AND C.CUSTOMER_TYPE = 2
+				<!-- AND CM.DELETED = 0 -->
+				AND (PW.DELETED=0 OR PW.DELETED IS NULL) 
+				AND LM.DELETED!=1
+				<!-- AND CM.DEFAULT_CUSTOMER = 0 -->
+				<!-- AND PW.DELETED = 0 -->
+				<if test="period!=null and period!=''">
+					AND I.PERIOD = #{period}
+				</if>
+				<if test="creditSubjectList!=null and creditSubjectList.size>0">
+					AND I.CREDIT_SUBJECT IN 
+					<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+			             #{item}
+			        </foreach>
+				</if>
+				<if test="debitCredit!=null and debitCredit!=''">
+					AND I.DEBIT_CREDIT = #{debitCredit}
+				</if>
+				<if test="searchCond!=null and searchCond!=''">
+					AND (
+	  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+	  				)
+				</if>
+				<if test="settleStatusList!=null and settleStatusList.size>0">
+						AND I.SETTLEMENT_STATUS IN 
+					<foreach item="item" index="index" collection="settleStatusList" open="(" separator="," close=")">
+			             #{item}
+			        </foreach>
+				</if>
+			</where>
+			GROUP BY I.CUSTOMER_ID, C.CUSTOMER_NAME, I.PERIOD, LM.TRACE_IDS 
+			ORDER BY PERIOD DESC
+		) T
+	</select>
+	
+	
+	<!-- 财务统计-获取欠费单位明细 -->
+	<select id="getCustomerAccountItemDetail" resultType="map">
+		SELECT
+			*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM 
+		<where>
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			DELETED=0
+			AND CREDIT_AMOUNT - DEBIT_AMOUNT &gt; 0  
+			<if test="period!=null and period!=''">
+				AND PERIOD &lt;= #{period}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND CUSTOMER_ID = #{customerId}
+			</if>
+			<if test="creditSubjectList!=null and creditSubjectList.size>0">
+				AND CREDIT_SUBJECT IN 
+				<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="settleStatusList!=null and settleStatusList.size>0">
+				AND SETTLEMENT_STATUS IN 
+				<foreach item="item" index="index" collection="settleStatusList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			
+		</where>
+		ORDER BY PERIOD DESC,ID DESC
+	</select>
+	
+	<!-- 查询本期已结算（全部结算或部分结算）的水费账单（无票收入） -->
+	<select id="getStatNoTaxBillList" resultType="map">
+		SELECT
+			COUNT(1) AS COUNT,
+			SUM( I.DEBIT_AMOUNT ) AS SUM_DEBIT_AMOUNT
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I 
+			LEFT JOIN PARTITION_WATER PW ON I.ID = PW.ACCOUNT_ITEM_ID 
+			LEFT JOIN LOCATION_METER LM ON PW.METER_ID = LM.METER_ID 
+			LEFT JOIN METERS M ON PW.METER_ID = M.ID 
+		WHERE
+			I.DELETED = 0 
+			AND I.SETTLEMENT_STATUS IN ( 1, 3 ) 
+			AND PW.DELETED = 0 
+			AND LM.DELETED != 1 
+			AND M.METER_USE='CHARGE_METER'
+			AND NOT EXISTS (
+				SELECT
+					* 
+				FROM
+					TAX_INVOICE_ACCOUNT_ITEM TI
+					LEFT JOIN TAX_INVOICE T ON TI.INVOICES = T.ID 
+				WHERE
+					<!-- TI.DELETED = 0 --> 
+					T.DELETED = 0 
+					AND T.ZFBZ = 0 
+					AND T.CHBZ = 0 
+					AND TI.COMBIN_ACCOUNT_ITEM LIKE CONCAT( '%', CONCAT( I.ID, '%' ) ) 
+				)
+			<if test="settleStatusList!=null and settleStatusList.size>0">
+				AND I.SETTLEMENT_STATUS IN 
+				<foreach item="item" index="index" collection="settleStatusList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<!-- &lt;表示小于，&gt;表示大于 -->
+			<if test="period!=null and period!=''">
+				AND I.PERIOD=#{period}
+			</if>
+			<if test="traceIdsList!=null and traceIdsList.size>0">
+				AND (
+				<foreach item="item" index="index" collection="traceIdsList">
+					<if test="index!=0">
+						OR 
+					</if>
+		            LM.TRACE_IDS LIKE CONCAT( #{item}, '%' ) 
+		        </foreach>
+		        )
+			</if>
+	</select>
+	
+	<!-- 查询客户余额,返回列表 -->
+	<select id="getCustomerBalanceStatusList" resultType="map">
+	select * from (	
+		SELECT
+			I.CUSTOMER_ID,
+			C.CUSTOMER_NAME,
+			SUM( I.DEBIT_AMOUNT - I.CREDIT_AMOUNT ) AS BALANCE,
+			NVL( SUM( T.CREDIT_AMOUNT - T.DEBIT_AMOUNT ), 0 ) AS OWE_AMOUNT 
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I 
+			LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID 
+			LEFT JOIN (SELECT *  FROM CUSTOMER_ACCOUNT_ITEM  
+						WHERE
+						DELETED=0
+						AND SETTLEMENT_STATUS != 1
+						AND CREDIT_AMOUNT != DEBIT_AMOUNT
+						AND CREDIT_AMOUNT > DEBIT_AMOUNT
+						<if test="creditSubjectList!=null and creditSubjectList.size>0">
+							AND CREDIT_SUBJECT IN 
+							<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+					             #{item}
+					        </foreach>
+						</if>
+						) T ON T.CUSTOMER_ID = I.CUSTOMER_ID
+		WHERE
+			EXISTS(
+				SELECT 
+					* 
+				FROM 
+					LOCATION_CUSTOMER LC 
+				WHERE 
+					LC.DELETED=0 
+					AND C.ID=LC.CUSTOMER_ID 
+					<if test="traceIds!=null and traceIds!=''">
+						AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+					</if>
+				)
+			AND I.DELETED = 0 
+			AND C.DELETED = 0 
+			AND I.DEBIT_AMOUNT != I.CREDIT_AMOUNT 
+			<!-- &gt;表示大于 -->
+			AND I.DEBIT_AMOUNT &gt; I.CREDIT_AMOUNT
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="searchCond!=null and searchCond!=''">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+		GROUP BY
+			I.CUSTOMER_ID,
+			C.CUSTOMER_NAME
+		ORDER BY
+			BALANCE,
+			I.CUSTOMER_ID
+			) A 
+			<where>
+				<!-- 余额大于欠费 -->
+				<if test="balanceStatus!=null and balanceStatus ==1">
+					A.BALANCE &gt; A.OWE_AMOUNT
+				</if>
+				<!-- 余额等于于欠费 -->
+				<if test="balanceStatus!=null and balanceStatus ==2">
+					AND A.BALANCE = A.OWE_AMOUNT
+				</if>
+				<!-- 余额小于欠费 -->
+				<if test="balanceStatus!=null and balanceStatus ==3">
+					AND A.BALANCE &lt; A.OWE_AMOUNT
+				</if>
+			 </where>
+	</select>
+	<!-- 查询微信客户的账单，按客户ID分组,返回列表 -->
+	<!-- 与getListGroupByCustomerId查询SQL相同，在原SQL的基础上增加了EXISTS条件，用于判断是否绑定微信，是否绑定微信判断规则是微信-客户关系表中是否存在记录，有记录表示已绑定微信，无记录表示未绑定微信 -->
+	<select id="getWechatCustomerOweBillList" resultType="map">
+		SELECT 
+			DISTINCT T.* 
+		FROM (
+			SELECT
+				I.CUSTOMER_ID,
+				C.CUSTOMER_NAME, 
+				<!-- LISTAGG ( I.ID, ',' ) WITHIN GROUP ( ORDER BY I.ID ) AS BILL_IDS, -->
+				<!-- MAX(I.ID) AS BILL_IDS, -->
+				<!-- LISTAGG ( PW.WATER_USE, ',' ) WITHIN GROUP ( ORDER BY I.ID DESC ) AS WATER_PRICE, -->
+				<!-- MIN(PW.WATER_USE) AS WATER_PRICE, --> 
+				I.PERIOD,
+				SUM(I.CREDIT_AMOUNT) AS BILL_AMOUNT,
+				SUM(I.DEBIT_AMOUNT) AS RECHARGE_AMOUNT,
+				( SUM(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) ) AS OWE_AMOUNT, 
+				LM.TRACE_IDS 
+			FROM
+				CUSTOMER_ACCOUNT_ITEM I
+				LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+				<!-- LEFT JOIN PARTITION_WATER PW ON I.ID=PW.ACCOUNT_ITEM_ID -->
+				LEFT JOIN CUSTOMER_METER CM ON C.ID=CM.CUSTOMER_ID
+				LEFT JOIN LOCATION_METER LM ON CM.METER_ID=LM.METER_ID
+				
+			<where>
+				<!-- 删除状态，1=已删除，0=未删除（默认） -->
+				I.DELETED = 0 
+				AND C.DELETED = 0
+				AND CM.DELETED = 0 
+				AND LM.DELETED!=1
+				<!-- AND CM.DEFAULT_CUSTOMER = 0 -->
+				<!-- AND PW.DELETED = 0 -->
+				<if test="period!=null and period!=''">
+					AND I.PERIOD = #{period}
+				</if>
+				<if test="creditSubjectList!=null and creditSubjectList.size>0">
+					AND I.CREDIT_SUBJECT IN 
+					<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+			             #{item}
+			        </foreach>
+				</if>
+				<if test="debitCredit!=null and debitCredit!=''">
+					AND I.DEBIT_CREDIT = #{debitCredit}
+				</if>
+				<if test="searchCond!=null and searchCond!=''">
+					AND (
+	  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+	  				)
+				</if>
+				<!-- 按时间查询账单日期 -->
+				<if test="startDate!=null and startDate!=''">
+					AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="endDate!=null and endDate!=''">
+					AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="traceIds!=null and traceIds!=''">
+					AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+				</if>
+				<if test="deductMode!=null">
+					AND C.DEDUCT_TYPE =#{deductMode}
+				</if>
+				<if test="settleStatusList!=null and settleStatusList.size>0">
+						AND I.SETTLEMENT_STATUS IN 
+					<foreach item="item" index="index" collection="settleStatusList" open="(" separator="," close=")">
+			             #{item}
+			        </foreach>
+				</if>
+			</where>
+			GROUP BY I.CUSTOMER_ID, C.CUSTOMER_NAME, I.PERIOD, LM.TRACE_IDS, CM.METER_ID 
+			ORDER BY PERIOD DESC
+		) T
+		<where>
+			EXISTS ( SELECT * FROM WECHAT_CUSTOMER WC WHERE WC.CUSTOMER_ID = T.CUSTOMER_ID )
+		</where>
+	</select>
+	
+	<!-- 查询非微信客户的账单，按客户ID分组,返回列表 -->
+	<!-- 与getListGroupByCustomerId查询SQL相同，在原SQL的基础上增加了NOT EXISTS条件，用于判断是否绑定微信，是否绑定微信判断规则是微信-客户关系表中是否存在记录，有记录表示已绑定微信，无记录表示未绑定微信 -->
+	<select id="getNotWechatCustomerOweBillList" resultType="map">
+		SELECT 
+			DISTINCT T.* 
+		FROM (
+			SELECT
+				I.CUSTOMER_ID,
+				C.CUSTOMER_NAME, 
+				<!-- LISTAGG ( I.ID, ',' ) WITHIN GROUP ( ORDER BY I.ID ) AS BILL_IDS, -->
+				<!-- MAX(I.ID) AS BILL_IDS, -->
+				<!-- LISTAGG ( PW.WATER_USE, ',' ) WITHIN GROUP ( ORDER BY I.ID DESC ) AS WATER_PRICE, -->
+				<!-- MIN(PW.WATER_USE) AS WATER_PRICE, --> 
+				I.PERIOD,
+				SUM(I.CREDIT_AMOUNT) AS BILL_AMOUNT,
+				SUM(I.DEBIT_AMOUNT) AS RECHARGE_AMOUNT,
+				( SUM(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) ) AS OWE_AMOUNT, 
+				LM.TRACE_IDS 
+			FROM
+				CUSTOMER_ACCOUNT_ITEM I
+				LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID
+				<!-- LEFT JOIN PARTITION_WATER PW ON I.ID=PW.ACCOUNT_ITEM_ID -->
+				LEFT JOIN CUSTOMER_METER CM ON C.ID=CM.CUSTOMER_ID
+				LEFT JOIN LOCATION_METER LM ON CM.METER_ID=LM.METER_ID
+				
+			<where>
+				<!-- 删除状态，1=已删除，0=未删除（默认） -->
+				I.DELETED = 0 
+				AND C.DELETED = 0
+				AND CM.DELETED = 0 
+				AND LM.DELETED!=1
+				<!-- AND CM.DEFAULT_CUSTOMER = 0 -->
+				<!-- AND PW.DELETED = 0 -->
+				<if test="period!=null and period!=''">
+					AND I.PERIOD = #{period}
+				</if>
+				<if test="creditSubjectList!=null and creditSubjectList.size>0">
+					AND I.CREDIT_SUBJECT IN 
+					<foreach item="item" index="index" collection="creditSubjectList" open="(" separator="," close=")">
+			             #{item}
+			        </foreach>
+				</if>
+				<if test="debitCredit!=null and debitCredit!=''">
+					AND I.DEBIT_CREDIT = #{debitCredit}
+				</if>
+				<if test="searchCond!=null and searchCond!=''">
+					AND (
+	  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+		 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+	  				)
+				</if>
+				<!-- 按时间查询账单日期 -->
+				<if test="startDate!=null and startDate!=''">
+					AND I.ACCOUNT_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="endDate!=null and endDate!=''">
+					AND I.ACCOUNT_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="traceIds!=null and traceIds!=''">
+					AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+				</if>
+				<if test="deductMode!=null">
+					AND C.DEDUCT_TYPE =#{deductMode}
+				</if>
+				<if test="settleStatusList!=null and settleStatusList.size>0">
+						AND I.SETTLEMENT_STATUS IN 
+					<foreach item="item" index="index" collection="settleStatusList" open="(" separator="," close=")">
+			             #{item}
+			        </foreach>
+				</if>
+			</where>
+			GROUP BY I.CUSTOMER_ID, C.CUSTOMER_NAME, I.PERIOD, LM.TRACE_IDS, CM.METER_ID 
+			ORDER BY PERIOD DESC
+		) T
+		<where>
+			NOT EXISTS ( SELECT * FROM WECHAT_CUSTOMER WC WHERE WC.CUSTOMER_ID = T.CUSTOMER_ID )
+		</where>
+	</select>
+	
+	<!-- 获取清欠充值记录 -->
+  	<select id="getDebitBillList" resultMap="BaseResultMap">
+		SELECT
+		 	I.*
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+		WHERE
+			I.DELETED=0 
+			AND I.DEBIT_CREDIT=1
+			<if test="rechargeBillId!=null">
+				AND I.PID = #{rechargeBillId}
+			</if>
+  			AND (I.DEBIT_SUBJECT LIKE concat('130','%')
+  			OR I.DEBIT_SUBJECT LIKE concat('131','%')
+  			OR I.DEBIT_SUBJECT LIKE concat('132','%'))
+  	</select>
+  	<!-- 更新清欠充值记录的贷方辅助核算为空 -->
+  	<update id="updateDebitBillCreditAssistantIsNull">
+  		UPDATE 
+  			CUSTOMER_ACCOUNT_ITEM 
+  		SET 
+  			CREDIT_AMOUNT=0, 
+  			CREDIT_ASSISTANT=null 
+  		WHERE 
+  			DELETED=0 
+			AND DEBIT_CREDIT=1
+			<if test="rechargeBillId!=null">
+				AND PID = #{rechargeBillId}
+			</if>
+  			AND (DEBIT_SUBJECT LIKE concat('130','%')
+  			OR DEBIT_SUBJECT LIKE concat('131','%')
+  			OR DEBIT_SUBJECT LIKE concat('132','%'))
+  	</update>
+  	<!-- 删除清欠充值记录 -->
+  	<update id="deleteDebitBill">
+  		UPDATE 
+  			CUSTOMER_ACCOUNT_ITEM 
+  		SET 
+  			DELETED=1 
+  		WHERE 
+  			DELETED=0 
+			AND DEBIT_CREDIT=1
+			<if test="rechargeBillId!=null">
+				AND PID = #{rechargeBillId}
+			</if>
+  			AND (DEBIT_SUBJECT LIKE concat('130','%')
+  			OR DEBIT_SUBJECT LIKE concat('131','%')
+  			OR DEBIT_SUBJECT LIKE concat('132','%'))
+  	</update>
+	
+</mapper>

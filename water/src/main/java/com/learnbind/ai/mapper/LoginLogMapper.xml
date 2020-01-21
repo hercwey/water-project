@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.LoginLogMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.LoginLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="USERNAME" jdbcType="VARCHAR" property="username" />
+    <result column="USER_ID" jdbcType="DECIMAL" property="userId" />
+    <result column="LOGIN_DATE" jdbcType="TIMESTAMP" property="loginDate" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, USERNAME, USER_ID, LOGIN_DATE, STATUS
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="search" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM LOGIN r
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (r.USERNAME LIKE concat(concat('%',#{searchCond}),'%'))
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+</mapper>

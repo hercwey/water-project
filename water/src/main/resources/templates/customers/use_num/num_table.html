@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>业主名称</th>
+				<th>业主手机</th>
+				<th>客户名称</th>
+				<th>客户手机</th>
+				<th>用水人数</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${customerList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				<!-- 业主名称-->
+				<td th:text="${item.propName}">业主名称</td>
+				<!-- 业主手机 -->
+				<td th:text="${item.propMobile}">业主手机</td>
+				<!-- 客户名称 -->
+				<td th:text="${item.customerName}">客户名称</td>
+				<!--客户手机-->
+				<td th:text="${item.customerMobile}">客户手机</td>
+				<!--用水人数-->
+				<td th:text="${item.useNum}">用水人数</td>
+				
+				<!-- 操作列 -->
+				<td>
+					<!-- 详情 -->
+					<button type="button" class="num-detail-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>详情</span>
+					</button> 
+					<!-- 用水人数修改 -->
+					<button type="button" class="num-modi-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>用水人数修改</span>
+					</button> 
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager::pager" class="pagerx"
+		style="float: right; margin-right: 100px;"></div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	var g_is_edit = true;//全局变量是否是编辑操作
+	//-----------------打开详情对话框------------------
+	
+		
+		/* 
+			加载详情对话框 
+		*/
+		$('.num-modi-single').on('click',function() {
+			g_is_edit = true;//全局变量是否是编辑操作
+			var itemId = $(this).attr("bind-id"); //条目ID		
+			getCustomersAjaxReq(itemId);
+			
+		});
+		/* 
+			加载修改批次对话框 
+		*/
+		$('.num-detail-single').on('click',function() {
+			g_is_edit = false;//全局变量是否是编辑操作
+			var itemId = $(this).attr("bind-id"); //条目ID
+			getCustomersAjaxReq(itemId);
+		});
+		
+		/**
+		 * 获取客户信息ajax请求
+		 */
+		function getCustomersAjaxReq(itemId){
+			var url = BASE_CONTEXT_PATH+'/use-num/loadmodiusenumdialog';
+			
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+	
+			$("#num-dialog-edit").load(url, parms,function(){
+				openUseNumDialog();//打开对话框
+				if(!g_is_edit){
+					$("#btn-modify-and-back").hide();
+					/* $("#dialog-modi-form input").attr("disabled", true);
+					$("#dialog-modi-form select").attr("disabled", true); */
+				}
+			}); //加载完毕后显示 
+		}
+		
+		
+		
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openUseNumDialog() {
+			//	可拖拽
+			$("#modal-container-num-edit").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-num-edit').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+		
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeUseNumDialog() {
+			$("#modal-container-num-edit").modal("hide");
+		}
+		
+		
+		
+	</script>
+</body>
+</html>

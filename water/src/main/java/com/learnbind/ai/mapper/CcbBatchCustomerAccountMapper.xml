@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CcbBatchCustomerAccountMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CcbBatchCustomerAccount">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="BATH_WITHHOLDING_ID" jdbcType="DECIMAL" property="bathWithholdingId" />
+    <result column="ACCOUNT_ITEM_ID" jdbcType="DECIMAL" property="accountItemId" />
+    <result column="WITHHOLDING_STATUS" jdbcType="DECIMAL" property="withholdingStatus" />
+    <result column="SETTLE_ACCOUNT_STATUS" jdbcType="DECIMAL" property="settleAccountStatus" />
+    <result column="JOIN_TIME" jdbcType="TIMESTAMP" property="joinTime" />
+    <result column="SETTLE_TIME" jdbcType="TIMESTAMP" property="settleTime" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="CUSTOMER_NAME" jdbcType="VARCHAR" property="customerName" />
+    <result column="CUSTOMER_CARD_NO" jdbcType="VARCHAR" property="customerCardNo" />
+    <result column="WITHHOLDING_NO" jdbcType="DECIMAL" property="withholdingNo" />
+    <result column="ACCOUNT_AMOUNT" jdbcType="VARCHAR" property="accountAmount" />
+    <result column="WITHHOLD_FAIL_REASON" jdbcType="VARCHAR" property="withholdFailReason" />
+    <result column="SETTLE_FAIL_REASON" jdbcType="VARCHAR" property="settleFailReason" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, BATH_WITHHOLDING_ID, ACCOUNT_ITEM_ID, WITHHOLDING_STATUS, SETTLE_ACCOUNT_STATUS, 
+    JOIN_TIME, SETTLE_TIME, OPERATOR_NAME, OPERATOR_ID, CUSTOMER_NAME, CUSTOMER_CARD_NO, 
+    WITHHOLDING_NO, ACCOUNT_AMOUNT, WITHHOLD_FAIL_REASON, SETTLE_FAIL_REASON
+  </sql>
+  
+  <select id="searchAllAccount" resultMap="BaseResultMap">
+  	select r.* from CCB_BATCH_CUSTOMER_ACCOUNT r
+  	<where>
+  		1=1
+  		<if test="settleAccountStatus!=null">
+			AND r.SETTLE_ACCOUNT_STATUS=#{settleAccountStatus}
+		</if>
+		<if test="period!=null and period !='' ">
+			AND TO_CHAR(r.JOIN_TIME, 'YYYY-MM') = #{period}
+		</if>
+  		<if test="searchCond!=null and searchCond!=''">
+		AND (
+			r.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 		OR r.CUSTOMER_CARD_NO LIKE concat(concat('%',#{searchCond}),'%')
+			)
+		</if>
+		
+  	</where>
+  
+  </select>
+  
+   <select id="selectAccountByRecordId" resultMap="BaseResultMap">
+  	select r.* from CCB_BATCH_CUSTOMER_ACCOUNT r
+  	<where>
+  		1=1
+  		<if test="withRecordId!=null">
+			AND r.BATH_WITHHOLDING_ID=#{withRecordId}
+		</if>
+		<if test="settleAccountStatus!=null">
+			AND r.SETTLE_ACCOUNT_STATUS=#{settleAccountStatus}
+		</if>
+		<if test="period!=null and period !='' ">
+			AND TO_CHAR(r.JOIN_TIME, 'YYYY-MM') = #{period}
+		</if>
+		<if test="searchCond!=null and searchCond!=''">
+		AND (
+			r.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 		OR r.CUSTOMER_CARD_NO LIKE concat(concat('%',#{searchCond}),'%')
+			)
+		</if>
+		
+  	</where>
+  
+  </select>
+  
+  <select id="getAccountStatistic" resultType="map">
+  	SELECT
+		r.SETTLE_ACCOUNT_STATUS,
+		count(r.SETTLE_ACCOUNT_STATUS) as NUM,
+		SUM( r.ACCOUNT_AMOUNT ) AS ACCOUNT_AMOUNT
+	FROM
+  		CCB_BATCH_CUSTOMER_ACCOUNT r
+  	<where>
+  		1=1
+  		<if test="withRecordId!=null">
+			AND r.BATH_WITHHOLDING_ID=#{withRecordId}
+		</if>
+		<if test="settleAccountStatus!=null">
+			AND r.SETTLE_ACCOUNT_STATUS=#{settleAccountStatus}
+		</if>
+		<if test="period!=null and period !='' ">
+			AND TO_CHAR(r.JOIN_TIME, 'YYYY-MM') = #{period}
+		</if>
+		<if test="searchCond!=null and searchCond!=''">
+		AND (
+			r.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 		OR r.CUSTOMER_CARD_NO LIKE concat(concat('%',#{searchCond}),'%')
+			)
+		</if>
+		GROUP BY
+		r.SETTLE_ACCOUNT_STATUS
+		
+  	</where>
+  
+  </select>
+  
+  <select id="getCustomerAccount" resultMap="BaseResultMap">
+  	select * from CCB_BATCH_CUSTOMER_ACCOUNT 
+  	<where>
+  		1=1
+  		<if test="withRecordId!=null">
+			AND BATH_WITHHOLDING_ID=#{withRecordId}
+		</if>
+  		<if test="withHoldNo!=null">
+			AND WITHHOLDING_NO=#{withHoldNo}
+		</if>
+  		<if test="cardNo!=null and cardNo!=''">
+			AND CUSTOMER_CARD_NO =#{cardNo}
+		</if>
+		<if test="customerName!=null and customerName!=''">
+			AND CUSTOMER_NAME =#{customerName}
+		</if>
+		<if test="accountAmount!=null">
+			AND ACCOUNT_AMOUNT =#{accountAmount}
+		</if>
+		<!-- 代扣状态未代扣，销账状态未销账 -->
+			AND WITHHOLDING_STATUS=0 AND SETTLE_ACCOUNT_STATUS=0
+		
+  	</where>
+  </select>
+  
+<select id="getWithHoldFileDeatil" resultMap="BaseResultMap">
+    SELECT * FROM CCB_BATCH_CUSTOMER_ACCOUNT 
+    <where>
+		BATH_WITHHOLDING_ID = #{withHoldFileId}
+		<if test="searchCond!=null and searchCond!='' ">
+			AND (
+				CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR CUSTOMER_CARD_NO LIKE concat(concat('%',#{searchCond}),'%')
+			)
+		</if>
+		<if test="withHoldStatus!=null">
+				AND WITHHOLDING_STATUS =#{withHoldStatus}
+		</if>
+		<if test="settleAccountStatus!=null">
+				AND SETTLE_ACCOUNT_STATUS=#{settleAccountStatus}
+		</if>
+	</where>
+	order by WITHHOLDING_NO ASC
+ </select>  
+ 
+ <!-- 查询批量代扣结果明细 -->
+ <select id="selectHoldFileDetail" resultType="map">
+  	SELECT
+  		MAX(ACCOUNT_ITEM_ID) AS ONE_ACCOUNT_ITEM_ID,
+  		MAX(JOIN_TIME) AS JOIN_TIME,
+		MAX( WITHHOLDING_STATUS ) AS WITHHOLDING_STATUS,
+		CUSTOMER_NAME,
+		CUSTOMER_CARD_NO,
+		SUM( ACCOUNT_AMOUNT ) AS ACCOUNT_AMOUNT,
+		MAX( WITHHOLD_FAIL_REASON ) AS WITHHOLD_FAIL_REASON
+	FROM
+  		CCB_BATCH_CUSTOMER_ACCOUNT 
+  	<where>
+  		<if test="withRecordId!=null">
+			BATH_WITHHOLDING_ID=#{withRecordId}
+		</if>
+		<if test="withholdingStatus!=null">
+			AND WITHHOLDING_STATUS=#{withholdingStatus}
+		</if>
+		<if test="searchCond!=null and searchCond!=''">
+		AND (
+			CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 		OR CUSTOMER_CARD_NO LIKE concat(concat('%',#{searchCond}),'%')
+			)
+		</if>
+		<if test="withholdFailReason!=null and withholdFailReason!=''">
+		AND (
+			WITHHOLD_FAIL_REASON LIKE concat(concat('%',#{withholdFailReason}),'%')
+			)
+		</if>
+  	</where>
+  	GROUP BY
+		CUSTOMER_CARD_NO,
+		CUSTOMER_NAME
+ </select>
+</mapper>

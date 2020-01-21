@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WorkOrderSaleMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.WorkOrderSale">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="WORk_ORDER_ID" jdbcType="DECIMAL" property="worKOrderId" />
+    <result column="USER_ID" jdbcType="DECIMAL" property="userId" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, WORK_ORDER_ID, USER_ID, REMARK, DELETED
+  </sql>
+  
+  <select id="selectRealnameByWorkOrderId" resultType="String">
+  	SELECT
+		listagg ( realname, ',' ) within GROUP ( ORDER BY WORK_ORDER_ID ) AS names 
+	FROM
+		( SELECT wos.WORK_ORDER_ID, su.realname FROM SYS_USERS su INNER join WORK_ORDER_SALE wos ON wos.user_id = su.id )
+		<where>
+		1=1
+		<if test="workOrderId!=null and workOrderId!='' ">
+		AND WORK_ORDER_ID=#{workOrderId}
+		</if>
+		</where> 
+		GROUP BY
+			WORK_ORDER_ID
+  </select>
+</mapper>

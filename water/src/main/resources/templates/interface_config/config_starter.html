@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('接口配置')" th:remove="tag"></div>
+
+</head>
+<body>
+	<!-- 参数配置主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<!-- <div>
+					<h4 class="panel-title" th:text="${interfaceTypeName}">接口类型名称</h4>
+					<hr style="height:1px;border:none;border-top:1px solid blue;">
+				</div> -->
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var G_INTERFACE_TYPE_CODE = [[${interfaceTypeCode}]];//接口类型，通用
+		/*]]>*/
+	</script>
+
+	<script type="text/javascript">
+	
+		/**
+		 * 	获取接口类型
+		 */
+		function getInterfaceType(){
+			return G_INTERFACE_TYPE_CODE;
+		}
+	
+		$(function() {
+			/* 
+				加载用户框架页
+			*/
+			function loadMainPage(parms, callback) {
+				var url = "/interface-config/main";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			var interfaceType = getInterfaceType();
+			var parms = {"interfaceType": interfaceType};
+			loadMainPage(parms, null);
+		})
+	</script>
+
+</body>
+</html>

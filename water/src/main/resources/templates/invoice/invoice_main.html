@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<!-- ZTree CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<link rel="stylesheet"	href="/css/meterbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="invoice-dialog-edit"></div>
+	<div id="account-item-dialog"></div>
+	<div id="account-item-dialog" th:include="invoice/insert/account_item_dialog"></div>
+	<input type="hidden" id="curr-edit-invoice-id" placeholder="当前编辑的工程信息ID" />
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label printer-main">
+		<div class="col-md-12 column">
+			<!-- 工程信息 -->
+			<div class="tabbable" id="tabs-invoice-div">
+				<ul class="nav nav-tabs" id="tabs-invoice-nav">
+					<li class="nav-item" id="invoice-item-tab" style="">
+						<a class="nav-link active show" href="#invoice-tab" data-toggle="tab">发票列表</a>
+					</li>
+					<li class="nav-item" id="invoice-doc-item-tab" style="display:none;">
+						<a class="nav-link" href="#invoice-doc-tab" data-toggle="tab">发票电子档信息</a>
+					</li>
+					<li class="nav-item" id="insert-invoice-item-tab" style="display:none;">
+						<a class="nav-link" href="#insert-invoice-tab" data-toggle="tab">增加发票</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="invoice-tab">
+						<!-- 工程列表 -->
+						<!-- 操作面板 -->
+						<div class="" style="display: inline-block" id="invoice-search-div">
+							<ul class="extra-l" style="list-style: none;">
+								<!-- 期间查询 -->
+								<li class="input-group-sm">
+									<input type="text" class="form-control Wdate invoice-period" readonly="readonly" style="width: 100px;"
+											id="invoice-period" name="period"
+											onClick="WdatePicker({dateFmt:'yyyy-MM',onpicked: setBackGround});"
+											placeholder="期间" title="期间" />
+								</li>
+								<!-- 面板:增加/删除 -->
+								<li value="0">
+									<button type="button" class="btn btn-primary btn-sm"
+										id="btn-add">
+										<i class="fa fa-plus" aria-hidden="true"> 
+											<!-- <span style="color:black">增加</span> -->
+											<span>增加</span>
+										</i>
+									</button>
+								</li>
+								<li value="1">
+									<button type="button" class="btn btn-danger btn-sm"
+										id="btn-del">
+										<i class="fa fa-remove" aria-hidden="true"> <span>删除</span>
+										</i>
+									</button>
+								</li>
+								
+								<li class="input-group-sm">
+									<select class="form-control invoice-type" id="invoice-type" name="invoiceType">
+										<option value="">——发票类型——</option>
+										<option value="1">专用发票</option>
+										<option value="2">普通发票</option>
+										<option value="3">手工发票</option>
+									</select>
+								</li>
+								<!-- 面板:查询 -->
+								<li class="input-group-sm"><input type="text" class="form-control search-cond" id="search-cond" placeholder="输入发票号码、单位名称、税号" title="请输入发票号码、单位名称、税号、开户账号等查询">
+								</li>
+								<!-- 查询按钮 -->
+								<li>
+									<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+									
+									<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+								
+								</li>
+							</ul>
+						</div>
+			
+						<div class="card">
+							<!-- 容器:字典列表 -->
+							<div class="invoice-table table-container" id="meters-body"></div>
+						</div>
+						
+					</div>
+					<div class="tab-pane" id="invoice-doc-tab">
+						<!-- 发票电子档信息 -->
+					</div>
+					
+					<div class="tab-pane" id="insert-invoice-tab">
+						<!-- 增加发票信息 -->
+						<div id="insert-invoice">
+						</div>
+						
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		var G_TABS_INVOICE_NAV_ID="#tabs-invoice-nav";//选项卡ul容器ID
+		var G_INVOICE_DOC_TAB_ID="#invoice-doc-item-tab";//工程单据选项卡li的ID
+		var G_INVOICE_DOC_TAB="#invoice-doc-tab";//工程单据选项卡a的ID，可用于显示选项卡
+		var g_curr_edit_invoice_id = "#curr-edit-invoice-id";//保存当前编辑的工程信息的ID
+	
+		//--------------------公共查询函数--------------------------
+		
+		/**
+		 * 	id：要显示选项卡的ID
+		 *	href：要显示选项卡的href
+		 *	status：show/hide
+		 */
+		function transferTabs(id, href, status){
+			$(id+' a[href="'+href+'"]').tab(status);
+		}
+		/**
+		 * 	显示单据信息选项卡
+		 */
+		function showInvoiceDocTab(){
+			$("#invoice-doc-item-tab").show();
+		}
+		/**
+		 * 	隐藏单据信息选项卡
+		 */
+		function hideInvoiceDocTab(){
+			$("#invoice-doc-item-tab").hide();
+		}
+		
+		/**
+		 * 	获取当前编辑的工程信息的ID
+		 */
+		function getCurrEditInvoiceId(){
+			return $(g_curr_edit_invoice_id).val();
+		}
+		/**
+		 * 	设置当前编辑的工程信息的ID
+		 */
+		function setCurrEditInvoiceId(invoiceId){
+			$(g_curr_edit_invoice_id).val(invoiceId);
+		}
+		
+		/**
+		 * 	隐藏增加发票信息选项卡
+		 */
+	 	function hideInsertInvoiceTab(){
+			$("#insert-invoice-item-tab").hide();
+		} 
+		/**
+		 * 	显示增加发票信息选项卡
+		 */
+		function showInsertInvoiceTab(){
+			$("#insert-invoice-item-tab").show();
+			$("#tabs-invoice-nav a[href='#insert-invoice-tab']").tab("show");//
+		}
+		
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function search(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/invoice/table"
+			$(".invoice-table").load(url, parms, callbackFuncx);
+		}
+		
+		function callbackFuncx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchInvoiceParams(){
+			//初始化请求参数
+			var parms = new Object();
+			var period = $("#invoice-search-div .invoice-period").val();
+			var invoiceType = $("#invoice-search-div .invoice-type").val();
+			var searchCond = $("#invoice-search-div .search-cond").val();
+			parms.period=period;
+			parms.invoiceType=invoiceType;
+			parms.searchCond=searchCond;
+			return parms;
+			
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearch() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchInvoiceParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchInvoiceParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+	
+			search(parms);
+
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchInvoiceParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+	
+			search(parms);
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		/*		
+			加载(Load): 增加/编辑对话框
+			将对话框内容加载到指定的容器中
+		 */
+		function loadDialog() {
+			var url = BASE_CONTEXT_PATH + '/invoice/load-edit-dialog';
+			$("#invoice-dialog-edit").load(url, null, openEditDialog); //加载完毕后显示
+		}
+			
+		/*
+		 * 	打开(Open) 对话框
+		 */
+		function openEditDialog() {
+			//可拖拽
+			$("#modal-container-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$('#modal-container-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			关闭(CLOSE) 对话框
+		 */
+		function closeEditDialog() {
+			$("#modal-container-dialog").modal("hide");
+		}
+		/*
+			设置日期选择input背景色
+		*/
+		function setBackGround() {
+			$("#invoice-period").css("background-color", "white");
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearch();
+
+			//---------事件绑定--------------
+			
+			/*
+				绑定工程列表选项卡的CLICK事件
+			*/
+			$('#invoice-item-tab').on('click', function() {
+				hideInvoiceDocTab();//隐藏单据信息选项卡
+				hideInsertInvoiceTab();//隐藏增加发票信息选项卡
+			}); 
+			
+			/* 
+				绑定增加发票信息按钮
+			*/
+			$("#invoice-search-div #btn-add").on('click',function() {
+				var url = BASE_CONTEXT_PATH+'/invoice/load-insert-invoice-item';
+				$("#insert-invoice").load(url, null,showInsertInvoiceTab); //加载完毕后显示 
+				
+			});
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#invoice-search-div #btn-search').on('click', function() {
+				btnSearchClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#invoice-search-div #btn-search-reset').on('click', function() {
+				$("#invoice-search-div #search-cond").val("");
+				$("#invoice-search-div #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#invoice-search-div #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#invoice-search-div #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/*
+				btn-del-
+				批量删除按钮
+			*/
+			$('#invoice-search-div #btn-del').on('click', function() {				
+				deleteConfirm();  //显示删除确认对话框
+			});
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

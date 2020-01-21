@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet"	href="/css/commform.css" />
+</head>
+<!-- 修改对话框 -->
+<body>
+
+
+
+	<div class="row clearfix" th:id="${dialogId}+'-table'">
+		<div class="col-md-12 column">
+
+			<div class="btn-group"
+				style="float: right; margin-top: 0px; margin-bottom: 10px; margin-right: 18px;">
+				<button type="button" class="btn btn-outline-info btn-sm btn-save"
+					 id="btn-save">
+					<i class="fa fa-cloud-upload" aria-hidden="true"> <span>确认冲红</span>
+					</i>
+				</button>
+			</div>
+
+		</div>
+		<div class="col-12" style="color: red;">
+			<hr
+				style="color: red; width: 100%; height: 1px; margin-bottom: 10px; margin-top: 0px;">
+		</div>
+		<div class="col-12">
+			<div class="invoice-red-table">
+				<!-- 此处加载table界面 -->
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- 发票冲红对话框JS -->
+	<script type="text/javascript" src="/js/tax/TaxInvoiceRedForm.js"></script>
+	<!-- 正则表达式验证 -->
+	<script src="/jquery/jquery-validation/jquery.validate.min.js"></script>
+	<script src="/jquery/jquery-validation/messages_zh.js"></script>
+
+	</th:block>
+
+</body>
+</html>

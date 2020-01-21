@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+
+	<!-- 保存客户ID -->
+	<input type="hidden" id="location-customer-id" value="0" />
+	<!-- 批次列表 -->
+	<table class="table table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>地址</th>
+				<th>客户名称</th>
+				<th>客户手机</th>
+				<!-- <th>是否默认</th> -->
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${customerMapList}">
+			
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.ID},data-bind=${item.ID}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.ID}"></label>
+					</div> 
+				</td>
+				
+				<!-- 地址-->
+				<td th:text="${item.place}">地址</td>
+				<!-- 业主名称-->
+				<td th:text="${item.CUSTOMER_NAME}">客户名称</td>
+				<!-- 业主手机-->
+				<td th:text="${item.CUSTOMER_MOBILE}">客户手机</td>
+				<!-- 是否默认-->
+				<!-- <td>
+					<span th:if="${item.DEFAULT_CUSTOMER==0}">是</span>
+					<span th:if="${item.DEFAULT_CUSTOMER==1}">否</span>
+				</td> -->
+				<!-- 操作列 -->
+				<td>
+					<!-- 设置为默认 -->
+					<!-- <button type="button" class="set-default-customer-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.ID}" title="设置为默认客户">
+						<i class="fa fa-tags" aria-hidden="true"></i>
+					</button> -->
+					<!-- 详情 -->
+					<button type="button" class="customer-detail-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.ID}, data-customer-type=${item.CUSTOMER_TYPE}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>详情</span>
+					</button> 
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerLocationCustomer')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		/**
+		 * 	获取客户ID
+		 */
+		function getCustomerIdFn(){
+			return $("#location-customer-id").val();
+		}
+		/**
+		 * 	设置客户ID
+		 */
+		function setCustomerIdFn(customerId){
+			 $("#location-customer-id").val(customerId);//设置全局客户ID
+		}
+	
+		$(".set-default-customer-single").on("click", function(){
+			var location = getSelectedTreeNodeFn();
+			if(location==null){
+				//dialog type: success warning info error,默认为info
+				util.message("请选择地理位置！",null,"warning");
+				return;
+			}
+			var locationId = location.id;
+			var customerId = $(this).attr("bind-id"); //条目ID
+			
+			var url = BASE_CONTEXT_PATH + "/location/set-default-customer";;
+			var parms = new Object();
+			parms.locationId = locationId;
+			parms.customerId = customerId;
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						getMeterAndCustomerTable(locationId);//加载表计档案和客户档案table
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		});
+		
+		//-----------------打开详情对话框------------------
+		/* 
+			加载详情对话框 
+		*/
+		$('.customer-detail-single').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/location/loadmodicustomerialog';
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+			setCustomerIdFn(itemId);
+			loadCustomerDetail(itemId);
+		
+		});
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openLocationCustomerDialog() {
+			//	可拖拽
+			$("#modal-container-customer-edit").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-customer-edit').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+		
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeLocationCustomerDialog() {
+			$("#modal-container-customer-edit").modal("hide");
+		}
+	
+		function loadCustomerDetail(customerId){
+			var customerId = getCustomerIdFn();
+			var url = BASE_CONTEXT_PATH+"/location/load-customer-detail-table";
+			var parms = {"customerId":customerId};
+			
+			$("#modal-container-customer-edit #load-customer-detail-table").load(url, parms, function(){
+				openLocationCustomerDialog();
+				windowResize();
+			});
+		}
+		function windowResize(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+		});
+		//创建分页组件实例
+		var pager=new Pager("pagerLocationCustomer");
+		$(function(){			
+			pager.init(loadLocationCustomerPage,curr_searchCond);			
+		});
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>普通发票卷选择对话框-组件UI部分</title>
+</head>
+<body>
+	<th:block th:fragment="dialog(dialogId)">
+	<div class="modal fade" th:id="${dialogId}" role="dialog"	aria-labelledby="myModalLabel" aria-hidden="true">
+		<style>
+			.invoice-vol-table tbody tr.curr{
+				background-color:darkcyan;
+				color:white;
+			}
+		</style>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<!-- 对话框头 -->
+				<div class="modal-header" style="background-color:darkcyan;height:30px;padding-top:0px;padding-bottom:0px;">
+					<!-- <h5 class="modal-title">Modal title</h5> -->
+					<span style="height:30px; line-height:30px;padding:0px;margin:0px;color:white;">
+						<i class="fa fa-film" aria-hidden="true" style="color:white;"></i>
+						<span class="dialog-title">Modal title</span>
+					</span>
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<!-- 对话框主体 -->
+				<div class="modal-body" style="padding-top:10px;height:300px;">
+					<div class="row">
+					<div class="col-12">
+						<div class="btn-group" style="float:right;">
+							<button type="button" class="btn btn-secondary btn-sm btn-choice-invoice-vol" ><i class="fa fa-check-circle-o" aria-hidden="true" style="color:lightgreen;"></i>&nbsp;选择</button>
+							<button type="button" class="btn btn-secondary btn-sm" style="color:lightgreen">|</button>
+							<button type="button" class="btn btn-secondary btn-sm btn-exit" ><i class="fa fa-stop-circle-o" aria-hidden="true" style="color:orange;"></i>&nbsp;退出</button>		    
+						</div>
+					 </div>
+					 </div>
+					 <div class="table-responsive-sm" style="padding-top:10px;">
+						  <!-- <h2>较小的表格</h2>
+						  <p>.table-sm 类用于通过减少内边距来设置较小的表格:</p> -->
+						  <!-- table-response -->            
+						  <table class="table table-bordered table-sm  table-hover  invoice-vol-table">
+						    <thead class="thead-default">
+						      <tr>
+						        <th>序号</th>
+						        <th>发票种类</th>
+						        <th>类别代码</th>
+						        <th>起始号码</th>
+						        <th>发票张数</th>
+						      </tr>
+						    </thead>
+						    <tbody>
+						      <tr class="curr" >
+						        <td>1</td>
+						        <td>普通发票</td>
+						        <td>DM001</td>
+						        <th>DM001-001</th>
+						        <th>100</th>
+						      </tr>
+						      <tr>
+						        <td>2</td>
+						        <td>普通发票</td>
+						        <td>DM002</td>
+						        <th>DM002-001</th>
+						        <th>300</th>
+						      </tr>
+						      
+						    </tbody>
+						  </table>
+					</div>				
+					
+				</div>
+				<!-- 对话框底部按钮 -->
+				<!-- <div class="modal-footer">
+					<button type="button" class="btn btn-primary  button-preview" >预览</button>
+					<button type="button" class="btn btn-primary  button-print-yes" >打印</button>
+					<button type="button" class="btn btn-primary  button-print-no"	data-dismiss="modal">不打印</button>
+				</div> -->
+			</div>
+		</div>
+	</div>
+	<!-- end of dialog -->
+	</th:block>
+</body>
+</html>

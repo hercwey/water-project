@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!-- 地理位置组件-UI部分 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>地理位置</title>
+
+</head>
+<body>
+
+	<th:block th:fragment="tree(treeId)">
+		<!-- 主界面(操作页板+列表容器) -->
+		<div class="row clearfix medic-label" th:id="${treeId}">
+			<div class="col-md-12 column" style="padding-left:2px;padding-right:2px;">
+				<!-- 查询面板 -->
+				<div class="row" id="">
+					<div class="col-md-12 column" style="display:inline-block; ">
+						<div class="search-ztree-form">
+							<div class="input-group input-group-sm">
+								<input type="text" class="form-control search-cond" id="" placeholder="请输入编码/名称"  style="display:inline-block;" />
+								<div class="input-group-append">
+							        <button type="button" class="btn btn-success input-group-text search-btn" id="" title="查询" style="height:100%; display:inline-block;">
+										<i class="fa fa-search" aria-hidden="true"></i>
+									</button>
+									<button type="button" class="btn btn-success input-group-text search-clear-btn" id="" title="清除" style="height:100%; display:inline-block;">
+										<i class="fa fa-times" aria-hidden="true"></i>
+									</button>
+									<button type="button" class="btn btn-success input-group-text search-prev-btn" id="" title="上一个" style="height:100%; display:inline-block;">
+										<i class="fa fa-chevron-left" aria-hidden="true"></i>
+									</button>
+									<button type="button" class="btn btn-success input-group-text search-next-btn" id="" title="下一个" style="height:100%; display:inline-block;">
+										<i class="fa fa-chevron-right" aria-hidden="true"></i>
+									</button>
+						    	</div>
+						    </div>
+						</div>
+					</div>
+				</div>
+				<!-- 容器:列表 -->
+				<div class="table-container">
+					<ul class="ztree" th:id="'location-tree-'+${treeId}"  style="margin-top: 1px"></ul>
+				</div>
+				
+			</div>
+		</div>
+
+	</th:block>
+</body>
+</html>

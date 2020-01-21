@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+					
+					<div class="modal-content">
+
+						<!-- 主体(用于展示表单) -->
+						<div class="modal-body">
+							<form class="form-horizontal " role="form" id="dialog-modi-group-form">
+								
+								<!-- 当前所编辑的条目ID -->
+								<input type="hidden" id="curr-notify-group-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+								
+								
+								<!-- 表单内容 -->
+								<!-- form-inline -->
+																	
+								<!-- 采用表格进行布局 -->
+								<!-- 配置费规则部分 -->
+								<table class="table-layout table">
+									<tbody>
+										<!-- 第二次优化时打开 -->
+										<tr>
+									
+											<td>
+												<!-- 客户 -->
+												<div class="form-group form-inline">
+													<label for="record-description" class="col-sm-4 control-label">客户&nbsp;<i style="color: red">*</i> </label>
+													<span class="input-group-sm col-sm-8">
+														<input type="hidden" id="group-customer-id" name="customerId" th:value="${currItem==null ? '' : currItem.customerId}" />
+														<input type="text" class="form-control"
+																th:value="${customer==null ? '' : customer.customerName}"
+																id="group-customer-name" name="customerName" readonly="readonly" onclick="getCustomerList()"
+																maxlength=20 title="请先选择客户" placeholder="请选择客户" required/>
+													</span>
+												</div>
+											</td>
+										</tr> 		
+										
+										<tr>
+											<td>
+												<!-- 分组名称 -->
+												<div class="form-group form-inline">
+													<label for="record-name" class="col-sm-4 control-label">分组名称&nbsp;<i style="color: red">*</i> </label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text"
+																th:value="${currItem==null ? '' : currItem.name}" 
+																class="form-control" 
+																id="notify-group-name" name="name" 
+																maxlength=20 title="请输入1-20位字符" placeholder="分组名称" required/>
+													</span>
+												</div>
+											</td>											
+										</tr>
+										<tr>
+											<td>
+												<!-- 包含关系-->
+												<div class="form-group form-inline">
+													<label for="user-sex" class="col-sm-4 control-label">包含关系&nbsp;<i style="color: red">*</i> </label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control" id="notify-group-include-flag" name="includeFlag" required>
+															<!-- 默认选择第一个 -->
+															<span th:each="item,iterStat: ${groupIncludeFlagList}" th:remove="tag">
+																<option th:value="${item.value}" th:text="${item.name}" th:attr="selected=${currItem!=null && currItem.includeFlag==item.value ? 'true' : 'false'}">名称</option>
+															</span>
+														</select>
+													</span>
+												</div>
+											</td>
+											
+										</tr>
+										<tr>
+											<td>
+												<!-- 是否使用地理位置-->
+												<div class="form-group form-inline">
+													<label for="user-sex" class="col-sm-4 control-label">使用地理位置&nbsp;<i style="color: red">*</i> </label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control" id="notify-group-use-location" name="useLocation" required>
+															<!-- 默认选择第一个 -->
+															<span th:each="item,iterStat: ${useLocationList}" th:remove="tag">
+																<option th:value="${item.value}" th:text="${item.name}" th:attr="selected=${currItem!=null && currItem.useLocation==item.value ? true : false}">名称</option>
+															</span>
+														</select>
+													</span>
+												</div>
+											</td>
+											
+										</tr>
+										
+									</tbody>
+									
+								</table>
+																										
+							</form>
+						</div>
+
+						<!-- 尾部 -->
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary btn-sm" id="btn-record-modify-and-back">保存&返回</button>
+						</div>
+						
+					</div>
+
+
+
+			</div>
+		</div>
+		
+		
+	<!-- 选择客户开票信息对话框 -->
+	<div th:include="customers/selectcustomer/select_customer_dialog::dialog('customer-dialog-1')"></div>
+	<!-- 选择客户开票信息JS -->
+	<script type="text/javascript" th:src="@{/js/component/selectcustomer/SelectCustomer.js}"></script>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		var dialogId = "customer-dialog-1";
+		/**
+		 * 	用户选择开票信息的回调函数
+		 */
+		function selectedCallback(customer){
+			console.log("----------selected callback");
+			console.log("user selected customer id is : "+JSON.stringify(customer));
+			
+			$("#group-customer-id").val(customer.customerId);
+			$("#group-customer-name").val(customer.customerName);
+			
+		}
+	
+		//创建实例
+		var selectCustomerDialog = new SelectCustomer(dialogId, selectedCallback);
+		/*
+			点击水表输入框click事件
+		*/
+		function getCustomerList(){
+			selectCustomerDialog.open();//主页:默认查询(加载默认列表)
+		}
+		
+		//-------------------	通用打开/关闭对话框功能	--------------------
+		/*
+		 * 	打开(Open)对话框
+		 */
+		function openDialogFn(dialogId) {
+			//可拖拽
+			$("#"+dialogId).draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$("#"+dialogId).modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+		 *	关闭(CLOSE)对话框
+		 */
+		function closeDialogFn(dialogId) {
+			$("#"+dialogId).modal("hide");
+		}
+	
+		
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiRecordItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/water-notify-group/insert";
+			
+			var recordId= $("#curr-notify-group-id").val();
+			if(recordId!=null && recordId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/water-notify-group/update";
+			}
+			var customerId = $("#dialog-modi-group-form #record-customer-id").val();//客户的ID
+			console.log(customerId);
+			var form=new FormData($("#dialog-modi-group-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							showNotifyGroupItem();//显示分组选项卡
+							loadPageClickPageNum();  //	重新刷新当前页面
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		
+		
+		$.validator.setDefaults({//验证成功后，保存数据
+		    submitHandler: function() {
+		    	modiRecordItem(true);	
+		     	//alert("提交事件!");
+		    }
+		});
+		
+		$(function() {
+			
+			
+			//---------------	init	---------------
+			$("#dialog-modi-group-form").validate({//设置正则验证
+			    rules: {
+			    	meterPlace: {
+			          required: true,
+			        },
+			      },
+			      messages: {
+			    	  meterPlace: "请选择一个水表",
+			       }
+			      });
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-record-modify-and-back').on('click',function() {
+				var customerId = $("#dialog-modi-group-form #group-customer-name").val();//客户的ID
+				console.log("=============================================="+customerId)
+				$("#dialog-modi-group-form").submit();
+				
+							
+			});
+			
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

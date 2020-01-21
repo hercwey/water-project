@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!-- wechat-用户绑定页 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')" th:remove="tag"></div> -->
+
+
+<style>
+hr.style-one { /*内嵌水平线*/
+	width: 70%;
+	margin: 0 auto;
+	margin-bottom: 10px; border : 0;
+	height: 0;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+	border: 0;
+}
+
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+hr.style-three { /*渐变*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background: #333;
+	background-image: linear-gradient(to right, #ccc, #333, #ccc);
+}
+</style>
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h5 style="text-align: center; margin-top: 10px;">用户绑定</h5>
+				<hr class="style-two" /> -->
+				<div th:include="wechat/public_page/header::header('用户绑定')" th:remove="tag"></div>
+
+				<form class="form-horizontal " role="form" id="bind-customer-form">
+					<!-- 用户编号-->
+					<div class="form-group form-inline">
+						<label for="customers-code" class="col-sm-4 ">用户编号 <i
+							class="fa fa-tag" aria-hidden="true" title="必填"
+							style="color: red"></i>
+						</label> 
+						<input class="form-control col-sm-8 btn-lg" type="text"
+							id="customers-code" name="customerCode" maxlength=30
+							title="请输入1-30个字符" placeholder="请输入开户时的用户编号" />
+
+					</div>
+
+					<!-- 用户姓名-->
+					<div class="form-group form-inline">
+						<label for="customers-name" class="col-sm-4 ">姓名 <i
+							class="fa fa-tag" aria-hidden="true" title="必填"
+							style="color: red"></i>
+						</label> 
+						<input type="text" class="form-control col-sm-8 btn-lg"
+							id="customers-name" name="customerName" maxlength=30
+							title="请输入1-30个字符" placeholder="请输入姓名" />
+
+					</div>
+
+					<!-- 用户手机号码-->
+					<div class="form-group form-inline">
+						<label for="customers-mobile" class="col-sm-4 control-label">手机号码
+							<i class="fa fa-tag" aria-hidden="true" title="必填"
+							style="color: red"></i>
+						</label> <input type="text" class="col-sm-8 form-control btn-lg"
+							id="customers-mobile" name="customerMobile" maxlength=11
+							title="请输入11个字符" placeholder="请输入手机号码" />
+					</div>
+
+					<!--短信验证码  注:暂时未用-->
+					<div class="form-group form-inline">
+						<label for="sm-code" class="col-sm-4 control-label">验证码</label> <input
+							type="text" class="col-sm-8 form-control btn-lg" id="sm-code"
+							name="smCode" maxlength=11 title="请输入11个字符" placeholder="请输入手机号码" />
+					</div>
+
+					<!--提交按钮-->
+					<div class="form-group form-inline">
+						<button type="button" id="btnConfirm" name="btnConfirm"
+							class="btn btn-primary btn-lg btn-block">提交绑定</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		
+		<!-- <div class="row">
+			<div th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')" th:remove="tag"></div>
+		</div> -->
+		
+		<div class="weui-footer ">
+			<p class="weui-footer__links" style="margin-bottom:5px;">
+				<a href="#" class="weui-footer__link">石家庄高新区供水排水公司</a>
+			</p>
+			<p class="weui-footer__links" style="margin-bottom:5px;">
+				<a href="#" class="weui-footer__link">供水热线:69099838</a>
+			</p>
+			<!-- <p class="weui-footer__text">Copyright &copy; 石家庄高新区供排水公司</p> -->
+		</div>
+		
+		
+	</div>
+
+
+
+</body>
+</html>

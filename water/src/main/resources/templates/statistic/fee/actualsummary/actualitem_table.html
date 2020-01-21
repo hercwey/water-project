@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<th:block th:fragment="table">
+		<table class="table table-sm" id="meter-record-table">
+		<thead>
+			<tr>
+				<th>水价名称</th>
+				<th>基础水价</th>
+				<th>污水处理费</th>
+				<th>应缴金额</th>
+				<th>已缴金额</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${dataList}">
+			
+				<!-- 水价名称 -->
+				<td th:text="${item.PRICE_NAME}">水价名称</td>
+				<!-- 基础水价-->
+				<td th:text="${item.BASE_PRICE}">基础水价</td>
+				<!-- 污水处理费-->
+				<td th:text="${item.TREATMETN_FEE}">污水处理费</td>
+				<!-- 应缴金额 -->
+				<td th:text="${item.PAYABLE_AMOUNT}">应缴金额</td>
+				<!-- 已缴金额 -->
+				<td th:text="${item.PAID_AMOUNT}">已缴金额</td>
+			</tr>
+			<tr>
+				<td colspan="3">统计：</td>
+				<td th:text="${payableTotalAmount}">应缴总金额</td>
+				<td th:text="${paidTotalAmount}">已缴总金额</td>
+			</tr>
+		</tbody>
+	</table>
+	</th:block>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-app-record-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>编辑:APP抄表记录</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal app-record-form" role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="app-record-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 上期抄表日期-->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-4 control-label">上期抄表日期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control input-sm Wdate" width="500px"
+																	id="record-pre-date" name="preDate"		
+																	th:value="${currItem==null ? '' : currItem.preDateStr}"				
+																	onClick="WdatePicker({dateFmt:'yyyy-MM-dd',onpicked: setBackGround});"
+																	placeholder="上期抄表日期" style="background-color: white;" title="上期抄表日期">
+														</span>
+													</div>
+												</td>											
+												<td>
+													<!-- 上期抄表底数-->
+													<div class="form-group form-inline">
+														<label for="role-description" class="col-sm-4 control-label">上期表底</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="number" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.preRead}" 
+																	id="record-pre-read" name="currRead" 
+																	maxlength=20 title="请输入1-20位字符" placeholder="上期表底"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											
+											<tr>
+												<td>
+													<!-- 本期抄表日期-->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-4 control-label">本期抄表日期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control input-sm Wdate" width="500px"
+																	id="record-curr-date" name="currDate"		
+																	th:value="${currItem==null ? '' : currItem.currDateStr}"				
+																	onClick="WdatePicker({dateFmt:'yyyy-MM-dd',onpicked: setBackGround});"
+																	placeholder="本期抄表日期" style="background-color: white;" title="本期抄表日期">
+														</span>
+													</div>
+												</td>											
+												<td>
+													<!-- 本期抄表底数-->
+													<div class="form-group form-inline">
+														<label for="role-description" class="col-sm-4 control-label">本期表底</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="number" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.currRead}" 
+																	id="record-curr-read" name="currRead" 
+																	maxlength=20 title="请输入1-20位字符" placeholder="本期表底"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<!-- <tr>
+												<td>
+													抄表方式
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-4 control-label">抄表方式</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="record-read-mode" name="readMode" th:value="${currItem==null ? '' : currItem.readMode}" required>
+																默认选择第一个
+																<span th:each="item,iterStat: ${readModeList}" th:remove="tag">
+																	<span th:if="${item.key=='MANUAL'}">
+																		<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.readMode ? 'true':'false'}"
+																				th:text="${item.value}">数据字典的值</option>
+																	</span>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+												<td>
+													抄表类型
+													<div class="form-group form-inline">
+														<label for="user-sex" class="col-sm-4 control-label">抄表类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="record-read-type" name="readType" th:value="${currItem==null ? 0 : currItem.readType}" required>
+																默认选择第一个
+																<option value="0" th:attr="selected=( ${currItem!=null && currItem.readType==0} )? 'selcted' ">正常抄表</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.readType==1} )? 'selcted' ">估抄</option>
+																<option value="2" th:attr="selected=( ${currItem!=null && currItem.readType==2} )? 'selcted' ">预抄</option>												
+															</select>
+														</span>
+													</div>
+												</td>	
+											</tr> -->
+											
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		/*
+		 *	设置日期插件input背景色
+		 */
+		function setBackGround() {
+			$("#record-curr-date").css("background-color", "white");
+		}
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			
+			var appRecordId= $("#app-record-id").val();
+			
+			var currRead = $(".app-record-form #record-curr-read").val();//本期抄表底数
+			var currDate = $(".app-record-form #record-curr-date").val();//本期抄表日期
+			
+			var preRead = $(".app-record-form #record-pre-read").val();//上期抄表底数
+			var preDate = $(".app-record-form #record-pre-date").val();//上期抄表日期
+			
+			urlStr = BASE_CONTEXT_PATH + "/app-meter-record/update";
+			var parm = new Object();
+			parm.appRecordId = appRecordId;
+			parm.preRead = preRead;
+			parm.preDate = preDate;
+			parm.currRead = currRead;
+			parm.currDate = currDate;
+			//parm.readMode = readMode;
+			//parm.readType = readType;
+			console.log(JSON.stringify(parm))
+			
+			$.post(urlStr, parm, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeModiDialog();
+						loadPageClickPageNum();
+						util.message(res.result_msg,null,"warning");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+			
+			//var form=new FormData($("#dialog-modi-form")[0]);
+			//return false;
+			/* $.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				processData:false,
+         		contentType:false,
+				data : parm,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadPageClickPageNum();  //	重新刷新当前页面
+							closeModiRecordDialog();
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			}); */
+			
+			
+			
+			/* $.post(urlStr, parm, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeModiDialog();
+						loadPageClickPageNum();
+						util.message(res.result_msg,null,"warning");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			}); */
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				
+				var sysDate = new Date();//系统日期
+				
+				var currRead = $(".app-record-form #record-curr-read").val();//本期抄表底数
+				var currDate = $(".app-record-form #record-curr-date").val();//本期抄表日期
+				
+				var preRead = $(".app-record-form #record-pre-read").val();//上期抄表底数
+				var preDate = $(".app-record-form #record-pre-date").val();//上期抄表日期
+				
+				//var appRecordId= $("#app-record-id").val();
+				
+				if(preRead==null || preRead=="" || preDate==null || preDate==""){
+					//dialog type: success warning info error,默认为info
+					util.message("上期抄表日期和表底均不能为空！",null,"warning");
+					return false;
+				}
+				if(currDate==null || currDate=="" || currRead==null || currRead==""){
+					//dialog type: success warning info error,默认为info
+					util.message("本期抄表日期和表底均不能为空！",null,"warning");
+					return false;
+				}
+				
+				if(preDate>currDate){
+					//dialog type: success warning info error,默认为info
+					util.message("上期抄表日期必须小于本期抄表日期！",null,"warning");
+					return false;
+				}
+				var fmtSysDate = dateFtt("yyyy-MM-dd",sysDate);//格式化系统日期
+				if(currDate>fmtSysDate){
+					//dialog type: success warning info error,默认为info
+					util.message("本期抄表日期必须小于当前日期！",null,"warning");
+					return false;
+				}
+				
+				/* if(preRead>currRead){
+					//dialog type: success warning info error,默认为info
+					util.message("上期表底必须小于本期表底！",null,"warning");
+					return false;
+				} */
+				
+				modiItem(true);
+				
+			});
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>下载红字信息表-查询对话框</title>
+</head>
+<body>
+	<th:block th:fragment="dialog(dialogId)">
+		<div class="modal fade download-redinfo-dialog" th:id="${dialogId}" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document" style="width:400px;">
+				<div class="modal-content">
+					<!-- 对话框头 -->
+					<div class="modal-header"
+						style="background-color: darkcyan; height: 30px; padding-top: 0px; padding-bottom: 0px;">
+						<!-- <h5 class="modal-title">Modal title</h5> -->
+						<span
+							style="height: 30px; line-height: 30px; padding: 0px; margin: 0px; color: white;">
+							<span class="dialog-title">Modal title</span>
+						</span>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<!-- 对话框主体 -->
+					<div class="modal-body" style="height:340px;">
+						<ul
+							style="list-style-type: none; padding-left: 0px; margin-left: 30px; margin-right: 30px;">
+							<li style="margin-bottom: 10px;">
+								<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+									<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">填写日期</legend>
+									<p style="margin-bottom:5px;">填开日期始:
+										<input type="text" class="Wdate query-date-start" readonly="readonly" style="width: 200px;"										
+										onClick="WdatePicker({dateFmt:'yyyy-MM-dd'});"
+										placeholder="期间" title="期间" />
+									</p>
+										
+									<p style="margin-bottom:5px;">填开日期止:
+										<input type="text" class="Wdate query-date-end" readonly="readonly" style="width: 200px;"											
+											onClick="WdatePicker({dateFmt:'yyyy-MM-dd'});"
+											placeholder="期间" title="期间" /></p>
+								</fieldset>
+							</li>
+							<li style="margin-bottom: 10px;">
+								<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+									<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">信息表信息</legend>
+									<p style="margin-bottom:5px;">购买方税号: <input type="text" class="buyer-tax-no"	style="width: 200px;" ></p>
+									<p style="margin-bottom:5px;">销售方税号: <input type="text" class="saler-tax-no"	style="width: 200px;" ></p>
+									<p style="margin-bottom:5px;">信息表编号: <input type="text" class="red-info-no"	style="width: 200px;" ></p>
+								</fieldset>
+							</li>	
+							<li style="margin-bottom: 10px;">
+								<fieldset style="padding:.35em .625em .75em;margin:0 2px;border:1px solid silver;">
+									<legend style="padding:.5em;border:0;width:auto;font-size:12px;padding-top:0px;padding-bottom:0px;margin-bottom:0px;">下载范围</legend>
+									 <p style="margin-bottom:5px;">
+									 	<input type="checkbox" class="check-self" th:id="${dialogId}+'-self'" checked="checked">
+									 	<label th:attr="for=${dialogId}+'-self'" style="margin-bottom:0px;">本企业填的红字信息表</label>
+									 </p>
+									 <p style="margin-bottom:5px;">
+									 	<input type="checkbox" class="check-other" th:id="${dialogId}+'-other'" checked="checked">
+									 	<label th:attr="for=${dialogId}+'-other'" style="margin-bottom:0px;">其它企业作为购买方填写的红字信息表</label>
+									 </p>									
+								</fieldset>
+							</li>
+						</ul>
+
+					</div>
+					<!-- 对话框底部按钮 -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary  button-ok">确定</button>
+						<button type="button" class="btn btn-primary  button-cancel" data-dismiss="modal">取消</button>						
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- end of dialog -->
+	</th:block>
+</body>
+</html>

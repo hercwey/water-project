@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 用户列表 -->
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>ID</th>
+				<th>用户名</th>
+				<th>昵称</th>
+				<th>真实姓名</th>
+				<th>电话</th>
+				<th>手机号</th>
+				<th>电子邮箱</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${userList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<td th:text="${item.id}">用户ID</td>
+				<td th:text="${item.username}">用户名</td>
+				<td th:text="${item.nickname}">昵称</td>
+				<td th:text="${item.realname}">真实姓名</td>
+				<td th:text="${item.tel}">电话</td>
+				<td th:text="${item.mobile}">手机</td>
+				<td th:text="${item.email}">电子邮箱</td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 授权 -->
+					<button type="button" class="role-auth-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>授权</span>
+					</button>
+					<!-- 修改 -->
+					<button type="button" class="modi-user-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>编辑</span>
+					</button> 
+					<!-- 删除 -->
+					<button type="button" class="del-user-single btn btn-secondary btn-sm"
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>删除</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerUser')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function delBatchItem(ids) {
+			var urlStr = BASE_CONTEXT_PATH+"/user/delete"; // 需要提交的url
+			
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadPage();
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+	
+		//--------------批量删除-----------------
+		
+		/*
+			批量删除确认
+		*/
+		function userDeleteConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录? ", "xxx", "ok_callback_name", "cancel_callback_name")			
+		}
+		
+		/*
+			批量删除确认:确认(回调)
+		*/
+		function ok_callback_name(id){
+			var ids=getSelectedIds();  //此函数定义于_table.html中
+			delBatchItem(ids);
+		}
+		
+		/*
+			批量删除确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		/* 
+			角色授权
+		*/
+		$('.role-auth-single').on('click', function() {
+			var userId = $(this).attr("bind-id"); //分录ID
+			//console.log("userId:" + userId);
+			//alert(userId);
+			$("#role-auth-user-id").val(userId);//设置当前授权的用户ID
+			
+			var urlStr = BASE_CONTEXT_PATH+"/user/select-role-auth"; // 需要提交的url
+			
+			$.ajax({
+				type : "get", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : {"userId": userId},
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							$(".role-auth-selector").prop("checked", false);
+							var userRefRoleList = res.userRefRoleList;
+							$.each(userRefRoleList, function(){
+								var roleIdYes = this.roleId;//已授权的角色ID
+								$(".role-auth-selector").each(function(index, elem) {
+									var roleIdNo = $(this).attr("data-bind"); //未授权的角色ID
+									if(roleIdNo==roleIdYes){
+										$(this).prop("checked", true);
+									}
+								});
+							});
+							openRoleAuthDialog();//打开角色授权对话框
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+			
+		});
+		/**
+		  	打开角色授权对话框
+		  	@returns
+		 */
+		function openRoleAuthDialog() {
+			//	可拖拽
+			$("#modal-container-role-auth-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-role-auth-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			close dialog:角色授权对话框 
+		*/
+		function closeRoleAuthDialog() {
+			$("#modal-container-role-auth-dialog").modal("hide");
+		}
+		
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.del-user-single').on('click', function() {
+			var userId = $(this).attr("bind-id"); //分录ID
+			//console.log("userId:" + userId);
+			util.delConfirm("确认删除此条目?", userId, "deleteUserSingle");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteUserSingle(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delBatchItem(idsArr);
+		}
+				
+		
+		//--------单个修改---------
+		/* 
+			加载修改批次对话框 
+		*/
+		$('.modi-user-single').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/user/loadmodidialog';
+
+			var userId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.userId = userId;
+
+			$("#user-dialog-edit").load(url, parms,openModiUserDialog); //加载完毕后显示 
+			
+		});
+		
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openModiUserDialog() {
+			//	可拖拽
+			$("#modal-container-user-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-user-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeModiUserDialog() {
+			$("#modal-container-user-dialog").modal("hide");
+		}
+				
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		
+		//创建分页组件实例
+		var pager=new Pager("pagerUser");
+		$(function(){			
+			pager.init(loadPage,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

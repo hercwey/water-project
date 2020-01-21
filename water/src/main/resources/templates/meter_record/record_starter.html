@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('抄表记录')" th:remove="tag"></div>
+<!-- 页面正在加载loading-->
+<script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>
+</head>
+<body>
+	<!-- 参数配置主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<!-- <div>
+					<span th:if="${readType==null}">
+						<h4 class="panel-title">抄表记录</h4>
+					</span>
+					<span th:if="${readType!=null && readType==1}">
+						<h4 class="panel-title">估抄记录</h4>
+					</span>
+					<span th:if="${readType!=null && readType==2}">
+						<h4 class="panel-title">预抄记录</h4>
+					</span>
+					<hr style="height:1px;border:none;border-top:1px solid blue;">
+				</div> -->
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var g_readType = [[${readType}]];
+		/*]]>*/
+	</script>
+	<script>
+	
+		$(function() {
+			/* 
+				加载用户框架页
+			*/
+			function loadMeterRecordList(parms, callback) {
+				var url = "/meter-record/main";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			var params = {"readType": g_readType};
+			loadMeterRecordList(params, null);
+		})
+	</script>
+
+</body>
+</html>

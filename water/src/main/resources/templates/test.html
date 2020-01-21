@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>测试页面</title>
+
+<!-- jQuery Js -->
+<script type="text/javascript" th:src="@{/jquery/3.3.1/jquery-3.3.1.js}"></script>
+<script type="text/javascript" th:src="@{/jquery/jquery.form.js}"></script>
+
+<script type="text/javascript" th:src="@{/jquery/ajaxFileUpload.js}"></script>
+
+<div th:include="common/common_head::headx('测试')" th:remove="tag"></div>
+
+</head>
+<body>
+<div>
+<form class="form-horizontal" id="">
+	<input type="file" id="img" name="img"
+				onchange="javascript:validateImgFileSizeFun(this);"
+				accept="image/*" multiple="multiple" />
+	<div id="thumbnail-portrait"></div>
+	<button type="button" id="upload-img">上传图片</button>
+</form>
+<br>
+<form class="form-horizontal" id="">
+	<input type="file" id="excel-location" name="excelLocation"
+				onchange="javascript:validateImgFileSizeFun(this);"
+				accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+	<div id="thumbnail-portrait"></div>
+	<button type="button" id="upload-excel-location">上传地理位置Excel</button>
+</form>
+<br>
+<form class="form-horizontal" id="">
+	<input type="file" id="excel-meter" name="excelMeter"
+				onchange="javascript:validateImgFileSizeFun(this);"
+				accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+	<div id="thumbnail-portrait"></div>
+	<button type="button" id="upload-excel-meter">上传表计Excel</button>
+</form>
+<br>
+<form class="form-horizontal" id="">
+	<input type="file" id="excel-customer" name="excelCustomer"
+				onchange="javascript:validateImgFileSizeFun(this);"
+				accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+	<div id="thumbnail-portrait"></div>
+	<button type="button" id="upload-excel-customer">上传客户Excel</button>
+</form>
+
+<br>
+<form class="form-horizontal" id="">
+	<button type="button" id="update-app-meter-record">更新全部APP抄表记录上期表底</button>
+</form>
+
+</div>
+<div id="uploaded">
+
+</div>
+
+
+<!-- 选择客户开票信息对话框 -->
+<div th:include="customers/invoice/invoice_select_customer_dialog::dialog('invoice-dialog-1')"></div>
+<!-- 选择客户开票信息JS -->
+<script type="text/javascript" src="/js/component/selectinvoice/SelectCustomerInvoice.js"></script>
+
+<button type="button" id="open-customer-dialog">打开客户开票信息对话框</button>
+
+<script type="text/javascript">
+
+	var dialogId = "invoice-dialog-1";
+	/**
+	 * 	用户选择开票信息的回调函数
+	 */
+	function selectedCallback(invoice){
+		console.log("----------selected callback");
+		console.log("user selected invoice id is : "+JSON.stringify(invoice));
+	}
+
+	//创建实例
+	var selectCustomerInvoiceDialog = new SelectCustomerInvoice(dialogId, selectedCallback);
+	
+	/**
+	 * 	绑定打开客户开票信息对话框按钮的click事件
+	 */
+	$("#open-customer-dialog").on("click", function(){
+		console.log("dialog id is : "+selectCustomerInvoiceDialog.dialogId);
+		selectCustomerInvoiceDialog.defaultSearchCustomerInvoice();//主页:默认查询(加载默认列表)
+	});
+	
+	//-------------------PAGE LOADED READY--------------------
+
+	$(function() {
+		
+		//---------事件绑定--------------
+		
+	});
+</script>
+
+<!-- 发票冲红对话框 -->
+<div th:include="tax_invoice/add_invocie_red_dialog::dialog('invoice-red-dialog-1')"></div>
+<!-- 选择客户账单对话框JS -->
+<script type="text/javascript" src="/js/tax/TaxInvoiceRedDialog.js"></script>
+
+<button type="button" id="open-tax-invocie-red-dialog">打开发票冲红对话框</button>
+
+<script type="text/javascript">
+
+	
+	/**
+	 * 	打开冲红弹窗的回调函数
+	 */
+	function openInvoiceRedCallback(data){
+		console.log("----------selected callback");
+		console.log("user selected bill detail is : "+JSON.stringify(data));
+	}
+
+	var redDialogId = "invoice-red-dialog-1";
+	//创建实例
+	var taxInvoiceRedDialogFun = new TaxInvoiceRedDialogFun(redDialogId, openInvoiceRedCallback);
+	
+	/**
+	 * 	绑定打开水费通知单选择对话框按钮的click事件
+	 */
+	$("#open-tax-invocie-red-dialog").on("click", function(){
+		console.log(taxInvoiceRedDialogFun.dialogId)
+		taxInvoiceRedDialogFun.open("255");//打开对话框
+	});
+	
+	//-------------------PAGE LOADED READY--------------------
+
+	$(function() {
+		
+		//---------事件绑定--------------
+		
+	});
+</script>
+
+
+
+
+
+
+<!-- 选择客户账单对话框 -->
+<div th:include="customers/invoice/bill/select_customer_bill_dialog::dialog('customer-bill-dialog-1')"></div>
+<!-- 选择客户账单对话框JS -->
+<script type="text/javascript" src="/js/component/selectinvoice/SelectCustomerBillDialog.js"></script>
+
+<button type="button" id="open-customer-bill-dialog">打开客户账单对话框</button>
+
+<script type="text/javascript">
+
+	
+	/**
+	 * 	用户选择客户账单的回调函数
+	 */
+	function selectedBillCallback(data){
+		console.log("----------selected callback");
+		console.log("user selected bill detail is : "+JSON.stringify(data));
+	}
+
+	var billDialogId = "customer-bill-dialog-1";
+	//创建实例
+	var selectCustomerBillDialog = new SelectCustomerBillDialog(billDialogId, selectedBillCallback);
+	
+	/**
+	 * 	绑定打开水费通知单选择对话框按钮的click事件
+	 */
+	$("#open-customer-bill-dialog").on("click", function(){
+		console.log("dialog id is : "+selectCustomerBillDialog.dialogId);
+		selectCustomerBillDialog.open("57455", "石家庄学院南院");//打开对话框
+	});
+	
+	//-------------------PAGE LOADED READY--------------------
+
+	$(function() {
+		
+		//---------事件绑定--------------
+		
+	});
+</script>
+
+
+<!-- 选择客户通知单对话框 -->
+<div th:include="customers/invoice/notify/select_customer_notify_dialog::dialog('customer-notify-dialog-1')"></div>
+<!-- 选择客户通知单对话框JS -->
+<script type="text/javascript" src="/js/component/selectinvoice/SelectCustomerNotifyDialog.js"></script>
+
+<button type="button" id="open-customer-notify-dialog">打开客户通知单对话框</button>
+
+<script type="text/javascript">
+
+	
+	/**
+	 * 	用户选择客户通知单的回调函数
+	 */
+	function selectedNotifyCallback(data){
+		console.log("----------selected callback");
+		console.log("user selected notify detail is : "+JSON.stringify(data));
+	}
+
+	var notifyDialogId = "customer-notify-dialog-1";
+	//创建实例
+	var selectCustomerNotifyDialog = new SelectCustomerNotifyDialog(notifyDialogId, selectedNotifyCallback);
+	
+	/**
+	 * 	绑定打开水费通知单选择对话框按钮的click事件
+	 */
+	$("#open-customer-notify-dialog").on("click", function(){
+		console.log("dialog id is : "+selectCustomerNotifyDialog.dialogId);
+		selectCustomerNotifyDialog.open("57455", "石家庄学院南院");//打开对话框
+	});
+	
+	//-------------------PAGE LOADED READY--------------------
+
+	$(function() {
+		
+		//---------事件绑定--------------
+		
+	});
+</script>
+
+
+<!-- 选择客户开票信息对话框 -->
+<div th:include="customers/selectcustomer/select_customer_dialog::dialog('customer-dialog-1')"></div>
+<!-- 选择客户开票信息JS -->
+<script type="text/javascript" src="/js/component/selectcustomer/SelectCustomer.js"></script>
+
+<button type="button" id="open-select-customer-dialog">打开客户对话框</button>
+
+<script type="text/javascript">
+
+	var dialogId = "customer-dialog-1";
+	/**
+	 * 	用户选择开票信息的回调函数
+	 */
+	function selectedCallback(invoice){
+		console.log("----------selected callback");
+		console.log("user selected customer id is : "+JSON.stringify(invoice));
+	}
+
+	//创建实例
+	var selectCustomerDialog = new SelectCustomer(dialogId, selectedCallback);
+	
+	/**
+	 * 	绑定打开客户开票信息对话框按钮的click事件
+	 */
+	$("#open-select-customer-dialog").on("click", function(){
+		console.log("dialog id is : "+selectCustomerDialog.dialogId);
+		selectCustomerDialog.open();//主页:默认查询(加载默认列表)
+	});
+	
+	//-------------------PAGE LOADED READY--------------------
+
+	$(function() {
+		
+		//---------事件绑定--------------
+		
+	});
+</script>
+
+
+<!-- 选择开票账单对话框 -->
+<div th:include="customers/invoice/selectinvoicebill/select_invoice_bill_dialog::dialog('select-invoice-bill-dialog-1')"></div>
+<!-- 选择开票账单JS -->
+<script type="text/javascript" src="/js/component/selectinvoice/SelectInvoiceBillDialog.js"></script>
+
+<button type="button" id="open-select-invoice-bill-dialog">打开选择开票账单对话框</button>
+
+<script type="text/javascript">
+
+	var invoiceBillDialogId = "select-invoice-bill-dialog-1";
+	/**
+	 * 	用户选择开票信息的回调函数
+	 */
+	function selectedInvoiceBillCallback(data){
+		console.log("----------selected callback");
+		console.log("user selected invoice bill is : "+JSON.stringify(data));
+	}
+
+	//创建实例
+	var selectInvoiceBillDialog = new SelectInvoiceBillDialog(invoiceBillDialogId, selectedInvoiceBillCallback);
+	
+	/**
+	 * 	绑定打开选择开票账单对话框按钮的click事件
+	 */
+	$("#open-select-invoice-bill-dialog").on("click", function(){
+		console.log("dialog id is : "+selectInvoiceBillDialog.dialogId);
+		selectInvoiceBillDialog.open("57455", "石家庄学院南院");//打开对话框
+	});
+	
+	//-------------------PAGE LOADED READY--------------------
+
+	$(function() {
+		
+		//---------事件绑定--------------
+		
+	});
+</script>
+
+
+<!-- jQuery Popup Overlay -->
+<!-- <script type="text/javascript" src="/jquery/jquery-popup/jquery.popupoverlay.js"></script>
+<link rel="stylesheet" href="/css/components/invoicenotifytooltip/tooltip.css" /> -->
+<!-- Tooltip -->
+	<!-- <div id="test-tooltip" class="well well--tooltip">
+	    <h4>Tooltip</h4>
+	    <p>
+	    	<code>type:'tooltip'</code> 
+	    	will use the opening link as an anchor for positioning. An anchor can be explicitly set with 
+	    	<code>tooltipanchor</code> 
+	    	option.
+	    </p>
+	    <p>
+	    	<code>offsetleft</code> 
+	    	and 
+	    	<code>offsetleft</code> 
+	    	will set the offset.
+	    </p>
+		<pre class="prettyprint">
+			<code>
+				$('#customer-notify-tooltip').popup({
+				  type: 'tooltip',
+				  tooltipanchor: $('#tooltip_open'),
+				  offsetleft: 0,
+				  offsettop: '-15',
+				  vertical: 'top',
+				  horizontal: 'center'
+				});
+			</code>
+		</pre>
+	    <button class="tooltip_close fall_open btn btn-success">Next example</button>
+	</div>
+<button type="button" id="open-tooltip-open">打开Tooltip</button> -->
+
+<!-- <script type="text/javascript">
+$(function(){
+	$('#test-tooltip').popup({
+		  type: 'tooltip',
+		  tooltipanchor: $('#open-tooltip-open'),
+		  offsetleft: 0,
+		  offsettop: '-15',
+		  vertical: 'top',
+		  horizontal: 'center'
+		});
+	
+	$("#open-tooltip-open").on("click", function(){
+		$('#test-tooltip').popup("show");
+	});
+});
+</script> -->
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+/*
+ * 验证图片文件大小
+ */
+function validateImgFileSizeFun(file){
+	if(isAllowUploadFile(file, 5120, '上传轮播图不能大于5M！')){
+		showPreview(file, 'thumbnail-portrait');
+		$("#upload-img").attr("disabled", false);
+	}else{
+		$("#upload-img").attr("disabled", true);
+	}
+}
+
+$(function(){
+	$("#upload-img").on("click", function(){
+		var url = "/test/upload-img";
+		var params = {"fileType":"img", "inputName":"img"};
+		$.ajaxFileUpload({
+			url: url, //用于文件上传的服务器端请求地址
+		    secureuri: false, //一般设置为false
+		    fileElementId: "img", //文件上传空间的id属性  <input type="file" id="file" name="file" />
+		    dataType: "json", //返回值类型 一般设置为json
+		    data: params,
+		    success: function (res){  //服务器成功响应处理函数
+		    	console.log("success:"+res);
+		    	if(res!=null){
+					if(res.result_code=="success"){
+						$("#uploaded").empty();
+						var filePathList = res.filePathList;
+						var html = "";
+						$.each(filePathList, function(){
+							html += "<img src='"+this+"' height='100px;'>";
+						});
+						$("#uploaded").html(html);
+					}else{
+						util.message(res.result_err_msg);
+					}
+				}
+		    },
+		    error: function (data, status, e){//服务器响应失败处理函数
+		    	console.log("error:"+data);
+		    }
+		});
+	});
+	$("#upload-excel-location").on("click", function(){
+		var url = "/test/upload-excel-location";
+		var params = {"fileType":"excel", "inputName":"excelLocation"};
+		$.ajaxFileUpload({
+			url: url, //用于文件上传的服务器端请求地址
+		    secureuri: false, //一般设置为false
+		    fileElementId: "excel-location", //文件上传空间的id属性  <input type="file" id="file" name="file" />
+		    dataType: "json", //返回值类型 一般设置为json
+		    data: params,
+		    success: function (res){  //服务器成功响应处理函数
+		    	console.log("success:"+res);
+		    	if(res!=null){
+					if(res.result_code=="success"){
+						/* $("#uploaded").empty();
+						var filePathList = res.filePathList;
+						var html = "";
+						$.each(filePathList, function(){
+							html += "<img src='"+this+"' height='100px;'>";
+						});
+						$("#uploaded").html(html); */
+					}else{
+						util.message(res.result_err_msg);
+					}
+				}
+		    },
+		    error: function (data, status, e){//服务器响应失败处理函数
+		    	console.log("error:"+data);
+		    }
+		});
+	});
+	$("#upload-excel-meter").on("click", function(){
+		var url = "/test/upload-excel-meter";
+		var params = {"fileType":"excel", "inputName":"excelMeter"};
+		$.ajaxFileUpload({
+			url: url, //用于文件上传的服务器端请求地址
+		    secureuri: false, //一般设置为false
+		    fileElementId: "excel-meter", //文件上传空间的id属性  <input type="file" id="file" name="file" />
+		    dataType: "json", //返回值类型 一般设置为json
+		    data: params,
+		    success: function (res){  //服务器成功响应处理函数
+		    	console.log("success:"+res);
+		    	if(res!=null){
+					if(res.result_code=="success"){
+						/* $("#uploaded").empty();
+						var filePathList = res.filePathList;
+						var html = "";
+						$.each(filePathList, function(){
+							html += "<img src='"+this+"' height='100px;'>";
+						});
+						$("#uploaded").html(html); */
+					}else{
+						util.message(res.result_err_msg);
+					}
+				}
+		    },
+		    error: function (data, status, e){//服务器响应失败处理函数
+		    	console.log("error:"+data);
+		    }
+		});
+	});
+	$("#upload-excel-customer").on("click", function(){
+		var url = "/test/upload-excel-customer";
+		var params = {"fileType":"excel", "inputName":"excelCustomer"};
+		$.ajaxFileUpload({
+			url: url, //用于文件上传的服务器端请求地址
+		    secureuri: false, //一般设置为false
+		    fileElementId: "excel-customer", //文件上传空间的id属性  <input type="file" id="file" name="file" />
+		    dataType: "json", //返回值类型 一般设置为json
+		    data: params,
+		    success: function (res){  //服务器成功响应处理函数
+		    	console.log("success:"+res);
+		    	if(res!=null){
+					if(res.result_code=="success"){
+						/* $("#uploaded").empty();
+						var filePathList = res.filePathList;
+						var html = "";
+						$.each(filePathList, function(){
+							html += "<img src='"+this+"' height='100px;'>";
+						});
+						$("#uploaded").html(html); */
+					}else{
+						util.message(res.result_err_msg);
+					}
+				}
+		    },
+		    error: function (data, status, e){//服务器响应失败处理函数
+		    	console.log("error:"+data);
+		    }
+		});
+	});
+	
+	$("#update-app-meter-record").on("click", function(){
+		var url = "/import-excel/update-app-record";
+		$.post(url, null, function(res){
+			console.log("success:"+JSON.stringify(res));
+	    	if(res!=null){
+				if(res.result_code=="success"){
+					util.message(res.result_msg);
+				}else{
+					util.message(res.result_msg);
+				}
+			}
+		});
+		
+	});
+	
+});
+
+</script>
+<script type="text/javascript">
+/*
+ * 选择上传图片时，页面显示图像<img> id设置为"portrait"
+ */
+function showPreview(source, portraitId) {
+	var file = source.files[0];
+	if (window.FileReader) {
+		var fr = new FileReader();
+		fr.onloadend = function(e) {
+			document.getElementById(portraitId).innerHTML = "<img src='" + e.target.result + "' height='100px;'>";
+		};
+		fr.readAsDataURL(file);
+	}
+}
+/*
+ * 显示多个预览图片
+ */
+function showMutiPreview(source, portraitId) {
+
+	document.getElementById(portraitId).innerHTML = "";
+
+	function readAndPreview(file) {
+		// Make sure `file.name` matches our extensions criteria
+		if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
+			var reader = new FileReader();
+			reader.addEventListener("load", function() {
+				var image = new Image();
+				image.height = 100;
+				image.title = file.name;
+				image.src = this.result;
+				document.getElementById(portraitId).appendChild(image);
+				document.getElementById(portraitId).innerHTML += "&nbsp;&nbsp;";
+			}, false);
+			reader.readAsDataURL(file);
+		}
+	}
+
+	if (source.files) {
+		[].forEach.call(source.files, readAndPreview);
+	}
+
+}
+
+// 上传图片时，form提交前验证文件大小
+var fileValidator = function() {
+	// 表单提交前做表单验证
+	var file = document.getElementById("img").files[0];
+	var fileSize = 0;
+	// 大小 字节
+	if (file == null) {
+		// alert("请选择上传文件");
+		// return;
+	} else {
+		fileSize = file.size;
+		fileSize = Math.round(fileSize / 1024 * 100) / 100; // 单位为KB
+		if (fileSize >= 10240) {
+			alert("照片最大尺寸为10MB，请重新上传!");
+			return false;
+		}
+	}
+
+};
+/*
+ * 选择上传文件时验证文件大小
+ * value:文件
+ * size:上传文件大小   单位为KB
+ * prompt:提示
+ */
+function isAllowUploadFile(value, size, prompt){
+	var allowUploadFile = false;
+	var fileSize = value.files[0].size;
+	fileSize = Math.round(fileSize / 1024 * 100) / 100; // 单位为KB
+	if (fileSize >= size) {
+		allowUploadFile = false;
+		util.message(prompt);
+	} else {
+		allowUploadFile = true;
+	}
+	return allowUploadFile;
+}
+
+/*
+ * 选择上传文件时验证文件大小（多个文件）
+ * value:文件
+ * size:上传文件大小   单位为KB
+ * prompt:提示
+ */
+function verifyFilesSize(value, size, prompt){
+	var flag = true;
+	var files = value.files;
+	for(var i=0; i<files.length; i++){
+		var fileSize = value.files[i].size;
+		fileSize = Math.round(fileSize / 1024 * 100) / 100; // 单位为KB
+		if (fileSize >= size) {
+			flag = false;
+			util.message("第 "+i+" 张"+prompt);
+			break;
+		}
+	}
+	return flag;
+}
+</script>
+
+</body>
+</html>

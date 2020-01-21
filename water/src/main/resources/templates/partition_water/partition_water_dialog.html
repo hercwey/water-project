@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+										
+				<div class="modal fade" id="modal-container-partition-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>分水量</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<div class="form-horizontal" id="dialog-partition--modi-form">
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<table class="table-layout table" style="border-collapse:separate; border-spacing:0px 1px;width:100%;">
+										<tbody id="partition-water-body">
+											<tr th:each="item,iterStat: ${pwList}">
+												<td class="input-group-sm">
+													
+													<input type="text" class="form-control btn-sm water-amount"
+																th:value="${item.waterAmount}" 
+																id="" name="" 
+																maxlength=30 title="请输入1-30个字符" placeholder="请输入水量"/>
+												
+												</td>
+												<td class="input-group-sm">
+													<select class="form-control btn-sm water-price" id="" name="">
+														<!-- 默认选择第一个 -->
+														<option value="" >-请选择水价-</option>
+														<span th:each="price,iterStat: ${waterPriceList}" th:remove="tag">
+															<option th:value="${price.totalPrice}"  
+																	th:attr="data-water-price-id=${price.id},selected=${price.priceCode==item.waterUse ? 'true':'false'},data-water-use=${price.priceTypeCode}"
+																	th:text="${price.ladderName}">数据字典的值</option>
+														</span>
+													</select>
+												</td>
+											</tr>
+										</tbody>
+										
+									</table>
+																											
+								</div>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-info btn-sm" id="btn-add-partition-water">+</button>
+								<button type="button" class="btn btn-default btn-sm"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var g_waterPriceList=[[${waterPriceList}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 *	获取设置分水量输入框html字符串
+		 */
+		function getPartitionWaterHtml(){
+			var html = '';
+				html = html + '<tr>';
+				html = html + '<td class="input-group-sm">';
+				html = html + '<input type="text" class="form-control btn-sm water-amount" id="" name="" maxlength=30 title="请输入1-30个字符" placeholder="请输入水量"/>';
+				html = html + '</td>';
+				html = html + '<td class="input-group-sm">';
+				html = html + '<select class="form-control btn-sm water-price" id="" name="">';
+				html = html + '<option value="" >-请选择水价-</option>';
+				html = html + getSelectOptionHtml();
+				html = html + '</select>';
+				html = html + '</td>';
+				html = html + '</tr>';
+			return html;
+		}
+		/**
+		 * 	获取水价下拉列表内容
+		 */
+		function getSelectOptionHtml(){
+			var html = '';
+			$.each(g_waterPriceList, function(){
+				html = html + '<option value="'+this.totalPrice+'" data-water-price-id="'+this.id+'" data-water-use="'+this.priceTypeCode+'">'+this.ladderName+'</option>';
+			});
+			return html;
+		}
+		/**
+		 *	绑定增加设置分水量输入框按钮的click事件
+		 */
+		$("#btn-add-partition-water").on("click", function(){
+			var html = getPartitionWaterHtml();
+			$("#partition-water-body").append(html);
+			console.log("g_waterPriceList:"+g_waterPriceList);
+		});
+		
+		
+		
+		//------------------业务操作----------------------
+		function getPartitionWaterParms(){
+			
+			var partitionWaterArr = new Array();
+			
+			$("#partition-water-body tr").each(function(){
+				
+				//var partWaterId = $(this).find(".part-water-id").val();
+				var waterAmount = $(this).find(".water-amount").val();
+				//var waterPrice = $(this).find(".water-price").val();
+				//var waterUse = $(this).find(".water-price").find("option:selected").attr("data-water-use");
+				var waterPriceId = $(this).find(".water-price").find("option:selected").attr("data-water-price-id");
+				var obj = new Object();
+				obj.waterPriceId = waterPriceId;
+				obj.waterAmount = waterAmount;
+				//obj.waterPrice = waterPrice;
+				//obj.waterUse = waterUse;
+				partitionWaterArr.push(obj);
+			});
+			var partitionWaterJSON = JSON.stringify(partitionWaterArr);
+			console.log(partitionWaterJSON);
+			
+			var customerId = getCustomerIdFn();//获取当前操作的客户ID
+			var period = getPeriodFn();//获取当前操作的期间
+			var recordIds = getRecordIdsFn();//获取当前操作的抄表记录ID
+			var meterIds = getMeterIdsFn();//获取当前操作的表计ID
+			
+			var params = new Object();
+			params.customerId = customerId;
+			params.period = period;
+			params.recordIds = recordIds;
+			params.meterIds = meterIds;
+			params.partitionWaterJSON = partitionWaterJSON;
+			return params;
+			
+		}
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			 
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH + "/partition-water/save-partition-water";
+			var params = getPartitionWaterParms();
+			
+			$.post(url, params, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						closePartitionDialog();
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+			 
+		 }
+	
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+			修改对话框-保存按钮-CLICK
+			保存所修改的条目
+		*/
+		$('#btn-modify-and-back').on('click',function() {
+			modiItem(true);				
+		});
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

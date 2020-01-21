@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+</head>
+<body>
+	
+	<div class="card">
+	    <div class="card-body" id="user-tab-body">
+	    	<!-- 用户列表 -->
+	    </div> 
+	 </div>
+
+	<script type="text/javascript">
+
+	
+		function loadUserTab(){
+			var url = BASE_CONTEXT_PATH + "/user/sysuser-tab";
+			$("#user-tab-body").load(url, null, function(){
+				console.log("系统用户列表加载完成");
+			});
+		}
+		
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			loadUserTab();
+
+		});
+	</script>
+
+
+
+</body>
+</html>

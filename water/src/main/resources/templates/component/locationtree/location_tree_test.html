@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!-- Location Tree组件测试 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<div th:include="common/common_head::headx('组件测试页')" th:remove="tag"></div>
+
+<!-- <link rel="stylesheet"	href="/css/searchpanel.css" /> -->
+
+<link rel="stylesheet" type="text/css"	th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css"	th:href="@{/ztree/css/custom.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+
+</head>
+<body>
+
+	<div class="row clearfix medic-label customers-main">
+		<div class="col-md-12 column">
+			<div class="row clearfix">
+				<div class="col-md-3 column" style="padding-right: 1px;">
+					<div class="card">
+						<!-- <h5 class="card-header">
+							地理位置
+						</h5> -->
+						<div class="card-body" id="location-body" style="padding-top: 10px; padding-bottom: 10px">
+							<!--  include Location tree  -->
+							<!-- 加载方式 -->
+							<div th:include="component/locationtree/location_tree::tree('tree1')" th:remove="tag"></div>
+							
+						</div>
+					</div>
+				</div>
+				<div class="col-md-9 column" style="padding-left: 1px;">
+					<div class="card">
+						<div th:include="component/locationtree/location_tree::tree('tree2')" th:remove="tag"></div>
+						<!-- <h5 class="card-header">
+							客户档案
+						</h5> -->
+						<div class="card-body customers-table" id="customer-body"
+							style="padding-left: 10px; padding-right: 10px;">
+							<!-- 表计列表 -->
+						</div>
+					</div>
+				</div>
+				<button type="button" id="btn-test">load tree1</button>
+			</div>
+		</div>
+	</div>
+
+</body>
+
+<script type="text/javascript"	th:src="@{/js/component/locationtree/LocationTree1.js}"></script>
+
+<script>
+
+	/* 
+	 *	动态加载LocationTree
+	 */
+	/* function loadLocationList(domId, callback) {
+		var url = BASE_CONTEXT_PATH+"/location/load-location-tree";
+		var callbackFunc = callback;
+		var containerId = "#"+domId;
+		loadPage(containerId, url, null, callback);
+	} */
+	
+	/*
+		加载地址位置树成功后回调函数
+	*/
+	/* function loadLocationTreeCallback(){
+		//主页:默认查询(加载默认列表)
+		//defaultSearch();
+		console.log("load location tree ok,into loadLocationTree callback function!");
+		
+	} */
+	
+	//loadLocationList("location-body", loadLocationTreeCallback);
+	var locationTree1=new LocationTree('tree1');
+	var locationTree2=new LocationTree('tree2');
+	//var locationTree2=new LocationTree('tree2');
+	
+	//locationTree.test();   //函数测试	
+	
+	function busFunc1(treeNode){
+		console.log("bus func1111 treeNode is:"+treeNode);
+	}
+	
+	function busFunc2(treeNode){
+		console.log("bus func22222 treeNode is:"+treeNode);
+	}
+	
+	
+	$(function(){
+				
+		
+		locationTree1.initTree();  //初始化树.		
+		locationTree1.setClickOuterFunction(busFunc1);  //设置外部业务函数
+		
+		
+		$("#btn-test").on('click',function(){
+			locationTree2.initTree();
+			locationTree2.setClickOuterFunction(busFunc2);
+		});
+		
+		
+	});
+	
+</script>
+
+
+
+</html>

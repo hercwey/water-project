@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>打印机选择对话框</title>
+
+<style type="text/css">
+	.curr-printer{
+		background-color:lightgray;
+	}
+</style>
+
+</head>
+<body>
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<input type="hidden" id="customer-id" name="id" th:value="${customerId==null ? '' : customerId}" />
+				<input type="hidden" id="place" name="place" th:value="${place}" />
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-single-print-dialog" role="dialog"
+					aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header"
+								style="background-color: #a5f1b6; height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									选择打印机<i class="fa fa-tags fa-1x" aria-hidden="true"
+										style="color: blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close"
+									data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<table class="table table-bordered table-sm">
+									<thead>
+										<tr>
+											<th>序号</th>
+											<th>名称</th>
+											<th>IP地址</th>
+											<th>打印机名称</th>
+										</tr>
+									</thead>
+									<tbody >
+										<tr th:each="printer,iter:${printerConfigList}"  th:attr="data-bind-id=${printer.id}">
+											<td th:text="${iter.count}">序号</td>
+											<td th:text="${printer.aliasName}">自定义打印机名称</td>
+											<td th:text="${printer.ipAddress}">IP地址</td>
+											<td th:text="${printer.printerName}">打印机名称</td>
+										</tr>
+									</tbody>
+								</table>
+								
+								<!-- 扣费日期-->
+								<div class="form-group form-inline" id="deduct-date-div" style="">
+									<label for="" class="col-sm-4 control-label">扣费日期</label>
+									<span class="input-group-sm col-sm-8">
+										<input type="date" class="form-control Wdate"
+												id="deduct-date" name="deductDate"		
+												th:value="${deductDate}"				
+												onClick="WdatePicker({dateFmt:'yyyy-MM-dd',onpicked: setBackGround});"
+												placeholder="扣费日期" style="background-color: white;" title="请选择扣费日期" >
+									</span>
+								</div>
+								<!-- 缴费截止日期-->
+								<div class="form-group form-inline" id="end-date-div" style="">
+									<label for="" class="col-sm-4 control-label"> 缴费截止日期</label>
+									<span class="input-group-sm col-sm-8">
+										<input type="date" class="form-control Wdate"
+												id="end-date" name="endDate"		
+												th:value="${endDate}"				
+												onClick="WdatePicker({dateFmt:'yyyy-MM-dd',onpicked: setBackGround});"
+												placeholder="缴费截止日期" style="background-color: white;" title="请选择缴费截止日期" >
+									</span>
+								</div>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">取消</button>
+								<button type="button" class="btn btn-primary"	id="btn-choice-single-printer">确认</button>
+							</div>
+						</div>  <!-- end of modal cotent -->
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+
+	</th:block>
+
+
+
+
+</body>
+<script type="text/javascript">
+	/*
+		选择第一行:默认打印机
+	*/
+	function selectSingleTheFirstPrinter(){
+		var printerRow="#modal-container-print-dialog tbody tr";		
+		var currPrinterClass="curr-printer";
+		
+		var firstRow=$(printerRow+":first").get(0);
+		if(firstRow!=null){
+			$(firstRow).addClass(currPrinterClass);
+		}
+	}
+
+	$(function(){
+		/*
+			打印机选择对话框:显示事件监听			
+		*/
+		$("#modal-container-single-print-dialog").on('shown.bs.modal', function () {
+			//alert('模态框打开了');
+		});
+		
+		/*
+			打印机选择对话框:关闭事件监听.
+		*/
+		$('#modal-container-single-print-dialog').on('hide.bs.modal', function () {
+	    	//alert('模态框关闭了');
+	    });
+		
+		/*
+			点击某行时:切换当前选择光条
+		*/
+		$("#modal-container-single-print-dialog tbody tr").on('click',function(){
+			var printerRow="#modal-container-single-print-dialog tbody tr";
+			var currRowClass="curr-printer";
+			
+			$(printerRow).removeClass(currRowClass);
+			$(this).addClass(currRowClass);
+			
+		});
+		
+		/*
+			选择打印机确认按钮:CLICK事件处理
+		*/
+		$('#btn-choice-single-printer').on('click',function(){
+			var printerRow="#modal-container-single-print-dialog tbody tr";		
+			var currPrinterClass=".curr-printer";
+			var dataBindId='data-bind-id';
+			var customerId = $("#customer-id").val();
+			var place = $("#place").val();
+			var deductDate= $("#deduct-date").val();
+			var endDate= $("#end-date").val();
+			var currPrinter=$(printerRow+currPrinterClass).get(0);
+			/* if(!G_ARREARS_NOTICE && endDate == null){
+				util.message("请选择缴费截止日期!");
+				return false;
+			} else{
+				util.message("请选择扣费日期!");
+				return false;
+			} */
+			if(currPrinter!=null){
+				var printerId=$(currPrinter).attr(dataBindId);
+				closeSinglePrinterDialog();  //关闭打印机选择对话框.
+				startSinglePrintNotice(printerId, customerId, place, deductDate, endDate);  //开始打印.
+			} else{
+				util.message("请选择打印机!");
+			}
+		});
+		
+		//-------------init--------------
+		selectSingleTheFirstPrinter();   //选择第一行作为默认打印机
+		
+	});
+</script>
+</html>

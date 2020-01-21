@@ -1,0 +1,133 @@
+<html> 
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>
+<style type="text/css" mce_bogus="1">
+@page{
+	size:70mm 90mm;
+	margin:0px;
+}
+
+.mybody {font-family: SimSun; font-size: 11px; padding:10px 0px;margin:0px;}
+.myBu{position:fixed;z-index:999;top:5px;left:5px;border:1px solid;font-size:10px;}
+.list-table{width:100%; text-align: left; table-layout:fixed; word-break:break-strict;font-size:13px;font-weight:600;}
+.list-table .left_td{height:19px;text-align:left;}
+.useinfo{width:100%;height:20px;line-height:20px;text-align:left;}
+.footer{font-size: 12px;}
+.footer-line{font-size: 12px;height:26px;}
+.footer-table {width:100%;padding-top: 3px;}
+.footer-table td{font-size: 10px;}
+.footer-tag-left{width:32px;height:13px;float:left;line-height:13px;}
+.footer-tag-right{border-bottom: 0px solid black;width:42px;height:13px;float:left;line-height:13px;text-align:left}
+.footer-left{width:100%;height:13px;overflow:hidden;font-weight:600}
+.footer-right{float:right;margin-right:5px;}
+.center-right{float:right;font-size: 12px;}
+.right_td_whi{height:19px;text-align:center;border-left:1px solid #000;border-top:1px solid #000;border-right:1px solid #000;}
+.right_td_bla{height:19px;text-align:center;border-left:1px solid #fff;border-top:1px solid #fff;border-right:1px solid #fff;background:#000000;color:#ffffff}
+.right_td_whiend{height:18px;text-align:center;border:1px solid #000}
+.right_td_blaend{height:18px;text-align:center;border:1px solid #fff;background:#000000;color:#ffffff}
+.patientInfo{width:100%;height:auto;margin-top:10px;font-weight:600}
+.patientInfo-item{height:30px;line-height:30px;font-size:22px;width:100%;text-align:center;font-weight:600}
+
+</style>
+</head>
+<body class="mybody">
+<div>
+	<div class="myBu" style="display:none">补</div>
+	<div style="width:93%;margin:0 auto">
+		<table class="list-table" cellspacing="0" cellpadding="0">
+			#if($list.size() > 0)
+			<thead>
+				<tr>
+					<td style="width:65%;text-align:center;height:20px">药品名称[规格]</td>
+					<td style="width:35%;text-align:center;height:20px">用量</td>
+				</tr>
+			</thead>
+			#end
+			#foreach($element in $list)
+				#set($showBg = 1) 
+				#if(${element.quantity.indexOf('.')} > 0) 
+					#set($showBg = 1) 
+				#else 
+					#set($showBg = 0) 
+				#end
+			<tr>
+				<td class="left_td">#if(${element.drugName})${element.drugName}#end</td>
+				<td #if($showBg == 0) 
+						#if($velocityCount == $list.size()) 
+							class="right_td_whiend"
+						#else 
+							class="right_td_whi"  
+						#end 
+				 	#else
+						#if($velocityCount == $list.size()) 
+							class="right_td_blaend" 
+						#else 
+							class="right_td_bla"  
+						#end 
+					#end
+				   >#if(${element.dose})${element.dose}#end#if(${element.doseUnit})${element.doseUnit}#end(#if(${element.quantity})${element.quantity}#end#if(${element.packingUnit})${element.packingUnit}#end)</td>
+			</tr>
+			#end
+		</table>
+		<div class="useinfo">输液量:<span>#if($transfusion)$transfusion#end</span>ml</div>
+	</div>
+	<div class="footer">
+		<div style="border-top: 1px solid;width:93%;margin:0 auto;">
+			<table class="footer-table">
+				<tr>
+					<td>
+						<div class="footer-tag-left">贴签：</div>
+						<div class="footer-tag-right"></div>
+						
+						<div class="footer-tag-left" style="margin-left:6px;">排药：</div>
+						<div class="footer-tag-right"><span id="putdrug"></span></div>
+
+						<div class="footer-tag-left" style="margin-left:6px;">审核：</div>
+						<div class="footer-tag-right"></div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div class="footer-tag-left;"  style="display: none"></div>
+						<div class="footer-tag-right"></div>
+						
+						<div class="footer-tag-left" style="margin-left:6px;">加药:</div>
+						<div class="footer-tag-right"><span id="putdrug"></span></div>
+						
+						<div class="footer-tag-left" style="margin-left: 6px;">复核:</div>
+						<div class="footer-tag-right"></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="footer-tag-left" style="width:40px">执行人：</div>
+						<div class="footer-tag-right" style="width:35px"></div>
+						
+						<div class="footer-tag-left" style="margin-left:6px;">时间：</div>
+						<div class="footer-tag-right"></div>
+						
+						<div class="footer-tag-left" style="margin-left:6px;">滴速：</div>
+						<div class="footer-tag-right"></div>
+					</td>
+				</tr>
+			</table>
+			<div class="footer-line" >
+				<div class="footer-left">提示:#if($remind)$remind#end</div>
+				<div>
+					<div class="center-right" ><span id="pageIndex"></span></div> 
+					<div class="footer-right">$useTime</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="patientInfo">
+		<div class="patientInfo-item">#if(${label.deptAliasName})${label.deptAliasName}#end</div>
+		<div class="patientInfo-item">#if(${label.bedNo})${label.bedNo}#end #if(${label.patName})${label.patName}#end</div>
+		<div class="patientInfo-item" style="font-size:13px;">#if(${label.bottleNum})${label.bottleNum}#end</div>
+	</div>
+</div>
+
+</body>
+
+</html>

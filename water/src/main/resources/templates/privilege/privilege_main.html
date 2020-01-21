@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+
+</head>
+<body>
+	<!-- 编辑菜单权限对话框 -->
+	<div class="container" id="privilege-dialog-edit" th:include="privilege/privilege_dialog_edit::dialog"></div>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block">
+				<!-- <ul class="extra-l" style="list-style: none;">
+				
+					面板:增加/删除
+					<li value="0">
+						<button type="button" class="btn btn-primary"
+							id="btn--add">
+							<i class="fa fa-plus" aria-hidden="true"> 
+								<span>增加</span>
+							</i>
+						</button>
+					</li>
+					<li value="1">
+						<button type="button" class="btn btn-danger"
+							id="btn-del-batch">
+							<i class="fa fa-info" aria-hidden="true"> 
+								<span>编辑</span>
+							</i>
+						</button>
+					</li>
+					<li value="2">
+						<button type="button" class="btn btn-danger"
+							id="btn-del-batch">
+							<i class="fa fa-remove" aria-hidden="true"> 
+								<span>删除</span>
+							</i>
+						</button>
+					</li>
+
+					面板:查询
+					<li><input type="text" class="form-control" id="search-cond" placeholder="请输入批次名称">
+					</li>
+					查询按钮
+					<li>
+						<button type="button" class="btn btn-success"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						<button type="button" class="btn btn-warning"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+				</ul> -->
+				<button type="button" class="btn btn-primary btn-sm"
+					id="add-btn" onclick="javascript:add(0, '', 0);">
+					<i class="fa fa-plus" aria-hidden="true"> 
+						<span>增加</span>
+					</i>
+				</button>
+				<button type="button" class="btn btn-info btn-sm"
+					id="edit-btn" onclick="javascript:edit(null);">
+					<i class="fa fa-info" aria-hidden="true"> 
+						<span>编辑</span>
+					</i>
+				</button>
+				<button type="button" class="btn btn-danger btn-sm"
+					id="del-btn" onclick="javascript:del(0, '', 0);">
+					<i class="fa fa-remove" aria-hidden="true"> 
+						<span>删除</span>
+					</i>
+				</button>
+			</div>
+			<hr>
+			<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+
+			<!-- 容器:字典列表 -->
+			<div class="batch-table table-container">
+				<ul id="privilege-ztree" class="ztree"></ul>
+			</div>
+			
+			<hr style="height:1px;border:none;border-top:1px solid blue;">
+			
+		</div>
+	</div>
+
+	<!-- JS Scripts-->
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var zNodes = [[${privilegeListJson}]];
+			/* var zNodes = [{"id":1, "pId":0, "name":"test1"},
+		    {"id":11, "pId":1, "name":"test11"},
+		    {"id":12, "pId":1, "name":"test12"},
+		    {"id":111, "pId":11, "name":"test111"}]; */
+		    //var zNodes = [{"createTime":"1523362262000","icon":"/index/images/li1.png","isHttps":0,"level":1,"module":"业务管理","name":"业务管理","parentId":0,"privilegeCode":"PIVAS_MENU_1","privilegeId":1,"seq":1,"sysCode":1,"type":0}];
+			//console.log("zNodes:"+zNodes);
+			//console.log("zNodes:"+JSON.stringify(zNodes));
+		/*]]>*/
+	</script>
+
+	<SCRIPT type="text/javascript">
+			
+		var setting = {
+			check: {
+				enable: false,
+				chkStyle: "checkbox",
+			},
+			data: {
+				key: {
+					name: "rightName",
+				},
+				simpleData: {
+					enable:true,
+					idKey: "id",
+					pIdKey: "pid",
+					rootPId: 0
+				}
+			},
+			callback: {
+				onClick: zTreeOnClick,//节点被点击的事件回调函数
+			},
+		};
+		
+		/*
+		 * 节点被点击的事件回调函数
+		 */
+		function zTreeOnClick(event, treeId, treeNode) {
+			//console.log("click:"+JSON.stringify(treeNode));
+			//console.log(treeNode.menuId + ", " + treeNode.menuName + ", " + treeNode.parentId);
+		    //$("#add-btn").attr("onclick", "javascript:add(&quot;"+treeNode.id+"&quot;);");
+		    
+		    var params = '"id":'+treeNode.id+', "right_level":'+treeNode.rightLevel+', "right_name":'+treeNode.rightName+', "remark":'+treeNode.remark+', "pid":'+treeNode.pid+', "right_link":'+treeNode.rightLink+', "sort":'+treeNode.sort;
+			$("#add-btn").attr("onclick", "javascript:add("+treeNode.id+", '"+treeNode.rightName+"', '"+treeNode.pid+"');");//修改添加按钮click事件
+			$("#edit-btn").attr("onclick", "javascript:edit("+JSON.stringify(treeNode)+");");//修改编辑按钮click事件
+			$("#del-btn").attr("onclick", "javascript:del("+treeNode.id+", '"+treeNode.rightName+"', '"+treeNode.pid+"');");//修改删除按钮click事件
+		}
+		
+		$(function(){
+			console.log("start init");
+			$.fn.zTree.init($("#privilege-ztree"), setting, zNodes);
+		});
+		
+	</SCRIPT>
+
+	<script type="text/javascript">
+	
+		/*
+		 * 	点击添加按钮时执行，打开添加选项卡
+		 */
+		function add(id, name, pid){
+			resetFun();
+			if(id!=null && id!=0){
+				$("#parent-id").val(id);//父类型ID
+				$("#parent-id").trigger("change");
+			}
+			
+			var rightLevel = $("#privilege-form #privilege-type").val();//类型（级别）
+			if(rightLevel==null || (rightLevel!=null && rightLevel==2)){
+				//console.log(type+"：show");
+				$("#privilege-href-tr").show();
+			}else{
+				//console.log(type+"：hide");
+				$("#privilege-href-tr").hide();
+			}
+			
+			$("#modal-title-span").text("增加：菜单权限");
+			
+			openEditPrivilegeDialog();
+		}
+	
+		/*
+		 * 	点击编辑按钮时执行，打开编辑选项卡
+		 */
+		function edit(privilege){
+			
+			console.log("---"+JSON.stringify(privilege));
+			if(privilege==null || privilege.id==0){
+				util.message("请选择要修改的菜单");
+				return;
+			}
+			
+			if(privilege.rightLevel==null || (privilege.rightLevel!=null && privilege.rightLevel==2)){
+				//console.log(privilege.type+"：show");
+				$("#privilege-href-tr").show();
+			}else{
+				//console.log(privilege.type+"：hide");
+				$("#privilege-href-tr").hide();
+			}
+			
+			$("#privilege-form #privilege-id").val(privilege.id);//ID
+			$("#privilege-form #privilege-type").val(privilege.rightLevel);//级别
+			$("#privilege-form #right-code").val(privilege.rightCode);//编码
+			$("#privilege-form #privilege-name").val(privilege.rightName);//名称
+			$("#privilege-form #privilege-description").val(privilege.remark);//描述
+			$("#privilege-form #parent-id").val(privilege.pid);//父类型ID
+			$("#privilege-form #privilege-href").val(privilege.rightLink);//URL
+			$("#privilege-form #privilege-seq").val(privilege.sort);//排序
+
+			$("#modal-title-span").text("编辑：菜单权限");
+			
+			openEditPrivilegeDialog();
+		}
+		
+		/*
+		 * 点击删除按钮时执行，打开删除选项卡
+		 */
+		function del(id, name, pid){
+			
+			if(id==null || id==0){
+				util.message("请选择要删除的菜单");
+				return;
+			}
+			
+			var ok_callback_name = "deleteAjaxRequest";
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录? ", id, ok_callback_name, "");
+			
+		}
+		/**
+		 * 	删除菜单Ajax请求
+		 */
+		function deleteAjaxRequest(id){
+			var url = BASE_CONTEXT_PATH + "/privilege/delete";
+			var params = {"id":id};
+			$.post(url, params, function(res){
+				//console.log(res);
+				if(res!=null){
+					var obj = res;//$.parseJSON(res);
+					if(obj.result_code=="success"){
+						//$("#update-menu-modal-div").modal("hide");//隐藏修改菜单对话框
+						//util.message(obj.result_msg);
+						//window.location.href="loginSubmit";
+						//操作成功后重新加载当前菜单内容
+						reloadInfoFun();
+					}else{
+						util.message(obj.result_msg);
+					}
+				}
+			});
+		}
+		
+		/*
+		 * 重置form表单
+		 */
+		function resetFun(){
+			var pid = $("#parent-id").val();//父类型ID
+			//$("#save-form").data('bootstrapValidator').destroy();//销毁bootstrapValidator验证
+			//bootstrapValidateFun();//启用验证
+			//$('#privilege-form')[0].reset();
+			$(":input","#privilege-form")  
+				.not(":button, :submit, :reset")  
+				.val("");
+			//.removeAttr("checked")  
+			//.removeAttr("selected");
+			$("#parent-id").val(pid);//父类型ID
+			$("#parent-id").trigger("change");
+		}
+		
+//---------- Dialog 操作 打开/关闭 ------------------------
+		
+		/*
+		 * 	打开(Open) 增加核对类型对话框
+		 */
+		function openEditPrivilegeDialog() {
+			//可拖拽
+			$("#modal-container-privilege-edit").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$('#modal-container-privilege-edit').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			关闭(CLOSE) 增加核对类型对话框
+		 */
+		function closeAddBatchDialog() {
+			$("#modal-container-privilege-edit").modal("hide");
+		}
+		
+	</script>
+
+</body>
+</html>

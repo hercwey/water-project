@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('发票状态更新')" th:remove="tag"></div>
+<title>发票状态更新</title>
+</head>
+<body>	
+	<div class="container-fluid">
+	<h5>发票状态更新</h5>
+	<div class="row-fluid">
+		<div class="col-12">
+			<h6>填写需更新的发票-表单</h6>
+			<!-- TODO 在表单加入相应的字段 -->
+			<form class="form-horizontal">							
+				<div class="control-group">
+					<div class="controls">						
+						 <!-- <label class="checkbox"><input type="checkbox" class="invoice-type" value="0"/>0:专用发票</label>
+						 <label class="checkbox"><input type="checkbox" class="invoice-type" value="2"/>2:普通发票</label>
+						 <label class="checkbox"><input type="checkbox" class="invoice-type" value="12"/>12:机动发票</label>
+						 <label class="checkbox"><input type="checkbox" class="invoice-type" value="51"/>51:电子发票</label> -->
+					</div>
+				</div>
+				
+				<div class="control-group">
+				
+				</div>
+				
+			</form>					
+		</div>
+		<button type="button" class="btn btn-sm btn-primary" id="btn-update-invoice-status">发票状态更新</button> 
+	</div>
+	<div class="row-fluid">
+		<div class="col-12">
+			<!-- 查询结果容器 -->
+			<div id="update-invoice-status-result-container">
+				
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+
+
+
+<!-- 嵌入式脚本,用于thymeleaf数据传递(json格式) -->
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		//后台向前端直接传递数据
+		//var returnObj = [[${returnObj}]]; 
+	/*]]>*/
+</script>
+
+<script type="text/javascript">
+
+	/*
+		发票状态更新
+		前端操作对象
+	 */
+	function UpdateInvoiceStatus(){
+		
+	}
+	
+	/*
+		功能:
+			发送查询请求
+		参数:
+			无
+	*/
+	UpdateInvoiceStatus.prototype.sendRequest=function(params){
+		const url=BASE_CONTEXT_PATH+"/tax/updateinvoicestatus/update";  //请求地址
+		const result_container="#update-invoice-status-result-container";  //存放查询结果容器
+		
+		$(result_container).load(url,params,null);  //采用load动态加载查询结果		
+	}
+	
+	/*
+		功能:
+			自表单中获取请求数据
+			校验可以在此处理
+		返回
+			请求参数
+	*/
+	UpdateInvoiceStatus.prototype.getParams=function(){
+		var params=new Object();
+		//todo: add code here
+		return params;
+	}
+	
+	/*
+		功能:
+			初始化监听器
+		参数:无
+	*/
+	UpdateInvoiceStatus.prototype.initListener=function(){
+		var self=this; //reference instance Object of QueryInventory ;
+		
+		const BTN_QUERY="#btn-update-invoice-status";
+		$(BTN_QUERY).on('click',startQuery);
+		
+		/*
+			click event's listener
+		*/
+		function startQuery(){
+			//console.log("btn clicked!");	
+			var params=self.getParams();
+			self.sendRequest(params);   //send request	
+		}    
+		
+	}	
+	
+	//create instance of front operation object 	
+	var updateInvoiceStatus= new UpdateInvoiceStatus();
+	
+	/* 
+		page loaded ready 
+	*/
+	$(function(){	
+		//page init 
+		updateInvoiceStatus.initListener();
+		
+	});
+
+</script>
+
+
+</html>

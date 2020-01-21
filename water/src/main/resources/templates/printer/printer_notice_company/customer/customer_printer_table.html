@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-striped table-hover table-sm" id="customer-printer-table">
+		<thead>
+			<tr>
+				<th>
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-customer-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-customer-toggle"></label>
+					</div>
+				</th>
+				<th>地理位置</th> 
+				<th>客户名称</th>
+				<th>期间</th>
+				<th>账单金额</th>
+				<th>违约金金额</th>
+				<th>往期欠费金额</th>
+				<th>欠费月份</th>
+				<th>欠费总金额</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${accountItemList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 地理位置 -->
+				<td th:text="${item.customerPlace}">地理位置</td>
+				<!-- 客户名称 -->
+				<td th:text="${item.customerName}">客户名称</td>
+				<!-- 期间-->
+				<td th:text="${item.period}">期间</td>
+				<!-- 账单金额 -->
+				<td th:text="${item.oweAmount}">账单金额</td>
+				<!-- 违约金金额 -->
+				<td th:text="${item.overdueOweAmount}">违约金总金额</td>
+				<!-- 往期欠费 -->
+				<td th:text="${item.pastOweAmount}">往期欠费</td>
+				<!-- 欠费月份 -->
+				<td>
+					<span th:each="pastPeriod,stat: ${item.pastPeriodList}" th:remove="tag">
+						<span class="badge badge-pill badge-warning" th:text="${pastPeriod}">警告</span>
+					</span>
+				</td>
+				<!-- 欠费总金额 -->
+				<td th:text="${item.totalOweAmount}">欠费总金额</td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 打印水费通知单 -->
+					<button type="button" class="print-customer-pdf-single btn btn-secondary btn-sm"
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-print" aria-hidden="true"></i> <span>打印</span>
+					</button> 
+					<!-- 预览 -->
+					<button type="button" class="generate-notice-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}, data-period=${item.period}, data-place=${item.customerName}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>预览</span>
+					</button> 
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerCustomer')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_customer_pageNum=[[${pageNum}]];
+		var curr_customer_pageSize=[[${pageSize}]];
+		var curr_customer_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	/*
+		批量打印
+	*/
+	function printCustomerConfirm(customerId){			
+		
+		var parms = new Object();
+		parms.customerId = customerId;
+		var url = BASE_CONTEXT_PATH+"/print-company/loadPrinterCustomerDialog"; // 需要提交的url
+		$("#print-customer-dialog").load(url,parms,showCustomerPrinterDialog);		
+	}
+
+	/*
+		打开(Open)打印机对话框
+	*/
+	function showCustomerPrinterDialog(){
+		$("#modal-container-customer-print-dialog").draggable({
+			cursor : "move",
+			handle : '.modal-header'
+		}); 
+	
+		$('#modal-container-customer-print-dialog').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+	}
+	
+	/* 
+		关闭(CLOSE) 打印机对话框
+	*/
+	function closeCustomerPrinterDialog() {
+		$("#modal-container-customer-print-dialog").modal("hide");
+	}
+	
+	/*
+		参数:
+			printerId: 打印机id
+		功能:
+			开始打印瓶签
+	*/
+	function startPrintCustomer(printerId, customerId, noticeDate, chargePeople){
+		var parms = getSearchCustomerParams();
+		var period = getCustomerPeriod();
+		var customerIdArr = getSelectedCustomerIds();
+		var traceIds = parms.traceIds;
+		parms.printerId=printerId;
+		parms.period=period;
+		parms.noticeDate=noticeDate;
+		parms.chargePeople=chargePeople;
+		parms.customerIdStr = customerIdArr.toString();
+		
+		if(customerId==null || customerId ==""){
+			if(customerIdArr.length <0){
+				if(parms.locaUnitTraceIds == null || parms.locaUnitTraceIds== ""){
+					util.message("请选择地理位置到单元");
+					return false;
+				}
+				if(period == null || period== ""){
+					util.message("请选择期间");
+					return false;
+				}
+			}
+			
+			printCompanyCustomerBatch(parms); 
+		} else{
+			printCompanyCustomerSingle(customerId,printerId, period, traceIds, noticeDate, chargePeople);  // 单个打印单位用户的通知单
+		}
+		
+		
+	}
+	
+	/*
+	功能:
+		批量打印单位用户的水费通知单
+	参数:
+		accountItemIds:账单ID
+		printerId:打印机ID
+	*/
+	function printCompanyCustomerSingle(customerId,printerId, period, traceIds, noticeDate, chargePeople){
+		var url = BASE_CONTEXT_PATH+"/print-company/printCustomerCompanySingle"; // 需要提交的url
+		$.ajax({
+			type : "POST", // 提交方式 get/post
+			url : url,
+			data : {"customerId":customerId,"period":period,"printerId":printerId,"traceIds":traceIds,"noticeDate":noticeDate,"chargePeople":chargePeople},
+			success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeCustomerPrinterDialog();
+						util.message(res.result_msg,null,"info");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				util.message("AJAX请求时发生错误!");
+			}
+		});				
+	}
+	
+	/*
+	功能:
+		单个打印单位用户的水费通知单
+	参数:
+		accountItemIds:账单ID
+		printerId:打印机ID
+	*/
+	function printCompanyCustomerBatch(parms){
+		var url = BASE_CONTEXT_PATH+"/print-company/printCompanyCustomerBatch"; // 需要提交的url
+		$.ajax({
+			type : "POST", // 提交方式 get/post
+			url : url,
+			data : parms,
+			success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeCustomerPrinterDialog();
+						util.message(res.result_msg,null,"info");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				util.message("AJAX请求时发生错误!");
+			}
+		});				
+	}
+	
+	
+	/**
+		返回所选条目的 id(每行对应一个唯一的ID)
+		@returns   
+	 */
+	function getSelectedCustomerIds(){
+		var idArr = new Array();
+	
+		// 扫描用户所选择条目ID
+		$("#customer-printer-table .item-selector").each(function(index, elem) {
+			if (this.checked) { // 对于己选条目
+				var meterId = $(this).attr("data-bind"); //
+				idArr.push(meterId);
+			}
+		}); // end of item-selector
+		return idArr;
+	}
+	
+	//------------------单个打印------------------
+	
+	/* 
+		单个打印
+	*/
+	$('.print-customer-pdf-single').on('click', function() {
+		var itemId = $(this).attr("bind-id"); //分录ID
+		var idsArr=new Array();
+		idsArr.push(itemId);	
+		printCustomerConfirm(itemId);
+	})
+	
+	
+	
+	/*
+		操作-预览按钮
+	*/
+	$('#customer-printer-table .generate-notice-single').on('click',function(){	
+		var traceIds = null;
+		var locaBlockTraceIds = locationCustoemrSearcher.getBlockId();//地理位置-小区traceIds
+		var locaBuildingTraceIds = locationCustoemrSearcher.getBuildingId();//地理位置-楼号traceIds
+		var locaUnitTraceIds = locationCustoemrSearcher.getUnitId();//地理位置-单元traceIds
+		
+		if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+			traceIds = locaUnitTraceIds;
+		}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+			traceIds = locaBuildingTraceIds;
+		}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+			traceIds = locaBlockTraceIds;
+		}
+		var period = $(this).attr("data-period");
+		var customerId = $(this).attr("bind-id");
+		var place = $(this).attr("data-place");
+		
+		previewCustomerPrepare(customerId,period, place, traceIds);
+			
+	});
+	
+	/*
+		功能:
+			btn-pdf-preview
+			PDF 预览
+		参数:			
+			bottleLabelSerialNo:瓶签序号
+			pageNo:页码(注:自1开始计数)
+	*/
+	function previewCustomer(period,place){
+		var curWwwPath=window.document.location.href;
+		var pathName=window.document.location.pathname;
+		var pos=curWwwPath.indexOf(pathName);
+		var localhostPath=curWwwPath.substring(0,pos);
+		
+		var attachmentUrl="";
+		var pdfFileName=place+"_"+period+".pdf";
+		
+		var url="/pdfjs/web/viewer.html?file=";
+		var parms="/preview?fileName%3D";   //"%3D"即是 =  的URL编码
+		
+		
+		console.log("PDF FILE NAME IS:"+pdfFileName);
+		console.log("url is:"+ localhostPath+url+attachmentUrl + "/preview?fileName%3D"+pdfFileName);
+		
+		window.open(localhostPath+url+attachmentUrl + "/preview?fileName%3D"+pdfFileName,"new window");
+	
+	};
+	
+	/*
+		功能:
+			预览准备.
+		参数:
+			druglistId:药贴ID
+	*/
+	function previewCustomerPrepare(customerId,period, place, traceIds){
+		var urlStr = BASE_CONTEXT_PATH+"/print-company/previewCustomerPrepare"; // 需要提交的url
+		$.ajax({
+			type : "POST", // 提交方式 get/post
+			url : urlStr,
+			data : {customerId,period,place, traceIds},
+			success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+				console.log(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						previewCustomer(period, place);  //预览
+					} else {
+						util.message("生成PDF时发生错误",null,"warning");
+					}
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				util.message("AJAX请求时发生错误!");
+			}
+		});
+	}
+	
+		
+				
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#customer-printer-table #select-all-customer-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$("#customer-printer-table .item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#customer-printer-table #' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$("#customer-printer-table .item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#customer-printer-table #' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		//创建分页组件实例
+		var pager=new Pager("pagerCustomer");
+		$(function(){			
+			pager.init(loadCustomerPage,curr_customer_searchCond);			
+		});
+	</script>
+</body>
+</html>

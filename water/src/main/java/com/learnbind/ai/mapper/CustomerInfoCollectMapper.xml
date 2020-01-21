@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerInfoCollectMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerInfoCollect">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_NAME" jdbcType="VARCHAR" property="customerName" />
+    <result column="CUSTOMER_PHONE" jdbcType="VARCHAR" property="customerPhone" />
+    <result column="QUESTION" jdbcType="VARCHAR" property="question" />
+    <result column="SOLUTION" jdbcType="VARCHAR" property="solution" />
+    <result column="REPLY_STATUS" jdbcType="DECIMAL" property="replyStatus" />
+    <result column="SATISFIED_STATUS" jdbcType="DECIMAL" property="satisfiedStatus" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="OPERATOR" jdbcType="VARCHAR" property="operator" />
+    <result column="REPLY_TIME" jdbcType="TIMESTAMP" property="replyTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_NAME, CUSTOMER_PHONE, QUESTION, SOLUTION, REPLY_STATUS, SATISFIED_STATUS, 
+    OPERATION_TIME, OPERATOR, REPLY_TIME
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchCond" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM customer_info_collect b
+		<where>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					b.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+  					OR b.CUSTOMER_PHONE LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY b.id DESC
+  </select>
+</mapper>

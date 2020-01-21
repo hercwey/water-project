@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+</head>
+<body>
+
+	<!-- tabs容器-->
+	<div class="row clearfix">
+		<div class="col-md-12">
+			<div class="tabbable" id="tabs-meters-item-div">
+				<ul class="nav nav-tabs" id="tabs-meters-item-nav">
+					<li class="nav-item" id="meters-item-tab" style="">
+						<a class="nav-link active show" href="#meters-tab" data-toggle="tab">表计列表</a></li>
+					<li class="nav-item" id="meters-detail-item-tab" style="display:none;">
+						<a class="nav-link" href="#meters-detail-tab" data-toggle="tab">表计档案</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="meters-tab">
+						<!-- 表计档案信息 -->
+					</div>
+					<div class="tab-pane" id="meters-detail-tab">
+						<br>
+						<div class="tabbable" id="tabs-meters-detail-div">
+							<ul class="nav nav-tabs" id="tabs-meters-detail-nav">
+								<li class="nav-item" id="meter-base-detail-item-tab" style="">
+									<a class="nav-link active show" href="#meter-base-detail-tab" data-toggle="tab">表计基本信息</a></li>
+								<li class="nav-item" id="binded-customers-item-tab" style="">
+									<a class="nav-link" href="#binded-customers-tab" data-toggle="tab">已绑定客户列表</a>
+								</li>
+								<li class="nav-item" id="meter-history-item-tab" style="">
+									<a class="nav-link" href="#meter-history-tab" data-toggle="tab">表计历史</a>
+								</li>
+							</ul>
+							<div class="tab-content">
+								<div class="tab-pane active" id="meter-base-detail-tab">
+									<!-- 表计基本信息 -->
+								</div>
+								<div class="tab-pane" id="binded-customers-tab">
+									<!-- 已绑定的客户列表 -->
+									已绑定的客户列表
+								</div>
+								<div class="tab-pane" id="meter-history-tab">
+									<!-- 表计历史 -->
+									表计历史
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script type="text/javascript">
+		
+		var G_TABS_METER_ITEM_NAV = "#tabs-meters-item-nav";//表计列表选项卡ul标签
+		var G_TABS_METER_DETAIL_NAV = "#tabs-meters-detail-nav";//表计档案选项卡ul标签
+		
+		var G_METERS_ITEM_TAB_LI_ID = "#meters-detail-item-tab";//表计列表选项卡li的ID
+		var G_METERS_ITEM_TAB = "#meters-item-tab";//表计列表选项卡
+		var G_METERS_DETAIL_TAB_LI_ID = "#meters-detail-item-tab";//表计档案选项卡li的ID
+		var G_METERS_DETAIL_TAB = "#meters-detail-tab";//表计档案选项卡
+		
+		var G_METER_BASE_DETAIL_TAB_ID = "#meter-base-detail-item-tab";//表计基本信息选项卡ID
+		var G_METER_BASE_DETAIL_TAB = "#meter-base-detail-tab";//表计基本信息选项卡
+		var G_BINDED_CUSTOMER_TABLE_TAB_ID = "#binded-customers-item-tab";//已绑定的客户列表选项卡
+		var G_BINDED_CUSTOMER_TABLE_TAB = "#binded-customers-tab";//已绑定的客户列表选项卡
+		var G_METER_HISTORY_TAB_ID = "#meter-history-item-tab";//表计历史选项卡
+		var G_METER_HISTORY_TAB = "#meter-history-tab";//表计历史选项卡
+		
+		/**
+		 * 	显示表计档案选项卡
+		 */
+		function showMeterDetailTab(){
+			$(G_METERS_DETAIL_TAB_LI_ID).show();
+		}
+		/**
+		 * 	隐藏表计档案选项卡
+		 */
+		function hideMeterDetailTab(){
+			//$(G_METERS_DETAIL_TAB).hide();
+			$(G_METERS_DETAIL_TAB_LI_ID).hide();
+		}
+		
+		/**
+		 * 	id：要显示选项卡的ID
+		 *	href：要显示选项卡的href
+		 *	status：show/hide
+		 */
+		function transferTabs(id, href, status){
+			//console.log("$(+id+' a[href="'+href+'"]').tab(status)");
+			$(id+' a[href="'+href+'"]').tab(status);
+			//$("#tabs-customers-nav a[href='#customer-detail-tab']").tab("show");//跳转到详细信息选项卡
+		}
+		
+		/* 
+			加载表计列表页
+		*/
+		function loadMainList(parms, callback) {
+			console.log("parms:"+JSON.stringify(parms));
+			var url = "/meter-remove/main";
+			var callbackFunc = callback;
+			var containerId = "#meters-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+	
+		/* 
+			加载表计基本信息
+		 */
+		function loadMeterBaseList(parms, callback) {
+			var url = BASE_CONTEXT_PATH + "/meter-remove/detail-table"
+			var callbackFunc = callback;
+			var containerId = "#meter-base-detail-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+
+		/* 
+			加载客户档案信息
+		 */
+		function loadBindCustomerList(parms, callback) {
+			var url = BASE_CONTEXT_PATH + "/meter-remove/cmain";
+			var callbackFunc = callback;
+			var containerId = "#binded-customers-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		/* 
+			加载客户历史
+		 */
+		function loadMeterCustomerHistory(parms, callback) {
+			var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+			parms.meterId = meterId;
+			var url = BASE_CONTEXT_PATH + "/meter-customer-history/meter-customer-main";
+			var callbackFunc = callback;
+			var containerId = "#meter-history-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		/**
+		 * 	加载初始化函数
+		 */
+		function initLoad(){
+			/* 
+				加载框架页面 
+			*/
+			var params = {"functionModule": getFunctionModuleFn(), "status": getMeterStatusFn()};//参数1：功能模块标识；参数2：表计状态 0复装 1暂拆
+			loadMainList(params, null);
+			//hideMeterDetailTab();//隐藏表计档案选项卡
+		}
+		/**
+		 * 	重新加载已绑定的客户列表
+		 */
+		function reLoadBindCustomerList(){
+			var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+			var parms = {"functionModule": getFunctionModuleFn(), "meterId":meterId};//参数：功能模块标识
+			loadBindCustomerList(parms, null);
+		}
+		
+		$(function() {
+
+			//初始化
+			initLoad();
+			
+			/**
+			 * 	绑定 表计列表选项卡 的click事件
+			 */
+			$(G_METERS_ITEM_TAB).on("click", function(){
+				
+				hideMeterDetailTab();//隐藏表计档案选项卡
+				customerResizeFuncx();
+				
+			});
+			function customerResizeFuncx(){
+				console.log("call back........");
+				var myEvent = new Event('resize');
+		        window.dispatchEvent(myEvent);
+			}
+			
+			/**
+			 * 	绑定 表计基本信息选项卡 的click事件
+			 */
+			$(G_METER_BASE_DETAIL_TAB_ID).on("click", function(){
+				
+				var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+				
+				var parms = {"functionModule": getFunctionModuleFn(), "meterId":meterId};//参数：功能模块标识
+				loadMeterBaseList(parms, null);
+				
+			});
+			
+			/**
+			 * 	绑定 已绑定的客户列表选项卡 的click事件
+			 */
+			$(G_BINDED_CUSTOMER_TABLE_TAB_ID).on("click", function(){
+				
+				reLoadBindCustomerList();//重新加载已绑定的客户列表
+				
+			});
+			/**
+			 * 	绑定 表计历史选项卡 的click事件
+			 */
+			$(G_METER_HISTORY_TAB_ID).on("click", function(){
+				var parms = new Object();
+				loadMeterCustomerHistory(parms, null);
+			});
+
+		})
+	</script>
+
+</body>
+</html>

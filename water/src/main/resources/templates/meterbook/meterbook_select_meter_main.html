@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-6 column">
+			<div class="card" style="height:100%;">
+				<h5 class="card-header" th:text="${unitName}">
+					表册1的表计
+				</h5>
+				<div class="card-body">
+					<!-- 加载我的表册包含的表计 -->
+					<!-- <div th:include="meterbook/my_meterbook_select_main"></div> -->
+					<div class="my-meter-book-select-main"></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6 column">
+			<div class="card" style="height:100%;">
+				<h5 class="card-header">
+					未绑定表册的表计
+				</h5>
+				<div class="card-body">
+					<!-- 加载全部表册包含的表计 -->
+					<!-- <div th:include="meterbook/all_meterbook_select_main"></div> -->
+					<div class="all-meter-book-select-main"></div>
+				</div>
+			</div>
+		</div> 
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var firstName = [[${firstName}]];
+		var secondName = [[${secondName}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//-------------------PAGE LOADED READY--------------------
+		
+		function loadMyBook(parms) {
+			//加载字典列表页面
+			var url = "/meter-book/my-meter-book-select-main";
+			$(".my-meter-book-select-main").load(url, null, triggerResize);
+		}
+		function loadAllBook(parms) {
+			//加载字典列表页面
+			var url = "/meter-book/all-meter-book-select-main";
+			$(".all-meter-book-select-main").load(url, null, triggerResize);
+		}
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		$(function() {
+			//------------init-------------
+			loadMyBook();
+			loadAllBook();
+			//---------事件绑定--------------
+			
+		});
+	</script>
+
+
+
+</body>
+</html>

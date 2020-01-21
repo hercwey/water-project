@@ -1,0 +1,1028 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterRecordMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterRecord">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="CURR_DATE" jdbcType="TIMESTAMP" property="currDate" />
+    <result column="CURR_READ" jdbcType="VARCHAR" property="currRead" />
+    <result column="PRE_DATE" jdbcType="TIMESTAMP" property="preDate" />
+    <result column="PRE_READ" jdbcType="VARCHAR" property="preRead" />
+    <result column="CURR_AMOUNT" jdbcType="DECIMAL" property="currAmount" />
+    <result column="READ_TYPE" jdbcType="DECIMAL" property="readType" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="READ_MODE" jdbcType="VARCHAR" property="readMode" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="IS_PART_WATER" jdbcType="DECIMAL" property="isPartWater" />
+    <result column="IS_ADD_SUB_WATER" jdbcType="DECIMAL" property="isAddSubWater" />
+    <result column="METER_USE" jdbcType="VARCHAR" property="meterUse" />
+    <result column="METER_TREE_ID" jdbcType="DECIMAL" property="meterTreeId" />
+    <result column="IS_MAKE_BILL" jdbcType="DECIMAL" property="isMakeBill" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, METER_ID, CUSTOMER_ID, PERIOD, CURR_DATE, CURR_READ, PRE_DATE, PRE_READ, CURR_AMOUNT, 
+    READ_TYPE, OPERATOR_NAME, OPERATOR_ID, OPERATION_TIME, REMARK, READ_MODE, DELETED, IS_PART_WATER, IS_ADD_SUB_WATER, METER_USE, METER_TREE_ID, IS_MAKE_BILL, STATUS  
+  </sql>
+  
+  
+  <!-- 查询名称,返回列表 -->
+  <!-- <select id="searchMeterRecord" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meter_record m
+		<where>
+			删除状态，1=已删除，0=未删除（默认） 
+			m.deleted=0 
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (m.PERIOD LIKE concat(concat('%',#{searchCond}),'%'))
+  			</if>
+		</where>
+		ORDER BY m.PERIOD DESC, m.CURR_DATE DESC, m.ID DESC
+  </select> -->
+  
+  <!-- 根据条件查询 -->
+  <select id="getMeterRecordList" resultType="map">
+  	SELECT
+		R.*, 
+		C.CUSTOMER_NAME, 
+		C.CUSTOMER_TYPE,
+		LM.TRACE_IDS
+	FROM
+		meter_record R
+		LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID 
+		LEFT JOIN METERS M ON R.METER_ID = M.ID 
+		LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID 
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		R.DELETED=0 AND LM.DELETED!=1 AND C.DELETED=0 AND M.DELETED=0
+		<!-- 过滤上期表底为空的数据 -->
+		AND R.PRE_READ IS NOT NULL
+		<!-- modified by tom on 2019/10/23 --> 
+		<!-- AND LM.DELETED=0 
+		AND M.DELETED=0 -->
+		<if test="customerId!=null and customerId!=''">
+			AND R.CUSTOMER_ID = #{customerId} 
+		</if>
+		
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				C.CUSTOMER_CODE LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+				<!-- C.PROP_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) 
+				OR C.PROP_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.PROP_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) -->
+				OR C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.CUSTOMER_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.CUSTOMER_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.ROOM LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				
+				OR M.METER_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.STEEL_SEAL_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.DESCRIPTION LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.PLACE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+			)
+		</if>
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+		</if>
+		<if test="period!=null and period!=''">
+			AND R.PERIOD=#{period}
+		</if>
+		<!-- 按时间查询账单日期 -->
+		<if test="startDate!=null and startDate!=''">
+			AND R.CURR_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			AND R.CURR_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<!-- 抄表类型：0=正常抄表；1=估抄；2=预抄； -->
+		<if test="readType!=null">
+			AND R.READ_TYPE = #{readType} 
+		</if>
+		<if test="meterRecordStatus!=null">
+			AND R.STATUS = #{meterRecordStatus} 
+		</if>
+		<if test="isPartWater!=null">
+			AND R.IS_PART_WATER = #{isPartWater} 
+		</if>
+		<if test="operatorId!=null">
+			AND R.OPERATOR_ID = #{operatorId} 
+		</if>
+		<if test="currAmount!=null and currAmount ==0">
+			AND R.CURR_AMOUNT &gt; 0
+		</if>
+		<if test="currAmount!=null and currAmount ==1">
+			AND R.CURR_AMOUNT=0
+		</if>
+		<if test="currAmount!=null and currAmount ==2">
+			AND R.CURR_AMOUNT &lt; 0
+		</if>
+		
+	</where>
+	ORDER BY
+		R.PERIOD DESC, R.CUSTOMER_ID DESC, R.ID DESC
+  	
+  </select>
+  
+  <!-- 获取统计数据 -->
+  <select id="getMeterRecorStatisticMap" resultType="map">
+  	SELECT
+		SUM(R.CURR_AMOUNT) AS TOTAL_WATER_AMOUNT
+	FROM
+		meter_record R
+		LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID 
+		LEFT JOIN METERS M ON R.METER_ID = M.ID 
+		LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID 
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		R.DELETED=0 AND LM.DELETED!=1 AND C.DELETED=0 AND M.DELETED=0
+		<!-- 过滤上期表底为空的数据 -->
+		AND R.PRE_READ IS NOT NULL
+		<!-- modified by tom on 2019/10/23 --> 
+		<!-- AND LM.DELETED=0 
+		AND M.DELETED=0 -->
+		<if test="customerId!=null and customerId!=''">
+			AND R.CUSTOMER_ID = #{customerId} 
+		</if>
+		
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				C.CUSTOMER_CODE LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+				<!-- C.PROP_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) 
+				OR C.PROP_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.PROP_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) -->
+				OR C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.CUSTOMER_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.CUSTOMER_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.ROOM LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				
+				OR M.METER_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.STEEL_SEAL_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.DESCRIPTION LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.PLACE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+			)
+		</if>
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+		</if>
+		<if test="period!=null and period!=''">
+			AND R.PERIOD=#{period}
+		</if>
+		<!-- 按时间查询账单日期 -->
+		<if test="startDate!=null and startDate!=''">
+			AND R.CURR_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			AND R.CURR_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<!-- 抄表类型：0=正常抄表；1=估抄；2=预抄； -->
+		<if test="readType!=null">
+			AND R.READ_TYPE = #{readType} 
+		</if>
+		<if test="meterRecordStatus!=null">
+			AND R.STATUS = #{meterRecordStatus} 
+		</if>
+		<if test="isPartWater!=null">
+			AND R.IS_PART_WATER = #{isPartWater} 
+		</if>
+		<if test="operatorId!=null">
+			AND R.OPERATOR_ID = #{operatorId} 
+		</if>
+		<if test="currAmount!=null and currAmount ==0">
+			AND R.CURR_AMOUNT &gt; 0
+		</if>
+		<if test="currAmount!=null and currAmount ==1">
+			AND R.CURR_AMOUNT=0
+		</if>
+		<if test="currAmount!=null and currAmount ==2">
+			AND R.CURR_AMOUNT &lt; 0
+		</if>
+		
+	</where>
+	ORDER BY
+		R.PERIOD DESC, R.CUSTOMER_ID DESC, R.ID DESC
+  	
+  </select>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchMeterRecord" resultMap="BaseResultMap">
+		SELECT
+			R.* 
+		FROM
+			meter_record R
+			LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID 
+			LEFT JOIN METERS M ON R.METER_ID = M.ID 
+			LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID
+			
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			R.deleted=0 
+			AND LM.DELETED!=1
+			<if test="period!=null and period!=''">
+				AND R.PERIOD = #{period} 
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+			</if>
+			<!-- 抄表类型：0=正常抄表；1=估抄；2=预抄； -->
+			<if test="readType!=null">
+				AND R.READ_TYPE = #{readType} 
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%'#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+					OR M.METER_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+					OR M.STEEL_SEAL_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+					OR M.PLACE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+  				)
+  			</if>
+		</where>
+		ORDER BY R.PERIOD DESC, C.CUSTOMER_ID DESC
+  </select>
+  
+  <!-- 根据条件查询集合并按钮客户和期间分组 -->
+  <select id="getListGroupByCustomerAndPeriod" resultType="map">
+  	
+  	SELECT
+		* 
+	FROM
+		(
+			SELECT
+				TO_CHAR ( R.ID ) AS RECORD_IDS,
+				TO_CHAR ( R.METER_ID ) AS METER_IDS,
+				R.CUSTOMER_ID AS CUSTOMER_ID,
+				R.PERIOD AS PERIOD,
+				R.IS_ADD_SUB_WATER AS IS_ADD_SUB_WATER,
+				R.IS_PART_WATER AS IS_PART_WATER,
+				C.IS_PART_WATER AS CUST_PART_WATER,
+				C.CUSTOMER_NAME AS CUSTOMER_NAME,
+				LC.TRACE_IDS AS TRACE_IDS, 
+				R.IS_MAKE_BILL AS IS_MAKE_BILL 
+			FROM
+				METER_RECORD R
+				LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID
+				LEFT JOIN LOCATION_CUSTOMER LC ON R.CUSTOMER_ID = LC.CUSTOMER_ID 
+			<!-- WHERE
+				R.DELETED = 0 
+				AND LC.DELETED = 0 
+				AND C.CHARGE_MODE = 0 
+				AND C.CHARGE_MODE = 1  -->
+			<where>
+				<!-- 删除状态，1=已删除，0=未删除（默认） -->
+				R.DELETED=0 
+				AND C.DELETED=0
+				AND LC.DELETED=0 
+				<!-- 收费方式，0：合并收费(默认值)，1单独收费；针对一表多户 -->
+				AND C.CHARGE_MODE = 1 
+				<if test="customerId!=null and customerId!=''">
+					AND R.CUSTOMER_ID = #{customerId} 
+				</if>
+				<if test="period!=null and period!=''">
+					AND R.PERIOD = #{period} 
+				</if>
+				<if test="searchCond!=null and searchCond!=''">
+					AND (
+						C.PROP_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) 
+						OR 
+						C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+						OR 
+						C.PROP_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+						OR 
+						C.PROP_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+						OR 
+						C.ROOM LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+					)
+				</if>
+				<!-- 按时间查询账单日期 -->
+				<if test="startDate!=null and startDate!=''">
+					AND R.CURR_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="endDate!=null and endDate!=''">
+					AND R.CURR_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="traceIds!=null and traceIds!=''">
+					AND LC.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+				</if>
+				<!-- 抄表类型：0=正常抄表；1=估抄；2=预抄； -->
+				<if test="readType!=null">
+					AND R.READ_TYPE = #{readType} 
+				</if>
+				<if test="operatorId!=null">
+					AND R.OPERATOR_ID = #{operatorId} 
+				</if>
+				<if test="isAddSubWater!=null">
+					AND R.IS_ADD_SUB_WATER = #{isAddSubWater} 
+				</if>
+				<if test="isPartWater!=null">
+					<!-- 是否已分水量 -->
+					AND R.IS_PART_WATER = #{isPartWater}
+					<!-- 是否需要分水量 -->
+					AND C.IS_PART_WATER = #{isPartWater} 
+				</if>
+			</where>
+		UNION 
+			SELECT
+				LISTAGG ( R.ID, ',' ) WITHIN GROUP ( ORDER BY R.CUSTOMER_ID, R.PERIOD, C.PROP_NAME ) AS RECORD_IDS,
+				LISTAGG ( R.METER_ID, ',' ) WITHIN GROUP ( ORDER BY R.CUSTOMER_ID, R.PERIOD, C.PROP_NAME ) AS METER_IDS,
+				R.CUSTOMER_ID AS CUSTOMER_ID,
+				R.PERIOD AS PERIOD,
+				R.IS_ADD_SUB_WATER AS IS_ADD_SUB_WATER,
+				R.IS_PART_WATER AS IS_PART_WATER,
+				C.IS_PART_WATER AS CUST_PART_WATER,
+				C.CUSTOMER_NAME AS CUSTOMER_NAME,
+				LC.TRACE_IDS AS TRACE_IDS, 
+				R.IS_MAKE_BILL AS IS_MAKE_BILL 
+			FROM
+				METER_RECORD R
+				LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID
+				LEFT JOIN LOCATION_CUSTOMER LC ON R.CUSTOMER_ID = LC.CUSTOMER_ID 
+			<!-- WHERE
+				R.DELETED = 0 
+				AND LC.DELETED = 0 
+				AND C.CHARGE_MODE = 0 
+				AND C.CHARGE_MODE = 1  -->
+			<where>
+				<!-- 删除状态，1=已删除，0=未删除（默认） -->
+				R.DELETED=0 
+				AND C.DELETED=0
+				AND LC.DELETED=0 
+				<!-- 收费方式，0：合并收费(默认值)，1单独收费；针对一表多户 -->
+				AND C.CHARGE_MODE = 0 
+				<if test="customerId!=null and customerId!=''">
+					AND R.CUSTOMER_ID = #{customerId} 
+				</if>
+				<if test="period!=null and period!=''">
+					AND R.PERIOD = #{period} 
+				</if>
+				<if test="searchCond!=null and searchCond!=''">
+					AND (
+						C.PROP_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) 
+						OR 
+						C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+						OR 
+						C.PROP_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+						OR 
+						C.PROP_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+						OR 
+						C.ROOM LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+					)
+				</if>
+				<!-- 按时间查询账单日期 -->
+				<if test="startDate!=null and startDate!=''">
+					AND R.CURR_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="endDate!=null and endDate!=''">
+					AND R.CURR_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+				</if>
+				<if test="traceIds!=null and traceIds!=''">
+					AND LC.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+				</if>
+				<!-- 抄表类型：0=正常抄表；1=估抄；2=预抄； -->
+				<if test="readType!=null">
+					AND R.READ_TYPE = #{readType} 
+				</if>
+				<if test="operatorId!=null">
+					AND R.OPERATOR_ID = #{operatorId} 
+				</if>
+				<if test="isAddSubWater!=null">
+					AND R.IS_ADD_SUB_WATER = #{isAddSubWater} 
+				</if>
+				<if test="isPartWater!=null">
+					<!-- 是否已分水量 -->
+					AND R.IS_PART_WATER = #{isPartWater}
+					<!-- 是否需要分水量 -->
+					AND C.IS_PART_WATER = #{isPartWater} 
+				</if>
+			</where>
+			GROUP BY
+				R.CUSTOMER_ID,
+				R.PERIOD,
+				C.CHARGE_MODE,
+				R.IS_ADD_SUB_WATER,
+				R.IS_PART_WATER,
+				C.IS_PART_WATER,
+				C.CUSTOMER_NAME,
+				LC.TRACE_IDS, 
+				R.IS_MAKE_BILL 
+		) RECORD 
+	ORDER BY
+		RECORD.PERIOD DESC
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+	<!-- SELECT
+		LISTAGG ( R.ID, ',') WITHIN GROUP ( ORDER BY R.CUSTOMER_ID, R.PERIOD, C.PROP_NAME ) AS RECORD_IDS,
+		LISTAGG ( R.METER_ID, ',') WITHIN GROUP ( ORDER BY R.CUSTOMER_ID, R.PERIOD, C.PROP_NAME ) AS METER_IDS, 
+		R.CUSTOMER_ID,
+		R.PERIOD,
+		R.IS_ADD_SUB_WATER,
+		R.IS_PART_WATER,
+		C.IS_PART_WATER AS CUST_PART_WATER, 
+		C.PROP_NAME, 
+		LC.TRACE_IDS 
+	FROM
+		METER_RECORD R
+		LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID 
+		LEFT JOIN LOCATION_CUSTOMER LC ON R.CUSTOMER_ID=LC.CUSTOMER_ID 
+	<where>
+		删除状态，1=已删除，0=未删除（默认）
+		R.DELETED=0 AND LC.DELETED=0
+		<if test="customerId!=null and customerId!=''">
+			AND R.CUSTOMER_ID = #{customerId} 
+		</if>
+		<if test="period!=null and period!=''">
+			AND R.PERIOD = #{period} 
+		</if>
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				C.PROP_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) 
+				OR 
+				C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR 
+				C.PROP_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR 
+				C.PROP_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+			)
+		</if>
+		按时间查询账单日期
+		<if test="startDate!=null and startDate!=''">
+			AND R.CURR_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			AND R.CURR_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+		</if>
+		抄表类型：0=正常抄表；1=估抄；2=预抄；
+		<if test="readType!=null">
+			AND R.READ_TYPE = #{readType} 
+		</if>
+		<if test="operatorId!=null">
+			AND R.OPERATOR_ID = #{operatorId} 
+		</if>
+		<if test="isAddSubWater!=null">
+			AND R.IS_ADD_SUB_WATER = #{isAddSubWater} 
+		</if>
+		<if test="isPartWater!=null">
+			是否已分水量
+			AND R.IS_PART_WATER = #{isPartWater}
+			是否需要分水量
+			AND C.IS_PART_WATER = #{isPartWater} 
+		</if>
+	</where>
+	GROUP BY
+		R.CUSTOMER_ID,
+		R.PERIOD,
+		R.IS_ADD_SUB_WATER,
+		R.IS_PART_WATER,
+		C.IS_PART_WATER, 
+		C.PROP_NAME, 
+		LC.TRACE_IDS 
+	ORDER BY
+		R.PERIOD DESC,
+		R.CUSTOMER_ID -->
+		
+  </select>
+  <!-- 根据抄表记录ID集合查询抄表记录 -->
+  <select id="getListByRecordIdList" resultMap="BaseResultMap">
+  	SELECT 
+  		* 
+  	FROM 
+  		METER_RECORD
+  	<where>
+  		1=1
+  		<if test="recordIdArr!=null and recordIdArr.length>0">
+  			AND ID IN 
+  			<foreach collection="recordIdArr" item="item" index="index"
+					open="(" close=")" separator=",">
+	        	#{item}
+	    	</foreach>
+  		</if>
+  	</where>
+  </select>
+  
+  <!-- 查询年总用水量 -->
+  <select id="getTotalWaterAmount" resultType="string">
+		SELECT
+			SUM( CURR_READ ) 
+		FROM
+			METER_RECORD 
+		WHERE
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			DELETED = 0 
+			AND CUSTOMER_ID = #{customerId} 
+			AND METER_ID = #{meterId} 
+			AND to_char ( to_date ( PERIOD, 'yyyy-mm' ), 'yyyy' ) = #{year}
+  </select>
+  
+  <select id="getMeterAmountInfo" resultType="map">
+  	SELECT
+			P.PERIOD,
+			P.WATER_AMOUNT,
+			(I.CREDIT_AMOUNT-I.DEBIT_AMOUNT) WATER_FEE,
+			LC.TRACE_IDS,
+			P.CUSTOMER_ID,
+			P.RECORD_ID,
+			P.WATER_USE
+		FROM
+			CUSTOMER_ACCOUNT_ITEM I
+			LEFT JOIN LOCATION_CUSTOMER LC ON I.CUSTOMER_ID = LC.CUSTOMER_ID
+			LEFT JOIN PARTITION_WATER P ON I.ID = P.ACCOUNT_ITEM_ID
+		WHERE
+			1=1
+			AND LC.DELETED=0
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<if test="debitCredit!=null and debitCredit!=''">
+				AND I.DEBIT_CREDIT = #{debitCredit}
+			</if>
+			<if test="creditSubject!=null and creditSubject!=''">
+				AND I.CREDIT_SUBJECT = #{creditSubject}
+			</if>
+			<if test="period!=null and period!=''">
+				AND P.PERIOD=#{period}
+			</if>
+			AND NOT EXISTS (SELECT 1 FROM CUSTOMER_ACCOUNT_ITEM C WHERE C.ID=I.ID AND C.SETTLEMENT_STATUS=#{arrearsStatus})
+		ORDER BY I.ID DESC
+  </select>
+  
+  <select id="getMeterAmountCompanyInfo" resultType="map">
+	SELECT
+	   P.*,
+	  (CA.CREDIT_AMOUNT-CA.DEBIT_AMOUNT) WATER_FEE
+
+	FROM
+	   customer_account_item CA
+	  LEFT JOIN PARTITION_WATER P ON CA.ID = P.ACCOUNT_ITEM_ID
+	WHERE
+	   1=1
+	   AND CA.DELETED=0
+	   <!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+	   <if test="accountItemId!=null and accountItemId!=''">
+	    AND CA.ID = #{accountItemId}
+	   </if>
+	   <if test="debitCredit!=null and debitCredit!=''">
+	    AND CA.DEBIT_CREDIT = #{debitCredit}
+	   </if>
+	   <if test="creditSubject!=null and creditSubject!=''">
+	    AND CA.CREDIT_SUBJECT = #{creditSubject}
+	   </if>
+	   AND NOT EXISTS (SELECT 1 FROM CUSTOMER_ACCOUNT_ITEM C WHERE C.ID=CA.ID AND C.SETTLEMENT_STATUS=#{arrearsStatus})
+  </select>
+  
+  
+   <!-- 根据条件查询集合并按钮客户和期间分组 -->
+  <select id="getListGroupByCustomerAndPeriodErrorAmount" resultType="map">
+	SELECT
+		R.*, 
+		C.CUSTOMER_NAME, 
+		C.CUSTOMER_TYPE,
+		LM.TRACE_IDS
+	FROM
+		meter_record R
+		LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID 
+		LEFT JOIN METERS M ON R.METER_ID = M.ID 
+		LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID 
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		R.DELETED=0 AND LM.DELETED!=1 AND C.DELETED=0 AND M.DELETED=0
+		<!-- 过滤上期表底为空的数据 -->
+		AND R.PRE_READ IS NOT NULL
+		<!-- modified by tom on 2019/10/23 --> 
+		<!-- AND LM.DELETED=0 
+		AND M.DELETED=0 -->
+		<if test="customerId!=null and customerId!=''">
+			AND R.CUSTOMER_ID = #{customerId} 
+		</if>
+		
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				C.CUSTOMER_CODE LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+				<!-- C.PROP_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) 
+				OR C.PROP_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.PROP_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) -->
+				OR C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.CUSTOMER_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.CUSTOMER_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR C.ROOM LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				
+				OR M.METER_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.STEEL_SEAL_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.DESCRIPTION LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.PLACE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+			)
+		</if>
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+		</if>
+		<if test="period!=null and period!=''">
+			AND R.PERIOD=#{period}
+		</if>
+		<!-- 按时间查询账单日期 -->
+		<if test="startDate!=null and startDate!=''">
+			AND R.CURR_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			AND R.CURR_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<!-- 抄表类型：0=正常抄表；1=估抄；2=预抄； -->
+		<if test="readType!=null">
+			AND R.READ_TYPE = #{readType} 
+		</if>
+		<if test="meterRecordStatus!=null">
+			AND R.STATUS = #{meterRecordStatus} 
+		</if>
+		<if test="isPartWater!=null">
+			AND R.IS_PART_WATER = #{isPartWater} 
+		</if>
+		<if test="operatorId!=null">
+			AND R.OPERATOR_ID = #{operatorId} 
+		</if>
+		<if test="currAmount!=null and currAmount ==0">
+			AND R.CURR_AMOUNT &gt; 0
+		</if>
+		<if test="currAmount!=null and currAmount ==1">
+			AND R.CURR_AMOUNT=0
+		</if>
+		<if test="currAmount!=null and currAmount ==2">
+			AND R.CURR_AMOUNT &lt; 0
+		</if>
+		 AND (R.CURR_AMOUNT <![CDATA[> ]]> (select upper_bound from ABNORMAL_QUANTITY where type=1 ) or R.CURR_AMOUNT <![CDATA[< ]]>(select lower_bound from ABNORMAL_QUANTITY where type=1))
+	</where>
+	ORDER BY
+		R.PERIOD DESC, R.CUSTOMER_ID DESC, R.ID DESC
+  </select>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="selectNewestMeterRecord" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meter_record m
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			m.deleted=0 
+			<if test="customerId!=null and customerId!='' ">
+  				AND M.CUSTOMER_ID=#{customerId}
+  			</if>
+  			<if test="meterId!=null and meterId!='' ">
+  				AND M.METER_ID=#{meterId}
+  			</if>
+  			and rownum = 1
+		</where>
+		ORDER BY  m.CURR_DATE DESC
+  </select>
+  <!-- 查询最后一次抄表记录 -->
+  <select id="getLastMeterRecord" resultMap="BaseResultMap">
+  	SELECT
+		R.* 
+	FROM
+		( 
+			SELECT 
+				* 
+			FROM 
+				METER_RECORD 
+			WHERE
+				DELETED=0  
+				<if test="customerId!=null and customerId!=''">
+	  				AND CUSTOMER_ID=#{customerId}
+	  			</if>
+	  			<if test="period!=null and period!=''">
+	  				AND PERIOD=#{period}
+	  			</if>
+	  			<if test="meterId!=null and meterId!=''">
+	  				AND METER_ID=#{meterId}
+	  			</if>
+			ORDER BY 
+				PERIOD DESC, ID DESC, CURR_DATE DESC 
+		) R 
+	WHERE
+		ROWNUM =1
+  </select>
+  
+  
+    <!-- 查询名称,返回列表 -->
+  <select id="getListByCustomerIdAndPeriodErrorAmount" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meter_record M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			M.deleted=0 
+			<if test="customerId!=null and customerId!='' ">
+  				AND M.CUSTOMER_ID=#{customerId}
+  			</if>
+  			<if test="period!=null and period!='' ">
+  				AND M.PERIOD=#{period}
+  			</if>
+  			AND  (M.CURR_AMOUNT <![CDATA[> ]]> (select upper_bound from ABNORMAL_QUANTITY where type=1 ) or M.CURR_AMOUNT <![CDATA[< ]]>(select lower_bound from ABNORMAL_QUANTITY where type=1))
+		</where>
+  </select>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="getExportMeterRecordData" resultType="map">
+		SELECT 
+			* 
+		FROM 
+			METER_RECORD R
+			LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_METER LC ON R.METER_ID = LC.METER_ID 
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			R.deleted=0 
+			AND LC.DELETED!=1
+			<if test="period!=null and period!=''">
+				AND R.PERIOD = #{period} 
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND R.CURR_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND R.CURR_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<!-- 抄表类型：0=正常抄表；1=估抄；2=预抄； -->
+			<if test="readType!=null">
+				AND R.READ_TYPE = #{readType} 
+			</if>
+			<!-- 是否分水量：0=未分；1=已分 -->
+			<if test="isPartWater!=null">
+				AND R.IS_PART_WATER = #{isPartWater} 
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="currAmount!=null and currAmount ==0">
+				AND R.CURR_AMOUNT &gt; 0
+			</if>
+			<if test="currAmount!=null and currAmount ==1">
+				AND R.CURR_AMOUNT=0
+			</if>
+			<if test="currAmount!=null and currAmount ==2">
+				AND R.CURR_AMOUNT &lt; 0
+			</if>
+		</where>
+		ORDER BY R.PERIOD DESC, C.ROOM ASC, R.CUSTOMER_ID DESC, R.ID DESC
+  </select>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="getMeterRecordData" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM 
+			METER_RECORD R
+			LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_METER LC ON R.METER_ID = LC.METER_ID 
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			R.deleted=0 
+			AND LC.DELETED!=1
+			AND R.PRE_READ IS NOT NULL
+			AND R.CURR_AMOUNT IS NOT NULL
+			<if test="period!=null and period!=''">
+				AND R.PERIOD = #{period} 
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND R.CURR_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND R.CURR_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<!-- 抄表类型：0=正常抄表；1=估抄；2=预抄； -->
+			<if test="readType!=null">
+				AND R.READ_TYPE = #{readType} 
+			</if>
+			<!-- 是否分水量：0=未分；1=已分 -->
+			<if test="isPartWater!=null">
+				AND R.IS_PART_WATER = #{isPartWater} 
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY R.PERIOD DESC, C.CUSTOMER_NAME DESC
+  </select>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="getCustomerMeterData" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM 
+			CUSTOMER_METER
+		<where>
+			CUSTOMER_ID=#{customerId}
+			
+		</where>
+  </select>
+  
+     <!-- 根据客户和地理位置查询抄表记录 -->
+  <select id="getListByCustomerIdAndPeriod" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM 
+			METER_RECORD R
+			LEFT JOIN LOCATION_METER LM ON LM.METER_ID = R.METER_ID
+		<where>
+			R.DELETED=0 AND LM.DELETED!=1
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+			</if>
+			<if test="period!=null and period!=''">
+				AND R.PERIOD=#{period}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND R.CUSTOMER_ID=#{customerId}
+			</if>
+				AND R.PRE_READ IS NOT NULL AND R.CURR_AMOUNT IS NOT NULL
+			
+		</where>
+		ORDER BY R.METER_ID
+  </select>
+  
+    <!-- 根据表计id和期间查询抄表记录 -->
+  <select id="getMeterRecordByMeter" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM 
+			METER_RECORD R
+		<where>
+			R.DELETED=0 
+			<if test="period!=null and period!=''">
+				AND R.PERIOD=#{period}
+			</if>
+			<if test="meterId!=null and meterId!=''">
+				AND R.METER_ID=#{meterId}
+			</if>
+				AND R.PRE_READ IS NOT NULL AND R.CURR_AMOUNT IS NOT NULL
+			
+		</where>
+		ORDER BY R.METER_ID
+  </select>
+  
+   <!-- 根据表计ID集合、客户、期间查询抄表记录 -->
+  <select id="getCustomerMeterRecord" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meter_record M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			M.deleted = 0 
+  			<if test="meterIdList!=null and meterIdList.size>0">
+					AND M.METER_ID IN 
+				<foreach item="item" index="index" collection="meterIdList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="period!=null and period!=''">
+				AND M.PERIOD=#{period}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND M.CUSTOMER_ID=#{customerId}
+			</if>
+				AND M.PRE_READ IS NOT NULL 
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  
+    <!-- 查讯抄表记录最大期间 -->
+  <select id="getMeterRecordMaxPeriod" resultType="String">
+		SELECT
+			MAX(R.PERIOD)
+		FROM
+			meter_record R
+			LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID 
+			LEFT JOIN LOCATION_METER LM ON R.METER_ID=LM.METER_ID
+		<where>
+			R.DELETED=0 AND C.DELETED=0 AND  LM.DELETED !=1
+			<if test="meterId!=null and meterId!=''">
+				AND R.METER_ID=#{meterId}
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+  </select>
+  
+    <!-- 导出异常水量的抄表记录 -->
+  <select id="getExportMeterRecordErrorAmountData" resultType="map">
+		SELECT 
+			* 
+		FROM 
+			METER_RECORD R
+			LEFT JOIN CUSTOMERS C ON R.CUSTOMER_ID = C.ID
+			LEFT JOIN LOCATION_METER LC ON R.METER_ID = LC.METER_ID 
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			R.deleted=0 
+			AND LC.DELETED!=1
+			<if test="period!=null and period!=''">
+				AND R.PERIOD = #{period} 
+			</if>
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+			</if>
+			<!-- 按时间查询账单日期 -->
+			<if test="startDate!=null and startDate!=''">
+				AND R.CURR_DATE &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND R.CURR_DATE &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<!-- 抄表类型：0=正常抄表；1=估抄；2=预抄； -->
+			<if test="readType!=null">
+				AND R.READ_TYPE = #{readType} 
+			</if>
+			<!-- 是否分水量：0=未分；1=已分 -->
+			<if test="isPartWater!=null">
+				AND R.IS_PART_WATER = #{isPartWater} 
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="currAmount!=null and currAmount ==0">
+				AND R.CURR_AMOUNT &gt; 0
+			</if>
+			<if test="currAmount!=null and currAmount ==1">
+				AND R.CURR_AMOUNT=0
+			</if>
+			<if test="currAmount!=null and currAmount ==2">
+				AND R.CURR_AMOUNT &lt; 0
+			</if>
+			 AND (R.CURR_AMOUNT <![CDATA[> ]]> (select upper_bound from ABNORMAL_QUANTITY where type=1 ) or R.CURR_AMOUNT <![CDATA[< ]]>(select lower_bound from ABNORMAL_QUANTITY where type=1))
+		</where>
+		ORDER BY R.PERIOD DESC, C.ROOM ASC, R.CUSTOMER_ID DESC, R.ID DESC
+  </select>
+</mapper>

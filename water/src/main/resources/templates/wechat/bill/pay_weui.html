@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<!-- wechat-用户编号结果列表 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 通用css及JS lib -->
+
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')" 	th:remove="tag"></div> -->
+
+<title>石家庄高新区供水排水公司</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<meta name="context-path" content="/" />
+
+<link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+hr.style-self { /*透明渐变水平线*/
+	width: 100%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 0, 0, 1),
+		rgba(0, 0, 255, 1), rgba(255, 0, 0, 1));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+/* 帐单-body不显示 */
+weui-form-preview__bd.hide {
+	display: none;
+}
+</style>
+
+
+</head>
+<body ontouchstart>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div th:include="wechat/public_page/header::header('帐单支付')"
+					th:remove="tag"></div>
+				<!-- 显示错误信息 -->
+				<!-- 此处显示无法支付的原因. -->
+				<div>
+					<span class="weui-payselect-title error-message" style="color:red;text-align:left;"></span>
+				</div>
+				<div class="weui-pay">
+					<h1 class="weui-payselect-title">水费</h1>
+					<p class="weui-pay-num" th:text="'￥' +${billSum}">￥15.00</p>
+					<ul class="weui-pay-u">
+						<li th:each="accountItem,iter:${accountItemList}">
+							<span class="title" th:text="'账单ID:' +${accountItem.id}" >账单1</span> 
+							<span class="content" th:text="${accountItem.creditAmount-accountItem.debitAmount}">¥7</span>
+						</li>
+						<!-- <li><span class="title">账单12</span> <span class="content">¥8</span>
+						</li> -->
+						<!-- <li>
+							<span class="title" th:text="">用户姓名</span> <span class="content">张三</span>
+						</li>
+						<li>
+							<span class="title" th:text="">电话号码</span> <span class="content">0311-12345678</span>
+						</li> -->
+					</ul>
+					<div class="pay-div">						
+						<a href="javascript:;" class="weui-btn weui-btn_primary" id="btn-pay">立即支付</a>
+						
+						<!-- <button type="button" class="btn btn-success  btn-block" id="btn-pay">立即支付</button> -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- <div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')"
+				th:remove="tag"></div>
+		</div> -->
+		
+		<div class="weui-footer ">
+				<p class="weui-footer__links" style="margin-bottom:5px;">
+					<a href="#" class="weui-footer__link">石家庄高新区供水排水公司</a>
+				</p>
+				<p class="weui-footer__links" style="margin-bottom:5px;">
+					<a href="#" class="weui-footer__link">供水热线:69099838</a>
+				</p>
+				<!-- <p class="weui-footer__text">Copyright &copy; 石家庄高新区供排水公司</p> -->
+			</div>
+		
+		
+		
+	</div>
+	
+	<script type="text/javascript" src="/weui/js/zepto.min.js"></script>
+		<!-- <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script> -->
+	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+
+	<script src="/weui/js/zepto.weui.js"></script>
+	
+	
+	
+	
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var busOrderId = [[${busOrderId}]];  //预支付订单ID
+			var jsMap=[[${jsMap}]];
+			var payMap=[[${payMap}]];
+			//console.log("jsMap is"+ JSON.stringify(jsMap));
+			//console.log("payMap is"+JSON.stringify(payMap));
+			//console.log("package is:"+payMap.packages);
+			
+			var payParamx=[[${payParams}]];  //支付参数对象  added by hz  2020/01/09
+			
+			console.log("payParams is:"+JSON.stringify(payParamx));
+			
+			
+		/*]]>*/
+		</script>
+
+	<script>
+		
+		/*
+			微信支付对象
+		*/
+		function Pay(){
+			
+			/*
+				增加支付按钮-listener
+			*/
+			this.addPayListener=function(){
+				const btnId="#btn-pay";
+				$(btnId).on('click',function(){	
+					console.log("pay button clicked!");
+					wxPay();
+				});				
+			}
+			
+			this.disableBtnPay=function(){
+				const btnId="#btn-pay";
+				$(btnId).enabled(false);
+			}
+			
+			//支付成功处理
+			this.paySuccess=function(busOrderId){
+				var url=BASE_CONTEXT_PATH+"/wechat/pay/success"
+				var parms=new Object();
+				parms.busOrderId=busOrderId;
+				$.post(url,parms,callback);
+				
+				function callback(){
+					console.log("支付成功更新订单状态请求-----执行---回调函数");	
+				}				
+			}
+			
+			//支付失败处理
+			this.payFail=function(busOrderId){
+				var url=BASE_CONTEXT_PATH+"/wechat/pay/fail"
+				var parms=new Object();
+				parms.busOrderId=busOrderId;
+				$.post(url,parms,callback);
+				
+				function callback(){
+					console.log("支付失败fail更新订单状态请求(in pay_weui.html)-----执行---回调函数");	
+				}				
+			}
+			
+			//判定是否可以调起微信支付(是否具备调起支付的条件.)
+			this.determineCanCallPay=function(){
+				const ERROR_MSG_CLASS=".error-message";
+				const btnId="#btn-pay";
+				if(payParamx.errcode!="000000"){
+					$(ERROR_MSG_CLASS).html(payParamx.errmsg);
+					$(btnId).attr("disabled", true);
+				}
+			}
+			
+		}
+	
+		
+		
+		
+		/* wx.ready(function(){
+			wx.chooseWXPay({
+				timestamp : ${timeStamp}, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+				nonceStr : '${nonceStr}', // 支付签名随机串，不长于 32 位
+				package : '${prepayId}', // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
+				signType : '${signType}', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+				paySign : '${paySign}', // 支付签名
+				success : function(res) {
+					location.href = "./pay/success?orderid=${order.id}";
+				}
+			});
+		}); */
+		
+		/*
+			
+		*/
+		function wxPay(){
+			
+			wx.config({
+				debug : false,
+				appId :   jsMap.jsAppId,
+				timestamp : jsMap.jsTimestamp,
+				nonceStr : jsMap.jsNonceStr,
+				signature : jsMap.jsSignature,
+				jsApiList : [ 'chooseWXPay' ]
+			});
+			
+			wx.ready(function(){
+				wx.chooseWXPay({
+					timestamp : payMap.timeStamp, 	// 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+					nonceStr : payMap.nonceStr, 	// 支付签名随机串，不长于 32 位
+					"package": payMap.packages, 	// 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
+					signType : payMap.signType, 	// 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+					paySign : payMap.paySign, 		// 支付签名
+					success : function(res) {
+						//后台暂时未处理此动作.
+						//location.href = "/wechat/pay/success/success?orderid=${order.id}";										
+						
+						//payObj.disableBtnPay();						
+						//$.toast('支付成功', 3000);
+						//alert("支付成功");
+						
+						payObj.paySuccess(busOrderId);  //更新订单状态.						
+						
+						// 支付成功后返回用户账单页面.
+						// 此处采用window.open()打开新的页面
+						//var url=BASE_CONTEXT_PATH+"/wechat/bill";
+						//location.href = BASE_CONTEXT_PATH+"/wechat/bill";
+						
+						//window.open(url,"_blank");						
+						//parent.location.href=url;						
+						
+						WeixinJSBridge.call('closeWindow');				
+						
+						
+					},
+					// 支付取消回调函数
+			        cencel: function (res) {
+			            $.toast('用户取消支付',2000);
+			            alert("用户取消支付");			            
+			        },
+			        // 支付失败回调函数
+			        fail: function (res) {			        	
+			           $.toast('支付失败',2000);
+			           //alert("支付失败");
+			           payObj.payFail(busOrderId);
+			           
+			           
+			       }
+					
+				});
+			});
+			
+		}
+	
+		var payObj=new Pay();  //前台交互对象
+		
+		//page loaded ready
+		$(function() {
+			payObj.determineCanCallPay();
+			payObj.addPayListener() ;
+			
+			
+			
+		});
+	</script>
+
+</body>
+</html>

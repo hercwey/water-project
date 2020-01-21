@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.LocationCustomerMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.LocationCustomer">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="LOCATION_ID" jdbcType="DECIMAL" property="locationId" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="BIND_TIME" jdbcType="TIMESTAMP" property="bindTime" />
+    <result column="UNBIND_TIME" jdbcType="TIMESTAMP" property="unbindTime" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="DEFAULT_CUSTOMER" jdbcType="DECIMAL" property="defaultCustomer" />
+    <result column="TRACE_IDS" jdbcType="VARCHAR" property="traceIds" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, LOCATION_ID, CUSTOMER_ID, REMARK, BIND_TIME, UNBIND_TIME, DELETED, DEFAULT_CUSTOMER, TRACE_IDS 
+  </sql>
+  
+  <!-- 同步地理位置traceIds，更新地理位置-客户关系表中traceIds与地理位置表中traceIds不同的数据，让地理位置-客户表中的traceIds=地理位置表中traceIds -->
+  <update id="updateTraceIds">
+  	UPDATE (
+		SELECT
+			LC.TRACE_IDS AS LC_TRACE_IDS,
+			L.TRACE_IDS AS L_TRACE_IDS 
+		FROM
+			LOCATION_CUSTOMER LC
+			LEFT JOIN LOCATION L ON LC.LOCATION_ID = L.ID 
+		WHERE
+			<!-- 删除状态，0=未删除（默认）；1=已删除； -->
+			LC.DELETED = 0 
+			AND L.DELETED = 0 
+		) T 
+		SET T.LC_TRACE_IDS = T.L_TRACE_IDS 
+	WHERE
+		T.LC_TRACE_IDS != T.L_TRACE_IDS
+  </update>
+  
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterUnusedReceiptMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterUnusedReceipt">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="CUSTOMER_NAME" jdbcType="VARCHAR" property="customerName" />
+    <result column="INSTALL_PLACE" jdbcType="VARCHAR" property="installPlace" />
+    <result column="CONSTRUCTION_COMPANY" jdbcType="VARCHAR" property="constructionCompany" />
+    <result column="METER_NO" jdbcType="VARCHAR" property="meterNo" />
+    <result column="END_DATE" jdbcType="TIMESTAMP" property="endDate" />
+    <result column="CERTIFICATE_NO" jdbcType="VARCHAR" property="certificateNo" />
+    <result column="CALIBER" jdbcType="VARCHAR" property="caliber" />
+    <result column="RETURN_METER_DATE" jdbcType="TIMESTAMP" property="returnMeterDate" />
+    <result column="METER_BOTTOM" jdbcType="VARCHAR" property="meterBottom" />
+    <result column="YYC_PEOPLE" jdbcType="VARCHAR" property="yycPeople" />
+    <result column="WZC_PEOPLE" jdbcType="VARCHAR" property="wzcPeople" />
+    <result column="SCRAP_REASON" jdbcType="VARCHAR" property="scrapReason" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+     <result column="RETURN_PEOPLE" jdbcType="VARCHAR" property="returnPeople" />
+      <result column="WZC_RECEIVE_PEOPLE" jdbcType="VARCHAR" property="wzcReceivePeople" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, METER_ID, CUSTOMER_NAME, INSTALL_PLACE, CONSTRUCTION_COMPANY, METER_NO, END_DATE, 
+    CERTIFICATE_NO, CALIBER, RETURN_METER_DATE, METER_BOTTOM, YYC_PEOPLE, WZC_PEOPLE, 
+    SCRAP_REASON, REMARK, RETURN_PEOPLE, WZC_RECEIVE_PEOPLE
+  </sql>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchCond" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM METER_UNUSED_RECEIPT M
+		<where>
+			M.METER_ID=#{meterId}
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.INSTALL_PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.CONSTRUCTION_COMPANY LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.CALIBER LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.CERTIFICATE_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+</mapper>

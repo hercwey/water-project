@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.PrinterConfigMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.PrinterConfig">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="ALIAS_NAME" jdbcType="VARCHAR" property="aliasName" />
+    <result column="PRINTER_NAME" jdbcType="VARCHAR" property="printerName" />
+    <result column="IP_ADDRESS" jdbcType="VARCHAR" property="ipAddress" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, ALIAS_NAME, PRINTER_NAME, IP_ADDRESS
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchPrinter" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM printer_config r
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (r.ALIAS_NAME LIKE concat(concat('%',#{searchCond}),'%'))
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+</mapper>

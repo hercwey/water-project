@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- 表计父子关系起始页 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<div th:include="common/common_head::headx('客户档案')" th:remove="tag"></div>
+</head>
+<body>
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+	</script>
+
+	<script>	
+	
+		$(function() {
+			/* 
+				加载业务主页
+			*/
+			function loadMainPage(parms, callback) {
+				var url = BASE_CONTEXT_PATH+"/psmeter/main";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载业务页面 
+			*/
+			loadMainPage(null, null);
+		})
+	</script>
+</body>
+</html>

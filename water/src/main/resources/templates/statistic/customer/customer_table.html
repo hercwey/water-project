@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<th:block th:fragment="table">
+		<table class="table table-striped table-hover table-sm">
+			<thead>
+				<tr>
+					<th>
+						<!-- <input type="checkbox" class="select-all-toggle"> --> <!-- <div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div> -->
+					</th>
+					<th>名称</th>
+					<th>手机号</th>
+					<th>身份证号</th>
+					<th>地址</th>
+					<th>用水状态</th>
+					<th>状态</th>
+					<!-- <th style="width:100px;">操作</th> -->
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="item,iterStat: ${customerList}">
+					<!-- 条目选择器 -->
+					<td>
+						<!-- <div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div>  -->
+					</td>
+
+					<!-- 业主姓名 -->
+					<td th:text="${item.CUSTOMER_NAME}">业主姓名</td>
+					<!-- 客户电话 -->
+					<td th:text="${item.CUSTOMER_MOBILE}">业主手机</td>
+					<!-- 用水性质 -->
+					<td th:text="${item.ID_NO}">身份证号</td>
+					<!-- 地址 -->
+					<td th:text="${item.ADDRESS}">地址</td>
+					<!-- 用水状态 用水状态:0=正常;1=停水 -->
+					<td th:attr="id='water-status-'+${item.ID}">
+						<span th:if="${item.WATER_STATUS==0}" th:remove="tag">正常</span>
+						<span th:if="${item.WATER_STATUS==1}" th:remove="tag">停水</span>
+					</td>
+					<!-- 客户状态 客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户； -->
+					<td th:attr="id='customer-status-'+${item.ID}">
+						<span th:if="${item.STATUS==-1}" th:remove="tag">未立户</span>
+						<span th:if="${item.STATUS==0}" th:remove="tag">已立户</span>
+						<span th:if="${item.STATUS==1}" th:remove="tag">已销户</span>
+						<span th:if="${item.STATUS==2}" th:remove="tag">已过户</span>
+						<span th:if="${item.STATUS==3}" th:remove="tag">过户</span>
+					</td>
+
+				</tr>
+			</tbody>
+		</table>
+	</th:block>
+</body>
+</html>

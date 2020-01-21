@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<th:block th:fragment="table">
+		<table class="table table-sm" id="yyc-arrears-table">
+		
+		<thead>
+			<tr>
+				<th>序号</th>
+				<th>用水性质</th>
+				<th>单位名称</th>
+				<th>欠费月份</th>				
+				<th>当月欠费（元）</th>				
+				<th>累计欠费（元）</th>				
+			</tr>
+		</thead>
+		<tbody>
+			<span th:if="${pageNum} ==1" th:remove="tag">
+		       	<tr>
+					<td>1</td>
+					<td>
+						<span class="badge badge-pill badge-warning" >居民生活</span>
+					</td>
+					<td >小区</td>
+					<td>
+						<span th:each="period,stat: ${blocklist}" th:remove="tag">
+							<span class="badge badge-pill badge-warning" th:text="${period}">欠费月份</span>
+						</span>
+					</td>
+					 <!-- 当月欠费 -->
+					<td  th:text="${currBlockAmount}"></td>
+					 <!-- 累计欠费 -->
+					<td  th:text="${totalBlockAmount}"></td>
+				</tr> 
+			</span>                             
+			<span th:each="item,iterStat: ${dataList}" th:remove="tag">
+				<tr>
+					<span th:if="${pageNum} !=1" th:remove="tag">
+						<td th:text="${item.count}-1">序号</td>
+					</span>
+					<span th:if="${pageNum} ==1" th:remove="tag">
+						<td th:text="${item.count}">序号</td>
+					</span>
+					<td>
+						<span th:each="price,stat: ${item.priceList}" th:remove="tag">
+							<span class="badge badge-pill badge-warning" th:text="${price}">用水性质</span>
+						</span>
+					</td>
+					<!-- 单位名称 -->
+					<td th:text="${item.CUSTOMER_NAME}"></td>
+					<td>
+						<span th:each="period,stat: ${item.periodList}" th:remove="tag">
+							<span class="badge badge-pill badge-warning" th:text="${period}">欠费月份</span>
+						</span>
+					</td>
+					 <!-- 当月欠费 -->
+					<td  th:text="${item.currOweAmount}"></td>
+					 <!-- 累计欠费 -->
+					<td  th:text="${item.BASE_WATER_FEE}"></td>
+				</tr>
+			</span>
+		</tbody>
+	</table>
+	</th:block>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.StatBlockWaterFeeMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.StatBlockWaterFee">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="PAYMENT_MODE" jdbcType="VARCHAR" property="paymentMode" />
+    <result column="STAT_BLOCK_JSON" jdbcType="VARCHAR" property="statBlockJson" />
+    <result column="STAT_TOTAL_JSON" jdbcType="VARCHAR" property="statTotalJson" />
+    <result column="STAT_WATER_PRICE_JSON" jdbcType="VARCHAR" property="statWaterPriceJson" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, PERIOD, PAYMENT_MODE, STAT_BLOCK_JSON, STAT_TOTAL_JSON, STAT_WATER_PRICE_JSON, 
+    CREATE_TIME
+  </sql>
+</mapper>

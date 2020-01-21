@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('水费缴费统计')" th:remove="tag"></div>
+
+</head>
+<body>
+	<!-- 参数配置主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<!-- <div>
+					<h4 class="panel-title" th:text="${title}"></h4>
+					<hr style="height:1px;border:none;border-top:1px solid blue;">
+				</div> -->
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		/*]]>*/
+		
+	</script>
+
+	<script>
+	
+		$(function() {
+			/* 
+				加载用户框架页
+			*/
+			function loadAccountItemList(parms, callback) {
+				var url = "/water-fee-stat/main";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			loadAccountItemList(null, null);
+		})
+	</script>
+
+</body>
+</html>

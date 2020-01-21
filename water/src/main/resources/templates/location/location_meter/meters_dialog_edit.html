@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+
+</script>
+
+<style>
+
+/* 输入布局 */
+.table-layout td{
+	border:0px;
+	padding:0px;
+}
+
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<!-- <script src="/calendar/WdatePicker.js" type="text/javascript"></script> -->
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-meter-edit" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>查看:表计信息</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="meters-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table-sm">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 水表口径 -->
+													<div class="form-group form-inline">
+														<label for="meters-name" class="col-sm-6 control-label">水表口径</label>
+														<select class="form-control col-sm-6 " id="meters-caliber" name="caliber" th:value="${currItem==null ? '' : currItem.caliber}">
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${waterCaliberList}" th:remove="tag">
+																<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.caliber ? 'true':'false'}"
+																		th:text="${item.value}">数据字典的值</option>
+															</span>
+															
+														</select>
+													</div>
+												</td>
+														
+			
+												<td>
+													<!--水表类型-->
+													<div class="form-group form-inline">
+														<label for="meters-name" class="col-sm-6 control-label">水表类型</label>
+														<select class="form-control col-sm-6 " id="meters-meter-type" name="meterType" th:value="${currItem==null ? '' : currItem.meterType}">
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${meterTypeList}" th:remove="tag">
+																<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterType ? 'true':'false'}"
+																		th:text="${item.value}">数据字典的值</option>
+															</span>
+															
+														</select>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<!-- 水表编号 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">水表编号</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.meterNo}" 
+																id="meters-meter-no" name="meterNo" 
+																maxlength=20 title="请输入1-20个字符" placeholder="水表编号"/>
+													</div>
+												</td>
+											
+												<td>
+													<!-- 水表位置 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">水表位置</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.place}" 
+																id="meters-place" name="place" 
+																maxlength=20 title="请输入1-20位字符" placeholder="水表位置"/>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 水表厂家 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">水表厂家</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.factory}" 
+																id="meters-factory" name="factory" 
+																maxlength=30 title="请输入1-30个字符" placeholder="水表厂家"/>
+													</div>          
+ 												</td>
+											
+												<td>
+													<!-- 厂家联系电话-->
+													<div class="form-group form-inline">
+														<label for="user-sex" class="col-sm-6 control-label">厂家联系电话</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.factoryPhone}" 
+																id="meters-factory-phone" name="factoryPhone" 
+																maxlength=30 title="请输入1-30个字符" placeholder="厂家联系电话"/>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 水表检定证书编号 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">水表检定证书编号</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.certificateNo}" 
+																id="meters-certificate-no" name="certificateNo" 
+																maxlength=30 title="请输入1-30个字符" placeholder="水表检定证书编号"/>
+													</div>
+												</td>
+											
+												<td>
+													<!-- 水表检定日期-->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">水表检定日期</label>
+														<input type="text" class="form-control input-sm Wdate"
+																id="meters-check-date" name="checkDate"		
+																th:value="${currItem==null ? '' : currItem.checkDateStr}"				
+																onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+																placeholder="水表检定日期" style="width: 120px; background-color: white;" title="水表检定日期">
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 水表有效日期-->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">水表检定日期</label>
+														<input type="text" class="form-control input-sm Wdate"
+																id="meters-effective-date" name="effectiveDate"		
+																th:value="${currItem==null ? '' : currItem.effectiveDateStr}"				
+																onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+																placeholder="水表有效日期" style="width: 120px; background-color: white;" title="水表有效日期">
+													</div>
+												</td>
+												<td>
+													<!-- 父表计id -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">父表计id</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.pid}" 
+																id="meters-pid" name="pid" 
+																maxlength=20 title="请输入1-20个字符" placeholder="父表计id"/>
+													</div>	
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 水表钢印号 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">水表钢印号 </label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.steelSealNo}" 
+																id="meters-steel-seal-no" name="steelSealNo" 
+																maxlength=20 title="请输入1-20个字符" placeholder="水表钢印号 "/>
+													</div>	
+												</td>
+												<td>
+													<!-- 新表表底数 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">新表表底数 </label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.newMeterBottom}" 
+																id="meters-new-meter-bottom" name="newMeterBottom" 
+																maxlength=20 title="请输入1-20个字符" placeholder="新表表底数  "/>
+													</div>	
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 拆换表表底数 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">拆换表表底数</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.changeMeterBottom}" 
+																id="meters-change-meter-bottom" name="changeMeterBottom" 
+																maxlength=15 title="请输入1-15个字符" placeholder="拆换表表底数"/>
+													</div>
+												</td>
+												<td>
+													<!-- 水表用途 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">水表用途</label>
+														<select class="form-control col-sm-6 " id="meters-meter-use" name="meterUse" th:value="${currItem==null ? '' : currItem.meterUse}">
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${meterUseList}" th:remove="tag">
+																<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterUse ? 'true':'false'}"
+																		th:text="${item.value}">数据字典的值</option>
+															</span>
+															
+														</select>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 水表类型 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">水表类型</label>
+														<select class="form-control col-sm-6 " id="meters-meter-type" name="meterType" th:value="${currItem==null ? '' : currItem.meterType}">
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${meterTypeList}" th:remove="tag">
+																<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterType ? 'true':'false'}"
+																		th:text="${item.value}">数据字典的值</option>
+															</span>
+															
+														</select>
+													</div>
+												</td>
+												<td>
+													<!-- 轮换上限 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">轮换上限</label>
+														<input type="text" class="form-control col-sm-6 "
+																th:value="${currItem==null ? '' : currItem.upperLimit}" 
+																id="meters-upper-limit" name="upperLimit" 
+																maxlength=10 title="请输入1-10个字符" placeholder="轮换上限"/>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 表计状态 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">表计状态</label>
+														<select class="form-control col-sm-6 " id="meters-meter-status" name="waterUse" th:value="${currItem==null ? '' : currItem.meterStatus}">
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${meterStatusList}" th:remove="tag">
+																<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterStatus ? 'true':'false'}"
+																		th:text="${item.value}">数据字典的值</option>
+															</span>
+															
+														</select>
+													</div>
+												</td>
+												<td>
+													<!-- 抄表方式-->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-6 control-label">抄表方式</label>
+														<select class="form-control col-sm-6 " id="meters-read-mode" name="readMode" th:value="${currItem==null ? '' : currItem.readMode}">
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${readMoedeList}" th:remove="tag">
+																<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.readMode ? 'true':'false'}"
+																		th:text="${item.value}">数据字典的值</option>
+															</span>
+															
+														</select>
+													</div>
+												</td>
+											</tr>
+										
+										</tbody>
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/meters/insert";
+			
+			var metersId= $("#meters-id").val();
+			if(metersId!=null && metersId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/meters/update";
+			}
+			var form=new FormData($("#dialog-modi-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), */
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeModiDialog();
+							}
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+		/*
+			设置input背景色
+		*/
+		function setBackGround() {
+			$("#meters-settle_time").css("background-color", "white");
+		}
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				modiItem(true);				
+			});
+
+		});
+	</script>
+	
+	<script type="text/javascript">
+	 function validate(){  
+	       var reg = new RegExp("^[0-9]+(.[0-9]{2})?$ ");  
+	       var obj = document.getElementById("number");  
+	       if(!reg.test(obj.value)){  
+	        alert("请输入数字!");  
+	    	}  
+	         
+	  	}  
+
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

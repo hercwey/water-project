@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<!-- 批次列表 -->
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>客户名称</th>
+				<th>客户手机号</th>
+				<th>身份证号</th>
+				<th>地址</th>
+				<th>用水状态</th>
+				<th>状态</th>
+				<th style="width:100px;">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${customersList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 业主姓名 -->
+				<td th:text="${item.customerName}">业主姓名</td>
+				<!-- 客户电话 -->
+				<td th:text="${item.customerTel}">业主手机</td>
+				<!-- 用水性质 -->
+				<td th:text="${item.idNo}">身份证号 </td>
+				<!-- 地址 -->
+				<td th:text="${item.address}">地址</td>
+				<!-- 用水状态 -->
+				<td th:attr="id='water-status-'+${item.id}" th:text="${item.waterStatusStr}">用水状态 </td>
+				<!-- 客户状态 -->
+				<td th:attr="id='customer-status-'+${item.id}" th:text="${item.statusStr}">客户状态 </td>
+				<!-- 操作列 -->
+				<td>
+					<div class="dropdown">
+					    <button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+					      	操作
+					    </button>
+					    <div class="dropdown-menu">
+					    	<!-- 客户基本信息 -->
+							<a class="dropdown-item info-detail-single btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="bind-id=${item.id}, data-customer-status=${item.status}, data-customer-name=${item.customerName}">
+								<i class="fa fa-file-o" aria-hidden="true"></i><span>详情</span>
+							</a>
+					      	<!-- 更名 -->
+							<a class="dropdown-item rename-detail-single btn-sm"
+								th:attr="bind-id=${item.id}">
+								<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>更名</span>
+							</a>
+					    </div>
+					</div>
+					
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+	
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+	
+
+	<!--  -->
+	<script th:inline="javascript">
+		var curr_searchCond=[[${searchCond}]];
+	</script>
+
+
+	<script type="text/javascript">
+		var G_CUSTOMER_TYPE_PERSION = "1";//客户类型-个人
+		var G_CUSTOMER_TYPE_COMPANY = "2";//客户类型-单位
+		var g_is_edit = true;//全局变量是否是编辑操作
+		
+		//--------------查看客户档案详情页信息--------------
+		$('.info-detail-single').on('click',function() {
+			var itemId = $(this).attr("bind-id"); //条目ID
+			setCustomerIdFn(itemId)//设置客户ID
+			
+			var customerStatus = $(this).attr("data-customer-status");//客户状态：-1=未立户；0=已立户；1=已销户；2=已过户
+			var customerName = $(this).attr("data-customer-name");
+			
+			$("#tabs-customers-detail-customer-name").text('客户档案（'+customerName+'）');//客户档案选项卡显示的客户名称
+			var params = new Object();//参数：功能模块标识
+			params.customerId = itemId;
+			loadDetailList(params, loadDetailListCallback);//加载某客户的详细信息
+			
+			//客户状态：-1=未立户；0=已立户；1=已销户；2=已过户
+			if(customerStatus==-1){
+				hideCustomerAccountTab();//隐藏账户信息选项卡
+			}else{
+				showCustomerAccountTab();//显示账户信息选项卡
+			}
+			
+		});
+		
+		/**
+		 * 	加载某客户详情信息回调
+		 */
+		function loadDetailListCallback(){
+			$("#customer-detail-item-tab").show();//显示客户档案信息选项卡
+			$("#tabs-customers-nav a[href='#customer-detail-tab']").tab("show");//跳转到详细信息选项卡
+			$("#tabs-customers-detail-nav a[href='#detail-tab']").tab("show");//跳转到客户详细信息选项卡
+		}
+		
+		//-----------------更名按钮------------------
+		/* 
+			加载更名对话框
+		*/
+		$('.rename-detail-single').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/rename/loadmodirenamedialog';
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+			
+		
+			$("#rename-dialog-edit").load(url, parms,openRenameDialog); //加载完毕后显示 
+		});
+		
+		/**
+		  	打开用水性质更改对话框
+		  	@returns
+		 */
+		function openRenameDialog() {
+			const DIALOG_ID="modal-container-rename-edit";
+			DialogUtil.openDialogFn(DIALOG_ID);
+		}
+		
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeRenameDialog() {
+			const DIALOG_ID="modal-container-rename-edit";
+			DialogUtil.closeDialogFn(DIALOG_ID);	
+		}
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

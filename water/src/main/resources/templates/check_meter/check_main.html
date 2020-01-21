@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+ <link rel="stylesheet"	href="/css/meterbody.css" />
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="check-dialog-edit" ></div>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label check-meter-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block">
+				<ul class="extra-l" style="list-style: none;">
+				
+					<!-- 面板:增加/删除 -->
+					<li value="0">
+						<button type="button" class="btn btn-primary btn-sm"
+							id="btn-add">
+							<i class="fa fa-plus" aria-hidden="true"> 
+								<!-- <span style="color:black">增加</span> -->
+								<span>增加</span>
+							</i>
+						</button>
+					</li>
+					<li value="1">
+						<button type="button" class="btn btn-danger btn-sm"
+							id="btn-del">
+							<i class="fa fa-remove" aria-hidden="true"> <span>删除</span>
+							</i>
+						</button>
+					</li>
+
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入口径">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						
+						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					
+					</li>
+				</ul>
+			</div>
+
+			<div class="card">
+				<!-- 容器:字典列表 -->
+				<div class="check-meter-table table-container" id="meters-body"></div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function search(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/check-meter/table"
+			$(".check-meter-table").load(url, parms, customerResizeFuncx);
+		}
+		
+		function customerResizeFuncx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchParams(){
+			//初始化请求参数
+			var parms = new Object();
+			var searchCond = $("#search-cond").val();
+			parms.searchCond=searchCond;
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearch() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		/*		
+			加载(Load): 增加/编辑对话框
+			将对话框内容加载到指定的容器中
+		 */
+		function loadDialog() {
+			var url = BASE_CONTEXT_PATH + '/check-meter/loadadddialog';
+			$("#check-dialog-edit").load(url, null, openAddDialog); //加载完毕后显示
+		}
+			
+		/*
+		 * 	打开(Open) 增加核对类型对话框
+		 */
+		function openAddDialog() {
+			//可拖拽
+			$("#modal-container-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$('#modal-container-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			关闭(CLOSE) 增加核对类型对话框
+		 */
+		function closeAddDialog() {
+			$("#modal-container-dialog").modal("hide");
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearch();
+
+			//---------事件绑定--------------
+			
+			/*
+				增加核对类型按钮CLICK
+			*/
+			$('#btn-add').on('click', function() {
+				loadDialog();  //先加载后显示对话框
+				//openAddDialog();
+			}); 
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#btn-search').on('click', function() {
+				btnSearchClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#btn-search-reset').on('click', function() {
+				$("#search-cond").val("");
+				$("#search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/*
+				btn-del
+				批量删除按钮
+			*/
+			$('#btn-del').on('click', function() {				
+				deleteConfirm();  //显示删除确认对话框
+			});
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

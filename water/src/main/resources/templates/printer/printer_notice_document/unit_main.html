@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="printer-dialog-edit" th:include="printer/printer_dialog_edit::dialog"></div>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label printer-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block">
+				<ul class="extra-l" style="list-style: none;">
+
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success generate-print-pdf"	id="btn-search">
+							<i class="fa fa-print" aria-hidden="true"> <span>打印</span></i>
+						</button>
+					
+					</li>
+				</ul>
+			</div>
+
+
+			<!-- 容器:字典列表 -->
+			<div class="detail-table table-container"></div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchUnitList(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/print-notice/detail-table"
+			$(".detail-table").load(url, parms, customerResizeFuncx);
+		}
+		
+		function customerResizeFuncx(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchUnitParams(){
+			var traceIds = "";
+			var searchCond = null
+			var period = getPeriod();//期间
+			var locaBlockTraceIds = locationSearcher.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationSearcher.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationSearcher.getUnitId();//地理位置-单元traceIds
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+
+			//初始化请求参数
+			var parms = new Object();
+			parms.traceIds=traceIds;
+			parms.searchCond=searchCond;
+			parms.locaBlockTraceIds=locaBlockTraceIds;
+			parms.period=period;
+			
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchUnit() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchUnitParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchUnitList(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchUnitClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchUnitParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchUnitList(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadUnitPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchUnitParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchUnitList(parms);
+		}
+		
+		/*
+			btn-del-
+			批量打印
+		*/
+		$('.generate-print-pdf').on('click', function() {		
+			var idsArr=getSelectedIds();
+			if(idsArr == null || idsArr==""){
+				util.message("请勾选小区单元");
+				return false;
+			}
+			printConfirm();  //显示删除确认对话框
+		});
+		//--------------批量打印-----------------
+		/* $('.generate-print-pdf').on('click',function(){	
+
+			var traceIds=getSelectedIds(); ;
+			var parms = new Object();
+			parms.traceIds = JSON.stringify(traceIds);;
+			var url = BASE_CONTEXT_PATH+"/print-notice/loadPrinterDialog"; // 需要提交的url
+			$("#print-dialog").load(url,parms,showPrinterDialog);	
+		}); */
+		/*
+			打开(Open)打印机对话框
+		*/
+		function showPrinterDialog(){
+	//		可拖拽
+			$("#modal-container-print-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-print-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+		
+		/* 
+			关闭(CLOSE) 打印机对话框
+		*/
+		function closePrinterDialog() {
+			$("#modal-container-print-dialog").modal("hide");
+		}
+
+		
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchUnit();
+
+			//---------事件绑定--------------
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

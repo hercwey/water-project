@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterRecordTempPhotoMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterRecordTempPhoto">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="IMAGE_PATH" jdbcType="VARCHAR" property="imagePath" />
+    <result column="IMAGE_FORMAT" jdbcType="VARCHAR" property="imageFormat" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, METER_ID, PERIOD, IMAGE_PATH, IMAGE_FORMAT, OPERATOR_NAME, OPERATOR_ID, OPERATION_TIME, 
+    CUSTOMER_ID
+  </sql>
+</mapper>

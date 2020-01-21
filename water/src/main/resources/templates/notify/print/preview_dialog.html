@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-preview-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: ;height: 50px;">
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+							<!-- Tooltip -->
+							<div id="customer-notify-tooltip" class="well rounded  border border-secondary" style="padding:10px;">
+							    <div class="water-fee-notify-container">此处显示水费通知单</div>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+		
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		/*]]>*/
+	</script>
+
+	<script>
+		function LoadWaterNotify(){
+			var self = this;
+			const PREFIX = "#"+self.containerId;
+			const NOTIFY_TOOLTIP_ID = "#customer-notify-tooltip";
+			const NOTIFY_CONTAINER_CLASS = "#customer-notify-tooltip .water-fee-notify-container";
+			var parms = new Object();
+			parms.notifyId = getNotifyId();
+			var url = BASE_CONTEXT_PATH + "/select-customer-notify/detail"
+			$(NOTIFY_CONTAINER_CLASS).load(url, parms, loadNotifyDetailCallback);
+			function loadNotifyDetailCallback(res){
+				console.log("load notify detail callback...");
+				var myEvent = new Event('resize');
+		        window.dispatchEvent(myEvent);
+		        
+		        $(NOTIFY_TOOLTIP_ID).popup('show');
+		        
+			}
+		}
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			LoadWaterNotify();
+			
+			
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

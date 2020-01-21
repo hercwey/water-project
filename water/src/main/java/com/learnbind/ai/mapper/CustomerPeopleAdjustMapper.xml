@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerPeopleAdjustMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerPeopleAdjust">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="ADD_NUM" jdbcType="DECIMAL" property="addNum" />
+    <result column="START_TIME" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="ENABLED" jdbcType="DECIMAL" property="enabled" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, ADD_NUM, START_TIME, END_TIME, OPERATOR_NAME, CREATE_TIME, ENABLED, 
+    OPERATOR_ID
+  </sql>
+  
+    <!-- 查询名称,返回列表 -->
+  <select id="searchCustomerPeopleAdjust" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM CUSTOMER_PEOPLE_ADJUST P
+		<where>
+			P.customer_id=#{customerId}
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					P.OPERATOR_NAME LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY p.id DESC
+  </select>
+</mapper>

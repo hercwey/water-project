@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户档案详细信息</title>
+
+</head>
+
+<body>
+	
+	<!-- 当前所编辑的账单ID -->
+	<input type="hidden" id="account-item-id" name="id" th:value="${accountItem==null ? '' : accountItem.id}" />
+	
+	<th:block th:fragment="dialog">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<h5 class="card-header">
+						账单信息
+					</h5>
+					<div class="card-body">
+						<table class="table" id="account-detail-table">
+							<tr>
+								<td>账户名称：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.accountName}"></td>
+								<td>期间：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.period}"></td>
+							</tr>
+							<tr>
+								<td>账单开始时间：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.startTimeStr}"></td>
+								<td>账单结束时间：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.endTimeStr}"></td>
+							</tr>
+							
+							<tr>
+								<td>账单类型：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.creditSubject}"></td>
+								<td>记账日期：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.accountDateStr}"></td>
+								
+							</tr>
+							<tr>
+								<td>账单金额：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.creditAmount}"></td>
+								<td>已充值金额：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.debitAmount}"></td>
+								
+							</tr>
+							<tr>
+								<td>违约金金额：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.overdueValue}"></td>
+								<td>已充值违约金金额：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.rechargeOverdueValue}"></td>
+							</tr>
+							<tr>	
+							
+								<td>账单描述：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.creditDigest}"></td>
+								<td>账单备注：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.remark}"></td>
+							</tr>
+							<!-- <tr>
+								<td>借/贷：</td>
+								<td  th:text="${accountItem==null ? '' : accountItem.debitCredit}"></td>
+								<td></td>
+								<td></td>
+							</tr> -->
+							
+						</table>
+					</div>
+					<!-- 尾部 -->
+					<div class="card-footer">
+							<b>欠费金额：<span th:text="${accountItem==null ? '' : accountItem.arrearsValue}"></span></b>
+							<button type="button" class="btn btn-info" id="settle-account">结算</button>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		
+	</th:block>
+	
+	
+	<script type="text/javascript">
+		
+		/* 
+			结算按钮对话框 
+		*/
+		$('#settle-account').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/bill-arrears/loadsettleaccountdialog';
+			var accountItemId = $("#account-item-id").val();
+			var settleAmount = $("#account-settle-amount").val();//结算金额
+			var parms = new Object(); //参数
+			parms.accountItemId = accountItemId;
+			parms.settleAmount = settleAmount;
+			console.log(parms);
+			$("#settle-account-dialog").load(url, parms,openSettleAccountDialog); //加载完毕后显示 
+		});
+	
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openSettleAccountDialog() {
+			//	可拖拽
+			$("#modal-container-settle-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-settle-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeSettleAccountDialog() {
+			$("#modal-container-settle-dialog").modal("hide");
+		}
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+<style>
+
+.extra-l  a {
+	color: black;
+}
+
+/* 时间查询条件样式 */
+.extra-l li {
+	float: left;
+	margin: auto 1px;
+	cursor: pointer;
+}
+
+/* placeholder color */
+/* chrome浏览器 */
+#search-cond::-webkit-input-placeholder{
+ color: lightblue; 
+}
+#search-cond:-moz-placeholder{
+color: lightblue;
+}
+#search-cond::-moz-placeholder{
+color: lightblue;
+}
+#search-cond:-ms-input-placeholder{
+color: lightblue;
+}
+
+</style>
+
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="num-dialog-edit" ></div>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label num-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block">
+				<ul class="extra-l" style="list-style: none;">
+			
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入客户名称" />
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+				</ul>
+			</div>
+
+			<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+
+			<!-- 容器:字典列表 -->
+			<div class="num-table table-container"></div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function search(searchCond, pageNum, pageSize) {
+
+			//初始化请求参数
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			parms.searchCond=searchCond;
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/use-num/table"
+			$(".num-table").load(url, parms, null);
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearch() {
+			var pageNum = 0;
+			var pageSize = 0;
+			var searchCond="";
+
+			search(searchCond, pageNum, pageSize);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			var searchCond=$("#search-cond").val();
+
+			search(searchCond, pageNum, pageSize);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPage() {
+			var pageNum = curr_pageNum;
+			var pageSize = curr_pageSize;
+			var searchCond=curr_searchCond;
+
+			search(searchCond, pageNum, pageSize);
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearch();
+
+			//---------事件绑定--------------
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#btn-search').on('click', function() {
+				btnSearchClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#btn-search-reset').on('click', function() {
+				$("#search-cond").val("");
+				$("#search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#btn-search').trigger("click");	                
+	            }	
+			});
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

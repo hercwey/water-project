@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+
+</script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-meter-out-stock-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>出库校验单</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="meter-out-stock-doc-form">
+									<!-- 当前所编辑表计的表计ID -->
+									<input type="hidden" id="meter-out-stock-doc-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />	
+									<!-- 当前所编辑表计的表计ID -->
+									<input type="hidden" id="meter-id" name="meterId" th:value="${meterId}" />	
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 单位名称 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">单位名称</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.knockDownUnit}" 
+																	id="knock-down-unit" name="knockDownUnit" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="单位名称"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 水表编号 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">水表编号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${meterNo}" 
+																	id="meter-no" name="meterNo" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="水表编号"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 施工单位 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">施工单位</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.constructionCompany}" 
+																	id="construction-company" name="constructionCompany" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="施工单位"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 施工人员 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">施工人员</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.constructionPeople}" 
+																	id="construction-people" name="constructionPeople" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="施工人员"/>
+														</span>
+													</div>
+												</td>
+												
+											</tr>
+											<tr>
+												<td>
+													<!-- 水表表底 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">水表表底</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.meterBottom}" 
+																	id="meter-bottom" name="meterBottom" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="水表表底"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 水表口径 -->
+													<div class="form-group form-inline">
+														<label for="meters-name" class="col-sm-4 control-label">水表口径&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-caliber" name="caliber" th:value="${currItem==null ? '' : currItem.caliber}" required>
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${waterCaliberList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.caliber ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+																
+															</select>
+														</span>
+														
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 水表位置-->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">水表位置</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.meterPlace}" 
+																	id="meter-place" name="meterPlace" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="水表位置"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 库房接收人-->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">库房接收人</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.storageReceivePeople}" 
+																	id="storage-meter-people" name="storageReceivePeople" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="库房接收人"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 营业处负责人 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">营业处负责人</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.yycPeople}" 
+																	id="yyc-people" name="yycPeople" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="营业处负责人"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 物资处负责人 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">物资处负责人</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.wzcPeople}" 
+																	id="wzc-people" name="wzcPeople" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="物资处负责人"/>
+														</span>
+													</div>
+												</td>
+												
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 出库日期-->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">出库日期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control Wdate"
+																	id="out-stock-date" name="outStockDate"		
+																	th:value="${currItem==null ? '' : currItem.outStockDateStr}"				
+																	onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+																	placeholder="水表检定日期" style="background-color: white;" title="出库日期">
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 备注-->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">备注</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.remark}" 
+																	id="remark" name="remark"
+																	maxlength=30 title="请输入1-30个字符" placeholder="备注"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+										</tbody>
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-meter-out-stock-doc-save">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+			var meter_id=[[${meterId}]];
+			var meter_no=[[${meterNo}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		
+		/*
+			设置input背景色
+		*/
+		function setBackGround() {
+			$("#out-stock-doc-date").css("background-color", "white");
+		}
+		
+
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		 $("#btn-meter-out-stock-doc-save").on("click", function() {
+				//需要提交的url	
+				var urlStr = BASE_CONTEXT_PATH + "/meter-return/insert-out-stock-doc";
+				
+				var docId= $("#meter-out-stock-doc-id").val();
+				if(docId!=null && docId!=""){
+					urlStr = BASE_CONTEXT_PATH + "/meter-return/update-out-stock-doc";
+				}
+				var form=new FormData($("#meter-out-stock-doc-form")[0]);
+				
+				$.ajax({
+					type : "POST", // 提交方式 get/post
+					url : urlStr,
+					processData:false,
+	         		contentType:false,
+					data : form,
+					success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+						if (res != null && res != "") {
+							if (res.result_code == "success") {
+								loadPageClickPageNum();//加载当前页
+								closeMeterOutStockDialog();
+								util.message(res.result_msg,null,"success");
+							} else {
+								util.message(res.result_msg,null,"warning");
+							}
+						}
+					},
+					error : function(jqXHR, textStatus, errorThrown) {
+						util.message("AJAX请求时发生错误!");
+					}
+				});
+			});
+		
+			
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

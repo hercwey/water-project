@@ -1,0 +1,369 @@
+/*
+ * @Description: 后台
+ * @Author: Wang Rfan
+ * @Date: 2019-07-25 23:39:05
+ */
+
+@import "./_reset.scss";
+
+$itemColor: #707070;
+$itemActiveColor: #007ffa;
+
+html,
+body {
+  height: 100%;
+}
+
+// header
+.header {
+  .navbar {
+    height: 80px;
+    background-color: #287dfe;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      width: 40%;
+      height: 100%;
+      background-image: url('../img/nav-bg.png');
+      background-repeat: no-repeat;
+      background-position: left center;
+      background-size: cover;
+      z-index: 10;
+      // opacity: 0.8;
+    }
+
+    .navbar-collapse {
+      z-index: 12;
+    }
+
+    .navbar-brand {
+      height: calc(100% + 1rem);
+      border-bottom: 1px solid #e6e6e6;
+      background-color: #fff;
+      color: #333;
+      width: 260px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      font-weight: bold;
+      flex: none;
+      margin: -0.5rem -1rem;
+      margin-right: 0;
+      padding: 1rem;
+
+      .logo-content {
+        height: 60px;
+        display: flex;
+        align-items: center;
+        transform: scale(0.75);
+
+        img {
+          height: 100%;
+          margin-right: 10px;
+        }
+
+        p {
+          margin-bottom: 0;
+
+          &.text {
+            font-weight: bold;
+            letter-spacing: 2.5px;
+            font-size: 18px;
+          }
+
+          &.eng {
+            font-size: 12px;
+            letter-spacing: -1px;
+          }
+        }
+      }
+    }
+
+    .navbar-nav {
+      height: 80px;
+
+      .nav-item {
+
+        &.active {
+          background-color: #0092ef;
+        }
+
+        .nav-link {
+          font-size: 14px;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          height: 80px;
+          min-width: 90px;
+
+          &.disabled {
+            opacity: .4;
+          }
+
+          >.iconfont {
+            margin-bottom: 6px;
+          }
+
+          >img {
+            height: 30px;
+            width: 30px;
+            margin-bottom: 6px;
+          }
+        }
+      }
+    }
+
+    .navbar-text {
+      color: #ffffff;
+
+      .date {
+        font-size: 14px;
+        text-align: right;
+      }
+
+      .operater {
+        ul {
+          list-style: none;
+          font-size: 14px;
+          margin-bottom: 0;
+          padding: 0;
+
+          >li {
+            display: inline-block;
+            vertical-align: middle;
+
+            .user-name {
+              color: yellow;
+            }
+
+            .btn {
+              color: #fff;
+              padding: 0 4px;
+              border: none;
+            }
+          }
+        }
+      }
+    }
+
+    .navbar-toggler {
+      color: rgba(255, 255, 255, .5);
+      border-color: rgba(255, 255, 255, .1);
+    }
+  }
+}
+
+
+.content-wrapper {
+  height: calc(100% - 80px);
+}
+
+// left side
+.left-nav {
+  transition: width 0.28s;
+  width: 260px;
+  height: calc(100% - 80px);
+  position: fixed;
+  top: 80px;
+  bottom: 0;
+  left: 0;
+  z-index: 1001;
+  border-right: 1px solid #e6e6e6;
+
+  .bg-img {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+
+    img {
+      width: 100%;
+      opacity: 0.8;
+    }
+  }
+
+  .left-menu-wrapper {
+    height: 100%;
+
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+
+      >li {
+        &.mm-active>a {
+          color: $itemActiveColor;
+          background-color: rgba(255, 255, 255, 0.2);
+          font-weight: bold;
+        }
+
+        >a {
+          text-decoration: none;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+          }
+        }
+      }
+    }
+
+    .left-menu {
+      display: none;
+      flex-direction: column;
+
+      >li {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+
+        &:first-child {
+          margin-top: 5px;
+        }
+
+        +li {
+          margin-top: 5px;
+        }
+
+        a {
+          position: relative;
+          display: block;
+          padding: 13px 15px;
+          color: $itemColor;
+          outline-width: 0;
+          transition: all .3s ease-out;
+          cursor: pointer;
+        }
+
+      }
+
+    }
+
+    .nav-second-level>li>a,
+    .nav-third-level>li>a {
+      // background-color: #fff;
+      padding-left: 40px;
+      white-space: nowrap;
+
+      // &:hover {
+      //   background-color: #ecf5ff;
+      // }
+    }
+
+    .nav-third-level>li>a {
+      padding-left: 60px;
+    }
+  }
+}
+
+.main-container {
+  height: 100%;
+  min-height: 100%;
+  -webkit-transition: margin-left .28s;
+  transition: margin-left .28s;
+  margin-left: 260px;
+  position: relative;
+
+  .hamburger-btn {
+    position: absolute;
+    left: 0;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+    z-index: 105;
+
+    .iconfont {
+      font-size: 20px;
+    }
+  }
+
+  // 面包屑样式
+  .breadcrumb {
+    height: 38px;
+    transition: all 1s;
+    position: relative;
+    padding: 8px 15px;
+    padding-left: 36px;
+    margin-bottom: 0;
+    background-color: #fff;
+    border-bottom: 1px solid #d8dce5;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);
+    z-index: 100;
+
+    >li {
+      color: #303133;
+      text-decoration: none;
+      font-size: 14px;
+    }
+  }
+}
+
+/* 侧边栏收缩样式 */
+.nav-collapse {
+  .left-nav {
+    width: 0;
+    opacity: 0;
+  }
+
+  .main-container {
+    margin-left: 0;
+
+    .hamburger-btn {
+      transform: rotateY(180deg)
+    }
+  }
+}
+
+// 页面容器样式
+.page-container {
+  height: calc(100% - 38px);
+  background-color: #f4f7fd;
+  iframe{
+    display: block;
+  }
+  .wel-wrap{
+    display: none;
+  }
+  &.welcome {
+    background-color: #fff;
+    .wel-wrap {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      overflow: hidden;
+
+      .wel-img {
+        position: relative;
+        width: 80%;
+        max-height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        p {
+          position: absolute;
+          top: 5%;
+          left: 0;
+          right: 0;
+          text-align: center;
+          font-size: 30px;
+          color: #287dfe;
+          letter-spacing: 5px;
+        }
+
+        img {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

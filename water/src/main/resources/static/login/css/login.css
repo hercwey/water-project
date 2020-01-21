@@ -1,0 +1,86 @@
+@charset "utf-8";
+
+body{text-align:left;background-color:#7391cc;margin:0 auto;}
+.header{background: url('../images/login.png') no-repeat 0 center transparent;width:925px;height:315px;}
+/* .userImg{background: url('../images/user.png') no-repeat 0 center transparent;width:28px;height:28px;display:inline-table;border:0px;margin:0px;font-size:0;margin-right:5px;} */
+/* .lt-icon-user{background: url('../images/user.png') no-repeat 0 center transparent;width:28px;height:28px;display:inline-table;border:0px;margin:0px;font-size:0;margin-right:5px;} */
+/* .passwordImg{background: url('../images/password.png') no-repeat 0 center transparent;width:28px;height:28px;display:inline-table;border:0px;margin:0px;font-size:0;margin-right:5px;} */
+/* .lt-icon-password{background: url('../images/password.png') no-repeat 0 center transparent;width:28px;height:28px;display:inline-table;border:0px;margin:0px;font-size:0;margin-right:5px;} */
+td{border:0px;margin:0px;padding:0px;height:20px;}/*45px*/
+/* input{height: 16px; padding: 13px 0px; font-size: 14px;background-color:#E3E8EE;border:0px;margin:0px;text-indent:10px;color:#B3B4B6;} */ 
+.login{font-weight:bold;font-size:20px;color:#FFFFFF;}
+.trH{height:10px;}
+/*login*/
+html,body{
+    height:100%;
+    overflow: hidden;
+}
+input {
+    outline:none;
+}
+.login-warpper{
+    height:450px;
+    width:100%;
+}
+.login-box-position{
+    position: relative;
+    width:1200px;
+    margin:0 auto;
+    height:450px;
+    top:65%;
+}
+.login-box-position .left,.login-box-position .right{
+    position: absolute;
+}
+.login-box-position .left{
+    left:50px;
+    width:300px;
+    height: 300px;
+}
+.login-box-position .right{
+    right:50px;
+    width:375px;
+    height: 300px;
+}
+.login-box{
+    position: relative;
+    padding:20px 30px;
+    background:#fff;
+}
+.login-titile{
+    /*position: absolute;*/
+    /*top:-35px;*/
+    width:315px;
+    height:45px;
+    text-align:center;
+    font-size:18px;
+    /*color:#fff;*/
+    font-weight: bold;
+}
+.input-group-item{
+    width:315px;
+    height:40px;
+    margin-bottom:28px;
+}
+.input-group-item .input-text input{
+    /* width:315px; */
+    width:282px;
+    float:right;
+    /* border:1px solid #969696;
+    background-color:#fff; */
+}
+.input-group-item .input-text input[type='submit']{
+    width:315px;
+}
+body{
+    /* background:url("../images/lgbg.jpg") center center; */
+    /* background-color: red; */
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.menu_div span{
+    color:#6F96E5;
+}
+.cbit-grid div.bDiv{
+    background: #ffffff;
+}

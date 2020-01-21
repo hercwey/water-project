@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="text-center" th:text="${period}+'拖欠水费用户登记表'">
+				201X年拖欠水费用户登记表
+			</h3>
+		
+			<table class="table table-bordered table-sm">
+				<thead>
+					<tr>
+						<th>客户名称</th>
+						<th>欠费月份</th>
+						<th>总计（元）</th>
+						<th>备注</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tbody>
+						<span th:if="${pageNum} ==1" th:remove="tag">
+							<tr>
+								<td >小区</td>
+								<td>
+									<span th:each="period,stat: ${blocklist}" th:remove="tag">
+										<span class="badge badge-pill badge-warning" th:text="${period}">欠费月份</span>
+									</span>
+								</td>
+								 <!-- 欠费金额 -->
+								<td  th:text="${totalBlockAmount}"></td>
+							</tr> 
+						</span>
+						<tr th:each="item,iterStat: ${dataList}">
+							<!-- 单位名称 -->
+							<td th:text="${item.CUSTOMER_NAME}"></td>
+							<td>
+								<span th:each="period,stat: ${item.periodList}" th:remove="tag">
+									<span class="badge badge-pill badge-warning" th:text="${period}">欠费月份</span>
+								</span>
+							</td>
+							 <!-- 当月欠费 -->
+							<td  th:text="${item.oweAmount}"></td>
+							 <!-- 备注 -->
+							<td></td>
+						</tr>
+						<tr>
+							<td th:text="${period}+'年合计'">
+								2018年合计：
+							</td>
+							<td th:text="${debtSum}+'元'" colspan="3">
+								200
+							</td>
+						</tr>
+					</tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerRecord')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+		
+		});
+		
+		//创建分页组件实例
+		var pager=new Pager("pagerRecord");
+		$(function(){			
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

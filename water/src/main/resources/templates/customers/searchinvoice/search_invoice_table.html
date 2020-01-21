@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>开票信息列表页面</title>
+
+</head>
+<body>
+	<div class="table-responsive">
+		<!-- 列表 -->
+		<table class="table table-hover table-sm" id="customer-invoice-table">
+			<thead>
+				<tr>
+					<!-- <th>
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input"
+								id="select-all-toggle" name="example1"> <label
+								class="custom-control-label" for="select-all-toggle"></label>
+						</div>
+					</th> -->
+					<th>客户编号</th>
+					<th>开票类型</th>
+					<th>客户名称</th>
+					<th>开票名称</th>
+					<th>税号</th>
+					<!-- <th style="width:20%;">开户行</th> -->
+					<!-- <th style="width:10%;">开户账号</th> -->
+					<th>地址</th>
+					<th>电话</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="item,iterStat: ${invoiceMapList}" th:attr="data-invoice-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-customer-name=${item.CUSTOMER_NAME}, data-invoice-name=${item.INVOICE_NAME}, data-bill-type=${item.BILL_TYPE}, data-tax-no=${item.TAX_NO}, data-account-bank=${item.ACCOUNT_BANK}, data-account-no=${item.ACCOUNT_NO}, data-reg-address=${item.REG_ADDRESS}, data-telephone=${item.TELEPHONE}">
+				
+					<!-- 条目选择器 -->
+					<!-- <td>
+						<div class="custom-control custom-checkbox"
+							style="margin-bottom: -1px !important;">
+							<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.ID},data-bind=${item.ID}">
+							<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.ID}"></label>
+						</div> 
+					</td> -->
+					
+					<!-- <span th:if="${item.invoiceSize==1}">
+						客户名称
+						<td th:attr="colspan=${item.invoiceSize}" th:text="${item.CUSTOMER_NAME}">客户名称 </td>
+					</span> -->
+					
+					<!-- <span th:if="${item.invoiceSize>1}">
+					
+					</span> -->
+					
+					<!-- 客户编号 -->
+					<td th:text="${item.BILL_NO}">客户编号</td>
+					<!-- 开票类型；1：专用发票，2：普通发票，3：手工发票 -->
+					<td>
+						<span th:if="${item.BILL_TYPE==1}">专用发票</span>
+						<span th:if="${item.BILL_TYPE==2}">普通发票</span>
+						<span th:if="${item.BILL_TYPE==3}">手工发票</span>
+					</td>
+					<!-- 客户名称 -->
+					 <!-- th:attr="rowspan=${item.invoiceSize}" -->
+					<td th:text="${item.CUSTOMER_NAME}">客户名称 </td>
+					
+					<!-- 开票名称 -->
+					<td th:text="${item.INVOICE_NAME}">开票名称</td>
+					<!-- 税号 -->
+					<td th:text="${item.TAX_NO}">税号</td>
+					<!-- 开户行 -->
+					<!-- <td th:text="${item.ACCOUNT_BANK==null ? '' : item.ACCOUNT_BANK}">开户行</td> -->
+					<!-- 账号 -->
+					<!-- <td th:text="${item.ACCOUNT_NO==null ? '' : item.ACCOUNT_NO}">开户账号</td> -->
+					<!-- 地址 -->
+					<td th:text="${item.REG_ADDRESS==null ? '' : item.REG_ADDRESS}">地址</td>
+					<!-- 电话 -->
+					<td th:text="${item.TELEPHONE==null ? '' : item.TELEPHONE}">电话</td>
+					<!-- 开票类型 -->
+					<!-- <td th:text="${item.BILL_TYPE}">开票类型</td> -->
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager(${containerId}+'-pager-table')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<!-- 此JS可自页面移出. -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	</script>
+</body>
+</html>

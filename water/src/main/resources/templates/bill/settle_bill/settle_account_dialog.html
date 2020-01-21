@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 输入布局 */
+.table{
+	width: 100%;
+}
+.table-layout td{
+	border-top: 0px;
+}
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+	
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-settle-dialog"
+					role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header"
+								style="background-color: #a5f1b6; height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>结算账单</span> <i class="fa fa-tags fa-1x"
+										aria-hidden="true" style="color: blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close"
+									data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-settle-form">
+									<!-- 当前结算的账单ID -->
+									<!-- <input type="hidden" id="account-item-id" name="" th:value="${accountItemId}" placeholder="" /> -->
+									<!-- 结算类型：1=按账单结算；2=按客户结算 -->
+									<input type="hidden" id="settle-type" th:value="${settleType}" placeholder="结算类型" />
+									<!-- 采用表格进行布局 -->
+									<table class="table-layout table">
+										<tbody id="overdue-fine-body">
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="customer-name" class="col-sm-4 control-label">客户</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" readonly="readonly"
+																	th:value="${customer.customerName}" placeholder="名称"
+																	id="customer-name" name="customerName" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="settle-period" class="col-sm-4 control-label">期间</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" readonly="readonly"
+																	th:value="${period}" placeholder="期间"
+																	id="settle-period" name="period" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="subject-action" class="col-sm-4 control-label">类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="subject-action" name="subjectAction" th:attr="data-total-amount=${totalOweAmount},data-base-amount=${basePriceOweAmount},data-treatment-amount=${treatmentFeeOweAmount}">
+																<span th:each="item,iterStat: ${subjectActionList}" th:remove="tag">
+																	<option th:value="${item.key}" th:text="${item.value}">支付方式</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="subject-payment" class="col-sm-4 control-label">支付方式</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="subject-payment" name="subjectPayment">
+																<span th:each="item,iterStat: ${subjectPaymentList}" th:remove="tag">
+																	<option th:value="${item.key}" th:text="${item.value}">支付方式</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="subject-action" class="col-sm-4 control-label">缴费类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="payment-type" name="paymentType" th:attr="data-total-amount=${totalOweAmount},data-base-amount=${basePriceOweAmount},data-treatment-amount=${treatmentFeeOweAmount}">
+																<option value="1">充值缴费</option>
+																<option value="2">清欠缴费</option>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="account-settle-amount" class="col-sm-4 control-label">结算金额</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control settle-amount"
+																	th:value="${customer.customerType==1} ? ${totalOweAmount} : ${basePriceOweAmount}" th:attr="placeholder=${customer.customerType==1} ? '欠费总金额 ￥'+${totalOweAmount} : '基础水费欠费总金额 ￥'+${basePriceOweAmount}, title=${customer.customerType==1} ? '欠费总金额 ￥'+${totalOweAmount} : '基础水费欠费总金额 ￥'+${basePriceOweAmount}" 
+																	id="account-settle-amount" name="settleAmount" maxlength="30" />
+														</span>
+													</div>
+												</td>
+
+											</tr>
+										</tbody>
+									</table>
+
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"
+									id="btn-modify-and-back">保存&返回</button>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+		<script>
+		//------------------业务操作----------------------
+		function getOverdueFineParms(){
+			var accountItemId = getCurrEditAccountItemId();//获取当前编辑账单的ID
+			var settleAmount = $("#account-settle-amount").val();//结算金额
+			var parms = new Object(); //参数
+			parms.accountItemId = accountItemId;
+			parms.settleAmount = settleAmount;
+			console.log(parms);
+		}
+		
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			 
+			const SETTLE_TYPE_BILL = 1;//结算类型-1=按账单结算
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH + "/settle-account-item/settle-account";
+			
+			var accountItemId = null;//结算账单ID
+			var customerId = null;//结算客户ID
+			var settlePeriod = null;//结算期间
+			
+			var settleType = $("#dialog-settle-form #settle-type").val();//结算类型：1=按账单结算；2=按客户结算
+			if(settleType==1){//按账单结算
+				//var accountItemId = $("#account-item-id").val();//结算账目ID
+				accountItemId = getCurrEditAccountItemId();//获取当前编辑账单的ID
+			}else{//按客户结算
+				customerId = getCurrEditCustomerId();//获取当前编辑账单的客户ID
+				settlePeriod = $("#dialog-settle-form #settle-period").val();//结算期间
+			}
+			
+			var settleAmount = $("#dialog-settle-form #account-settle-amount").val();//结算金额
+			if(settleAmount==null || settleAmount==""){
+				//dialog type: success warning info error,默认为info
+				util.message("缴费金额不能为空！",null,"warning");
+				return false;
+			}
+			
+			var subjectAction = $("#dialog-settle-form #subject-action").val();//缴费类型
+			var subjectPayment = $("#dialog-settle-form #subject-payment").val();//支付方式
+			var paymentType = $("#dialog-settle-form #payment-type").val();//缴费类型，1=充值缴费；2=清欠缴费
+			
+			var parms = new Object(); //参数
+			parms.settleType = settleType;
+			parms.accountItemId = accountItemId;
+			parms.customerId = customerId;
+			parms.period = settlePeriod;
+			parms.settleAmount = settleAmount;
+			parms.subjectAction = subjectAction;
+			parms.subjectPayment = subjectPayment;
+			parms.paymentType = paymentType;
+			console.log(parms);
+			
+			if(!parms){
+				return false;
+			}
+			
+			$.post(url, parms, function(res){
+				$('#btn-modify-and-back').attr("disabled", false);//设置保存按钮可操作
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						//loadPage();
+						closeSettleAccountDialog();
+						util.message(res.result_msg,null,"warning");
+						
+						if(settleType==1){//按账单结算
+							defaultSearchCustomerBillDetailTable();//加载客户账单列表
+							loadPageClickPageNum();//重新加载当前页面
+						}else{
+							loadPageClickPageNum();//重新加载当前页面
+						}
+						
+						
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+		
+
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeSettleAccountDialog() {
+			$("#modal-container-settle-dialog").modal("hide");
+		}
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			$("#subject-action").on("change", function(){
+				
+				//PAY_WATER_FEE("10", "交水费（综价）"),
+				//PAY_BASE_FEE("11", "交水费（基价）"),
+				//PAY_TREATMENT_FEE("12", "交污水处理费"),
+				
+				var msg = "";
+				var subjectActionCode = $(this).val();//类型
+				var settleAmount = 0.00;//结算金额
+				if(subjectActionCode==10){
+					var totalAmount = $(this).attr("data-total-amount");//水费欠费总金额
+					msg = "欠费总金额 ￥"+totalAmount;
+					settleAmount = totalAmount;//结算金额
+				}else if(subjectActionCode==11){
+					var baseAmount = $(this).attr("data-base-amount");//水费基础水费欠费总金额
+					msg = "基础水费欠费总金额 ￥"+baseAmount;
+					settleAmount = baseAmount;//结算金额
+				}else if(subjectActionCode==12){
+					var treatmentAmount = $(this).attr("data-treatment-amount");//水费污水处理费欠费总金额
+					msg = "污水处理费欠费总金额 ￥"+treatmentAmount;
+					settleAmount = treatmentAmount;//结算金额
+				}else{
+					msg = msg+"0";
+				}
+				$("#account-settle-amount").attr("placeholder", msg);
+				$("#account-settle-amount").attr("title", msg);
+				$("#dialog-settle-form #account-settle-amount").val(settleAmount);//结算金额
+			});
+			
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				$('#btn-modify-and-back').attr("disabled", true);//设置保存按钮不可操作
+				modiItem(true);				
+			});
+
+
+		});
+	</script>
+
+
+
+	</th:block>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>作废指定数量空白发票对话框-TEST页面</title>
+<div th:include="common/common_head::headx('作废指定数量空白发票对话框-TEST')" th:remove="tag"></div>
+</head>
+<body>
+	
+<div class="container-fluid">
+	<div class="row-fluid">
+		<!-- 对话框容器 -->
+		<div class="span12">
+			<!-- 对话框1 -->
+			<span th:include="component/invalidinvoicedialog/invalid_invoice_dialog::dialog('dialog1')"  th:remove='tag'></span>
+			<!-- 对话框2 -->
+			<span th:include="component/invalidinvoicedialog/invalid_invoice_dialog::dialog('dialog2')"  th:remove='tag'></span>
+		</div>
+		<div class="span12">
+			 <button class="btn btn-primary" type="button" id="button1">空白专票指定数量作废确认对话框-打开</button>
+			 <button class="btn btn-primary" type="button" id="button2">空白专票指定数量作废确认对话框-打开</button>
+		</div>
+	</div>
+</div>
+</body>
+
+<!-- 通用对话框工具JS -->
+<!-- <script type="text/javascript" th:src="js/component/dialogutil/DialogUtil.js"></script> -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 发票号码确认对话框组件JS部分 -->
+<script type="text/javascript" th:src="@{/js/component/invalidinvoicedialog/InvalidInvoiceDialog.js}"></script>
+<!-- 发票业务部分:发票类型 -->
+<script type="text/javascript" th:src="@{/js/component/invoicepublic/InvoiceType.js}"></script>
+
+
+<script type="text/javascript">
+	
+	var dialog1=new InvalidInvoiceDialog("dialog1");  //未使用发票作废号码确认-专票
+	//dialog1.setTitle("my title");
+	//dialog1.setMessage("my message");
+	dialog1.setInvoiceType("专用发票");
+	dialog1.setInvoiceDM("DM123");
+	dialog1.setInvoiceHM("HM456");
+	dialog1.setButtonOkCallback(buttonOkCallback);
+	dialog1.setButtonCancelCallback(buttonCancelCallback);
+	
+	var dialog2=new InvalidInvoiceDialog("dialog2");  //发票号码确认-普票
+	
+	function buttonOkCallback(){
+		console.log("button ok callback function is called!");
+	}
+	
+	function buttonCancelCallback(){
+		console.log("button cancel callback function is called!");
+	}
+	
+	
+	
+	
+	//page loaded ready
+	$(function() {
+		
+		/*
+			功能:查询发票库存
+			invoiceType:发票类型,参见InvoiceType.js
+						
+		*/
+		function queryInventory(invoiceType,successCallback){				
+			const url=BASE_CONTEXT_PATH+"/tax/inventory/query";  //请求地址
+			
+			//发票类型列表
+			var invoiceTypeList=new Array();
+			invoiceTypeList.push(invoiceType);
+			
+			var param=new Object();			
+			param.invoiceTypeList=invoiceTypeList;
+				
+			$.post(url,param,successCallback);  //采用load动态加载查询结果
+		}
+		
+		/*
+			查询库存成功-专用发票-回调函数
+		*/		
+		function querySpecialSuccess(resp){
+			console.log("返回的数据是-专用发票:"+resp);
+			if(resp!=""){
+				console.log("返回数据正常");
+				//将JSON转换为JS数组对象.此处必须将resp转换成JS对象.
+				var inventoryArr=JSON.parse(resp);  				
+				var inventory=inventoryArr[0];
+				
+				console.log("发票库存:"+inventory);
+				console.log("发票代码"+inventory.FPDM);
+				console.log("发票号码"+inventory.FPHM);
+				console.log("发票库存"+inventory.KCFPSL);
+				
+				var fpdm=inventory.FPDM;  	//发票代码
+				var fphm=inventory.FPHM;		//发票号码
+				var kcfpsl=inventory.KCFPSL; //库存发票数量
+				
+				dialog1.setInvoiceType("专用发票");
+				dialog1.setInvoiceDM(fpdm);
+				dialog1.setInvoiceHM(fphm);
+				dialog1.setInvoiceNum(kcfpsl);
+				
+				dialog1.show();
+				
+			}
+			
+		}
+		
+		/*
+			查询库存成功-普通发票-回调函数
+		*/
+		function queryNormalSuccess(resp){
+			console.log("返回的数据是-普通发票"+resp);			
+			if(resp!=""){
+				console.log("返回数据正常");
+				//将JSON转换为JS数组对象.此处必须将resp转换成JS对象.
+				var inventoryArr=JSON.parse(resp);  				
+				var inventory=inventoryArr[0];
+				
+				console.log("发票库存:"+inventory);
+				console.log("发票代码"+inventory.FPDM);
+				console.log("发票号码"+inventory.FPHM);
+				console.log("发票库存"+inventory.FPKCSL);
+				
+				var fpdm=inventory.FPDM;
+				var fphm=inventory.FPHM;
+				var kcfpsl=inventory.KCFPSL; //库存发票数量
+				
+				dialog2.setInvoiceType("普通发票");
+				dialog2.setInvoiceDM(fpdm);
+				dialog2.setInvoiceHM(fphm);
+				dialog2.setInvoiceNum(kcfpsl);
+				
+				dialog2.show();
+			}
+			
+			dialog2.show();
+		}
+		
+		$("#button1").on('click',function(){
+			//专用发票库存查询
+			queryInventory(InvoiceType.FPZL_SPECIAL_INVOICE,querySpecialSuccess);			
+		});
+		
+		$("#button2").on('click',function(){
+			//普通发票库存查询
+			queryInventory(InvoiceType.FPZL_NORMAL_INVOICE,queryNormalSuccess);
+		});	
+		
+	});
+</script>
+
+</html>

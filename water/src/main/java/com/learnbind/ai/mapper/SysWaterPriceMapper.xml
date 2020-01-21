@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.SysWaterPriceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.SysWaterPrice">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PRICE_TYPE_NAME" jdbcType="VARCHAR" property="priceTypeName" />
+    <result column="LADDER_NAME" jdbcType="VARCHAR" property="ladderName" />
+    <result column="LADDER_START" jdbcType="VARCHAR" property="ladderStart" />
+    <result column="LADDER_END" jdbcType="VARCHAR" property="ladderEnd" />
+    <result column="BASE_PRICE" jdbcType="DECIMAL" property="basePrice" />
+    <result column="TREATMENT_FEE" jdbcType="DECIMAL" property="treatmentFee" />
+    <result column="TOTAL_PRICE" jdbcType="DECIMAL" property="totalPrice" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="PRICE_TYPE_CODE" jdbcType="VARCHAR" property="priceTypeCode" />
+    <result column="PRICE_CODE" jdbcType="VARCHAR" property="priceCode" />
+    <result column="IS_LADDER_PRICE" jdbcType="DECIMAL" property="isLadderPrice" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, PRICE_TYPE_NAME, LADDER_NAME, LADDER_START, LADDER_END, BASE_PRICE, TREATMENT_FEE, 
+    TOTAL_PRICE, REMARK, PRICE_TYPE_CODE, IS_LADDER_PRICE, DELETED
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchWaterPrice" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM sys_water_price r
+		<where>
+			DELETED=0
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (r.PRICE_TYPE_NAME LIKE concat(concat('%',#{searchCond}),'%'))
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+  
+  <!-- 获取价格类型 -->
+  <select id="getPriceTypeList" resultType="map">
+		select distinct price_type_code,price_type_name from sys_water_price where DELETED=0
+  </select>
+  
+  <!-- 根据价格类型编码获取价格类型名称 -->
+  <select id="getPriceTypeName" resultType="String">
+		select distinct(price_type_name) from sys_water_price where price_type_code = #{priceTypeCode} and DELETED=0
+  </select>
+  
+   <!-- 根据priceCode获取水价 -->
+  <select id="getWaterPriceByPriceCode" resultMap="BaseResultMap">
+	SELECT
+		* 
+	FROM
+		sys_water_price 
+	<where>
+		DELETED=0
+		<if test="priceCode!=null and priceCode!='' ">
+			AND PRICE_CODE = #{priceCode}
+		</if>
+	</where>
+		
+  </select>
+</mapper>

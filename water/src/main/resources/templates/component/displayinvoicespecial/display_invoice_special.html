@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>专用发票显示对话框</title>
+</head>
+<body>
+	<th:block th:fragment="dialog(dialogId)">
+	<div class="modal fade " th:id="${dialogId}" role="dialog"	aria-labelledby="myModalLabel" aria-hidden="true" >		
+		<div class="modal-dialog" role="document">
+			<div class="modal-content" style="width:1050px;">
+				<!-- 对话框头 -->
+				<div class="modal-header" style="background-color:darkcyan;height:30px;padding-top:0px;padding-bottom:0px;">
+				 
+					<!-- <h5 class="modal-title">Modal title</h5> -->
+					<span style="height:30px; line-height:30px;padding:0px;margin:0px;color:white;">
+						<i class="fa fa-film" aria-hidden="true" style="color:yellow;"></i>
+						<span class="dialog-title">Modal title</span>
+					</span>					
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true" style="color:yellow;">×</span>
+					</button> 
+				</div>
+				<!-- 对话框主体 -->
+					<div class="modal-body" style="padding-top: 10px; height: 650px;">
+						<div class="row">						
+							<div class="col-12">			
+								<!-- 专用发票组件  设置对话框的高度与宽度 -->
+								<div id="invoice-special-container" style="padding-top:2px; padding-bottom:2px;padding-left:1px; padding-right:1px;" >
+									<div th:include="tax/components/invoice_special::invoice('invoice-special-1')"  th:remove="tag"></div>			
+								</div>								
+							</div>
+							<div class="col-12">			
+							</div>
+						</div>
+					</div>
+					<!-- 对话框底部按钮 -->
+				<!-- <div class="modal-footer">
+					<button type="button" class="btn btn-primary  button-preview" >预览</button>
+					<button type="button" class="btn btn-primary  button-print-yes" >打印</button>
+					<button type="button" class="btn btn-primary  button-cancel"	data-dismiss="modal">关闭</button>
+				</div> -->
+			</div>
+		</div>
+	</div>
+	<!-- end of dialog -->
+	</th:block>
+</body>
+</html>

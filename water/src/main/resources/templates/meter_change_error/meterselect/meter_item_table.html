@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>选择表计列表</title>
+</head>
+<body>
+	
+	<!-- 表计列表 -->
+	<table class="table table-hover table-sm" id="meter-select-item-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input select-all-toggle"
+							id="meter-select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="meter-select-all-toggle"></label>
+					</div>
+				</th>
+				<th>编号</th>
+				<th>钢印号</th>
+				<th>表计位置</th>
+				<th>生产厂家</th>
+				<!-- <th>抄表方式</th> -->
+				<th>表地址</th>
+				<th>水表用途</th>
+				<th>描述</th>
+				<!-- <th>停/复水</th> -->
+				<!-- <th style="width:100px;">操作</th> -->
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${meterList}" th:attr="data-bind=${item.id}" class="meter-item-selector-tr">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input meter-item-selector" name="example1" th:attr="id='meter-item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='meter-item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 编号 -->
+				<td th:text="${item.meterNo}">编号</td>
+				<!-- 钢印号 -->
+				<td th:text="${item.steelSealNo}">钢印号</td>
+				<!-- 表计位置 -->
+				<td th:text="${item.place}">表计位置</td>
+				<!-- 生产厂家 -->
+				<td th:text="${item.factory}">生产厂家</td>
+				<!-- 抄表方式 -->
+				<!-- <td th:text="${item.readMode}">抄表方式 </td> -->
+				<!-- 表地址 -->
+				<td th:text="${item.meterAddress}">表地址</td>
+				<!-- 水表用途 -->
+				<td th:text="${item.meterUseStr}">水表用途</td>
+				<!-- 水表描述 -->
+				<td th:text="${item.description}">水表描述</td>
+				<!-- 停/复水 -->
+				<!-- <td th:id="'meter-status-'+${item.id}" th:text="${item.meterStatusStr}">停/复水</td> -->
+				
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerMeterSelect')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_select_pageNum=[[${pageNum}]];
+		var curr_select_pageSize=[[${pageSize}]];
+		var curr_select_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		var G_NEW_METER_ID = 0;//保存用户换表时选中的新表ID
+		
+		/**
+		 *	返回所选条目的 id(每行对应一个唯一的ID)
+		 *	@return   
+		 */
+		function getNewMeterId(){
+			return G_NEW_METER_ID;
+		}
+		
+		/**
+		 *	设置所选条目的 id(每行对应一个唯一的ID)
+		 */
+		function setNewMeterId(meterId){
+			G_NEW_METER_ID = meterId;
+		}	
+	
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/**
+			 * 绑定客户列表行的click事件，用户点击行来设置该行是否选中（checkbox是否选中）
+			 */
+			$("#meter-select-item-table .meter-item-selector-tr").on('click', function(e) {
+				
+				var itemId = $(this).attr("data-bind");  //item'id
+				setNewMeterId(itemId);//把用户所选行的客户ID设置为新客户ID
+				
+				var prefix = "meter-item-selector-";
+				
+				//设置非当前选中行的checkbox为未选中状态，并设置当前选中行的checkbox为选中状态
+				$("#meter-select-item-table tbody .meter-item-selector").each(function(index, elem) {
+					this.checked = true;
+					var surfix = $(this).attr("data-bind");  //item'id
+					var rowId = prefix + surfix; 
+					if(surfix==itemId){
+						//console.log("checkbox true:"+surfix);
+						$('#meter-select-item-table tbody #' + rowId).prop("checked", true);
+					}else{
+						//console.log("checkbox false:"+surfix);
+						$('#meter-select-item-table tbody #' + rowId).prop("checked", false);
+					}
+				});
+				
+			});
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#meter-select-item-table .select-all-toggle").on('click', function(e) {
+				var prefix = "meter-item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$("#meter-select-item-table .meter-item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#meter-select-item-table #' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$("#meter-select-item-table .meter-item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#meter-select-item-table #' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		
+		//创建分页组件实例
+		var pager=new Pager("pagerMeterSelect");
+		$(function(){			
+			pager.init(loadPageClickPageNumMeterSelect,curr_select_searchCond);			
+		});
+
+	</script>
+</body>
+</html>

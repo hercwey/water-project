@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>通知单模板</title>
+<!-- .pdf文件下载  download -->
+ <script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+ <script src="https://cdn.bootcss.com/jspdf/1.3.4/jspdf.debug.js"></script>
+<!-- jQuery 2.2.3 -->
+<script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!-- <link href="src/main/resources/static/font-awesome/4.7.0/css/font-awesome.css"  rel="stylesheet" /> -->
+
+<style>
+	/* 横线的样式  */
+	
+	/* 页大小 */	
+	@page{
+		size:70mm 90mm portrait;
+	}
+	
+	/* 横线样式 */
+	hr{
+		background-color:red;height: 1px;width:100%;border: none;
+	}
+	
+	span#line-text{
+		border-bottom: 0.8px solid ;
+		}
+	
+	/* 
+	@font-face {
+    font-family: glyphicons;
+    font-size: small;    
+    src: url('src/main/resources/static/font-awesome/4.7.0/fonts/fontawesome-webfont.woff') format('woff');
+	} 
+	*/
+	th{
+		text-align:center;
+	}	
+	td{
+		text-align:center;
+	} 	
+</style>
+
+
+</head>
+<body style = "font-family: SimSun;" >
+	<div class="container-fluid">
+	
+		<div class="row">
+			<div class="col-md-12">
+				<table class="table table-sm">
+					<tbody  th:each="item,iterStat: ${textData}">
+						<!-- 标题信息 -->
+						<div class="row">
+							<div class="col-md-12">
+								<p></p>
+								<div class="row">
+									<div class="col-md-12" style="text-align:center;font-size:18px;font-weight:bold;">
+										<span>欠费充值通知</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- 通知单内容 -->
+						<div class="row">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-12">
+										<span class="" style="font-weight:bold;">尊敬的用户：</span> 
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<!-- <span th:text="'&nbsp;&nbsp;您好，您在'  +${item.place}+'的住房，'  +${item.periodStr}+'月的水费在'  +${item.deductDateStr}+'扣费时显示余额不足，发送短信通知后仍扣费失败，
+										截至目前已形成累计欠费：'   +${item.totalOweAmount}+ ' 元，请您尽快向卡内充费，我们将于，'  +${item.nextDeductDateStr}+'11-15日进行扣费。再次失败的，根据供水协议本月底将涉及停水。'"></span>  -->
+										
+										
+										
+										&nbsp;&nbsp;您好，您在<span id="line-text" th:text="${item.place}" ></span>的住房，<span th:text="${item.perPeriodStr}"></span>的水费在<span th:text="${item.deductDateStr}" ></span>扣费时显示余额不足，发送短信通知后仍扣费失败，截至目前已形成累计欠费：<span id="line-text" th:text="${item.totalOweAmount}" ></span>元，请您尽快向卡内充费，我们将于，<span id="line-text" th:text="${item.nextDeductDateStr}+'11-15日进行扣费'" ></span>。再次失败的，根据供水协议本月底将<span id="line-text">涉及停水</span>。 
+									</div>
+								</div>
+								<div th:if="${item.isEnter}" th:remove="tag">
+									<div class="row">
+										<div class="col-md-12">
+											<span>&nbsp;<!-- <b th:text="${item.isEnter}"></b> -->&nbsp;</span> 
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<span>&nbsp;&nbsp;地址：黄河大道秦岭大街交口东行280米路北，电话：69099838</span> 
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12" style="text-align:right;">
+										<span >高新区供水排水公司营业处</span> 
+									</div>
+								</div>
+								<!-- <div class="row">
+									<div class="col-md-12" style="text-align:right;">
+										<span  th:text=${item.sysdate}>日期</span> 
+									</div>
+								</div> -->
+								<br/>
+								<br/>
+								<br/>
+								<br/>
+							</div>
+						</div>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		
+	</div>
+	
+</body>
+
+</html>

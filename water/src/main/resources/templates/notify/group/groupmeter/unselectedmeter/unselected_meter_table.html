@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>已选择的表计列表</title>
+</head>
+<body>
+	<!-- 列表 -->
+	<table class="table table-striped table-hover table-sm" id="unselected-group-meter-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input select-all-toggle"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>水表编号</th>
+				<th>水表钢印号</th>
+				<th>水表位置</th>
+				<th>水表描述</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${unselectedMeterList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<td th:text="${item.meterNo}">水表编号</td>
+				<td th:text="${item.steelSealNo}">水表钢印号</td>
+				<td th:text="${item.place}">水表位置</td>
+				<td th:text="${item.description}">水表描述</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager-unselected-group-meter')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		//var meterBook_pageNum=[[${pageNum}]];
+		//var meterBook_pageSize=[[${pageSize}]];
+		var unselected_meter_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		/**
+		 *	返回所选条目的 id(每行对应一个唯一的ID)
+		 *	@returns   
+		 */
+		function getUnselectedMeterSelectedIds(){
+			var idArr = new Array();
+		
+			// 扫描用户所选择条目ID
+			$("#unselected-group-meter-table .item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/**
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			 */
+			$("#unselected-group-meter-table .select-all-toggle").on('click', function(e) {
+				console.log("click unselected all checkbox");
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$("#unselected-group-meter-table .item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#unselected-group-meter-table #' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$("#unselected-group-meter-table .item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#unselected-group-meter-table #' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		//创建分页组件实例
+		var pagerUnselectedMeter=new Pager("pager-unselected-group-meter");
+		$(function(){	
+			pagerUnselectedMeter.init(loadUnselectedGroupMeterPage,unselected_meter_searchCond);			
+		});
+	</script>
+</body>
+</html>

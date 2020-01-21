@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<!-- wechat-缴费记录 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')"
+	th:remove="tag"></div> -->
+	
+<title>石家庄高新区供水排水公司</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta name="context-path" content="/" />	
+
+<link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+hr.style-self { /*透明渐变水平线*/
+	width: 100%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 0, 0, 1),
+		rgba(0, 0, 255, 1), rgba(255, 0, 0, 1));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+/* 帐单-body不显示 */
+weui-form-preview__bd.hide {
+	display: none;
+}
+
+label.weui-label {
+	margin-bottom: 0px;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body ontouchstart>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div th:include="wechat/public_page/header::header('缴费记录')"	th:remove="tag"></div>
+				<!-- 客户可在此选择不同的客户编号.(微信 -- 1:n -- >客户) -->
+
+				<div class="weui-cells weui-cells_checkbox rounded">
+					<!-- 注,此处需置labe的样式 -->
+					<label th:each="customer,iter:${customerList}" class="weui-cell weui-check__label"	 th:attr="for='customer-no-'+${customer.customerId}"	style="margin-bottom: 0px;">
+						<div class="weui-cell__hd">
+							<input class="weui-check chk-customer" name=""
+								th:attr="id='customer-no-'+${customer.customerId},data-bind-customer-id=${customer.customerId}"								
+								checked="checked" type="checkbox"> <i
+								class="weui-icon-checked"></i>
+						</div>
+						<div class="weui-cell__bd">
+							<span th:text="'客户编号:'+${customer.customerCode}+'('+${customer.location}+')' ">客户编号:1234567890</span>
+						</div>
+					</label>
+				</div>
+
+				<!-- 加入时间查询条件 -->
+				<div class="weui-cells weui-cells_form">
+					<div class="weui-cell">
+						<div class="weui-cell__hd">
+							<label for="time-format" class="weui-label">起始日期</label>
+						</div>
+						<div class="weui-cell__bd">
+							<input class="weui-input" id="start-date" type="text">
+						</div>
+					</div>
+
+					<div class="weui-cell">
+						<div class="weui-cell__hd">
+							<label for="time-format" class="weui-label">终止日期</label>
+						</div>
+						<div class="weui-cell__bd">
+							<input class="weui-input" id="end-date" type="text">
+						</div>
+					</div>
+
+				</div>
+
+
+				<!--提交按钮-->
+				<div class="weui-btn-area">
+					<!-- <a class="weui-btn weui-btn_primary" href="javascript:" id="btn">提交绑定</a> -->
+					<!-- <button type="button" id="btnSearchFeeRecord" name="btnSearchFeeRecord" 	class="btn btn-primary  btn-block">查询</button> -->
+					<a class="weui-btn weui-btn_primary bg-blue" href="javascript:"  id="btnSearchFeeRecord" name="btnSearchFeeRecord">查询</a>
+				</div>
+
+				<hr class="style-self" style="height: 1px;" />
+
+				<div id="fee-list-container"></div>
+
+				
+
+				<!-- 缴费金额合计 -->
+				<div class="weui-form-preview__hd rounded" data-bind-id="all">
+					<label class="weui-form-preview__label">合计金额</label> 
+					<span	id="fee-amount" class="weui-form-preview__value">¥0.00</span>
+				</div>
+				
+				<!-- 帐户余额合计 -->
+				<span th:each="customer,iter:${customerList}" th:remove="tag">				
+					<div class="weui-form-preview__hd rounded" data-bind-id="balance">
+						<label class="weui-form-preview__label" th:text="${customer.location}+'-账户余额'">账户余额</label> 
+						<span	id="fee-amount" class="weui-form-preview__value" th:text="'¥'+${#numbers.formatDecimal(customer.balance,1,2)}">¥0.00</span>
+					</div>
+				</span>
+
+			</div>
+
+		</div>
+
+
+		<!-- <div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')"
+				th:remove="tag"></div>
+		</div> -->
+		
+		<div class="weui-footer ">
+				<p class="weui-footer__links" style="margin-bottom:5px;">
+					<a href="#" class="weui-footer__link">温馨提示:系统现支持查询半年(即6个月)内的账单.如需查询更长时间请拔打供水热线.</a>
+				</p>
+				<p class="weui-footer__links" style="margin-bottom:5px;">
+					<a href="#" class="weui-footer__link">石家庄高新区供水排水公司</a>
+				</p>
+				<p class="weui-footer__links" style="margin-bottom:5px;">
+					<a href="#" class="weui-footer__link">供水热线:69099838</a>
+				</p>
+				<!-- <p class="weui-footer__text">Copyright &copy; 石家庄高新区供排水公司</p> -->
+			</div>
+		
+	</div>
+	
+	<script type="text/javascript" src="/weui/js/zepto.min.js"></script>	
+	<script type="text/javascript" src="/weui/js/zepto.weui.js"></script>
+	<script type="text/javascript" src="/weui/js/php.js"></script>
+	<!-- <script type="text/javascript" src="/js/moment/moment.js"></script> -->
+	<script type="text/javascript" src="/assets/common/moment.min.js"></script>
+	
+
+	<!-- <script src="/weui/js/f2.min.js"></script> -->
+	
+	<!-- <script src="pivas/js/common/dateutil.js"></script> -->
+	<script type="text/javascript" src="/pivas/js/common/dateutil.js"></script>
+	
+	<script type="text/javascript">
+			var BASE_CONTEXT_PATH = $('meta[name=context-path]')
+					.attr("content");
+			console.log("BASE_CONTEXT_PATH0:"+BASE_CONTEXT_PATH) ;
+			BASE_CONTEXT_PATH = BASE_CONTEXT_PATH.substr(0,BASE_CONTEXT_PATH.length - 1);
+			console.log("BASE_CONTEXT_PATH1:"+BASE_CONTEXT_PATH) ;
+			
+		</script>
+	
+	
+	
+	<script	>
+		/*
+			缴费记录对象定义
+		*/
+		function FeeRecord(){
+			
+			/*
+				功能:
+					查询	条件收集
+				返回:
+					idArr:客户ID数组
+					startDate:开始时间
+					endDate:结束时间
+			*/			
+			this.getParms=function(){
+				//(1)客户ID
+				var idArr=getSelectedCustomer();
+				//(2)查询时间
+				var startDate=$('#start-date').val();
+				var endDate=$('#end-date').val();
+				var parms=new Object();
+				
+				parms.idArr=JSON.stringify(idArr);
+				parms.startDate=startDate;
+				parms.endDate=endDate;
+				
+				return parms;				
+			}
+		
+			/*
+				功能:
+					查询缴费记录
+				参数:
+					parms  查询参数,结构见  getParms
+			*/
+			this.searchFeeList=function(reqParms){
+				const   containerId="#fee-list-container";
+				var url=BASE_CONTEXT_PATH+'/wechat/searchfee';
+				
+				var parm=new Object();
+				parm.parms=reqParms;
+				
+				console.log("查询参数是:"+JSON.stringify(parm));
+				
+				$(containerId).load(url,reqParms,callbackFunc);
+			}
+			
+			/*
+				功能:
+					获取已经选定的客户id列表
+				返回:
+					客户id数组
+			*/
+			getSelectedCustomer=function(){
+				const chkCustomerClass=".chk-customer";
+				var ids = new Array();
+				$(chkCustomerClass).each(function() {
+					if ($(this).is(":checked")) {
+						//向数组中增加客户的ID
+						ids.push($(this).attr("data-bind-customer-id"));
+					}
+				});
+				console.debug('selected customer ids :'+JSON.stringify(ids));
+				return ids;			
+			}
+			
+			/*
+				显示合计金额
+			*/
+			this.displaySum=function(sum){
+				const dispId="#fee-amount";
+				$(dispId).text(sum);
+			}
+			
+			/*
+				初始化查询日期
+			*/
+			this.initSearchDate=function(){
+				const PERIOD_NUM=6;   //自当前日期向推进的月份数.(只查询半年的数据)
+				//当前日期
+				var currDate=new Date();	
+				console.log("当前日期:"+currDate);
+				
+				//6个月前的日期
+				//var currDatex=new Date(currDate);
+				
+				var preDate=moment().subtract(6, "months").format("YYYY-MM-DD");
+				
+				//var preDate=addMonth(currDate,-6);
+				//var fmtDate=dateFtt("yyyy-MM-dd",preDate);
+				
+				//初始日期查询组件
+				$("#start-date").val(preDate);
+				$("#end-date").val(today());
+			}
+			
+			/*
+				开始查询
+			*/
+			this.triggerSearch=function(){
+				const btnId="#btnSearchFeeRecord";
+				$(btnId).trigger('click');
+			}
+			
+			//初始化
+			this.initDateListener=function(){
+				const START_DATE="#start-date";
+				const END_DATE="#end-date";
+				
+				$(START_DATE).on('change',callback1);
+				$(END_DATE).on('change',callback2);
+				
+				//开始时间有变化时的处理.
+				function callback1(){
+					console.log("start_date change event triggered!");
+					var startDate=$(this).val();  //取得开始日期
+					var endDate=moment(startDate).subtract(-6, "months").format("YYYY-MM-DD");
+					$(END_DATE).val(endDate);
+				}
+				
+				//结束时间有变化时的处理.
+				function callback2(){
+					console.log("change event triggered!");
+					var endDate=$(this).val();  //取得开始日期
+					var startDate=moment(endDate).subtract(6, "months").format("YYYY-MM-DD");
+					$(START_DATE).val(startDate);
+				}
+				
+			}
+			
+		}	
+		
+		/*
+			页面加载完毕后的回调函数
+		*/
+		function callbackFunc(){
+			console.debug("callback is called");
+			//计算所有条目的合计
+			var sum=feeListObj.calcSum();
+			feeRecordObj.displaySum(sum);
+		}
+	
+	
+	</script>
+	
+	
+
+	<script>
+		
+		var feeRecordObj=new FeeRecord();  //生成对象
+	
+		
+		$("#start-date").datetimePicker({
+			title : '请选择日期',
+			years : range(1940, 2030),
+			times : function() {
+				return [];
+			},
+			parse : function(str) {
+				return str.split("-");
+			},
+			onChange : function(picker, values, displayValues) {
+				console.log(values);
+			}
+		});
+
+		$("#end-date").datetimePicker({
+			title : '请选择日期',
+			years : range(1940, 2030),
+			times : function() {
+				return [];
+			},
+			parse : function(str) {
+				return str.split("-");
+			},
+			onChange : function(picker, values, displayValues) {
+				console.log(values);
+			}
+		}); 
+
+		$(function() {
+			//var feeRecord=new FeeRecord();			
+			$('#btnSearchFeeRecord').on('click',function(){
+				console.debug("button clicked");
+				var parms=feeRecordObj.getParms();
+				console.debug("parms:"+JSON.stringify(parms));
+				feeRecordObj.searchFeeList(parms);
+			});
+			
+			feeRecordObj.initSearchDate();
+			feeRecordObj.triggerSearch();
+			
+			feeRecordObj.initDateListener(); 
+			
+		});
+	</script>
+
+</body>
+</html>

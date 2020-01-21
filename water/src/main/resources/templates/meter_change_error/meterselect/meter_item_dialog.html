@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>表计列表</title>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-meter-select-item" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg" style="max-width: 1000px">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>选择:表计列表</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<div class="card">
+							    	<div class="card-body">
+							    		<form class="form-horizontal " role="form" id="input-meter-read-form">
+											<table class="table-layout table">
+												<tbody>
+													<tr>
+														<td>
+															<!-- 旧表表底 -->
+															<div class="form-group form-inline">
+																<label for="input-old-meter-read" class="col-sm-4 control-label">旧表表底</label>
+																<span class="input-group-sm col-sm-8">
+																	<input type="text" id="input-old-meter-read" class="form-control" 
+																		value="" placeholder="请输入旧表表底" title="请输入旧表表底" />
+																</span>
+															</div>	
+														</td>
+														<td>
+															<!-- 旧表表底 -->
+															<div class="form-group form-inline">
+																<label for="input-new-meter-read" class="col-sm-4 control-label">新表表底</label>
+																<span class="input-group-sm col-sm-8">
+																	<input type="text" id="input-new-meter-read" class="form-control" 
+																		value="" placeholder="请输入新表表底" title="请输入新表表底" />
+																</span>
+															</div>	
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</form>
+							    	</div>
+								</div>
+								<div class="card">
+									<div class="card-body" id="meter-select-item-dialog-body">
+										<!-- 加载客户列表 -->
+									</div>
+								</div>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-change-meter-and-back">确认换表</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		
+		function changeCycleAjaxRequestFn(){
+			
+			//获取旧表表底和新表表底
+			var oldMeterRead = $("#input-meter-read-form #input-old-meter-read").val();//旧表表底
+			var newMeterRead = $("#input-meter-read-form #input-new-meter-read").val();//新表表底
+			
+			var newMeterId = getNewMeterId();//获取新表计ID
+			var oldMeterId = getMeterIdFn();//获取表计ID
+			
+			var url = BASE_CONTEXT_PATH+'/meter-change-error/change-meter';
+			var parms = {"oldMeterId": oldMeterId, "newMeterId": newMeterId, "oldMeterRead": oldMeterRead, "newMeterRead": newMeterRead};
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res!=null && res!="") {
+					if (res.result_code == "success") {
+						closeDialogFn("modal-container-meter-select-item");//关闭对话框
+						$("#modal-container-meter-select-item").on("hidden.bs.modal", function () {
+							//当模态框完全对用户隐藏时触发。
+							//loadPageClickPageNum();//加载当前页
+							var redirect = BASE_CONTEXT_PATH+"/meter-change-error/starter";//成功后的重定向链接
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,redirect,"success");
+						});
+						
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+			$("#btn-change-meter-and-back").on("click", function(){
+				var newMeterId = getNewMeterId();
+				if(newMeterId==0){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择新表！",null,"warning");
+					return false;
+				}
+				var oldMeterId = getMeterIdFn();//获取表计ID
+				if(newMeterId==oldMeterId){
+					//dialog type: success warning info error,默认为info
+					util.message("不能选择旧表，请选择新表！",null,"warning");
+					return false;
+				}
+				
+				//获取旧表表底和新表表底
+				var oldMeterRead = $("#input-meter-read-form #input-old-meter-read").val();//旧表表底
+				var newMeterRead = $("#input-meter-read-form #input-new-meter-read").val();//新表表底
+				if(oldMeterRead==null || oldMeterRead=="" || newMeterRead==null || newMeterRead==""){
+					//dialog type: success warning info error,默认为info
+					util.message("旧表表底和新表表底都不能为空!",null,"success");
+					return false;
+				}
+				
+				console.log("new meter id:"+newMeterId+", old meter id:"+oldMeterId+", new meter read:"+newMeterRead+",old meter read:"+oldMeterRead);
+				
+				//注: 回调函数需要采用引号引起来
+				util.confirm("确认换表？", "", "changeCycleAjaxRequestFn", "cancel_callback_name");//销户拆表确认
+				
+			});
+			
+
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

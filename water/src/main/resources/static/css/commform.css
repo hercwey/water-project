@@ -1,0 +1,13 @@
+@charset "UTF-8";
+/* 输入布局 */
+.table-layout td{
+	border:0px;
+	padding:0px;
+}
+
+.form-inline .form-control {
+    width:100%;
+}
+.form-group {
+    margin-bottom: 0.25rem;
+}

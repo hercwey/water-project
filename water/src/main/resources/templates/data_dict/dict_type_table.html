@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style type="text/css">
+
+#data-dict-type-card .card-body ul li {
+	height: 30px;
+}
+#data-dict-type-card .card-body ul li:hover {
+	background-color: #CCFFCC;
+	cursor: pointer;
+}
+
+.curr_active {
+	background-color: #CCFFCC;
+}
+
+</style>
+
+</head>
+<body>
+	<!-- 数据字典类型列表 -->
+	<!-- <table class="table">
+		<thead>
+			<tr>
+				<th>类型名称</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${dictTypeList}">
+				类型名称
+				<td th:attr="data-dict-type-code=${item.code},data-dict-type-name=${item.name}" th:text="${item.name}">类型名称</td>
+			</tr>
+		</tbody>
+	</table> -->
+	<div class="card" id="data-dict-type-card">
+		<h5 class="card-header">
+			类型列表
+		</h5>
+		<div class="card-body">
+			<ul class="list-unstyled">
+				<li th:each="item,iterStat: ${dictTypeList}" th:attr="data-dict-type-code=${item.TYPE_CODE},data-dict-type-name=${item.TYPE_NAME}" class="list-item">
+					<span th:text="${item.TYPE_NAME}" th:remove="tag">类型名称</span>
+				</li>
+			</ul>
+			
+			<!-- <p th:each="item,iterStat: ${dictTypeList}" class="card-text">
+				<span th:attr="data-dict-type-code=${item.code},data-dict-type-name=${item.name}" th:text="${item.code}" th:remove="tag">类型名称</span>
+			</p> -->
+		</div>
+		<!-- <div class="card-footer">
+			Card footer
+		</div> -->
+	</div>
+
+	<script type="text/javascript">
+	
+		/**
+		 * 清除选中的字典类型样式
+		 */
+		function clearActiveDictTypeCss(){
+			$("#data-dict-type-card .card-body ul li").removeClass("curr_active");//取消所有选中的字典类型的样式
+		}
+	
+		$(function(){
+			
+			$("#data-dict-type-card .card-body ul li").on("click", function(){
+				
+				var dictTypeCode = "";//字典类型编码
+				
+				var flag = $(this).hasClass("curr_active");//判断是否选中
+				
+				clearActiveDictTypeCss();//清除选中的字典类型样式
+				
+				if(!flag){//未选中
+					$(this).addClass("curr_active");//设置当前选中的字典类型的样式
+					var typeCode = $(this).attr("data-dict-type-code");
+					dictTypeCode = typeCode;//字典类型编码
+				}
+				
+				clearSearchCondFun();//清空查询条件
+				var parms = new Object();
+				var pageNum = 0;
+				var pageSize = 0;
+				parms.pageNum=pageNum;
+				parms.pageSize=pageSize;
+				parms.dictTypeCode=dictTypeCode;
+				search(parms);
+				
+			});
+			
+		});
+	
+	</script>
+
+</body>
+</html>

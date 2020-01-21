@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('销账')" th:remove="tag"></div>
+<!-- 页面正在加载loading-->
+<script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>
+</head>
+<body>
+	<!-- 用户管理主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<!-- <div>
+					<h4 class="panel-title">销账</h4>
+					<hr style="height:1px;border:none;border-top:1px solid blue;">
+				</div> -->
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		$(function() {
+			/* 
+				加载用户框架页
+			*/
+			function loadMainPage(parms, callback) {
+				var url = "/holdfile-settle-account-cmbc/main";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			loadMainPage(null, null);
+		})
+	</script>
+
+</body>
+</html>

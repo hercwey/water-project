@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<script type="text/javascript" src="/jsonview/jquery.jsonview.js"></script>
+<body>
+
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span12">
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="home-tab"
+						data-toggle="tab" href="#inventory-tab" role="tab" aria-controls="home"
+						aria-selected="true">
+							<h6>发票库存</h6>
+					</a></li>
+					<li class="nav-item nav-json"><a class="nav-link" id="profile-tab"
+						data-toggle="tab" href="#jsonresult-tab" role="tab" aria-controls="profile"
+						aria-selected="false">
+							<h6>发票库存-JSON格式</h6>
+					</a></li>
+				</ul>
+				<div class="tab-content border border-top-0" id="myTabContent" style="margin-bottom:10px;">
+					<div class="tab-pane fade show active" id="inventory-tab" role="tabpanel"
+						aria-labelledby="home-tab">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item">发票库存</li>
+							
+							<li class="list-group-item invoice-inventory-table" >
+								<span th:include="tax/queryinventory/invoice_inventory_table" th:remove="tag"></span>
+							</li>
+							
+						</ul>
+					</div>
+					<div class="tab-pane fade" id="jsonresult-tab" role="tabpanel" aria-labelledby="jsonresult-tab">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item">发票库存-JSON格式</li>
+							
+							<li class="list-group-item">
+								<span id="resultJSON"></span>
+							</li>
+							
+						</ul>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+
+
+	<!-- <span th:text="${resultJSON}"></span> -->
+
+	<!-- <span th:each="item,itor:${inventoryList}">
+		<span th:text="${item.RETCODE}"></span>
+	</span> -->
+
+</body>
+
+<link rel="stylesheet" href="/jsonview/jquery.jsonview.css" />
+
+<!-- 嵌入式脚本,用于thymeleaf数据传递(json格式) -->
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		//后台向前端直接传递数据
+		var inventoryList = [[${inventoryList}]];  	//库存列表
+		var resultJSON = [[${resultJSON}]];  		//库存列表JSON格式
+		
+		console.log("test data is:"+inventoryList[0].RETCODE);  //error:  not defined
+		console.log("test data is:"+inventoryList[0].retcode);  //ok
+		console.log("the result is:"+JSON.stringify(inventoryList));  //全部小字 生成的JSON字段均为小写
+		
+		//var resultJSON=JSON.stringify(inventoryList);  //全部小写
+		
+	/*]]>*/
+</script>
+
+<script type="text/javascript">
+
+	/*
+		发票查询结果对象
+	*/
+	function InventoryResult(resultJSON){
+		this.resultJSON=resultJSON;
+	}
+	
+	/*
+		对象初始化(选项卡点击时)
+	*/
+	InventoryResult.prototype.init=function(){
+		var self=this;
+		
+		const  NAVI_CLASS_NAME=".nav-item";
+		$(NAVI_CLASS_NAME).on('click',tabNaviClick);
+		
+		/*
+			只所以调用此函数,滚动条刷新.
+		*/
+		function tabNaviClick(){
+			console.log("tab navi is clicked!");			
+			var hasClass=$(this).hasClass("nav-json");
+			if(hasClass){				
+				 setTimeout(function(){
+					console.log("timer event execute");
+					triggerWindowEvent()
+					}, 200);  
+			}
+		}
+		
+		/*
+			触发window resize event
+		*/
+		function triggerWindowEvent(){
+			//console.log("dispatch window resize event");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+	}
+	
+	/*
+		功能:以JSON格式显示结果		
+	*/
+	InventoryResult.prototype.showResult=function(json){
+		const containerId="#resultJSON";
+		//$(containerId).html("");
+		$(containerId).JSONView(json);  //JSONView用于格式化json		
+	}
+	
+	//生成查询结果操作对象.
+	var inventoryResult=new  InventoryResult(resultJSON);
+	
+	
+	$(function(){		
+		inventoryResult.init();   //初始化
+		inventoryResult.showResult(resultJSON);  //显示发票库存结果(JSON格式)  		
+	});
+</script>
+
+
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-dialog" role="dialog"
+					aria-labelledby="myModalLabel" aria-hidden="true">
+
+					<div class="modal-dialog modal-lg">
+
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header"
+								style="background-color: #a5f1b6; height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<p>编辑:水价维护</p>
+									 <!-- <i class="fa fa-tags fa-1x" aria-hidden="true" style="color: blue;"></i> -->
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close"
+									data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="water-price-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									<input type="hidden" id="setting-is-ladder-price" name="isLadderPrice" th:value="${currItem==null ? 0 : currItem.isLadderPrice}" />
+
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 价格分类 -->
+													<div class="form-group form-inline">
+														<label for="setting-name" class="col-sm-4 control-label">价格分类&nbsp<i style="color: red">*</i> </label>
+														<span class="input-group-sm col-sm-8">
+														<input type="hidden" class="form-control  " th:value="${currItem==null ? '' : currItem.priceTypeCode}" id="setting-price-type-code" name="priceTypeCode"/>
+														<input type="hidden" class="form-control  " th:value="${currItem==null ? '' : currItem.priceCode}" id="setting-price-code" name="priceCode"/>
+															<select class="form-control  " id="setting-price-type-name" name="priceTypeName" th:value="${currItem==null ? '' : currItem.priceTypeName}" required>
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${waterUseList}" th:remove="tag">
+																	<option th:value="${item.value}"   th:attr="selected=${currItem!=null && item.value==currItem.priceTypeName ? 'true':'false'}, data-price-type-code=${item.key}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!--价格名称 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">价格名称&nbsp<i style="color: red">*</i> </label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  "
+																th:value="${currItem==null ? '' : currItem.ladderName}"
+																id="setting-ladder-name" name="ladderName" maxlength=20
+																title="请输入1-20位字符" placeholder="价格名称" required/>
+														</span>
+													</div>
+												</td>
+
+											</tr>
+											<tr>
+												<td>
+													<!-- 阶梯初值 -->
+													<div class="form-group form-inline" id="ladder-start-div"style="display: none">
+														<label for="setting-name" class="col-sm-4 control-label">阶梯初值</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"th:value="${currItem==null ? '' : currItem.ladderStart}"
+																class="form-control  " id="setting-ladder-start"
+																name="ladderStart" maxlength=32 title="请输入数字"
+																placeholder="阶梯初值" />
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 阶梯终值 -->
+													<div class="form-group form-inline" id="ladder-end-div" style="display: none">
+														<label for="setting-description"class="col-sm-4 control-label">阶梯终值</label>
+														<span class="input-group-sm col-sm-8"> 
+															<input type="text" class="form-control  "
+																th:value="${currItem==null ? '' : currItem.ladderEnd}"
+																id="setting-ladder-end" name="ladderEnd" maxlength=12
+																title="请输入数字" placeholder="阶梯终值" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!--基础水价-->
+													<div class="form-group form-inline">
+														<label for="setting-name" class="col-sm-4 control-label">基础水价&nbsp<i style="color: red">*</i> </label>
+														<span class="input-group-sm col-sm-8">
+															<input type="number" th:value="${currItem==null ? '' : currItem.basePrice}"
+																class="form-control  " id="setting-base-price"
+																name="basePrice" maxlength=6 title="允许输入最大长度为六位"
+																placeholder="基础水价" required/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 污水处理费 -->
+													<div class="form-group form-inline">
+														<label for="setting-description" class="col-sm-4 control-label">污水处理费&nbsp<i style="color: red">*</i> </label>
+														<span class="input-group-sm col-sm-8"> 
+															<input type="number" class="form-control  "
+																th:value="${currItem==null ? '' : currItem.treatmentFee}"
+																id="setting-treatment-fee" name="treatmentFee"
+																maxlength=6 title="允许输入最大长度为六位" placeholder="污水处理费" required/>
+														</span>
+													</div>
+												</td>
+
+											</tr>
+											<tr>
+												<td>
+													<!-- 合计水价 -->
+													<div class="form-group form-inline">
+														<label for="setting-description" class="col-sm-4 control-label">合计水价</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  " readonly="readonly"
+																th:value="${currItem==null ? '' : currItem.totalPrice}"
+																id="setting-total-price" name="totalPrice" maxlength=7
+																title="请输入数字" placeholder="合计水价" />
+														</span>
+													</div>
+												</td>
+												<td></td>
+											</tr>
+										</tbody>
+
+									</table>
+
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"
+									id="btn-modify-and-back">保存&返回</button>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+		<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/water-price/insert";
+			
+			var waterPriceId= $("#water-price-id").val();
+			if(waterPriceId!=null && waterPriceId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/water-price/update";
+			}
+			
+			var form=new FormData($("#dialog-modi-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), */
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeModiDialog();
+							}
+							util.message(res.result_msg,null,"success");
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+		
+		$.validator.setDefaults({//验证成功后，保存数据
+		    submitHandler: function() {
+		    	modiItem(true);
+		     	//alert("提交事件!");
+		    }
+		});
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			var waterUse = $("#setting-price-type-name").find("option:selected").attr("data-price-type-code");
+			if(waterUse == 'JMSHYS'){
+				$("#ladder-end-div").show();//显示阶梯终值输入框
+				$("#ladder-start-div").show();//显示阶梯初值输入框
+			}
+			//---------------click event process binding---------------
+			$("#dialog-modi-form").validate();
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				$("#dialog-modi-form").submit();
+				//modiItem(true);				
+			});
+			
+
+			$("#setting-price-type-name").on('change',function() {//用水性质下拉框改变事件
+				var url = BASE_CONTEXT_PATH + "/water-price/get-water-price";
+				var waterUse = $(this).find("option:selected").attr("data-price-type-code");
+				$("#setting-price-type-code").val(waterUse);
+				if(waterUse == 'JMSHYS'){
+					$("#ladder-end-div").show();//显示阶梯终值输入框
+					$("#ladder-start-div").show();//显示阶梯初值输入框
+					$("#setting-is-ladder-price").val("1");//设置为阶梯水价
+				} else {
+					$("#ladder-end-div").hide();//隐藏阶梯终值输入框
+					$("#ladder-start-div").hide();//隐藏阶梯初值输入框
+					$("#setting-is-ladder-price").val("0");//设置为非阶梯水价
+				}
+			});
+			
+			$('#setting-base-price').on('change',function() {//计算水费污水处理费合计
+				var basePrice = $(this).val();
+				var treatmentFee = $("#setting-treatment-fee").val();
+				if(treatmentFee == null || treatmentFee ==""){
+					treatmentFee = 0;
+				}
+				var totalPrice = Calc.Add(basePrice,treatmentFee,2);
+				$("#setting-total-price").val(totalPrice);
+			});
+			$('#setting-treatment-fee').on('change',function() {//计算水费污水处理费合计
+				var basePrice = $("#setting-base-price").val();
+				var treatmentFee = $(this).val();
+				if(basePrice == null || basePrice ==""){
+					basePrice = 0;
+				}
+				var totalPrice = Calc.Add(basePrice,treatmentFee,2);
+				$("#setting-total-price").val(totalPrice);
+			});
+			
+			
+			
+		
+
+		});
+	</script>
+
+
+	</th:block>
+
+</body>
+</html>

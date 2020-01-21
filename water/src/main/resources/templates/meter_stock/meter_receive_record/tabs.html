@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- 引入通用对话框工具 -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+</head>
+<body>
+	<!-- 安装领用水表对话框 -->
+	<div id="meter-install-receive-dialog"></div>
+	<!-- 换表领用对话框 -->
+	<div id="meter-change-receive-dialog"></div>
+	<!-- 打印安装领用单对话框 -->
+	<div id="print-install-dialog"></div>
+	<!-- 打印换表领用单对话框 -->
+	<div id="print-change-dialog"></div>
+	<!-- tabs容器-->
+	<div class="row clearfix">
+		<div class="col-md-12">
+			<div class="tabbable" id="tabs-meters-item-div">
+				<ul class="nav nav-tabs" id="tabs-meters-item-nav">
+					<li class="nav-item" id="meters-item-tab" style="">
+						<a class="nav-link active show" href="#meters-tab" data-toggle="tab">表计列表</a></li>
+					<li class="nav-item" id="meters-detail-item-tab" style="display:none;">
+						<a class="nav-link" href="#meters-detail-tab" data-toggle="tab">表计档案</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="meters-tab">
+						<!-- 表计档案信息 -->
+					</div>
+					<div class="tab-pane" id="meters-detail-tab">
+						<br>
+						<div class="tabbable" id="tabs-meters-detail-div">
+							<ul class="nav nav-tabs" id="tabs-meters-detail-nav">
+								<li class="nav-item" id="meter-base-detail-item-tab" style="">
+									<a class="nav-link active show" href="#meter-base-detail-tab" data-toggle="tab">表计基本信息</a></li>
+								<li class="nav-item" id="electronic-record-item-tab" style="">
+									<a class="nav-link" href="#electronic-record-tab" data-toggle="tab">电子档案</a>
+								</li>
+								<li class="nav-item" id="install-receipt-item-tab" style="">
+									<a class="nav-link" href="#install-receipt-tab" data-toggle="tab">安装领用单</a>
+								</li>
+								<li class="nav-item" id="change-receipt-item-tab" style="">
+									<a class="nav-link" href="#change-receipt-tab" data-toggle="tab">换表领用单</a>
+								</li>
+							</ul>
+							<div class="tab-content">
+								<div class="tab-pane active" id="meter-base-detail-tab">
+									<!-- 表计基本信息 -->
+								</div>
+								<div class="tab-pane" id="electronic-record-tab">
+									<!-- 电子档案 -->
+								</div>
+								<div class="tab-pane" id="install-receipt-tab">
+									<!-- 安装领用单 -->
+								</div>
+								<div class="tab-pane" id="change-receipt-tab">
+									<!-- 换表领用单 -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script type="text/javascript">
+		
+		var G_TABS_METER_ITEM_NAV = "#tabs-meters-item-nav";//表计列表选项卡ul标签
+		var G_TABS_METER_DETAIL_NAV = "#tabs-meters-detail-nav";//表计档案选项卡ul标签
+		
+		var G_METERS_ITEM_TAB_LI_ID = "#meters-detail-item-tab";//表计列表选项卡li的ID
+		var G_METERS_ITEM_TAB = "#meters-item-tab";//表计列表选项卡
+		var G_METERS_DETAIL_TAB_LI_ID = "#meters-detail-item-tab";//表计档案选项卡li的ID
+		var G_METERS_DETAIL_TAB = "#meters-detail-tab";//表计档案选项卡
+		
+		var G_METER_BASE_DETAIL_TAB_ID = "#meter-base-detail-item-tab";//表计基本信息选项卡ID
+		var G_METER_BASE_DETAIL_TAB = "#meter-base-detail-tab";//表计基本信息选项卡
+		var G_E_RECORD_TABLE_TAB_ID = "#electronic-record-item-tab";//电子档案选项卡
+		var G_E_RECORD_TABLE_TAB = "#electronic-record-tab";//电子档案选项卡
+		
+		const DIALOG_INSTALL_RECEIVE_ID="modal-container-meter-install-receive-dialog";//安装领用对话框
+		const DIALOG_CHANGE_RECEIVE_ID="modal-container-meter-change-receive-dialog";//换表领用对话框
+		
+		//选择打印安装领用单对话框			
+		const DIALOG_SELECT_PRINT_INSTALL_RECEIPT="modal-container-print-install-dialog";
+		//选择打印换表领用单对话框			
+		const DIALOG_SELECT_PRINT_CHANGE_RECEIPT="modal-container-print-change-dialog";
+		/**
+		 * 	显示表计档案选项卡
+		 */
+		function showMeterDetailTab(){
+			$(G_METERS_DETAIL_TAB_LI_ID).show();
+		}
+		/**
+		 * 	隐藏表计档案选项卡
+		 */
+		function hideMeterDetailTab(){
+			//$(G_METERS_DETAIL_TAB).hide();
+			$(G_METERS_DETAIL_TAB_LI_ID).hide();
+		}
+		
+		/**
+		 * 	水表领用记录选项卡
+		 */
+		function showMeterReceiveRecordTab(){
+			$("#meters-receive-record-item-tab").show();
+			$("#tabs-meters-item-div a[href='#meters-receive-record-tab']").tab("show");
+		}
+		
+		/**
+		 * 	id：要显示选项卡的ID
+		 *	href：要显示选项卡的href
+		 *	status：show/hide
+		 */
+		function transferTabs(id, href, status){
+			$(id+' a[href="'+href+'"]').tab(status);
+		}
+		
+		/* 
+			加载表计列表页
+		*/
+		function loadMainList(parms, callback) {
+			var url = "/meter-receive-record/main";
+			var callbackFunc = callback;
+			var containerId = "#meters-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		
+		/* 
+			加载安装领用单列表
+		*/
+		function loadInstallReceiptMainList(parms, callback) {
+			var url = "/meter-receive/install-receipt-main";
+			var callbackFunc = callback;
+			var containerId = "#install-receipt-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		/* 
+			加载安装领用单列表
+		*/
+		function loadChangeReceiptMainList(parms, callback) {
+			var url = "/meter-receive/change-receipt-main";
+			var callbackFunc = callback;
+			var containerId = "#change-receipt-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+	
+		/* 
+			加载表计基本信息
+		 */
+		function loadMeterBaseList(parms, callback) {
+			var url = BASE_CONTEXT_PATH + "/meter-receive/detail-table"
+			var callbackFunc = callback;
+			var containerId = "#meter-base-detail-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+
+		/* 
+			加载表计-电子档案信息
+		 */
+		function loadMeterERecordList(parms, callback) {
+			var url = BASE_CONTEXT_PATH + "/meter-erecord/erecord-main";
+			var callbackFunc = callback;
+			var containerId = "#electronic-record-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		
+		/**
+		 * 	加载初始化函数
+		 */
+		function initLoad(){
+			/* 
+				加载框架页面 
+			*/
+			loadMainList(null, null);
+		}
+		/**
+		 * 	重新加载表计-电子档案列表
+		 */
+		function reLoadMeterERecordItemList(){
+			var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+			
+			var parms = {"meterId":meterId};//参数：功能模块标识
+			loadMeterERecordList(parms, null);//重新加载表计电子档案
+		}
+		
+		/*
+		 * 	打开(Open) 换表领用对话框
+		 */
+		function openMeterInstallReceiveDialog() {
+			DialogUtil.openDialogFn(DIALOG_INSTALL_RECEIVE_ID);
+			
+		}
+	
+		/* 
+			关闭(CLOSE) 换表领用对话框
+		 */
+		function closeMeterInstallReceiveDialog() {
+			DialogUtil.closeDialogFn(DIALOG_INSTALL_RECEIVE_ID);
+		}
+		
+		/*
+		 * 	打开(Open) 安装领用对话框
+		 */
+		function openMeterChangeReceiveDialog() {
+			DialogUtil.openDialogFn(DIALOG_CHANGE_RECEIVE_ID);
+		}
+
+		/* 
+			关闭(CLOSE) 安装领用对话框
+		 */
+		function closeMeterChangeReceiveDialog() {
+			DialogUtil.closeDialogFn(DIALOG_CHANGE_RECEIVE_ID);
+		}
+	
+		
+		/*
+		 * 	打开(Open) 选择打印安装对话框
+		 */
+		function openPrintInstallDialog() {
+			
+			DialogUtil.openDialogFn(DIALOG_SELECT_PRINT_INSTALL_RECEIPT);
+		}
+		/* 
+			关闭(CLOSE) 选择打印安装对话框
+		 */
+		function closePrintInstallDialog() {
+			DialogUtil.closeDialogFn(DIALOG_SELECT_PRINT_INSTALL_RECEIPT);
+		}
+		
+		/*
+		 * 	打开(Open) 选择打印换表对话框
+		 */
+		function openPrintChangeDialog() {
+			
+			DialogUtil.openDialogFn(DIALOG_SELECT_PRINT_CHANGE_RECEIPT);
+		}
+		/* 
+			关闭(CLOSE) 选择打印换表对话框
+		 */
+		function closePrintChangeDialog() {
+			DialogUtil.closeDialogFn(DIALOG_SELECT_PRINT_CHANGE_RECEIPT);
+		}
+		
+		$(function() {
+
+			//初始化
+			initLoad();
+			
+			/**
+			 * 	绑定 表计列表选项卡 的click事件
+			 */
+			$(G_METERS_ITEM_TAB).on("click", function(){
+				
+				hideMeterDetailTab();//隐藏表计档案选项卡
+				customerResizeFuncx();
+				
+			});
+			function customerResizeFuncx(){
+				console.log("call back........");
+				var myEvent = new Event('resize');
+		        window.dispatchEvent(myEvent);
+			}
+			
+			
+			$("#install-receipt-item-tab").on("click", function(){//安装领用单选项卡click事件
+				var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+				
+				var parms = {"meterId":meterId};//参数：功能模块标识
+				loadInstallReceiptMainList(parms, null);
+				
+			});
+
+			$("#change-receipt-item-tab").on("click", function(){//换表领用单选项卡click事件
+				var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+				
+				var parms = {"meterId":meterId};//参数：功能模块标识
+				loadChangeReceiptMainList(parms, null);
+				
+			});
+			
+			/**
+			 * 	绑定 表计基本信息选项卡 的click事件
+			 */
+			$(G_METER_BASE_DETAIL_TAB_ID).on("click", function(){
+				
+				var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+				
+				var parms = {"meterId":meterId};//参数：功能模块标识
+				loadMeterBaseList(parms, null);
+				
+			});
+			/**
+			 * 	绑定 客户-电子档案选项卡 的click事件
+			 */
+			$(G_E_RECORD_TABLE_TAB_ID).on("click", function(){
+				
+				reLoadMeterERecordItemList();//重新加载表计电子档案列表
+				
+			});
+
+		})
+	</script>
+
+</body>
+</html>

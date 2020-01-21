@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户-协议列表</title>
+</head>
+<body>
+
+	<div class="row">
+		<div class="col-md-4" th:each="item,iterStat: ${agreementList}">
+			<div class="card" style="height:100%;">
+				<div class="card-body">
+					<p style="text-align: center;">
+						<img class="card-img-top" th:attr="title=${item.agreementName}+'：'+${item.path},alt=${item.agreementName}" th:src="${item.path}" style="height:100px;width:auto;" />
+					</p>
+					<h5 class="card-title" th:text="${item.agreementName}">协议名称</h5>
+					<p class="card-text" th:text="${item.remark}">协议备注</p>
+					<span th:class="${FUNCTION_MODULE=='MODULE_MANAGE' || FUNCTION_MODULE=='MODULE_ACCOUNT_OPEN' ? '' : 'd-none'}">
+						<p>
+							<button type="button" class="btn btn-warning btn-delete-agreement" th:attr="data-id=${item.id},data-path=${item.path}">删除</button>
+						</p>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+	
+	/**
+	 * 	ajax请求删除客户协议
+	 */
+	function ajaxReqDeleteAgreement(id){
+		var url = BASE_CONTEXT_PATH + "/customer-account/delete-agreement"
+		var params = new Object();
+		params.id = id;
+		//params.path = path;
+		$.post(url, params, function(res){
+			//console.log("success:"+res);
+	    	if(res!=null){
+				if(res.result_code=="success"){
+					//重新加载协议列表
+					loadAgreementItem();//加载客户-协议列表
+				}else{
+					util.message(res.result_msg);
+				}
+			}
+		});
+	}
+	
+	$(function(){
+		$(".btn-delete-agreement").on("click", function(){
+			var id = $(this).attr("data-id");
+			var path = $(this).attr("data-path");
+			
+			var ok_callback_bank = "ajaxReqDeleteAgreement";
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录? ", id, ok_callback_bank, "cancel_callback_name")
+			
+		});
+	});
+	
+	</script>
+</body>
+</html>

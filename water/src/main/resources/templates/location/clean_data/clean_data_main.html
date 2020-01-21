@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+<!-- 正则表达式验证 -->
+<script src="/jquery/jquery-validation/jquery.validate.min.js"></script>
+<script src="/jquery/jquery-validation/messages_zh.js"></script>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<link rel="stylesheet"	href="/css/meterbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block" id="search-div">
+				<ul class="extra-l" style="list-style: none; padding-inline-start: 20px;">
+					<li>
+						<button type="button" class="btn btn-danger btn-sm"
+							id="btn-batch-del">
+							<i class="fa fa-remove" aria-hidden="true"> <span>清理</span></i>
+						</button>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-md-12">
+		
+			<div class="row clearfix">
+				<div class="col-md-4 column" style="padding-right:1px;">					
+					<div class="card">
+						<div class="card-body" id="location-body" style="padding-top:10px;padding-bottom:10px">
+							<!-- 地理位置列表 -->
+							<!-- 加载方式 -->
+							<div th:include="component/locationtree/location_tree::tree('location-tree')" th:remove="tag"></div>
+						</div>
+					</div>
+				</div>
+				
+				
+			</div>
+		</div>
+			
+	</div>
+	<!-- 地理位置treeJS -->
+	<script type="text/javascript"	th:src="@{/js/component/locationtree/LocationTree1.js}"></script>
+	<!-- 地理位置树自适应JS -->
+	<script type="text/javascript"	th:src="@{/js/location_tree_adaptive/location_tree_adaptive.js}"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			//var zNodes = [[${meterListJson}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		//---------- 重新加载表计档案树状结构 ------------------------
+		/*
+		 * 	重新加载树状结构
+		 */
+		function reloadInfoFun(){
+			//操作成功后重新加载
+			var href = "/clean-data/starter";
+			location.href = href;//重新加载页面
+		}
+		
+		//----------------------------------地理位置tree实例---------------------------------------------------------------------
+		var locationTree = new LocationTree('location-tree');
+		/*
+			ztree树click某节点后的回调函数
+		*/
+		function clickZTreeNodeCallback(treeNode) {
+			
+			if(treeNode==null){
+				return false;
+			}
+			var traceIds = treeNode.traceIds;//获取点击节点的traceIds
+			//初始化请求参数
+			var parms = new Object();
+			parms.traceIds=traceIds;
+			getZTreeSearchParam();
+		}
+		
+		function getZTreeSearchParam(){//获取点击地理位置树的traceIds
+			var traceIds = null;
+			if(locationTree.getSelectedTreeNode() != null){
+				traceIds = locationTree.getSelectedTreeNode().traceIds;
+			}
+			var parms = new Object();
+			parms.traceIds = traceIds;
+			console.log(traceIds);
+			return parms;
+		}
+		
+		//**********************************数据清理************************	
+		/**
+		 * 	删除按钮click时间
+		 */
+		$("#btn-batch-del").on('click',function() {
+			
+			batchDeleteConfirm();
+		});
+		
+		/*
+			清理数据确认
+		*/
+		function batchDeleteConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("确定对该节点及节点下的数据进行清理? ", "xxx", "ok_callback_name", "cancel_callback_name")			
+		}
+		/*
+			数据清理:确认(回调)
+		*/
+		function ok_callback_name(id){
+			batchDelete();	
+		}
+		/*
+			数据清理:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		function batchDelete(){//清理数据
+			var parms = getZTreeSearchParam();
+			
+			if(parms.traceIds == null || parms.traceIds ==""){
+				util.message("清理数据前，请选择一个地理位置节点");
+				return false;
+			}
+			var url = BASE_CONTEXT_PATH+'/clean-data/batch-clean-data';
+			$.post(url, parms, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						util.message(res.result_msg,null,"success");
+						//reloadInfoFun();
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		
+		$(function(){
+			//------------------初始化ztree--------------------------------------------------
+			locationTree.initTree();  //初始化树.		
+			locationTree.setClickOuterFunction(clickZTreeNodeCallback);  //设置外部业务函数
+			
+			
+		});
+	</script>
+
+</body>
+</html>

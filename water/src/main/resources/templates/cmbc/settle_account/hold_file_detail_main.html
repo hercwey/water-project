@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- ZTree CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<link rel="stylesheet"	href="/css/billtablebody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label ccb-account-main">
+		<div class="col-md-12 column">
+			<div class="tab-content">
+				<div class="tab-pane active" id="tab-customer-account-item">
+					<!-- 操作面板 -->
+					<div class="" style="display: inline-block" id="hold-file-detail-form">
+						
+						<ul class="extra-l" style="list-style: none;">
+							<!-- 面板:查询 -->
+							<li class="input-group-sm">
+								<input type="text" class="form-control search-cond" id="search-cond" placeholder="客户名称/卡号">
+							</li>
+							
+							<li class="input-group-sm">
+								<select class="form-control withholding-status" id="withholding-status" name="withholdingStatus">
+									<option value="">——代扣状态——</option>
+										<option value="0">未代扣</option>
+										<option value="1">代扣成功</option>
+										<option value="2">代扣失败</option>
+								</select>
+							</li>
+							<li class="input-group-sm">
+								<select class="form-control withhold-fail-reason" id="withhold-fail-reason" name="withholdFailReason">
+									<option value="">——代扣失败原因——</option>
+									<option value="交易成功">交易成功</option>
+									<option value="可用余额小于要扣款金额">可用余额小于要扣款金额</option>
+									<option value="账户通可调余额不足">账户通可调余额不足</option>
+									<option value="已注销">卡号（或折号）已注销</option>
+								</select>
+							</li>
+							<!-- 查询按钮 -->
+							<li>
+								<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
+									<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+								</button>
+								
+								<button type="button" class="btn btn-warning btn-sm btn-general-search-reset"  id="btn-general-search-reset">
+									<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+								</button>
+							
+							</li>
+							<button type="button" class="btn btn-success btn-sm export-hold-file-detail-excel"  id="export-hold-file-detail-excel">
+								<i class="fa fa-download" aria-hidden="true">
+									<span>导出EXCEL</span>
+								</i>
+							</button>
+							
+						</ul>
+					</div>
+				</div>
+				
+			</div>
+			<div class="hold-file-detail-table table-container" id="bill-table-body"></div>
+					<!--客户账单 -->
+		</div>
+	</div>
+	
+	
+	<hr>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		/*]]>*/
+	</script>
+
+	<script>
+		//记录选择的代扣文件
+		var HOLD_FILE_ID_ARR = new Array();
+		
+		/*
+			设置日期选择input背景色
+		*/
+		function setBackGround() {
+			$("#settle-result-period").css("background-color", "white");
+		}
+		
+		/**
+		 * 	获取当前系统月份（表示为抄表记录中的期间）
+		 */
+		function getCurrSysMonth(){
+			var date = new Date();
+			var year = date.getFullYear();    //获取完整的年份(4位,1970-????)
+			var month = date.getMonth();       //获取当前月份(0-11,0代表1月)
+			if(month<10){
+				month = "0"+month
+			}
+			return year+"-"+month;
+		}
+		/**
+		 * 	设置账单期间默认值为系统月份
+		 */
+		function setSettleResultPeriodDefault(){
+			$("#settle-result-period").val(getCurrSysMonth());
+		}
+	
+		//--------------------公共查询函数--------------------------
+		
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchHoldFileDetailItem(parms) {
+
+			console.log("----------"+JSON.stringify(parms));
+			
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/holdfile-settle-account-cmbc/hold-file-detail-table"
+			$(".hold-file-detail-table").load(url, parms, null);
+		}
+		
+		//------------------------------	获取查询参数	------------------------------
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchHoldFileDetailParams(){
+			var searchCond=$("#hold-file-detail-form .search-cond").val();
+			var withholdingStatus = $("#hold-file-detail-form .withholding-status").val();
+			var withholdFailReason = $("#hold-file-detail-form .withhold-fail-reason").val();
+			
+			console.log("----------代扣结果："+withholdFailReason);
+			var withRecordId = getWithRecordId();
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.withholdingStatus=withholdingStatus;
+			parms.withholdFailReason=withholdFailReason;
+			parms.withRecordId = withRecordId;
+			return parms;
+		}
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchHoldFileDetailItem() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchHoldFileDetailParams();//获取普通查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchHoldFileDetailItem(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchHoldFileDetailItemClick() {
+			
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchHoldFileDetailParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchHoldFileDetailItem(parms);
+		}
+	
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadHoldFileDetailItemPage() {
+			var pageNum = curr_pageNum;
+			var pageSize = curr_pageSize;
+	
+			//获取参数
+			var parms = null;
+			var parms = getSearchHoldFileDetailParams();//获取查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchHoldFileDetailItem(parms);
+		}
+
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			
+			//设置查询的默认期间
+			setSettleResultPeriodDefault()
+			defaultSearchHoldFileDetailItem();
+			//------------init-------------
+		
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#hold-file-detail-form .btn-general-search').on('click', function() {
+				defaultSearchHoldFileDetailItem();//查询客户账单
+			});
+			/*
+				查询条件复位按钮CLICK
+			 */
+			$('#hold-file-detail-form .btn-general-search-reset').on('click', function() {
+				$("#hold-file-detail-form .search-cond").val("");
+				$("#hold-file-detail-form .search-cond").focus();//获得焦点
+	
+				
+				$("#hold-file-detail-form .withholding-status").val("");//设置代扣状态
+	
+			});
+			/*
+				查询条件输入框 KEYUP
+			 */
+			$('#hold-file-detail-form .search-cond').on('keyup', function(event) {
+				if (event.keyCode == 13) {
+					$('#hold-file-detail-form .btn-general-search').trigger("click");
+				}
+			});
+			/**
+			 * 	导出代扣结果Excel
+			 */
+			$("#hold-file-detail-form .export-hold-file-detail-excel").on("click", function(){
+				var parms = getSearchHoldFileDetailParams();
+				
+				var url = BASE_CONTEXT_PATH + "/holdfile-settle-account-cmbc/export-hold-file-detail-excel";
+				location.href = url+"?withRecordId="+parms.withRecordId+"&searchCond="+parms.searchCond+"&withholdingStatus="+parms.withholdingStatus+"&withholdFailReason="+parms.withholdFailReason;
+				console.log("导出代扣结果Excel完成");
+			});
+
+		});
+	</script>
+
+
+
+</body>
+</html>

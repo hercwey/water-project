@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+</head>
+<body>
+
+	<!-- tabs容器-->
+	<div class="row clearfix">
+		<div class="col-md-12">
+			<div class="tabbable" id="tabs-printer-item-div">
+				<ul class="nav nav-tabs" id="tabs-printer-item-nav">
+					<li class="nav-item" id="customer-item-tab" style="">
+						<a class="nav-link active show" href="#customer-tab" data-toggle="tab">按客户打印</a>
+					</li>
+					<li class="nav-item" id="meter-item-tab" style="">
+						<a class="nav-link " href="#meter-tab" data-toggle="tab">按水表打印</a>
+					</li>
+					
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="customer-tab">
+						<!-- 按客户打印 -->
+					</div>
+					<div class="tab-pane active" id="meter-tab">
+						<!-- 按水表打印 -->
+					</div>
+					
+				</div>
+			</div>
+			
+
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script type="text/javascript">
+		
+		/**
+		 * 	隐藏按客户打印通知单
+		 */
+		function hideCustomerPrinterItem(){
+			$("#customer-item-tab").hide();
+		}
+			
+		/**
+		 * 	显示按客户打印通知单
+		 */
+		function showCustomerPrinterItem(){
+			$("#customer-item-tab").show();
+			$("#tabs-printer-item-div a[href='#customer-tab']").tab("show");
+		}
+		
+		/**
+		 * 	隐藏按水表打印通知单
+		 */
+		function hideMeterPrinterItem(){
+			$("#meter-item-tab").hide();
+		}
+			
+		/**
+		 * 	显示按水表打印通知单
+		 */
+		function showMeterPrinterItem(){
+			$("#meter-item-tab").show();
+			$("#tabs-printer-item-div a[href='#meter-tab']").tab("show");
+		}
+		
+		/* 
+			加载按客户打印选项卡
+		*/
+		function loadCustomerMainList(parms, callback) {
+			var url = "/print-company/customer-main";
+			var callbackFunc = callback;
+			var containerId = "#customer-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		/* 
+			加载按表计打印选项卡
+		*/
+		function loadMeterMainList(parms, callback) {
+			var url = "/print-company/meter-main";
+			var callbackFunc = callback;
+			var containerId = "#meter-tab";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		
+		
+		/**
+		 * 	加载初始化函数
+		 */
+		function initLoad(){
+			/* 
+				加载框架页面 
+			*/
+			//loadMeterMainList(null, null);
+			loadCustomerMainList(null, null);
+		}
+		function customerResizeFuncx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		$(function() {
+
+			//初始化
+			initLoad();
+			
+			//---------事件绑定--------------
+			$("#customer-item-tab").on("click", function(){//点击按客户打印选项卡
+				showCustomerPrinterItem();
+				loadCustomerMainList(null, null);
+				//hideMeterPrinterItem();
+				//triggerResize();
+			});
+			
+			$("#meter-item-tab").on("click", function(){//点击按表计打印选项卡
+				showMeterPrinterItem();
+				loadMeterMainList(null, null);
+				//hideCustomerPrinterItem();
+				//triggerResize();
+			});
+			
+			
+			
+
+		})
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.StatMonthReadMeterRateMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.StatMonthReadMeterRate">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="RECE_READ_METER" jdbcType="DECIMAL" property="receReadMeter" />
+    <result column="ACTUAL_READ_METER" jdbcType="DECIMAL" property="actualReadMeter" />
+    <result column="READ_METER_RATE" jdbcType="DECIMAL" property="readMeterRate" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, PERIOD, RECE_READ_METER, ACTUAL_READ_METER, READ_METER_RATE, CREATE_TIME
+  </sql>
+</mapper>

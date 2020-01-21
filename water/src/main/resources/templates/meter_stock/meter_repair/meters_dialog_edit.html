@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+
+</script>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-meter-edit-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>编辑</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="meter-modi-form">
+									
+									<!-- 当前所编辑表计的条目ID -->
+									<input type="hidden" id="meters-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />									
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											
+											<tr>	
+												<td>
+													<!-- 生命周期状态 -->
+													<div class="form-group form-inline">
+														<label for="meters-cycle-status" class="col-sm-4 control-label">状态 </label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-cycle-status" name="cycleStatus" th:value="${currItem==null ? '' : currItem.cycleStatus}">
+																<!-- 默认选择第一个 -->
+																<option value="0" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==0} )? 'selcted' ">待用</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==1} )? 'selcted' ">领用</option>	
+																<option value="2" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==2} )? 'selcted' ">待启用</option>
+																<option value="3" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==3} )? 'selcted' ">使用中</option>	
+																<option value="4" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==4} )? 'selcted' ">待检测</option>
+																<option value="5" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==5} )? 'selcted' ">检测中</option>	
+																<option value="6" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==6} )? 'selcted' ">待检修</option>
+																<option value="7" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==7} )? 'selcted' ">检修中</option>	
+																<option value="8" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==8} )? 'selcted' ">报废</option>
+																<option value="9" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==9} )? 'selcted' ">退库</option>	
+															</select>
+														</span>
+													</div>
+												</td>										
+											</tr>
+											
+										</tbody>
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-meter-save">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		 $("#btn-meter-save").on("click", function() {
+			var url = BASE_CONTEXT_PATH + "/meter-deduct/update";
+			var parms = new Object();
+			var cycleStatus = $("#meters-cycle-status").val();
+			var meterId = $("#meters-id").val();
+			parms.cycleStatus = cycleStatus;
+			parms.meterId = meterId;
+			console.log(JSON.stringify(parms))
+			$.post(url, parms, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeEditDialog();//关闭对话框
+						
+						loadPageClickPageNum();//加载当前页
+						util.message(res.result_msg,null,"success");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		});
+		 /* 
+			关闭(CLOSE) 对话框
+		 */
+		function closeEditDialog() {
+			$("#modal-container-meter-edit-dialog").modal("hide");
+		}
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

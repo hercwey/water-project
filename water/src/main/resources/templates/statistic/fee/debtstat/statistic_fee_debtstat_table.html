@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<!-- 记录列表 -->
+	<span th:include="statistic/fee/public/debtitem_table::table" th:remove="tag"></span>
+	<!-- 统计结果 -->
+	<span th:text="'欠费合计' +${debtSum}" ></span>
+	
+	
+	<!-- 当列表为空时 -->
+	<!-- <span  th:if="${#lists.isEmpty(accountItemSumList)}">
+		<span >基价合计:0元</span>
+		<span >污水费合计:0元</span>
+		<span >综合水价合计:0元</span>
+	</span> -->
+	
+	<!-- 应收合计 -->
+	<!-- 当列表不为空时 -->
+	<!-- <span  th:if="${not #lists.isEmpty(accountItemSumList)}" th:remove="tag">
+		<span th:each="item,iter:${accountItemSumList}">
+			<span th:text="'基价合计'+${item.BASE_AMOUNT_SUM}">基价合计</span>
+			<span th:text=" '污水费合计'+ ${item.TREATMENT_AMOUNT_SUM}">污水费合计</span>
+			<span th:text=" '综合水价合计:' ${item.CREDIT_AMOUNT_SUM}">综合水价合计</span>
+		</span>
+	</span> -->
+	
+	
+		
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+	<!-- 加入分页组件 -->
+	<div th:include="common/common_pager_new::pager('pager1')" class="pagerx"	style="float: right; margin-right: 10px;"></div>	
+		
+	<!-- 内联 -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/	
+		var curr_searchCond=[[${searchCond}]];  //json格式数据
+		/*]]>*/
+	</script>
+	
+	<!-- 分页 -->
+	<script src="/js/pager/Pager.js"></script>
+	
+	<script type="text/javascript">
+	
+		var pager=new Pager("pager1");		
+		$(function(){			
+			pager.init(statisticFeeDebtStat.pageSearch,curr_searchCond);			
+		});		
+	
+	</script>
+	
+	
+</body>
+</html>

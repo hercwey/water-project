@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户-账户基本信息</title>
+
+</head>
+<!-- 客户-账户基本信息 -->
+<body>
+
+	<th:block th:fragment="account">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td>账户名称</td>
+					<td th:text="${account==null ? '' : account.accountName}"></td>
+					<td>身份证</td>
+					<td th:text="${account==null ? '' : account.idNo}"></td>
+				</tr>
+				<tr>
+					<td>电话</td>
+					<td th:text="${account==null ? '' : account.tel}"></td>
+					<td>手机</td>
+					<td th:text="${account==null ? '' : account.mobile}"></td>
+				</tr>
+				<tr>
+					<td>开户时间</td>
+					<td th:text="${account==null ? '' : account.createTimeStr}"></td>
+					<td>账户状态</td>
+					<td th:text="${account==null ? '' : account.statusStr}"></td>
+				</tr>
+				<tr>
+					<td>操作员</td>
+					<td th:text="${account==null ? '' : account.operatorName}"></td>
+					<td>备注</td>
+					<td th:text="${account==null ? '' : account.remark}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</th:block>
+	
+</body>
+</html>

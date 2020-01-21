@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WechatCustomerMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.WechatCustomer">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="WECHAT_ID" jdbcType="DECIMAL" property="wechatId" />
+    <result column="OPENID" jdbcType="VARCHAR" property="openid" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="MOBILE" jdbcType="VARCHAR" property="mobile" />
+    <result column="ID_CARD_NO" jdbcType="VARCHAR" property="idCardNo" />
+    <result column="CUSTOMER_CODE" jdbcType="VARCHAR" property="customerCode" />
+    <result column="BIND_DATE" jdbcType="TIMESTAMP" property="bindDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, WECHAT_ID, OPENID, CUSTOMER_ID, MOBILE, ID_CARD_NO, CUSTOMER_CODE, BIND_DATE
+  </sql>
+</mapper>

@@ -1,0 +1,116 @@
+
+<!-- 专用发票详情行HTML -->
+<tr th:id="${rowId}" class="detail-row">
+	<!-- 行选择器 -->
+	<td width="19" valign="top" class="row-choicer"
+		style="width: 14.2pt; border-top: none; padding: 0cm 5pt 0cm 5pt">
+		<p align="center" style="text-align: center;">
+			<span><i class="fa fa-square" aria-hidden="true"></i></span>
+		</p>
+	</td>
+	<!-- 商品名称 -->
+	<td width="169" valign="top" class="product-name-col" style="width: 126.75pt; border-top: none; border-left: none; padding: 0px;">
+		<p align="left" style="text-align: left">
+			<span class="product-name" style="display:none;">*水*自来水</span>
+			<div class="input-group mb-3  product-name-editor" style="margin-bottom:0px !important;" >
+					<input type="text" class="product-name-input" placeholder="货物,应税劳务,服务名称" style="border:0px;width:100%">
+					<div class="input-group-append">
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-name-edit" type="button"><i class="fa fa-user-circle" aria-hidden="true" ></i></button> -->
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-name-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button> -->
+					</div>
+			</div>
+		</p>
+	</td>
+	<!-- 商品规则 -->
+	<td width="66" valign="top"  class="product-type-col"
+		style="width: 49.65pt; border-top: none; border-left: none; padding: 0px;">
+		<p align="left" style="text-align: left">
+			<span class="product-type" style="display:none;">规格-纯净水</span>
+			<div class="input-group mb-3  product-type-editor" style="margin-bottom:0px !important;" >
+					<input type="text" class="product-type-input" placeholder="规格" style="border:0px;width:100%">
+					<div class="input-group-append">
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-name-edit" type="button"><i class="fa fa-user-circle" aria-hidden="true" ></i></button> -->
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-type-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button> -->
+					</div>
+			</div>
+			
+		</p>
+	</td>
+	<!-- 商品单位 -->
+	<td width="47" valign="top"  class="product-unit-col"
+		style="width: 35.4pt; border-top: none; border-left: none; padding: 0px;">
+		<p align="left" style="text-align: left">
+			<span class="product-unit" style="display:none;">吨</span>
+			<div class="input-group mb-3  product-unit-editor" style="margin-bottom:0px !important;" >
+					<input type="text" class="product-unit-input" placeholder="单位" style="border:0px;width:100%">
+					<div class="input-group-append">
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-name-edit" type="button"><i class="fa fa-user-circle" aria-hidden="true" ></i></button> -->
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-unit-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button> -->
+					</div>
+			</div>
+		</p>
+	</td>
+	<!-- 单条目数量 -->
+	<td width="47" valign="top"	class="product-quantity-col"
+		style="width: 35.45pt; border-top: none; border-left: none; padding: 0px;">
+		<p align="left" style="text-align: left">
+			<span class="product-quantity" style="display:none;">123456789</span>
+			<div class="input-group mb-3  product-quantity-editor" style="margin-bottom:0px !important;" >
+					<input type="text" class="product-quantity-input" placeholder="数量" style="border:0px;width:100%">
+					<div class="input-group-append">
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-name-edit" type="button"><i class="fa fa-user-circle" aria-hidden="true" ></i></button> -->
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-quantity-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button> -->
+					</div>
+			</div>
+		</p>
+	</td>
+	<!-- 单商品价格 -->
+	<td width="95" valign="top"	class="product-price-col"
+		style="width: 70.9pt; border-top: none; border-left: none; padding: 0px;">
+		<p align="left" style="text-align: left">
+			<span class="product-price" style="display:none;">4.74</span>
+			<div class="input-group mb-3  product-price-editor" style="margin-bottom:0px !important;" >
+					<input type="text" class="product-price-input" placeholder="价格" style="border:0px;width:100%">
+					<div class="input-group-append">
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-name-edit" type="button"><i class="fa fa-user-circle" aria-hidden="true" ></i></button> -->
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-price-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button> -->
+					</div>
+			</div>
+		</p>
+	</td>
+	<!-- 单条目金额 -->
+	<td width="94" valign="top"  class="product-amount-col"
+		style="width: 70.85pt; border-top: none; border-left: none; padding: 0px;">
+		<p align="left" style="text-align: left">
+			<span class="product-amount">0.00</span>
+		</p>
+	</td>
+	<!-- 单条目税率 -->
+	<td width="39" valign="top"  class="product-tax-rate-col"
+		style="width: 29.4pt; border-top: none; border-left: none; padding: 0px;">
+		<p align="left" style="text-align: left">
+			<span class="product-tax-rate" style="display:none;">5%</span>
+			<div class="input-group mb-3  product-tax-rate-editor" style="margin-bottom:0px !important;" >
+					<!-- <input type="text" class="product-tax-rate-input" placeholder="税率" style="border:0px;width:100%"> -->
+					<select class="product-tax-rate-input" style="font-weight:400;font-family:Song;font-size:0.9em;border:0px;width:100%;">
+						<option value='0.03'>3%</option>
+                		<option value='0.05'>5%</option>
+                		<option value='0.06'>6%</option>
+            		</select>
+					
+					
+					<div class="input-group-append">
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-tax-rate-edit" type="button"><i class="fa fa-user-circle" aria-hidden="true" ></i></button> -->
+						<!-- <button class="btn btn-outline-primary btn-sm btn-product-tax-rate-clear" type="button"><i class="fa fa-remove" aria-hidden="true"></i></button> -->
+					</div>
+			</div>
+		</p>
+	</td>
+	<!-- 单条目税额 -->
+	<td width="65" valign="top"  class="product-tax-amount-col"
+		style="width: 49.1pt; border-top: none; border-left: none; padding: 0px;">
+		<p align="left" style="text-align: left">
+			<span class="product-tax-amount">0.00</span>
+		</p>
+	</td>
+</tr>

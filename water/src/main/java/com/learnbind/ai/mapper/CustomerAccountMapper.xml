@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerAccountMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerAccount">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName" />
+    <result column="ID_NO" jdbcType="VARCHAR" property="idNo" />
+    <result column="TEL" jdbcType="VARCHAR" property="tel" />
+    <result column="MOBILE" jdbcType="VARCHAR" property="mobile" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, ACCOUNT_NAME, ID_NO, TEL, MOBILE, CREATE_TIME, OPERATOR_ID, OPERATOR_NAME, 
+    REMARK, STATUS, DELETED
+  </sql>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="getAccountIdByCustomerName" resultType="Long">
+		SELECT 
+			id 
+		FROM customer_account 
+		<where>
+		1=1
+			<if test="customerId!=null and customerId!='' ">
+  				AND	CUSTOMER_ID=#{customerId}
+  			</if>
+		</where>
+  </select>
+</mapper>

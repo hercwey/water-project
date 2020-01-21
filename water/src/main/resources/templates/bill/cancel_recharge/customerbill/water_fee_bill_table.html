@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>水费账单列表</title>
+<style type="text/css">
+	.card {
+		margin-top: 10px;
+	}
+</style>
+</head>
+<body>
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th style="width: 25%;">类型</th>
+				<th style="width: 25%;">描述</th>
+				<th style="width: 25%;">账单金额</th>
+				<th style="width: 25%;">记账日期</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${waterFeeBillList}">
+				<!-- 类型-->
+				<td th:text="${item.creditSubjectStr}">类型</td>
+				<!-- 描述 -->
+				<td th:text="${item.creditDigest}">描述</td>
+				<!-- 充值金额 -->
+				<td th:text="${item.creditAmount}">账单金额</td>
+				<!--记账日期-->
+				<td th:text="${item.accountDateStr}">记账日期</td>
+			</tr>
+			<tr>
+				<td colspan="2">合计</td>
+				<td th:text="${totalCreditAmount}">合计金额</td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<script type="text/javascript">
+		
+	</script>
+
+</body>
+</html>

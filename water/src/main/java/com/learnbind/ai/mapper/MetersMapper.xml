@@ -1,0 +1,916 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MetersMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.Meters">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CALIBER" jdbcType="VARCHAR" property="caliber" />
+    <result column="METER_NO" jdbcType="DECIMAL" property="meterNo" />
+    <result column="PLACE" jdbcType="VARCHAR" property="place" />
+    <result column="FACTORY" jdbcType="VARCHAR" property="factory" />
+    <result column="FACTORY_PHONE" jdbcType="VARCHAR" property="factoryPhone" />
+    <result column="CERTIFICATE_NO" jdbcType="VARCHAR" property="certificateNo" />
+    <result column="CHECK_DATE" jdbcType="TIMESTAMP" property="checkDate" />
+    <result column="EFFECTIVE_DATE" jdbcType="TIMESTAMP" property="effectiveDate" />
+    <result column="PID" jdbcType="DECIMAL" property="pid" />
+    <result column="STEEL_SEAL_NO" jdbcType="VARCHAR" property="steelSealNo" />
+    <result column="NEW_METER_BOTTOM" jdbcType="VARCHAR" property="newMeterBottom" />
+    <result column="CHANGE_METER_BOTTOM" jdbcType="VARCHAR" property="changeMeterBottom" />
+    <result column="METER_USE" jdbcType="VARCHAR" property="meterUse" />
+    <result column="METER_TYPE" jdbcType="VARCHAR" property="meterType" />
+    <result column="UPPER_LIMIT" jdbcType="VARCHAR" property="upperLimit" />
+    <result column="METER_STATUS" jdbcType="DECIMAL" property="meterStatus" />
+    <result column="METER_MODEL" jdbcType="VARCHAR" property="meterModel" />
+    <result column="READ_MODE" jdbcType="VARCHAR" property="readMode" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="METER_ADDRESS" jdbcType="VARCHAR" property="meterAddress" />
+    <result column="VIRTUAL_REAL" jdbcType="DECIMAL" property="virtualReal" />
+    <result column="COLLECTOR_ADDR" jdbcType="VARCHAR" property="collectorAddr" />
+    <result column="CHANNEL_NO" jdbcType="VARCHAR" property="channelNo" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="CYCLE_STATUS" jdbcType="DECIMAL" property="cycleStatus" />
+    <result column="WATER_USE" jdbcType="VARCHAR" property="waterUse" />
+    <result column="PRICE_CODE" jdbcType="VARCHAR" property="priceCode" />
+    <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+     <result column="SORT_VALUE" jdbcType="DECIMAL" property="sortValue" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CALIBER, METER_NO, PLACE, FACTORY, FACTORY_PHONE, CERTIFICATE_NO, CHECK_DATE, 
+    EFFECTIVE_DATE, PID, STEEL_SEAL_NO, NEW_METER_BOTTOM, CHANGE_METER_BOTTOM, METER_USE, 
+    METER_TYPE, UPPER_LIMIT, METER_STATUS, METER_MODEL, READ_MODE, DELETED, REMARK, METER_ADDRESS, 
+    VIRTUAL_REAL, COLLECTOR_ADDR, CHANNEL_NO, STATUS, CYCLE_STATUS, WATER_USE, PRICE_CODE, DESCRIPTION, SORT_VALUE 
+  </sql>
+  
+  <!-- 根据条件查询,返回列表 -->
+  <select id="getListBySearchCond" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meters M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			M.deleted = 0
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchMeters" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meters M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			deleted = 0
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.METER_NO LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  					OR M.DESCRIPTION LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  
+  <!-- 获取可以换表的表计集合 -->
+  <select id="searchChangeMeters" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meters M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			M.DELETED = 0
+			<!-- 记录水表的生命周期状态 0：待用（待使用）（默认值）；1：领用；2：待启用；3：使用中；4：待检测；5：检测中；6：待检修；7：检修中；8：报废；9：退库； -->
+			<if test="cycleStatusList!=null and cycleStatusList.size>0">
+				AND M.CYCLE_STATUS IN 
+				<foreach item="item" index="index" collection="cycleStatusList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchMetersByStatus" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meters M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			deleted = 0
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<!-- 表计状态 0复装 1暂拆 -->
+  			<if test="status!=null">
+  				AND M.STATUS = #{status}
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  <!-- 根据条件查询表计集合 -->
+  <select id="getMeterList" resultMap="BaseResultMap">
+  	SELECT
+		M.* 
+	FROM
+		METERS M
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		M.DELETED=0 
+		AND LM.DELETED=0
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  					OR M.DESCRIPTION LIKE CONCAT(CONCAT('%',#{searchCond}),'%')
+  				)
+ 		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  <!-- 获取可以换表的表计集合 -->
+  <select id="getChangeMeterList" resultMap="BaseResultMap">
+  	SELECT
+		M.* 
+	FROM
+		METERS M
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		M.DELETED=0 
+		AND LM.DELETED=0
+		<!-- 记录水表的生命周期状态 0：待用（待使用）（默认值）；1：领用；2：待启用；3：使用中；4：待检测；5：检测中；6：待检修；7：检修中；8：报废；9：退库； -->
+		<if test="cycleStatusList!=null and cycleStatusList.size>0">
+			AND M.CYCLE_STATUS IN 
+			<foreach item="item" index="index" collection="cycleStatusList" open="(" separator="," close=")">
+	             #{item}
+	        </foreach>
+		</if>
+		
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+ 		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  <!-- 根据条件查询表计集合 -->
+  <select id="getMeterListByStatus" resultMap="BaseResultMap">
+  	SELECT
+		M.* 
+	FROM
+		METERS M
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		M.DELETED=0 
+		AND LM.DELETED=0
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+ 		</if>
+ 		<!-- 表计状态 0复装 1暂拆 -->
+		<if test="status!=null">
+			AND M.STATUS = #{status}
+		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+   <!-- 根据地理位置查询表计集合 -->
+  <select id="getMeterListByLocationId" resultMap="BaseResultMap">
+		SELECT
+		DISTINCT M.* 
+		FROM
+			METERS	M LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			M.DELETED = 0 AND LM.DELETED=0
+			<if test="locationId!=null">
+  				AND LM.LOCATION_ID = #{locationId}
+  			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (M.FACTORY LIKE concat(concat('%',#{searchCond}),'%'))
+  			</if>
+		</where>
+		<!-- ORDER BY C.ID DESC -->
+  </select>
+  
+  <!-- 查询已绑定客户的表计集合（包含客户信息） -->
+  <select id="getBindMeterList" resultType="map">
+		SELECT
+			M.ID AS METER_ID,
+			M.PID AS METER_PID,
+			M.STEEL_SEAL_NO,
+			M.PLACE,
+			C.ID AS CUSTOMER_ID,
+			C.PROP_NAME 
+		FROM
+			METERS M
+			INNER JOIN CUSTOMER_METER CM ON M.ID = CM.METER_ID
+			INNER JOIN CUSTOMERS C ON CM.CUSTOMER_ID = C.ID 
+			INNER JOIN CUSTOMER_ACCOUNT A ON C.ID=A.CUSTOMER_ID 
+		WHERE 
+			<!-- 删除状态，1=已删除，0=未删除（默认） -->
+			M.DELETED=0 
+			<!-- 表计状态：0=正常（默认）；1=停水 -->
+			AND M.METER_STATUS=0 
+			<!-- 虚/实表，0：实表（默认）/1：虚表 -->
+			AND M.VIRTUAL_REAL=0 
+			AND CM.DELETED=0  
+			AND C.DELETED=0 
+			AND A.DELETED=0 
+			<!-- 是否默认客户，1=否；0=是（默认） -->
+			AND CM.DEFAULT_CUSTOMER=0 
+			<!-- 表计状态 0复装(默认) 1暂拆 -->
+			AND CM.METER_STATUS=0
+			<if test="meterId!=null">
+				AND M.PID=#{meterId}
+			</if>
+  </select>
+  
+   <!-- 查询需要检测的表计 -->
+  <select id="searchCheckMeterRemindMeters" resultType="map">
+  	select T.* FROM
+	(SELECT
+		a.* ,
+		months_between (  add_months(a.check_date,s.DETECTION_PERIOD*12), sysdate ) as num
+	FROM
+		meters a 
+		LEFT JOIN SYS_CHECK_METER s ON s.CALIBER = a.CALIBER
+	WHERE
+		(
+		( SELECT sysdate FROM DUAL ) > trunc (
+		add_months ( a.check_date, ( 12 * ( SELECT DETECTION_PERIOD FROM SYS_CHECK_METER b WHERE b.CALIBER = a.CALIBER ) ) - 2 ),
+		'DD' 
+		) 
+		)
+	<if test="caliber!=null and caliber!='' ">
+		AND a.CALIBER=#{caliber}
+	</if>
+	<if test="cycleStatusList!=null and cycleStatusList.size>0">
+		AND a.CYCLE_STATUS IN 
+		<foreach item="item" index="index" collection="cycleStatusList" open="(" separator="," close=")">
+             #{item}
+        </foreach>
+	</if>
+	<!-- 查询条件（匹配业主姓名和客户姓名） -->
+	<if test="searchCond!=null and searchCond!='' ">
+		AND (
+				a.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+				OR a.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+				OR a.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+			)
+	</if>
+	) T 
+	<where>
+	<!-- 提前一个月 -->
+	<if test="checkMonth!=null and checkMonth ==1">
+	 ( T.num &gt;=0 and T.num &lt; 1)
+	</if>
+	<!-- 提前2个月 -->
+	<if test="checkMonth!=null and checkMonth ==2">
+		AND ( T.num &gt;=1 and T.num &lt;= 2)
+	</if>
+	<!-- 过期 -->
+	<if test="checkMonth!=null and checkMonth ==3">
+		AND  T.num &lt;0
+	</if>
+	</where>
+		ORDER BY T.CHECK_DATE DESC
+  </select>
+  
+  <!-- 根据条件查询表计集合 -->
+  <select id="getCheckMeterRemindList" resultType="map">
+  	SELECT T.* FROM
+  	(SELECT
+		M.* ,
+		months_between (  add_months(M.check_date,s.DETECTION_PERIOD*12), sysdate ) as num
+	FROM
+		meters M 
+		LEFT JOIN SYS_CHECK_METER s ON s.CALIBER = M.CALIBER
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+	<where>
+		(
+		( SELECT sysdate FROM DUAL ) > trunc (
+		add_months ( M.check_date, ( 12 * ( SELECT DETECTION_PERIOD FROM SYS_CHECK_METER b WHERE b.CALIBER = M.CALIBER ) ) - 2 ),
+		'DD' 
+		) 
+		)
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		AND M.DELETED=0 
+		AND LM.DELETED=0
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+ 		</if>
+ 		<if test="caliber!=null and caliber!='' ">
+ 			AND M.CALIBER=#{caliber}
+ 		</if>
+ 		</where>
+ 		) T 
+ 		<where>
+ 		<!-- 提前一个月 -->
+		<if test="checkMonth!=null and checkMonth ==1">
+			 ( T.num &gt;=0 and T.num &lt; 1)
+		</if>
+		<!-- 提前2个月 -->
+		<if test="checkMonth!=null and checkMonth ==2">
+			AND ( T.num &gt;=1 and T.num &lt;= 2)
+		</if>
+		<!-- 过期 -->
+		<if test="checkMonth!=null and checkMonth ==3">
+			AND  T.num &lt;0
+		</if>
+		</where>
+	ORDER BY T.CHECK_DATE DESC
+  </select>
+  
+  
+  <!-- 根据id查询子节点集合 -->
+  <select id="getChildListById" resultType="com.learnbind.ai.bean.MeterBean">
+  	SELECT
+		L.ID AS id,
+		L.METER_NO AS meterNo,
+		L.PLACE AS meterPlace,
+		L.FACTORY AS factory,
+		L.PID AS pid,
+		L.STEEL_SEAL_NO AS steelSealNo,
+		L.CHANGE_METER_BOTTOM AS changeMeterBottom,
+		L.REMARK AS remark,
+		L.DELETED AS deleted,
+		
+		( CASE WHEN ( EXISTS ( SELECT * FROM  METERS WHERE PID = L.ID )) THEN 'true' ELSE 'false' END ) isParent 
+	FROM
+		METERS L 
+	WHERE
+		L.DELETED=0
+		AND L.PID = #{id}
+	ORDER BY L.ID ASC
+  </select>
+  
+  
+  <!-- 根据水表钢印哈查询水表信息 -->
+  <select id="getMeterMessage" resultMap="BaseResultMap">
+		SELECT
+			* 
+		FROM
+			METERS	 
+		<where>
+			1=1
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			AND DELETED = 0 
+			<if test="steelSealNo!=null and steelSealNo!='' ">
+  				AND STEEL_SEAL_NO = #{steelSealNo}
+  			</if>
+		</where>
+  </select>
+  
+  
+  
+  <!-- 根据条件查询未绑定表计() -->
+  <select id="getBindBigMeterList" resultMap="BaseResultMap">
+  	SELECT
+		M.* 
+	FROM
+		METERS M
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+	<where>
+		NOT	 EXISTS (SELECT * FROM CUSTOMER_METER CM WHERE CM.METER_ID=M.ID
+			<if test="customerId!=null and customerId!=''">
+				 AND CM.CUSTOMER_ID=#{customerId} 
+			</if>
+				 and CM.DELETED=0 and CM.DEFAULT_CUSTOMER=0)
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		AND M.DELETED=0 
+		AND (LM.DELETED=0 OR LM.DELETED IS NULL)
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 水表用途 -->
+		<if test="meterUse!=null and meterUse!=''">
+			AND M.METER_USE = #{meterUse}
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+ 		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  
+  
+   <!-- 根据条件查询已绑定表计() -->
+  <select id="getUnBindBigMeterList" resultMap="BaseResultMap">
+  	SELECT
+		M.* 
+	FROM
+		METERS M
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+		LEFT JOIN CUSTOMER_METER CM ON M.ID = CM.METER_ID 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		M.DELETED=0 
+		AND (LM.DELETED=0 OR LM.DELETED IS NULL)
+		AND CM.DELETED=0
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 水表用途 -->
+		<if test="meterUse!=null and meterUse!=''">
+			AND M.METER_USE = #{meterUse}
+		</if>
+		<if test="customerId!=null and customerId!=''">
+			AND CM.CUSTOMER_ID = #{customerId}
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+ 		</if>
+ 		
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  
+  
+  <!-- 根据条件查询表计集合 -->
+  <select id="getMeterBindCustomerList" resultType="map">
+  	SELECT
+		M.*,
+		C.CUSTOMER_TYPE, 
+		C.CUSTOMER_NAME,
+		LM.TRACE_IDS 
+	FROM
+		METERS M
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+		LEFT JOIN CUSTOMER_METER CM ON CM.METER_ID = M.ID
+		LEFT JOIN CUSTOMERS C ON C.ID = CM.CUSTOMER_ID
+	<where>
+		 M.DELETED=0 AND LM.DELETED=0 AND CM.DELETED=0 AND CM.DEFAULT_CUSTOMER=0 AND C.DELETED=0 
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+			<if test="searchType==1 ">
+				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			</if>
+			<if test="searchType==2 ">
+	 			AND (
+	  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+	  				)
+  			</if>
+ 		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  
+  
+  <!--  条件查询已绑定客户、地理位置的水表 -->
+  <select id="getMetersBindCustomersList" resultType="map">
+  	SELECT
+			M.ID AS METER_ID,
+			M.METER_NO AS METER_NO,
+			M.STEEL_SEAL_NO,
+			M.PLACE,
+			C.ID AS CUSTOMER_ID,
+			C.CUSTOMER_NAME,
+			C.CUSTOMER_TEL
+		FROM
+			METERS M
+			INNER JOIN CUSTOMER_METER CM ON M.ID = CM.METER_ID
+			INNER JOIN CUSTOMERS C ON CM.CUSTOMER_ID = C.ID 
+			INNER JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+		<where>
+			<!-- 查询未存在与表册中的表计 -->
+			not EXISTS(SELECT * FROM METER_BOOK_METER MBM WHERE MBM.METER_ID = M.ID)
+			
+			AND M.DELETED=0 AND CM.DELETED=0 AND CM.DEFAULT_CUSTOMER = 0
+			AND C.DELETED=0 AND LM.DELETED = 0 AND M.VIRTUAL_REAL=0
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<!-- 查询条件（匹配业主姓名和客户姓名） -->
+			<if test="searchCond!=null and searchCond!='' ">
+	 			AND (
+	  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+	  				)
+ 		</if>
+ 		ORDER BY M.ID DESC
+		</where>
+  </select>
+  
+   <!--  条件查询已绑定客户、地理位置的水表 -->
+  <select id="getExportMeterData" resultType="map">
+  	SELECT
+			M.*,
+			LM.TRACE_IDS
+		FROM
+			METERS M
+			LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+			LEFT JOIN LOCATION L ON l.ID = LM.LOCATION_ID 
+		<where>
+			<!-- 查询未存在与表册中的表计 -->
+			 M.DELETED=0 
+			 AND LM.DELETED = 0
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<!-- 查询条件（匹配业主姓名和客户姓名） -->
+			<if test="searchCond!=null and searchCond!='' ">
+	 			AND (
+	  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+	  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+	  					
+	  				)
+ 		</if>
+ 		ORDER BY CAST( REGEXP_REPLACE(L.PYCODE, '[a-zA-Z]*[-]*', '') AS int )
+		</where>
+  </select>
+  
+   <select id="getMeterListByTraceIds" resultMap="BaseResultMap">
+		SELECT
+		DISTINCT M.* 
+		FROM
+			METERS	M LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			M.DELETED = 0 AND LM.DELETED=0
+			<if test="traceIds!=null || traceIds != ''">
+  				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+  			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (M.FACTORY LIKE concat(concat('%',#{searchCond}),'%'))
+  			</if>
+		</where>
+		<!-- ORDER BY C.ID DESC -->
+  </select>
+  
+  <select id="getMeterData" resultMap="BaseResultMap">
+		SELECT
+		M.* 
+		FROM
+			METERS	M LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+		<where>
+			<if test="traceIds!=null || traceIds != ''">
+  				LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+  			</if>
+		</where>
+  </select>
+  
+  <!-- 查询虚表 -->
+  <select id="getVirtualMeterList" resultMap="BaseResultMap">
+  	SELECT
+		M.* 
+	FROM
+		METERS M LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+	WHERE
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		M.DELETED = 0 
+		AND LM.DELETED = 0 
+		<!-- 虚/实表，0：实表（默认）/1：虚表 -->
+		AND M.VIRTUAL_REAL =1
+		<if test="traceIds!=null || traceIds != ''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+  </select>
+  
+  
+   <!-- 根据条件查询表计集合 -->
+  <select id="getRealMeterList" resultMap="BaseResultMap">
+  	SELECT
+		M.* 
+	FROM
+		METERS M
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		M.DELETED=0 
+		AND LM.DELETED=0
+		AND M.VIRTUAL_REAL=#{virtualRealStatus}
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+ 		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  
+   <select id="searchRealMeters" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meters M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			M.deleted = 0 AND M.VIRTUAL_REAL=#{virtualRealStatus}
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  
+  <!-- 根据条件查询表计集合 -->
+  <select id="getMeterListByCycleStatus" resultMap="BaseResultMap">
+  	SELECT
+		M.* 
+	FROM
+		METERS M
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		M.DELETED=0 
+		AND LM.DELETED=0
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<if test="cycleStatusList!=null and cycleStatusList.size>0">
+				AND M.CYCLE_STATUS IN 
+			<foreach item="item" index="index" collection="cycleStatusList" open="(" separator="," close=")">
+	             #{item}
+	        </foreach>
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+ 		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchMetersByCycleStatus" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM meters M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			deleted = 0
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="cycleStatusList!=null and cycleStatusList.size>0">
+					AND M.CYCLE_STATUS IN 
+				<foreach item="item" index="index" collection="cycleStatusList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  
+  
+    <!-- 根据条件查询表计集合 -->
+  <select id="getMeterDocList" resultMap="BaseResultMap">
+  	SELECT
+		M.* 
+	FROM
+		METERS M
+		LEFT JOIN LOCATION_METER LM ON M.ID = LM.METER_ID 
+		<!-- LEFT JOIN METER_ERECORD E ON M.ID = E.METER_ID -->
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		M.DELETED=0 
+		AND LM.DELETED=0
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<if test="cycleStatusList!=null and cycleStatusList.size>0">
+				AND M.CYCLE_STATUS IN 
+			<foreach item="item" index="index" collection="cycleStatusList" open="(" separator="," close=")">
+	             #{item}
+	        </foreach>
+		</if>
+		<!-- <if test="docType!=null">
+  			AND E.ERECORD_TYPE=#{docType}
+  		</if> -->
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+ 		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  
+    <!-- 根据条件查询表计集合 -->
+  <select id="searchMeterDocList" resultMap="BaseResultMap">
+  	SELECT
+  		DISTINCT
+		M.* 
+	FROM
+		METERS M
+		<!-- LEFT JOIN METER_ERECORD E ON M.ID = E.METER_ID -->
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		M.DELETED=0 
+		<!-- <if test="docType!=null">
+  			AND E.ERECORD_TYPE=#{docType}
+  		</if> -->
+  		<if test="cycleStatusList!=null and cycleStatusList.size>0">
+				AND M.CYCLE_STATUS IN 
+			<foreach item="item" index="index" collection="cycleStatusList" open="(" separator="," close=")">
+	             #{item}
+	        </foreach>
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+ 		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  
+    <!-- 根据条件查询表计集合 -->
+  <select id="getDefaultMeterList" resultMap="BaseResultMap">
+  	SELECT
+  		DISTINCT
+		M.*
+	FROM
+		PARTITION_WATER PW
+		LEFT JOIN LOCATION_METER LM ON LM.METER_ID = PW.METER_ID
+		LEFT JOIN CUSTOMERS C ON C.ID = PW.CUSTOMER_ID
+		LEFT JOIN METERS M ON M.ID = PW.METER_ID
+		LEFT JOIN SYS_WATER_PRICE W ON W.PRICE_CODE = PW.WATER_USE
+	<where>
+		<!--删除状态，1=已删除，0=未删除（默认）  -->
+		PW.DELETED=0 AND LM.DELETED=0 AND C.DELETED=0 AND M.DELETED=0
+		<if test="customerType!=null">
+  			AND C.CUSTOMER_TYPE=#{customerType}
+  		</if>
+  		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="waterPrice!=null and waterPrice!=''">
+			AND PW.WATER_USE = #{waterPrice}
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+  					OR C.PROP_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) 
+					OR C.PROP_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+					OR C.PROP_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+					OR C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+					OR C.CUSTOMER_MOBILE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+					OR C.CUSTOMER_TEL LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+					OR C.ROOM LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+  				)
+ 		</if>
+	</where>
+	ORDER BY M.ID DESC
+  </select>
+  
+  
+    <select id="getStockMeterByFactory" resultType="map">
+  	SELECT
+		M.CALIBER,
+		M.FACTORY,
+		M.METER_TYPE,
+		COUNT(M.CALIBER) AS NUM
+	FROM
+		METERS M
+	<where>
+		M.DELETED=0 AND M.VIRTUAL_REAL=#{meterVirtualReal} AND M.CYCLE_STATUS !=#{cycleStatus} AND M.CALIBER IS NOT NULL
+		
+	</where>
+	GROUP BY M.CALIBER,
+	M.FACTORY,
+	M.METER_TYPE
+	ORDER BY M.CALIBER
+  </select>
+</mapper>

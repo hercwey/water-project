@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-12 column">
+
+			<div class="tabbable" id="tabs-meterbook-allot">
+				<ul class="nav nav-tabs">
+					<li class="nav-item" id="tab-user-item-li">
+						<a class="nav-link active" href="#tab-user-item" data-toggle="tab">抄表员</a>
+					</li>
+					<li class="nav-item" id="tab-meter-book-item-li" style="display: none;">
+						<a class="nav-link" href="#tab-meter-book-item" data-toggle="tab">表册</a>
+					</li>
+					<li class="nav-item" id="tab-meter-book-meter-li" style="display: none;">
+						<a class="nav-link" href="#tab-meter-book-meter" data-toggle="tab">表计列表</a>
+					</li>
+					<li class="nav-item" id="tab-meter-book-meter-detail-li" style="display: none;">
+						<a class="nav-link" href="#tab-meter-book-meter-detail" data-toggle="tab">表计详情</a>
+					</li>
+					<li class="nav-item" id="tab-allot-meter-book-li" style="display: none;">
+						<a class="nav-link" href="#tab-allot-meter-book" data-toggle="tab">表册分配</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab-user-item">
+						<!-- 抄表员列表 -->
+						<div th:include="meterbook/allot/reader_main"></div>
+					</div>
+					<div class="tab-pane" id="tab-meter-book-item">
+						<div id="meter-book-item">
+							<!-- 表册列表 -->
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-meter-book-meter">
+						<div id="meter-book-meter">
+							<!-- 表计列表 -->
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-meter-book-meter-detail">
+						<div id="meter-book-meter-detail">
+							<!-- 表计详情 -->
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-allot-meter-book">
+						<div id="allot-meter-book">
+							<!-- 表册分配 -->
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		/**
+		 * 	隐藏表册列表
+		 */
+		function hideMeterBookItem(){
+			$("#tab-meter-book-item-li").hide();
+		}
+		/**
+		 * 	显示表册列表
+		 */
+		function showMeterBookItem(){
+			$("#tab-meter-book-item-li").show();
+			$("#tabs-meterbook-allot a[href='#tab-meter-book-item']").tab("show");//跳转到表册选项卡
+		}
+		
+		/**
+		 * 	隐藏表计列表
+		 */
+		function hideMeterBookMeter(){
+			$("#tab-meter-book-meter-li").hide();
+		}
+		/**
+		 * 	显示表册列表
+		 */
+		function showMeterBookMeter(){
+			$("#tab-meter-book-meter-li").show();
+			$("#tabs-meterbook-allot a[href='#tab-meter-book-meter']").tab("show");//跳转到表计列表选项卡
+		}
+		
+		/**
+		 * 	隐藏表计详情列表
+		 */
+		function hideMeterBookMeterDetail(){
+			$("#tab-meter-book-meter-detail-li").hide();
+		}
+		/**
+		 * 	显示表册详情列表
+		 */
+		function showMeterBookMeterDetail(){
+			$("#tab-meter-book-meter-detail-li").show();
+			$("#tabs-meterbook-allot a[href='#tab-meter-book-meter-detail']").tab("show");//跳转到表计详情选项卡
+		}
+		
+		/**
+		 * 	隐藏表册分配选项卡
+		 */
+		function hideAllotMeterBook(){
+			$("#tab-allot-meter-book-li").hide();
+		}
+		/**
+		 * 	显示表册分配选项卡
+		 */
+		function showAllotMeterBook(){
+			$("#tab-allot-meter-book-li").show();
+			$("#tabs-meterbook-allot a[href='#tab-allot-meter-book']").tab("show");//跳转到表册分配选项卡
+		}
+	
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+
+			//---------事件绑定--------------
+			$("#tab-user-item-li").on("click", function(){
+				hideMeterBookItem();
+				hideMeterBookMeter();
+				hideMeterBookMeterDetail();
+				hideAllotMeterBook();
+				triggerResize();
+			});
+			function triggerResize(){
+				console.log("call back........");
+				var myEvent = new Event('resize');
+		        window.dispatchEvent(myEvent);
+			}
+		});
+	</script>
+
+
+
+</body>
+</html>

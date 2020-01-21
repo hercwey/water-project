@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerPledgeMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerPledge">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="CUSTOMER_NAME" jdbcType="VARCHAR" property="customerName" />
+    <result column="PLEDGE_TYPE" jdbcType="DECIMAL" property="pledgeType" />
+    <result column="PLEDGE_AMOUNT" jdbcType="DECIMAL" property="pledgeAmount" />
+    <result column="IS_REFUND" jdbcType="DECIMAL" property="isRefund" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, CUSTOMER_NAME, PLEDGE_TYPE, PLEDGE_AMOUNT, IS_REFUND, OPERATOR_NAME, 
+    OPERATION_TIME, DELETED, OPERATOR_ID
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchCustomerPledge" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM CUSTOMER_PLEDGE p
+		
+		<where>
+		deleted = 0
+		AND	p.customer_id=#{customerId}
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					p.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY p.id DESC
+  </select>
+</mapper>

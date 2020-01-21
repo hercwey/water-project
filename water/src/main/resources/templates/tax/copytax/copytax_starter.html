@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('汇总抄表')" th:remove="tag"></div>
+<title>汇总抄表</title>
+</head>
+<body>	
+	<div class="container-fluid">
+	<h5>汇总抄表</h5>
+	<div class="row-fluid">
+		<div class="col-12">					
+		</div>
+		<button type="button" class="btn btn-sm btn-primary" id="btn-copytax">汇总抄表</button> 
+	</div>
+	<div class="row-fluid">
+		<div class="col-12">
+			<!-- 查询结果容器 -->
+			<div id="copytax-result-container">
+				
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+
+
+
+<!-- 嵌入式脚本,用于thymeleaf数据传递(json格式) -->
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		//后台向前端直接传递数据
+		//var returnObj = [[${returnObj}]]; 
+	/*]]>*/
+</script>
+
+<script type="text/javascript">
+
+	/*
+		汇总抄表
+		前端操作对象
+	 */
+	function CopyTax(){
+		
+	}
+	
+	/*
+		功能:
+			发送查询请求
+		参数:
+			无
+	*/
+	CopyTax.prototype.sendRequest=function(){
+		const url=BASE_CONTEXT_PATH+"/tax/copytax/copy";  //请求地址
+		const result_container="#copytax-result-container";  //存放查询结果容器	
+		
+		$(result_container).load(url,null,null);  //采用load动态加载查询结果		
+	}
+	
+	/*
+		功能:
+			初始化监听器
+		参数:无
+	*/
+	CopyTax.prototype.initListener=function(){
+		var self=this; //reference instance Object of QueryInventory ;
+		
+		const BTN_QUERY="#btn-copytax";
+		$(BTN_QUERY).on('click',startQuery);
+		
+		/*
+			click event's listener
+		*/
+		function startQuery(){
+			//console.log("btn clicked!");						
+			self.sendRequest();	
+		}  //end of startQuery  
+		
+	}	
+	
+	//create instance of front operation object 	
+	var copyTax= new CopyTax();
+	
+	/* 
+		page loaded ready 
+	*/
+	$(function(){	
+		//page init 
+		copyTax.initListener();
+		
+	});
+
+</script>
+
+
+</html>

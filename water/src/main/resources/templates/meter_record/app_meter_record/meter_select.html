@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>选择表计</title>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<style type="text/css">
+	ul.ztree {margin-top: 10px;border: 1px solid #617775;background: #f0f6e4;width:100%;height:360px;overflow-y:scroll;overflow-x:auto;}
+</style>
+</head>
+<body>
+	<div class="card card-select-ztree" id="card-select-ztree" style="display:none; position: absolute;">
+		<!-- <h5 class="card-header">
+			地理位置树状结构列表
+		</h5> -->
+		<div class="card-body">
+			<!-- 查询面板 -->
+			<!-- <div class="row" id="search-div">
+				<div class="col-md-12 column" style="display:inline-block;">
+					<form id="search-select-ztree-form" style="">
+						<input type="text" class="form-control" id="search-cond" placeholder="请输入编码/名称"  style="height:100%; width:60%; display:inline-block;" />
+						<button type="button" class="btn btn-success" id="search-btn" title="开始查询" style="height:100%; display:inline-block;">
+							<i class="fa fa-search" aria-hidden="true"></i>
+						</button>
+						<button type="button" class="btn btn-info" id="search-refresh-btn" title="刷新" style="height:100%; display:inline-block;">
+							<i class="fa fa-refresh" aria-hidden="true"></i>
+						</button>
+					</form>
+				</div>
+			</div> -->
+			<ul id="ztree-meter-select" class="ztree" style="margin-top:0; width:100%;"><li id="ztree-loading">正在加载中，请稍等...</li></ul>
+		</div>
+	</div>
+	<!-- <div id="card-select-ztree" class="card-select-ztree" style="display:none; position: absolute;">
+		查询面板
+		<div class="row" id="search-div">
+			<div class="col-md-12 column" style="display:inline-block;">
+				<form id="search-select-ztree-form" style="">
+					<input type="text" class="form-control" id="search-cond" placeholder="请输入编码/名称"  style="height:100%; width:60%; display:inline-block;" />
+					<button type="button" class="btn btn-success" id="search-btn" style="height:100%; display:inline-block;">
+						<i class="fa fa-search" aria-hidden="true"></i>
+					</button>
+				</form>
+			</div>
+		</div>
+		<ul id="ztree-meter-select" class="ztree" style="margin-top:0; width:100%;"></ul>
+	</div> -->
+	
+	<!-- JS Scripts-->
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.exedit.js}"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			//var zNodes = [[${locationListJson}]];
+		/*]]>*/
+	</script>
+
+	<SCRIPT type="text/javascript">
+		
+		/**
+		 * 	ztree加载中
+		 */
+		function ztreeSelectLoading(){
+			$("#ztree-meter-select").html("<li id='ztree-loading'>正在加载中，请稍等...</li>");
+		}
+		/**
+		 * 	ztree加载完成
+		 */
+		function ztreeSelectLoaded(){
+			$("#ztree-meter-select #ztree-loading").remove();
+		}
+	
+		var selectZTreeSetting = {
+			/* view: {
+				fontCss: {
+					'color': "red",
+					'font-size': "18px",
+				}
+			}, */
+			async: {
+				enable: true,
+				url: "/meter-record/get-meter-nodes",
+				autoParam: ["METER_ID=meterId"]
+			},
+			
+			check: {
+				enable: false,
+				chkStyle: "checkbox",
+			},
+			data: {
+				key: {
+					name: "PLACE",
+				},
+				simpleData: {
+					enable:true,
+					idKey: "METER_ID",
+					pIdKey: "METER_PID",
+					rootPId: 0
+				}
+			},
+			callback: {
+				onClick: locationSelectZTreeOnClick,//节点被点击的事件回调函数
+				beforeAsync: selectZTreeBeforeAsync,//用于捕获异步加载之前的事件回调函数
+				onAsyncSuccess: selectZTreeOnAsyncSuccess,//用于捕获异步加载正常结束的事件回调函数
+				onAsyncError: selectZTreeOnAsyncError,//用于捕获异步加载出现异常错误的事件回调函数
+			},
+		};
+		
+		/**
+		 * 	异步加载之前的事件回调函数
+		 */
+		function selectZTreeBeforeAsync(treeId, treeNode) {
+			//console.log(treeNode);
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				ztreeSelectLoading();//ztree加载中
+			}
+			return true;
+		};
+		/**
+		 * 	异步加载正常结束的事件回调函数
+		 */
+		function selectZTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+			//console.log(treeNode);
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				ztreeSelectLoaded();//ztree加载完成
+			}
+		    //alert(msg);
+		};
+		/**
+		 * 	异步加载出现异常错误的事件回调函数
+		 */
+		function selectZTreeOnAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown) {
+			//console.log(treeNode);
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				ztreeSelectLoaded();//ztree加载完成
+			}
+		    //alert(XMLHttpRequest);
+		};
+		
+		/*
+		 * 节点被点击的事件回调函数
+		 */
+		function locationSelectZTreeOnClick(event, treeId, treeNode) {
+			//console.log("click:"+JSON.stringify(treeNode));
+			//console.log(treeNode.menuId + ", " + treeNode.menuName + ", " + treeNode.parentId);
+			hideSelectZTreeFn();//隐藏下拉菜单（ztree）
+			
+			var customerId = treeNode.CUSTOMER_ID;
+			if(customerId==null || typeof(customerId)=="undefined"){
+				//设置表计ID和表计位置
+				$("#record-meter-id").val("");//设置表计ID
+				$("#record-meter-place").val("");//设置表计位置
+				//设置客户ID和业主姓名
+				$("#record-customer-id").val("");//设置客户的ID
+				$("#record-customer-propname").val("");//设置客户的业主姓名
+				
+				//dialog type: success warning info error,默认为info
+				util.message("表计未绑定客户，请重新选择！",null,"warning");
+			}else{
+				//设置表计ID和表计位置
+				$("#record-meter-id").val(treeNode.METER_ID);//设置表计ID
+				$("#record-meter-place").val(treeNode.PLACE);//设置表计位置
+				
+				//设置客户ID和业主姓名
+				$("#record-customer-id").val(treeNode.CUSTOMER_ID);//设置客户的ID
+				$("#record-customer-propname").val(treeNode.PROP_NAME);//设置客户的业主姓名
+			}
+			
+			
+			
+		}
+		$(function(){
+			//console.log("start init");
+			//$.fn.zTree.init($("#location-ztree"), setting, zNodes);
+			$.fn.zTree.init($("#ztree-meter-select"), selectZTreeSetting);
+		});
+		
+	</SCRIPT>
+
+	<script type="text/javascript">
+	
+		//------------------------------选择表计部分------------------------------	
+		/**
+		 * 	显示下拉菜单（ztree）
+		 */
+		function showSelectZTreeFn() {
+			var cityObj = $("#record-meter-place");
+			var cityOffset = $("#record-meter-place").offset();
+			$("#card-select-ztree").css({
+					left:cityOffset.left + "px", 
+					top:cityOffset.top + cityObj.outerHeight() + "px", 
+					"z-index":999999
+					}).slideDown("fast");
+	
+			$("body").bind("mousedown", onBodyDown);
+		}
+		/**
+		 * 	隐藏下拉菜单（ztree）
+		 */
+		function hideSelectZTreeFn() {
+			$("#card-select-ztree").fadeOut("fast");
+			$("body").unbind("mousedown", onBodyDown);
+		}
+		/**
+		 * 	body down 事件
+		 */
+		function onBodyDown(event) {
+			if (!(event.target.id == "card-select-ztree" || $(event.target).parents("#card-select-ztree").length>0)) {
+			//if (!(event.target.id == "select-ztree-btn" || event.target.id == "card-select-ztree" || $(event.target).parents("#card-select-ztree").length>0)) {
+				hideSelectZTreeFn();//隐藏下拉菜单（ztree）
+			}
+		}	
+	
+		//------------------------------	查询部分	------------------------------
+		/**
+		 * 	绑定查询面板中查询按钮的click事件
+		 */
+		$("#search-select-ztree-form #search-btn").on("click", function(){
+			
+			var searchCond = $("#search-select-ztree-form #search-cond").val();//查询条件
+			if(searchCond==null || searchCond==""){
+				$("#record-meter-place").val("");//设置表计位置
+				$("#record-meter-id").val("");//设置表计ID
+				
+				$.fn.zTree.init($("#ztree-meter-select"), selectZTreeSetting);
+				return;
+			}
+			
+			searchMeterSelect(searchCond);//根据条件查询表计并展开对应节点
+			
+		});
+		/**
+		 * 	清空查询条件，并刷新全部节点
+		 */
+		$("#search-select-ztree-form #search-refresh-btn").on("click", function(){
+			
+			$("#record-meter-place").val("");//设置表计位置
+			$("#record-meter-id").val("");//设置表计ID
+			
+			$.fn.zTree.init($("#ztree-meter-select"), selectZTreeSetting);
+			
+		});
+		/**
+		 * 	根据条件查询表计并展开对应节点
+		 */
+		function searchMeterSelect(searchCond){
+			ztreeSelectLoading();//ztree加载中
+			var url = BASE_CONTEXT_PATH + "/location/search";// 需要提交的url
+			var params = {"searchCond":searchCond};
+			$.post(url, params, function(res){
+				ztreeSelectLoaded();//ztree加载完成
+				//console.log(res);//由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						var meterList = res.meterList;
+						$.fn.zTree.init($("#ztree-meter-select"), selectZTreeSetting, meterList);
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+	</script>
+
+</body>
+</html>

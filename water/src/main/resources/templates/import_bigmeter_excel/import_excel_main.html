@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<!-- 文件上传JS插件 -->
+<script type="text/javascript" th:src="@{/jquery/ajaxFileUpload.js}"></script>
+<!-- 上传文件验证JS -->
+<script type="text/javascript" th:src="@{/commons/file-upload-validate.js}"></script>
+
+<style type="text/css">
+	.card{
+		/* height:100%; */
+		padding-bottom: 10px;
+	}
+</style>
+
+</head>
+<body>
+
+	<div class="row clearfix">
+		<div class="col-md-12">
+			<div class="card">
+				<h5 class="card-header">
+					选择地理位置-小区
+				</h5>
+				<div class="card-body">
+					<form role="form">
+						<div class="form-group">
+							<!-- <label for="excel-meter-location">
+								选择地理位置-小区
+							</label> -->
+							<select class="form-control" id="import-excel-location-select">
+								<option value="" data-code="" data-long-code="">——请选择地理位置-小区——</option>
+								<span th:each="item,iterStat: ${locationList}">
+									<option th:value="${item.id}" th:attr="data-traceids=${item.traceIds}, data-code=${item.pycode}, data-long-code=${item.pycode}" th:text="${item.name}">地理位置-小区名称</option>
+								</span>
+							</select>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<br>
+		<br>
+		<div class="col-md-4">
+			<div class="card">
+				<h5 class="card-header">
+					Step-1：导入大表Excel
+				</h5>
+				<div class="card-body">
+					<form role="form">
+						<div class="form-group">
+							<label for="excel-location">
+								选择大表Excel
+							</label>
+							<input type="file" class="btn btn-info" id="excel-location" name="excelLocation"
+								onchange="javascript:validateLocationEFileSizeFn(this);"
+								accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+						</div>
+						<button type="button" class="btn btn-info" disabled="disabled"
+							id="import-location-excel-data-btn">
+							<i class="fa fa-cloud-upload" aria-hidden="true">
+								<span>导入大表数据</span>
+							</i>
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!-- <div class="col-md-4">
+			<div class="card">
+				<h5 class="card-header">
+					Step-2：导入表计Excel
+				</h5>
+				<div class="card-body">
+					<form role="form">
+						<div class="form-group">
+							<label for="excel-meter">
+								选择表计Excel
+							</label>
+							<input type="file" class="btn btn-info" id="excel-meter" name="excelMeter"
+								onchange="javascript:validateMeterEFileSizeFn(this);"
+								accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+						</div>
+						<button type="button" class="btn btn-info" disabled="disabled"
+							id="import-meter-excel-data-btn">
+							<i class="fa fa-cloud-upload" aria-hidden="true">
+								<span>导入表计数据</span>
+							</i>
+						</button>
+					</form>
+				</div>
+			</div>
+		</div> -->
+		<!-- <div class="col-md-4">
+			<div class="card">
+				<h5 class="card-header">
+					Step-3：导入客户Excel
+				</h5>
+				<div class="card-body">
+					<form role="form">
+						<div class="form-group">
+							<label for="excel-customer">
+								选择客户Excel
+							</label>
+							<input type="file" class="btn btn-info" id="excel-customer" name="excelCustomer"
+								onchange="javascript:validateCustomerEFileSizeFn(this);"
+								accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+						</div>
+						<button type="button" class="btn btn-info" disabled="disabled"
+							id="import-customer-excel-data-btn">
+							<i class="fa fa-cloud-upload" aria-hidden="true">
+								<span>导入客户数据</span>
+							</i>
+						</button>
+					</form>
+				</div>
+			</div>
+		</div> -->
+			
+		<hr style="height:1px;border:none;border-top:1px solid blue;">
+		
+	</div>
+
+	<script type="text/javascript">
+	
+		var G_EXCEL_TYPE_LOCATION = "location";//excel类型常量：地理位置
+		var G_EXCEL_TYPE_METER = "meter";//excel类型常量：表计
+		var G_EXCEL_TYPE_CUSTOMER = "customer";//excel类型常量：客户
+	
+		/*
+		 *	验证地理位置文件大小
+		 */
+		function validateLocationEFileSizeFn(file){
+			if(isAllowUploadFile(file, 5120)){
+				$("#import-location-excel-data-btn").attr("disabled", false);
+			}else{
+				//dialog type: success warning info error,默认为info
+				util.message("上传Excel不能大于5M！",null,"warning");
+				$("#import-location-excel-data-btn").attr("disabled", true);
+			}
+		}
+		/*
+		 *	验证表计Excel文件大小
+		 */
+		function validateMeterEFileSizeFn(file){
+			if(isAllowUploadFile(file, 5120)){
+				$("#import-meter-excel-data-btn").attr("disabled", false);
+			}else{
+				//dialog type: success warning info error,默认为info
+				util.message("上传Excel不能大于5M！",null,"warning");
+				$("#import-meter-excel-data-btn").attr("disabled", true);
+			}
+		}
+		
+		/*
+		 *	验证客户Excel文件大小
+		 */
+		function validateCustomerEFileSizeFn(file){
+			if(isAllowUploadFile(file, 5120)){
+				$("#import-customer-excel-data-btn").attr("disabled", false);
+			}else{
+				//dialog type: success warning info error,默认为info
+				util.message("上传Excel不能大于5M！",null,"warning");
+				$("#import-customer-excel-data-btn").attr("disabled", true);
+			}
+		}
+		
+		/**
+		 * 	导入Excel数据AJAX请求
+		 */
+		function importExcelDataReqFn(url, params, elementId, excelType){
+			
+			setImportBtnLoadingFn(excelType);//设置导入Excel按钮导入中状态；设置按钮的信息为正在导入，并设置按钮不可编辑
+			
+			//console.log("url:"+url);
+			//console.log("params:"+JSON.stringify(params));
+			//console.log("elementId:"+elementId);
+			
+			//var url = "/import-excel/import-excel-location";
+			//var params = {"fileType":"excel", "inputName":"excelLocation"};
+			$.ajaxFileUpload({
+				url: url, //用于文件上传的服务器端请求地址
+			    secureuri: false, //一般设置为false
+			    //fileElementId: "excel-location", //文件上传空间的id属性  <input type="file" id="file" name="file" />
+			    fileElementId: elementId, //文件上传空间的id属性  <input type="file" id="file" name="file" />
+			    dataType: "json", //返回值类型 一般设置为json
+			    data: params,
+			    success: function (res){  //服务器成功响应处理函数
+
+			    	setImportBtnLoadedFn(excelType);//设置导入Excel按钮导入完成状态；设置按钮的信息为导入完成，并设置按钮可编辑
+			    	
+			    	console.log("success:"+JSON.stringify(res));
+			    	if(res!=null){
+			    		if(res.result_code=="success"){
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}else{
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"error");
+						}
+					}
+			    },
+			    error: function (data, status, e){//服务器响应失败处理函数
+			    	setImportBtnLoadedFn(excelType);//设置导入Excel按钮导入完成状态；设置按钮的信息为导入完成，并设置按钮可编辑
+			    	console.log("error:"+data);
+			    }
+			});
+		}
+	
+		/**
+		 * 	设置导入Excel按钮导入中状态
+		 *		设置按钮的信息为正在导入，并设置按钮不可编辑
+		 */
+		function setImportBtnLoadingFn(excelType){
+			
+			var btnMsg = "正在导入，请等待...";
+			
+			if(excelType==G_EXCEL_TYPE_LOCATION){
+				$("#import-location-excel-data-btn").text(btnMsg);
+				$("#import-location-excel-data-btn").attr("disabled", true);
+			}else if(excelType==G_EXCEL_TYPE_METER){
+				$("#import-meter-excel-data-btn").text(btnMsg);
+				$("#import-meter-excel-data-btn").attr("disabled", true);
+			}else if(excelType==G_EXCEL_TYPE_CUSTOMER){
+				$("#import-customer-excel-data-btn").text(btnMsg);
+				$("#import-customer-excel-data-btn").attr("disabled", true);
+			}else{
+				console.log("excel type is "+excelType);
+			}
+			
+		}
+		
+		/**
+		 * 	设置导入Excel按钮导入完成状态
+		 *		设置按钮的信息为导入完成，并设置按钮可编辑
+		 */
+		function setImportBtnLoadedFn(excelType){
+			
+			if(excelType==G_EXCEL_TYPE_LOCATION){
+				$("#import-location-excel-data-btn").text("导入大表数据");
+				$("#import-location-excel-data-btn").attr("disabled", false);
+				$("#excel-location").val("");
+			}else if(excelType==G_EXCEL_TYPE_METER){
+				$("#import-meter-excel-data-btn").text("导入表计数据");
+				$("#import-meter-excel-data-btn").attr("disabled", false);
+				$("#excel-meter").val("");
+			}else if(excelType==G_EXCEL_TYPE_CUSTOMER){
+				$("#import-customer-excel-data-btn").text("导入客户数据");
+				$("#import-customer-excel-data-btn").attr("disabled", false);
+				$("#excel-customer").val("");
+			}else{
+				console.log("excel type is "+excelType);
+			}
+			
+		}
+	
+		$(function(){
+			/**
+			 * 	导入地理位置Excel
+			 */
+			$("#import-location-excel-data-btn").on("click", function(){
+				
+				var locationId = $("#import-excel-location-select").val();//地理位置-小区ID
+				console.log("locationId:"+locationId);
+				if(locationId==null || locationId==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择地理位置-小区！",null,"warning");
+					return;
+				}
+				
+				var traceIds = $("#import-excel-location-select").find("option:selected").attr("data-traceids");//地理位置-小区ID
+				
+				var url = "/import-bigmeter-excel/import-excel";
+				var params = {"fileType":"big-meter-excel", "inputName":"excelLocation", "traceIds": traceIds};
+				var elementId = "excel-location";
+				
+				importExcelDataReqFn(url, params, elementId, G_EXCEL_TYPE_LOCATION);//导入Excel数据后台请求
+			});
+			
+			/**
+			 * 	导入表计Excel
+			 */
+			$("#import-meter-excel-data-btn").on("click", function(){
+				
+				var locationBlockCode = $("#import-excel-location-select").find("option:selected").attr("data-code");//地理位置-小区编码
+				if(locationBlockCode==null || locationBlockCode==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择地理位置-小区！",null,"warning");
+					return;
+				}
+				
+				var url = "/import-excel/import-excel-meter";
+				var params = {"fileType":"excel", "inputName":"excelMeter", "locationBlockCode":locationBlockCode};
+				var elementId = "excel-meter";
+				
+				importExcelDataReqFn(url, params, elementId, G_EXCEL_TYPE_METER);//导入Excel数据后台请求
+			});
+			
+			/**
+			 * 	导入客户Excel
+			 */
+			$("#import-customer-excel-data-btn").on("click", function(){
+				
+				var locationBlockCode = $("#import-excel-location-select").find("option:selected").attr("data-code");//地理位置-小区编码
+				if(locationBlockCode==null || locationBlockCode==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择地理位置-小区！",null,"warning");
+					return;
+				}
+				
+				var url = "/import-excel/import-excel-customer";
+				var params = {"fileType":"excel", "inputName":"excelCustomer", "locationBlockCode":locationBlockCode};
+				var elementId = "excel-customer";
+				
+				importExcelDataReqFn(url, params, elementId, G_EXCEL_TYPE_CUSTOMER);//导入Excel数据后台请求
+			});
+		});
+	</script>
+	
+</body>
+</html>

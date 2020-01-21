@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>表计档案</title>
+
+</head>
+<body>
+
+	<!-- 编辑地理位置对话框 -->
+	<div class="container" id="customer-edit-dialog"></div>
+	<!-- 保存全局的客户ID，用于绑定地理位置 -->
+	<input type="hidden" id="g-customer-id" value="0" />
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label">
+		<div>
+		</div>
+	</div>
+	<!-- 批次列表 -->
+	<table class="table table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>ID</th>
+				<th>业主名称</th>
+				<th>业主手机号</th>
+				<th>客户名称</th>
+				<th>客户手机号</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${customersList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- ID -->
+				<td th:text="${item.id}">ID</td>
+				<!-- 业主名称 -->
+				<td th:text="${item.propName}">业主名称</td>
+				<!-- 业主手机 -->
+				<td th:text="${item.propMobile}">业主手机号</td>
+				<!-- 客户名称 -->
+				<td th:text="${item.customerName}">客户名称 </td>
+				<!-- 客户手机 -->
+				<td th:text="${item.customerMobile}">客户手机</td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 详情信息 -->
+					<button type="button" class="info-detail-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-file-o" aria-hidden="true"></i><span>详情</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager::pager" class="pagerx"
+		style="float: right; margin-right: 100px;"></div>
+		
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>	
+	
+	<script type="text/javascript">
+	
+	/* 
+		加载详情对话框 
+	*/
+	$('.info-detail-single').on('click',function() {
+		var url = BASE_CONTEXT_PATH+'/location-customer/load-customer-detail-dialog';
+	
+		var itemId = $(this).attr("bind-id"); //条目ID			
+		var parms = new Object(); //参数
+		parms.itemId = itemId;
+		
+	
+		$("#customer-dialog-edit").load(url, parms,openCustomerDialog); //加载完毕后显示 
+	});
+	
+	/**
+	  	打开修改参话框
+	  	@returns
+	 */
+	function openCustomerDialog() {
+		//	可拖拽
+		$("#modal-container-customer-edit").draggable({
+			cursor : "move",
+			handle : '.modal-header'
+		}); 
+	
+		$('#modal-container-customer-edit').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+	}
+	
+	/* 
+		close dialog:修改对话框 
+	*/
+	function closeCustomerDialog() {
+		$("#modal-container-customer-edit").modal("hide");
+	}
+	
+	/**
+		返回所选条目的 id(每行对应一个唯一的ID)
+		@returns   
+	 */
+	function getSelectedIds(){
+		var idArr = new Array();
+	
+		// 扫描用户所选择条目ID
+		$(".item-selector").each(function(index, elem) {
+			if (this.checked) { // 对于己选条目
+				var id = $(this).attr("data-bind"); //
+				idArr.push(id);
+				
+			}
+		}); // end of item-selector
+		return idArr;
+	}
+
+		
+	//-----------------page loaded ready------------------
+	$(function() {
+		
+		/*
+			选择/取消选择  当前页记录
+			select all  or  deselect all			 	
+		*/
+		$("#select-all-toggle").on('click', function(e) {
+			var prefix = "item-selector-";
+	
+			if (this.checked) {					
+				//查询列表中的项目
+				$(".item-selector").each(function(index, elem) {
+					this.checked = true;
+					var surfix = $(this).attr("data-bind");  //item'id
+					var rowId = prefix + surfix; 
+					$('#' + rowId).addClass("selected");
+				});
+			} 
+			else{
+				$(".item-selector").each(function(index, elem) {
+					this.checked = false;
+					var surfix = $(this).attr("data-bind");
+					var rowId = prefix + surfix;
+					$('#' + rowId).removeClass("selected");
+				});
+			} // end of else
+		});
+
+		//======================分页（页码导航）========================
+
+		/*
+		 	【分页】导航： 当点击页号时读取需要导航到的页码及每页记录数（pageNum,pageSize）
+		 	 data-bind:pageNum-pageSize形式 
+		 	 如果data-bind为空字符串，不做动作 
+		 	 当用户点击某页时，	 则发送请求
+		*/
+		$(".pagination li a").on('click', function(e) {
+			var dataBind = $(this).attr("data-bind");
+			//当dataBind有数据时处理
+			if (dataBind != "") {
+				var pageArr = new Array();
+				pageArr = dataBind.split("-");
+				// 置分页数据
+				curr_pageNum = pageArr[0];
+				curr_pageSize = pageArr[1];
+				//加载页
+				loadPage(); 
+			}
+
+		});
+
+	});
+	
+	</script>
+
+</body>
+</html>

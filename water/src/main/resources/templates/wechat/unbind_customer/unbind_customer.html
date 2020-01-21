@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<!-- wechat-用户编号结果列表-解除绑定-使用中 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, height=device-height, initial-scale=1">
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')" th:remove="tag"></div> -->
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body>
+
+	<div id="confirm-dialog-container">	
+	</div>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h5 style="text-align: center; margin-top: 10px;">用户编号</h5>
+				<hr class="style-two" /> -->
+				<!-- <div th:include="wechat/public_page/header::header('用户解绑')"
+					th:remove="tag"></div>
+ -->
+				<!-- <div class="form-horizontal " role="form" id="bind-customer-form"> -->
+				<!-- 用户编号-->
+				<div class="" style="text-align: center;">
+					<ul class="customer-no-list " style="list-sytle-type: none; padding-top:10px;">	
+						<span th:remove="tag" th:if="${#lists.isEmpty(bindedCustomerList)}">						
+							<li>尚未绑定</li>
+						</span>										
+						<li th:each="customer,iter:${bindedCustomerList}">
+							<!-- <div class="input-group">
+								prepend
+								<div class="input-group-prepend" >
+									<span class="input-group-text" style="font-size:18px;" >No.<span th:text="${iter.count}"></span></span>
+								</div>
+								input
+								<input type="text" class="form-control" placeholder="Username"
+									id="usr" name="username">
+								<label class="form-control" id="customer-no-1" name="customer-no-1">
+									<div style="font-size:18px;" th:text="${customer.customerCode}">1234567890</div>
+									<div style="font-size:18px;" th:text="${customer.address}+${customer.room}">如园-1-1-101</div>
+								</label>	
+								append
+								<div class="input-group-append">
+									<button class="btn btn-primary unbind" 
+										type="button"
+										th:attr="data-bind-customer-code=${customer.customerCode},
+												 data-bind-customer-address=${customer.address},
+												 data-bind-customer-room=${customer.room},
+												 data-bind-relation-id=${customer.relationId}
+												 "
+												  
+										style="font-size:18px;" >解绑</button>
+								</div>
+							</div> -->
+							
+							<div class="weui-form-preview rounded  border-radius  w"
+									style="background-color: white;margin-left:10px;margin-right:10px;">
+
+									<!-- 当点击此处时,打开或收缩帐单BODY -->
+									<div class="weui-form-preview__hd rounded">
+										<!-- ${#dates.format(date, 'dd/MMM/yyyy HH:mm')} -->
+										<label class="weui-form-preview__label">序号</label>
+										<em class="weui-form-preview__value" style="font-size: 20px;"  th:text="${iter.count}"></em>
+									</div>
+
+									<div class="weui-form-preview__bd">
+										<div class="weui-form-preview__item">
+											<label class="weui-form-preview__label">用户编号</label> <span
+												class="weui-form-preview__value" th:text="${customer.customerCode}">用户编号</span>
+										</div>
+										<div class="weui-form-preview__item">
+											<label class="weui-form-preview__label">门牌号</label> <span
+												class="weui-form-preview__value" th:text="${customer.address}+${customer.room}">用户门牌号码</span>
+										</div>
+									</div>
+									<div class="weui-btn-area">
+											<a href="javascript:;"
+												class="weui-btn weui-btn_primary unbind block"
+										
+												th:attr="data-bind-customer-code=${customer.customerCode},
+														 data-bind-customer-address=${customer.address},
+														 data-bind-customer-room=${customer.room},
+														 data-bind-relation-id=${customer.relationId}">解绑</a>
+									</div>
+
+								</div> 
+							
+						</li>
+						
+						<!-- <li class="">
+							<div class="input-group">
+								prepend
+								<div class="input-group-prepend" >
+									<span class="input-group-text" style="font-size:18px;" >No.2</span>
+								</div>
+								input								
+								<label class="form-control" id="customer-no-1" name="customer-no-1">
+									<div style="font-size:18px;" >0123456789</div>
+									<div style="font-size:18px;" >凤来城-12-2-1011</div>
+								</label>	
+								append
+								<div class="input-group-append">
+									<button class="btn btn-primary  unbind" type="button" style="font-size:18px;" >解绑</button>
+								</div>
+							</div>
+						
+						</li> -->
+
+					</ul>
+
+				</div>
+				<!--提交按钮-->
+				<!-- <div class="form-group form-inline">
+						<button type="button" id="btnReturn" name="btnReturn"
+							class="btn btn-primary btn-lg btn-block">返回</button>
+					</div> -->
+				<!-- </div> -->
+			</div>
+		</div>
+		<!-- <div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')"
+				th:remove="tag"></div>
+		</div> -->
+	</div>
+
+
+	<script type="text/javascript">
+	
+		function UnbindCustomer(){
+			var self=this;
+			
+			/*
+				加载确认对话框
+			*/
+			this.loadConfirmDialog=function() {
+				//初始化请求参数
+				var parms = new Object();
+				/*
+				parms.customerId = getCustomerIdFn();//获取客户ID
+				parms.functionModule=getFunctionModuleFn();//参数：功能模块标识 */
+		
+				//加载字典列表页面
+				var url = BASE_CONTEXT_PATH + "/wechat/loadunbindconfirmdialog";
+				console.debug("load dialog url is:"+url);
+				$("#confirm-dialog-container").load(url, parms, null);
+			}
+			
+			/*
+			 * 	打开(Open) 增加核对类型对话框
+			 */
+			openDialog=function() {
+				 var modalDialog = $("#unbind-confirm-dialog").eq(0);
+		          dialogHeight = modalDialog.height();
+		          windowHeight = $(window).height(); 
+
+		      // When dialog height greater than window height,
+		      // use default margin top value to set dialog position.
+		      // if (windowHeight < dialogHeight) {
+		          // do nothing
+		          // return;
+		      // }
+
+		      // When dialog height less than window height,
+		      // use margin top set it position.
+		      // Dialog position set it with vertical center.
+		      if (windowHeight > dialogHeight) {
+		          modalDialog.css({
+		              "marginTop": ( windowHeight - dialogHeight) / 2
+		          });
+		      }
+				
+				//可拖拽
+				$("#unbind-confirm-dialog").draggable({
+					cursor : "move",
+					handle : '.modal-header'
+				});
+				//点击对话框外部,不关闭对话框 
+				$('#unbind-confirm-dialog').modal({
+					backdrop : 'static',
+					keyboard : false
+				});
+			}
+			
+			//打开确认对话框
+			openConfirmDialog=function(parms){
+					
+	                $.confirm("您确定要解除绑定吗?", "确认解绑?", 
+	                	function() {
+	                		//获取解绑时关系ID
+							var relationId=parms.relationId;
+							self.unbindCustomer(relationId);  //解除绑定
+		                   	$.toast("解绑成功!");
+	                   		
+	                	}, 
+	                	function() {
+	                		//取消操作	
+	                	}
+	                );  //end of confirm
+	            
+				
+			}
+
+			/* 
+				关闭(CLOSE) 增加核对类型对话框
+			 */
+			this.closeDialog=  function () {
+				$("#unbind-confirm-dialog").modal("hide");
+			}
+			
+			/*
+				功能:
+					获取参数(用于设置对话框)
+				参数:无
+				返回:参数对象,包括如下参数
+					customerCode;
+					customerAddress;
+					customerRoom;
+					relationId;
+			*/
+			getParms=function(that){
+				var customerCode=$(that).attr("data-bind-customer-code");
+				var customerAddress=$(that).attr("data-bind-customer-address");
+				var customerRoom=$(that).attr("data-bind-customer-room");					
+				var relationId=$(that).attr("data-bind-relation-id");
+				
+				var parms=new Object();
+				parms.customerCode=customerCode;
+				parms.customerAddress=customerAddress;
+				parms.customerRoom=customerRoom;
+				parms.relationId=relationId;
+				
+				return parms;
+			}
+			
+			/*
+				绑定事件
+			*/
+			this.addListener=function(){
+				
+				//解绑按钮:click 事件处理.			
+				$('.unbind').on('click',function(){
+					//console.debug("clicked");
+					//(1)设置对话框参数
+					var parms=getParms(this);					
+					//unbindConfirmDialog.setDialogParms(parms);
+					
+					//(2)打开对话框
+					openConfirmDialog(parms);
+				});
+			}
+			
+			/*
+				解除绑定.
+				当点击确认对话框[确认]按钮时调用.
+			*/
+			this.unbindCustomer=function(relationId){
+				var url=BASE_CONTEXT_PATH+"/wechat/unbind";
+				var parms=new Object();
+				parms.relationId=relationId;
+				$.post(url,parms,unbindCallback);
+			}
+			
+			/*
+				解绑回调函数
+					unction(response,status,xhr)可选。规定 load() 方法完成时运行的回调函数。	
+					额外的参数：
+						response - 包含来自请求的结果数据
+						status - 包含请求的状态（"success"、"notmodified"、"error"、"timeout"、"parsererror"）
+						xhr - 包含 XMLHttpRequest 对象
+			*/
+			unbindCallback=function(response,status,xhr){
+				const REQUEST_SUCCESS='success';
+				var resultCode=response.result_code;   //success, fail  业务层面常量
+				var resultMsg=response.result_msg;				
+				console.log("response:"+response);
+				
+				$.toast(resultMsg, 2000);
+				if(resultCode==REQUEST_SUCCESS){
+					refreshPage();  //解绑成功后刷新页面
+				}				
+			}
+			
+			/*
+				刷新页面(解绑成功后)
+			*/
+			refreshPage=function(){
+				customerRelation.refreshUnbindCustomer();
+			}
+			
+		}
+		
+		
+		var unbindCustomer=new UnbindCustomer();
+		
+		//page loaded ready
+		$(function(){
+			//初始化部分
+			unbindCustomer.addListener();
+			
+			// unbindCustomer.loadConfirmDialog();
+			
+		});
+	
+	</script>
+
+
+</body>
+</html>

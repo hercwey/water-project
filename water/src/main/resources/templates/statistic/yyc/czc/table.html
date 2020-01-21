@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="text-center" th:text="${period}+'城中村小区欠费明细'">
+				201X.MM月城中村小区欠费明细
+			</h3>
+		
+			<table class="table table-bordered table-sm">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>水量</th>
+						<th>水费（欠费）</th>
+						<th>备注</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="item,iterStat: ${dataList}">
+						<td th:text="${item.count}"></td>
+						<td th:text="${item.CUSTOMER_NAME}"></td>
+						<td th:text="${item.WATER_AMOUNT}">xxxx</td>
+						<td th:text="${item.OWE_AMOUNT}">xxx</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td colspan="2">合计</td>
+						<td th:text="${totalWaterAmount}"></td>
+						<td th:text="${totalWaterFee}">xxxx</td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+		
+		});
+	</script>
+</body>
+</html>

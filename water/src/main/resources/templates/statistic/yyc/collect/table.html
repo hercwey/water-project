@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="text-center" th:text="${period}+'水费收缴情况表'">
+				201X.MM月水费收缴情况表
+			</h3>
+		
+			<table class="table table-bordered table-sm">
+				<thead>
+					<tr>
+						<th>指标</th>
+						<th>单价</th>
+						<th>数量</th>
+						<th>应缴水费</th>
+						<th>实缴水费</th>
+						<th>欠费金额</th>
+						<th>备注</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>售水总量</td>
+						<td></td>
+						<td th:text="${totalWaterAmount}"></td>
+						<td th:text="${totalCreditAmount}">xxx</td>
+						<td th:text="${totalDebitAmount}">xxx</td>
+						<td th:text="${totalOweAmount}">xxxx</td>
+						<td>均价（元/吨）</td>
+					</tr>
+					<tr th:each="item,iterStat: ${dataList}">
+						<td th:text="${item.LADDER_NAME}">生活用水</td>
+						<td th:text="${item.BASE_PRICE}">3.45</td>
+						<td th:text="${item.SUM_REAL_WATER_AMOUNT}">xxxx</td>
+						<td th:text="${item.SUM_CREDIT_AMOUNT}">xxx</td>
+						<td th:text="${item.SUM_DEBIT_AMOUNT}">xxx</td>
+						<td th:text="${item.SUM_OWE_AMOUNT}">xxxx</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>电厂</td>
+						<td></td>
+						<td th:text="${powerPlantAmount}"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>维生药业</td>
+						<td></td>
+						<td th:text="${wsyyAmount}"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>其他用水</td>
+						<td></td>
+						<td th:text="${freeWaterAmount}"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>收当月</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td th:text="${totalDebitAmount}"></td>
+						<td></td>
+						<td>备注</td>
+					</tr>
+					<tr>
+						<td>清欠</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td th:text="${totalCleanAmount}"></td>
+						<td></td>
+						<td>实收率</td>
+					</tr>
+					<tr>
+						<td>当月总量</td>
+						<td></td>
+						<td th:text="${totalWaterAmount}+${freeWaterAmount}">xxxx</td>
+						<td th:text="${totalCreditAmount}">xxx</td>
+						<td th:text="${totalMonthAmount}">xxx</td>
+						<td th:text="${totalOweAmount}">xxxx</td>
+						<td th:text="${actualRate}+'%'">备注</td>
+					</tr>
+					<!-- <tr>
+						<td>累计总量</td>
+						<td></td>
+						<td>xxxx</td>
+						<td>xxx</td>
+						<td>xxx</td>
+						<td>xxxx</td>
+						<td>备注</td>
+					</tr> -->
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+		
+		});
+	</script>
+</body>
+</html>

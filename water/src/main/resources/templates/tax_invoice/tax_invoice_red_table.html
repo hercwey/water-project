@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+	
+
+	<form class="form-horizontal tax-invocie-red-form" role="form" id="tax-invocie-red-form" >
+		<!-- 采用表格进行布局 -->
+		<table class="table-layout table">
+			<tbody id="overdue-fine-body">
+				<tr>
+					<td style="width:50%">
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">信息表流水号&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<input type="number" class="form-control"
+										 placeholder="信息表流水号" maxlength="14"
+										id="tax-red-info-xxblsh" name="xxblsh" required/>
+							</span>
+						</div>
+					</td>
+					<td style="width:50%">
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">填开日期&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control input-sm Wdate"
+										id="tax-red-info-tkrq" name="tkrq"		
+										th:value="${tkrq}"				
+										onClick="WdatePicker({dateFmt:'yyyy-MM-dd', isShowClear:false});"
+										placeholder="填开日期" style="background-color: white;" title="填开日期 " required>
+							</span>
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td style="width:50%">
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">红字发票代码&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control"
+										 placeholder="红字发票代码" maxlength="50"
+										id="tax-red-info-hzfpdm" name="hzfpdm" required/>
+							</span>
+						</div>
+					</td>
+					<td style="width:50%">
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">红字发票号码&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control"
+										 placeholder="红字发票号码" maxlength="50"
+										id="tax-red-info-hzfphm" name="hzfphm" required/>
+							</span>
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td colspan="2">
+						<div class="form-group form-inline">
+							<label for="" class="control-label col-sm-2" style="display: inline-block; text-align:right;">申请说明&nbsp<i style="color: red">*</i></label>
+							<textarea rows="3" cols="1" class="form-control" 
+									id="tax-red-info-sqsm" name="sqsm" style="width:610px; margin-left: 15px; resize: none"
+									maxlength=200 title="申请说明必填"  placeholder="申请说明" required></textarea>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"><hr style="width:100%; text-align:center;vertical-align:middle; margin-top: 3px; margin-bottom: 8px"/></td> 
+				</tr>
+				 
+				<tr>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label"  style="display: inline-block; text-align:right;">申请方单位名称&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control " id="tax-red-info-sqfmc" name="sqfmc">
+									<!-- 默认选择第一个 -->
+									<option value="">-请选择-</option>
+									<span th:each="item,iterStat: ${sqfxxList}" th:remove="tag">
+										<option th:value="${item.invoiceName}" th:attr="data-tax-no=${item.taxNo}" required
+												th:text="${item.invoiceName}">数据字典的值</option>
+									</span>
+									
+								</select>
+							</span>
+						</div>
+					</td>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">申请方单位税号</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly" 
+										 placeholder="申请方单位税号"
+										id="tax-red-info-sqfsh" name="sqfsh" />
+							</span>
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">对应蓝票代码</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly"
+										th:value="${currItem.fpdm}" placeholder="对应蓝票代码"
+										id="tax-red-info-dylpdm" name="dylpdm" />
+							</span>
+						</div>
+					</td>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">对应蓝票号码</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly"
+										th:value="${currItem.fphm}" placeholder="对应蓝票号码"
+										id="tax-red-info-dylphm" name="dylphm" />
+							</span>
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">购方名称</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly"
+										th:value="${currItem.gfmc}" placeholder="购方名称"
+										id="tax-red-info-gfmc" name="gfmc" />
+							</span>
+						</div>
+					</td>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">购方税号</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly"
+										th:value="${currItem.gfsh}" placeholder="购方税号"
+										id="tax-red-info-gfsh" name="gfsh" />
+							</span>
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">销方名称</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly"
+										th:value="${currItem.xfmc}" placeholder="销方名称"
+										id="tax-red-info-xfmc" name="xfmc" />
+							</span>
+						</div>
+					</td>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">销方税号</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly"
+										th:value="${currItem.xfsh}" placeholder="销方税号"
+										id="tax-red-info-xfsh" name="xfsh" />
+							</span>
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">合计税额</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly"
+										th:value="${currItem.hjse}" placeholder="合计税额"
+										id="tax-red-info-hjse" name="hjse" />
+							</span>
+						</div>
+					</td>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">税率</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly"
+										th:value="${slv}" placeholder="税率"
+										id="tax-red-info-sl" name="slv" />
+							</span>
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label" style="display: inline-block; text-align:right;">合计金额</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control" readonly="readonly"
+										th:value="${currItem.hjje}" placeholder="合计金额"
+										id="tax-red-info-hjje" name="hjje" />
+							</span>
+						</div>
+					</td>
+					<td>
+						
+					</td>
+				</tr>
+				
+				
+			</tbody>
+		</table>
+	
+	</form>
+
+
+
+</body>
+</html>

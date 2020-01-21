@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CompanyAccountItemMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CompanyAccountItem">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="ACCOUNT_ID" jdbcType="DECIMAL" property="accountId" />
+    <result column="DEBIT_DIGEST" jdbcType="VARCHAR" property="debitDigest" />
+    <result column="DEBIT_SUBJECT" jdbcType="VARCHAR" property="debitSubject" />
+    <result column="DEBIT_ASSISTANT" jdbcType="VARCHAR" property="debitAssistant" />
+    <result column="DEBIT_AMOUNT" jdbcType="DECIMAL" property="debitAmount" />
+    <result column="CREDIT_DIGEST" jdbcType="VARCHAR" property="creditDigest" />
+    <result column="CREDIT_SUBJECT" jdbcType="VARCHAR" property="creditSubject" />
+    <result column="CREDIT_ASSISTANT" jdbcType="VARCHAR" property="creditAssistant" />
+    <result column="CREDIT_AMOUNT" jdbcType="DECIMAL" property="creditAmount" />
+    <result column="ACCOUNT_DATE" jdbcType="TIMESTAMP" property="accountDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="ACCOUNTER" jdbcType="VARCHAR" property="accounter" />
+    <result column="DEBIT_CREDIT" jdbcType="VARCHAR" property="debitCredit" />
+    <result column="BASE_WATER_FEE" jdbcType="DECIMAL" property="baseWaterFee" />
+    <result column="SEWAGE_WATER_FEE" jdbcType="DECIMAL" property="sewageWaterFee" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, ACCOUNT_ID, DEBIT_DIGEST, DEBIT_SUBJECT, DEBIT_ASSISTANT, DEBIT_AMOUNT, 
+    CREDIT_DIGEST, CREDIT_SUBJECT, CREDIT_ASSISTANT, CREDIT_AMOUNT, ACCOUNT_DATE, REMARK, 
+    ACCOUNTER, DEBIT_CREDIT, BASE_WATER_FEE, SEWAGE_WATER_FEE
+  </sql>
+</mapper>

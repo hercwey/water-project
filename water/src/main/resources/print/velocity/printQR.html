@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" > 
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>
+<style type="text/css" mce_bogus="1">
+@page{
+	size:70mm 90mm;
+	margin:0px;
+}
+
+.mybody {font-family: SimHei;}
+.barcode_div{width:100%;}
+.barcode_content{text-align:center;}
+.barcode_image{width:150px;height:150px;margin-top:50px;}
+.barcode_account{margin-top:30px;font-size:50px;}
+
+</style>
+</head>
+<body class="mybody">
+	<div class="barcode_div">
+		<div class="barcode_content">
+			#if($mainPageOfLabel && $barcode)
+			<img class="barcode_image" src="$barcode" /> 
+			<div class="barcode_account">$account</div>
+			#end
+		</div>
+	</div>
+</body>
+</html>

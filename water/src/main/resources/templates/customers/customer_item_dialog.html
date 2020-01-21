@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户列表</title>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-customer-item" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg" style="max-width: 1000px">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>选择:客户列表</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body" id="customer-item-dialog-body">
+								<!-- 加载客户列表 -->
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">确认过户</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		
+		function AjaxReqTransferAccountFn(oldCustomerId, newCustomerId){
+			var url = BASE_CONTEXT_PATH+'/customers/transfer-account';
+			var parms = {"oldCustomerId": oldCustomerId, "newCustomerId": newCustomerId};
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res!=null && res!="") {
+					if (res.result_code == "success") {
+						closeDialogFn("modal-container-customer-item");//关闭对话框
+						$("#modal-container-customer-item").on("hidden.bs.modal", function () {
+							//当模态框完全对用户隐藏时触发。
+							var params = {"functionModule": getFunctionModuleFn()};
+							loadCustomerList(params, null);
+						});
+						
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+			$("#btn-modify-and-back").on("click", function(){
+				var newCustomerId = getNewCustomerId();
+				if(newCustomerId==0){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择新客户！",null,"warning");
+					return false;
+				}
+				var oldCustomerId = getCustomerIdFn();//获取客户ID
+				if(newCustomerId==oldCustomerId){
+					//dialog type: success warning info error,默认为info
+					util.message("不能过户到老客户，请选择新客户！",null,"warning");
+					return false;
+				}
+				
+				console.log("new customer id:"+newCustomerId+"old customer id:"+oldCustomerId);
+				
+				AjaxReqTransferAccountFn(oldCustomerId, newCustomerId);
+				
+			});
+
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

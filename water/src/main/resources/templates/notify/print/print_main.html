@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/billtablebody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+<!-- 引入通用对话框工具 -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+</head>
+<body>
+	<div id="print-customer-dialog"></div>
+	<!-- 通知单-->
+	<div id="preview-dialog"></div>
+	<!-- 修改备注-->
+	<div id="edit-remark-dialog"></div>
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="col-md-12">
+		<!-- 表计档案信息 -->
+		<!-- 操作面板 -->
+		<div class="" style="display: inline-block" id="div-customer-search">
+			<ul class="extra-l" style="list-style: none;">
+				<li class="input-group-sm">
+					<input type="text" class="form-control btn-sm Wdate customer-period" readonly="readonly" style="width: 100px;"
+							id="customer-period" name="period"
+							onClick="WdatePicker({dateFmt:'yyyy-MM',onpicked: setCustomerBackGround});"
+							placeholder="期间" title="期间" />
+				</li>
+				<li class="input-group-sm">
+					<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher-customer')" th:remove="tag"></div>
+				</li>
+				<!-- 面板:查询 -->
+				<li><input type="text" class="form-control btn-sm search-cond" id="search-cond" placeholder="请输入客户名称、编号、通知单序号" title="输入客户名称、编号、通知单序号查询">
+				</li>
+				<!-- 排序方式-->
+				<li class="input-group-sm">
+					<select class="form-control sort-method" id="sort-method">
+						<option value="0">抄表顺序</option>
+						<option value="1">发票顺序</option>
+					</select>
+				</li>
+				<!-- 排序方式-->
+				<li class="input-group-sm">
+					<select class="form-control arrears-amount" id="arrears-amount">
+						<option value="">欠费金额</option>
+						<option value="1">大于0</option>
+						<option value="2">等于0</option>
+						<option value="3">小于0</option>
+					</select>
+				</li>
+				<!-- 查询按钮 -->
+				<li>
+					<button type="button" class="btn btn-success btn-sm btn-search"	id="btn-search">
+						<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+					</button>
+					<button type="button" class="btn btn-warning btn-sm btn-search-reset"	id="btn-search-reset">
+						<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+					</button>
+					<!-- <button type="button" class="btn btn-success btn-sm generate-print-pdf"	id="generate-print-pdf">
+						<i class="fa fa-print" aria-hidden="true"> <span>批量打印</span></i>
+					</button>
+					<button type="button" class="btn btn-warning btn-sm destory-water-notify-batch"	id="destory-water-notify-batch">
+						<i class="fa fa-exclamation-circle" aria-hidden="true"> <span>批量报废</span></i>
+					</button> -->
+	
+				</li>
+				<li>
+					<div class="dropdown">
+						<button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+							操作
+						</button>
+						<div class="dropdown-menu">
+							<a class="dropdown-item btn-sm generate-print-pdf" id="generate-print-pdf">
+								<i class="fa fa-print" aria-hidden="true">
+									<span>批量打印</span>
+								</i>
+							</a>
+							<div class="dropdown-divider" style="border-top: 0.8px solid blue;"></div> 
+							<a class="dropdown-item btn-sm destory-water-notify-batch" id="destory-water-notify-batch">
+								<i class="fa fa-exclamation-circle" aria-hidden="true">
+									<span>批量报废</span>
+								</i>
+							</a>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+
+		<div class="card">
+			<div  class="customer-table table-container" id="bill-table-body" style="padding-left:10px;padding-right:10px;">
+				<!-- 表计列表 -->
+			</div>
+		</div>
+	</div>
+
+	<!-- 地理位置下拉框查询JS -->
+	<script type="text/javascript"	th:src="@{/js/component/districtsearcher/DistrictSearcher.js}"></script>
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//选择打印机对话框			
+		const DIALOG_SELECT_PRINT="modal-container-print-dialog";
+		//预览通知单对话框
+		const DIALOG_PREVIEW_NOTIFY="modal-container-preview-dialog";
+		//修改备注对话框
+		const DIALOG_EDIT_NOTIFY_REMARK="modal-container-edit-remark-dialog";
+		/*
+			设置日期选择input背景色
+		*/
+		function setCustomerBackGround() {
+			$("#div-customer-search .customer-period").css("background-color", "white");
+		}
+		
+		/**
+		 * 	获取期间
+		 */
+		function getCustomerPeriod(){
+			return $('#div-customer-search .customer-period').val();
+		}
+		
+		/**
+		 * 	获取当前系统月份（表示为抄表记录中的期间）
+		 */
+		function getCustomerCurrSysMonth(){
+			var date = new Date();
+			var year = date.getFullYear();    //获取完整的年份(4位,1970-????)
+			var month = date.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+			if(month<10){
+				month = "0"+month
+			}
+			return year+"-"+month;
+		}
+		/**
+		 * 	设置账单期间默认值为系统月份
+		 */
+		function setCustomerPeriodDefault(){
+			$("#div-customer-search .customer-period").val(getCustomerCurrSysMonth());
+		}
+		
+		/**
+		 * 	绑定期间查询的change事件
+		 */
+		$('#div-customer-search .customer-period').on('change',function() {
+			defaultSearchCustomer();
+		});
+		
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchCustomer(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/notify-print/table"
+			$(".customer-table").load(url, parms, customerCustomerResizeFuncx);
+		}
+		
+		function customerCustomerResizeFuncx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchCustomerParams(){
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var traceIds = null;
+			var locaBlockTraceIds = locationCustoemrSearcher.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationCustoemrSearcher.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationCustoemrSearcher.getUnitId();//地理位置-单元traceIds
+			
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			var searchCond=$("#div-customer-search .search-cond").val();
+			var period = $("#div-customer-search .customer-period").val();//期间
+			var sortMethod = $("#div-customer-search .sort-method").val();//排序方式
+			var arrearsAmount = $("#div-customer-search .arrears-amount").val();//欠费金额
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			parms.period=period;
+			parms.sortMethod=sortMethod;
+			parms.arrearsAmount=arrearsAmount;
+			return parms;
+		}
+
+		//---------------------------------------------
+		var locationCustoemrSearcher = new DistrictSearcher("location-searcher-customer", locationSelectSearchCustomerCallback); //此处searcher的ID和回调函数
+		
+		/**
+		 * 	地理位置下拉查询组件回调函数
+		 */
+		function locationSelectSearchCustomerCallback(){
+			
+			defaultSearchCustomer();//查询客户
+		}
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchCustomer() {
+			var pageNum = 0;
+			var pageSize = 0;
+			//获取参数
+			var parms = null;
+			parms = getSearchCustomerParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+	
+			searchCustomer(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchCustomerClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchCustomerParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+	
+			searchCustomer(parms);
+		}
+		
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadCustomerPage(searchCond,pageNum,pageSize) {
+			var parms = getSearchCustomerParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+	
+			searchCustomer(parms);
+			
+		}
+
+		 /*
+			btn-del-
+			批量打印按钮
+		*/
+		$('#div-customer-search .generate-print-pdf').on('click', function() {	
+			printCustomerConfirm();  //显示确认打印对话框
+		});
+		 
+		 /*
+		btn-del-
+			批量报废通知单
+		*/
+		$('#div-customer-search .destory-water-notify-batch').on('click', function() {	
+			destoryWaterNotifyConfirm();  //显示确认打印对话框
+		});
+		 
+
+		
+		/*
+		 * 	打开(Open) 选择打印机对话框
+		 */
+		function openPrintDialog() {
+			
+			DialogUtil.openDialogFn(DIALOG_SELECT_PRINT);
+		}
+		/* 
+			关闭(CLOSE) 选择打印机对话框
+		 */
+		function closePrintDialog() {
+			DialogUtil.closeDialogFn(DIALOG_SELECT_PRINT);
+		}
+		
+		
+		
+		/*
+		 * 	打开(Open) 预览通知单对话框
+		 */
+		function openPreviewDialog() {
+			
+			DialogUtil.openDialogFn(DIALOG_PREVIEW_NOTIFY);
+		}
+		/* 
+			关闭(CLOSE) 预览通知单对话框
+		 */
+		function closePreviewDialog() {
+			DialogUtil.closeDialogFn(DIALOG_PREVIEW_NOTIFY);
+		}
+		
+		/*
+		 * 	打开(Open) 修改通知单备注对话框
+		 */
+		function openEditRemarkDialog() {
+			
+			DialogUtil.openDialogFn(DIALOG_EDIT_NOTIFY_REMARK);
+		}
+		/* 
+			关闭(CLOSE) 修改通知单备注对话框
+		 */
+		function closeEditRemarkDialog() {
+			DialogUtil.closeDialogFn(DIALOG_EDIT_NOTIFY_REMARK);
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//设置账单期间默认值为系统月份
+			setCustomerPeriodDefault();
+			//地理位置下拉组件初始化
+			locationCustoemrSearcher.init();
+			//主页:默认查询(加载默认列表)
+			defaultSearchCustomer();
+
+			//---------事件绑定--------------
+			/*
+				查询按钮CLICK
+			*/
+			$('#div-customer-search .btn-search').on('click', function() {
+				btnSearchCustomerClick();
+			});
+			//排序方式下拉框改变事件
+			$('#div-customer-search .sort-method').on('change', function() {
+				defaultSearchCustomer();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#div-customer-search .btn-search-reset').on('click', function() {
+				//查询输入框设置为null且获取光标
+				$("#div-customer-search .search-cond").val("");
+				$("#div-customer-search .search-cond").focus();//获得焦点
+				//设置小区-楼号-单元下拉框为未选择
+				$("#div-customer-search .location-block").val("");//设置地理位置-小区值为空
+				$("#div-customer-search .location-building").val("");//设置地理位置-楼号值为空
+				$("#div-customer-search .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$("#div-customer-search .location-unit").val("");//设置地理位置-单元值为空
+				$("#div-customer-search .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			});
+
+		});
+	</script>
+
+
+
+</body>
+</html>

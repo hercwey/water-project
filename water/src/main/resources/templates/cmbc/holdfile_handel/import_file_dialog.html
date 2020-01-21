@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>回盘文件导入</title>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+		<div class="modal fade" id="modal-container-import-file-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="myModalLabel">
+							导入：回盘文件
+						</h5> 
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<!--回盘文件上传 -->
+						<form role="form" id="return-file-upload-form">
+							<div class="form-group">
+								<label for="txt-file">回盘文件</label>
+								<input type="file" class="form-control-file" id="txt-file" name="txtFile" multiple
+										accept=".txt" />
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" id="upload-save-submit-btn">保存</button> 
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+				
+			</div>
+			
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+	<script>
+	
+	
+	/**
+	 * 	获取协议参数
+	 */
+	function getImportFileParams(){
+		
+		var holdFileId = getWithRecordId();//获取代扣文件ID
+		var params = new Object();
+		params.fileType = "cmbc_txt";
+		params.inputName = "txtFile";
+		params.holdFileId = holdFileId;
+		return params;
+	}
+	
+	$(function(){
+		/**
+		 * 	上传协议保存按钮的click事件
+		 */
+		$("#upload-save-submit-btn").on("click", function() {
+			var url = BASE_CONTEXT_PATH + "/cmbc-holdfile-handel/import-return-file";
+			var params = getImportFileParams();//获取参数
+			$.ajaxFileUpload({
+				url: url, //用于文件上传的服务器端请求地址
+			    secureuri: false, //一般设置为false
+			    fileElementId: "txt-file", //文件上传空间的id属性  <input type="file" id="file" name="file" />
+			    dataType: "json", //返回值类型 一般设置为json
+			    data: params,
+			    success: function (res){  //服务器成功响应处理函数
+			    	if(res!=null){
+						if(res.result_code=="success"){
+							closeImportFileDialog();//关闭文件导入对话框
+							loadHoldFileItemPage();//刷新代扣文件列表
+							util.message(res.result_msg);
+						}else{
+							util.message(res.result_msg);
+						}
+					}
+			    },
+			    error: function (data, status, e){//服务器响应失败处理函数
+			    	console.log("error:"+data);
+			    }
+			});
+		});
+		
+	});
+	
+	
+	
+	</script>	
+	
+	</th:block>
+	
+</body>
+</html>

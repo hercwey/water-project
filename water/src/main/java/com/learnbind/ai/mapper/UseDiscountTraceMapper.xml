@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.UseDiscountTraceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.UseDiscountTrace">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="BASE_PRICE" jdbcType="DECIMAL" property="basePrice" />
+    <result column="TREATMENT_FEE" jdbcType="DECIMAL" property="treatmentFee" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="PARTITION_WATER_ID" jdbcType="DECIMAL" property="partitionWaterId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, NAME, BASE_PRICE, TREATMENT_FEE, REMARK, PARTITION_WATER_ID
+  </sql>
+</mapper>

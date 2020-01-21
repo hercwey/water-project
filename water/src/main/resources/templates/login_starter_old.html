@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('登录')" th:remove="tag"></div>
+<link th:href="@{/login/css/login.css}" rel="stylesheet" />
+<!-- <link href="/index/css/popup.css" rel="stylesheet" /> -->
+
+<style type="text/css">
+
+</style>
+</head>
+<body onkeydown="loginEvent(event);">
+	<span style="position: absolute; right: 40px; top: 3px; display:none;" >
+	   <span style="font-size: 12px;height:30px;line-height:28px;margin-left:5px;">语言选择:</span>
+	   <select id="siteLanguageSelector" style="width: 120px;height: 23px; line-height: 23px; padding: 0;margin-top: 5px;">
+			<!-- <c:forEach items="${languages}" var="var_language">
+				<option value="${var_language.code}"
+					<c:if test="${var_language.code eq language}">selected="selected"</c:if>>${var_language.description}</option>
+			 </c:forEach> -->
+			 <option value="chinese" selected="selected">Chinese</option>
+			 <option value="english">English</option>
+	    </select>
+	</span>
+	
+	<div class="login-warpper">
+		<div class="login-box-position">
+			<div class="left">
+
+			</div>
+			<div class="right">
+				<div class="login-box">
+					<form action="/user-login/submit" id="login-form" method="post" style="margin: 0;">
+						<div class="login-titile">智慧营收系统</div>
+						<input type="hidden" id="public-key" th:value="${publicKey}" />
+						<div class="input-group-item">
+							<div class="lt-icon-user" style="float:left;margin-top:6px;">
+								<i class="fa fa-user fa-2x" aria-hidden="true"></i>
+							</div>
+							<div class="input-text">
+								<input type="hidden" id="encrypt-username" name="username" placeholder="加密后的用户名" />
+								<input type="text" class="form-control" id="username" name="" value="" placeholder="请输入用户名" autofocus="autofocus">
+							</div>
+						</div>
+						<div class="input-group-item">
+							<!-- <div class="lt-icon-password" style="float:left;"><img style="width:28px;height:28px;" src="/login/images/password.png" /></div> -->
+							<div class="lt-icon-user" style="float:left;margin-top:6px;">
+								<i class="fa fa-lock fa-2x" aria-hidden="true"></i>
+							</div>
+							<div class="input-text">
+								<input type="hidden" id="encrypt-password" name="password" placeholder="加密后的密码" />
+								<input type="password" class="form-control" id="password" name="" value="" placeholder="请输入密码" >
+							</div>
+						</div>
+						<!-- <div class="input-group-item">
+							<div class="lt-icon-user" style="float:left;"></div>
+							<div class="input-text">
+								<div style="float: left;">
+									<input class="Text" type="text" style="width: 82px; height: 16px; line-height: 22px;" id="code_id" name="captcha" />
+								</div>
+							    <img style="height:28px; margin: 10px;" src="/login/images/user.png" onClick="onClickCode();" id="onCode_id" />
+							</div>
+						</div> -->
+						<div class="input-group-item">
+							<div class="lt-icon-submit"></div>
+							<div class="input-text">
+								<button type="button" class="btn btn-success btn-lg btn-block" id="login-submit-btn">登录&nbsp;<i class="fa fa-sign-in" aria-hidden="true"></i></button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- jsencrypt JS前端加密 -->
+	<!-- <script type="text/javascript" src="/jsencrypt/jsencrypt.min.js"></script> -->
+	<script type="text/javascript" th:src="@{/jsencrypt/jsencrypt.min.js}"></script>
+	
+	<script th:inline="javascript">  
+		/*<![CDATA[*/
+		var g_error_msg = [[${error_msg}]];//登录失败信息
+		/*]]>*/  
+	</script>
+	<script>
+	
+		/**
+		 *	登录提交
+		 */
+		function loginSubmit(){
+			var username = $("#username").val();
+			var password = $("#password").val();
+			
+			if(username==null || username=="" || password==null || password==""){
+				//dialog type: success warning info error,默认为info
+				util.message("用户名或密码不能为空！",null,"error");
+				return;
+			}
+			
+			console.log(username);
+			console.log(password);
+			
+			//获取PUBLIC_KEY通过后台传入前端放在隐藏域中，此处直接获取
+			var publicKey = $("#public-key").val();
+			//new JSEncrypt并set公钥
+			var encrypt = new JSEncrypt();
+			encrypt.setPublicKey(publicKey);
+			//对用户名和密码进行加密
+			var encryptUsername = encrypt.encrypt(username);
+			var encryptPassword = encrypt.encrypt(password);
+			console.log(encryptUsername);
+			console.log(encryptPassword);
+			
+			$("#encrypt-username").val(username);
+			$("#encrypt-password").val(password);
+			
+			$("#login-form").submit();
+			
+		}
+	
+		$(function(){
+			console.log("登录页面加载完成！");
+			
+			//如果登录页面在iframe中显示，则在iframe外重新加载登录页面
+			if (window!=top){
+				console.log("========== go main");
+				window.top.location.href="/main-index/starter";
+			}
+			
+			if(g_error_msg!=null && g_error_msg!=""){
+				//dialog type: success warning info error,默认为info
+				util.message(g_error_msg,null,"error");
+			}
+			
+			/**
+			 * 	绑定登录按钮的click事件
+			 */
+			$("#login-submit-btn").on("click", function(){
+				loginSubmit();
+			});
+			
+		});
+		/**
+		 *	刷新验证码图片
+		 */
+		function onClickCode() {
+			$("#onCode_id").attr('src',"${pageContext.request.contextPath}/captchaCode?_dc="+ (new Date()).getTime());
+		}
+		
+		/**
+		 *	reset表单
+		 */
+		function myreset() {
+			$("#username").val("");
+			$("#password").val("");
+			$("#logincode").val("");
+			$("#username").focus();
+		}
+	
+		/**
+		 * 回车事件，调用登录接口
+		 */
+		function loginEvent(event) {
+			if (event.keyCode === 13) {
+				loginSubmit();
+			}
+		}
+	
+	</script>
+</body>
+</html>

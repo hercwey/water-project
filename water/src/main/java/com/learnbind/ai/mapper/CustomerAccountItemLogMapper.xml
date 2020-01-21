@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerAccountItemLogMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerAccountItemLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="ACCOUNT_ITEM_ID" jdbcType="DECIMAL" property="accountItemId" />
+    <result column="TYPE" jdbcType="DECIMAL" property="type" />
+    <result column="AMOUNT" jdbcType="DECIMAL" property="amount" />
+    <result column="SUBJECT" jdbcType="VARCHAR" property="subject" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, ACCOUNT_ITEM_ID, TYPE, AMOUNT, SUBJECT, OPERATOR_NAME, OPERATOR_ID, 
+    OPERATION_TIME, REMARK
+  </sql>
+</mapper>

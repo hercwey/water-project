@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>客户名称</th>
+				<th>客户手机</th>
+				<th>地址</th>
+				<th>用水状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${customerList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 客户名称 -->
+				<td th:text="${item.customerName}">客户名称</td>
+				<!--客户手机-->
+				<td th:text="${item.customerMobile}">客户手机</td>
+				<!-- 地址-->
+				<td th:text="${item.address}">地址</td>
+				<!-- 用水状态 -->
+				<td th:attr="id='water-status-'+${item.id}" th:text="${item.waterStatusStr}">用水状态 </td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 详情 -->
+					<button type="button" class="water-detail-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>详情</span>
+					</button> 
+					<!-- 正常-->
+					<button type="button" class="btn-water-enable btn btn-secondary btn-sm"
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-unlock" aria-hidden="true"></i> <span>正常</span>
+					</button>
+					<!-- 停水 -->
+					<button type="button" class="btn-water-disable btn btn-secondary btn-sm"
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-lock" aria-hidden="true"></i> <span>停水</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager::pager" class="pagerx"
+		style="float: right; margin-right: 100px;"></div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	//-----------------打开详情对话框------------------
+		/* 
+			加载详情对话框 
+		*/
+		$('.water-detail-single').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/water-status/loadmodiwaterdialog';
+		
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+			
+		
+			$("#water-dialog-edit").load(url, parms,openWaterStatusDialog); //加载完毕后显示 
+		});
+		
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openWaterStatusDialog() {
+			//	可拖拽
+			$("#modal-container-water-edit").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-water-edit').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+		
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeWaterStatusDialog() {
+			$("#modal-container-water-edit").modal("hide");
+		}
+		
+		
+		
+		//-----------------停水复水------------------
+		/**
+		 * 修改用水状态
+		 */
+		function updateEnabledStatus(customerId, waterStatus){
+			
+			var url = BASE_CONTEXT_PATH+'/water-status/update-status';
+			
+			var parms = new Object(); //参数
+			parms.customerId = customerId;
+			parms.waterStatus = waterStatus;
+			
+			$.post(url, parms, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						$("#water-status-"+id).text(getWaterStatusStr(waterStatus));
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			})
+			defaultSearch();
+		}
+		
+		/**
+		 * 获取用水状态字符串
+		 */
+		function getWaterStatusStr(waterStatus){
+			var ENABLED = 0;//是否有效：0=有效（默认）；1=无效
+			var DISABLED = 1;//是否有效：0=有效（默认）；1=无效
+			
+			var getWaterStatusStr = "正常";
+			if(waterStatus==1){
+				getWaterStatusStr = "停水";
+			}
+			return getWaterStatusStr;
+		}
+		
+		/* 
+			正常按钮 
+		*/
+		$('.btn-water-enable').on('click',function() {
+
+			var ENABLED = 0;//是否有效：0=有效（默认）；1=无效
+			var DISABLED = 1;//是否有效：0=有效（默认）；1=无效
+			
+			var itemId = $(this).attr("bind-id"); //条目ID
+			
+			updateEnabledStatus(itemId, ENABLED);//修改启用禁用状态
+			
+		});
+		
+		/* 
+			停水按钮
+		*/
+		$('.btn-water-disable').on('click',function() {
+	
+			var ENABLED = 0;//是否有效：0=有效（默认）；1=无效
+			var DISABLED = 1;//是否有效：0=有效（默认）；1=无效
+			
+			var itemId = $(this).attr("bind-id"); //条目ID
+			
+			updateEnabledStatus(itemId, DISABLED);//修改启用禁用状态
+			
+		});
+	</script>
+</body>
+</html>

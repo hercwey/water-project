@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.AbnormalQuantityMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.AbnormalQuantity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="TYPE" jdbcType="DECIMAL" property="type" />
+    <result column="MONTHS" jdbcType="DECIMAL" property="months" />
+    <result column="LOWER_BOUND" jdbcType="DECIMAL" property="lowerBound" />
+    <result column="UPPER_BOUND" jdbcType="DECIMAL" property="upperBound" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, TYPE, MONTHS, LOWER_BOUND, UPPER_BOUND, REMARK
+  </sql>
+</mapper>

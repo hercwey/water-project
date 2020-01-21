@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterTreeMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterTree">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="NODE_TYPE" jdbcType="VARCHAR" property="nodeType" />
+    <result column="PID" jdbcType="DECIMAL" property="pid" />
+    <result column="NODE_LEVEL" jdbcType="DECIMAL" property="nodeLevel" />
+    <result column="SORT_VALUE" jdbcType="DECIMAL" property="sortValue" />
+    <result column="TRACE_IDS" jdbcType="VARCHAR" property="traceIds" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, NAME, CODE, NODE_TYPE, PID, NODE_LEVEL, SORT_VALUE, TRACE_IDS, DELETED, REMARK, 
+    METER_ID
+  </sql>
+  
+  <!-- 根据id查询子节点集合 -->
+  <select id="getChildListById" resultType="com.learnbind.ai.bean.MeterTreeNodeBean">
+  	SELECT
+		L.ID AS id,
+		L.NAME AS name,
+		L.CODE AS code,
+		L.NODE_TYPE AS nodeType,
+		L.PID AS pid,
+		L.NODE_LEVEL AS nodeLevel,
+		L.SORT_VALUE AS sortValue,
+		L.REMARK AS remark,
+		L.DELETED AS deleted,		
+		L.TRACE_IDS AS traceIds,
+		L.METER_ID AS meterId,		
+		( CASE WHEN ( EXISTS ( SELECT * FROM METER_TREE WHERE PID = L.ID )) THEN 'true' ELSE 'false' END ) isParent 
+	FROM
+		METER_TREE L 
+	WHERE
+		L.DELETED=0
+		AND L.PID = #{id}
+	ORDER BY L.NODE_LEVEL ASC, L.SORT_VALUE ASC, L.PID ASC, L.TRACE_IDS ASC
+  </select>
+  
+  <!-- 
+  	查询指定节点的直接子结点最大排序值
+  	可能为null 
+  -->
+  <select id="getMaxSortValueOfSibling" resultType="int">
+  		SELECT MAX(SORT_VALUE) FROM METER_TREE WHERE PID=#{parentId} 
+  </select>
+
+  <!--
+  	根据traceIds删除树结点. 
+   -->  
+  <delete id="deleteMeterTreeNodeByTraceIds" >
+  		DELETE FROM METER_TREE WHERE TRACE_IDS LIKE CONCAT(#{traceIds},'%')
+  </delete>
+  
+  <!-- 
+   	增加指定范围内节点的sort value
+   -->
+   <update id="addNodeSortValueOfSilbing">
+   		UPDATE METER_TREE 
+   			SET SORT_VALUE=SORT_VALUE+#{addValue}
+   		WHERE 
+   			PID=#{pid}
+   			<choose>
+	   			<when test="includeStart==1">
+	            	AND
+	   				SORT_VALUE &gt;= #{startSortValue}
+	        	</when>
+	        	<otherwise>
+	            	AND
+	   				SORT_VALUE &gt; #{startSortValue}
+	        	</otherwise>
+        	</choose>
+        	<choose>        	
+	        	<when test="includeEnd==1">
+	   				AND
+	   				SORT_VALUE &lt;= #{endSortValue}
+	        	</when>
+	        	<otherwise>            	
+	   				AND
+	   				SORT_VALUE &lt; #{endSortValue}
+	        	</otherwise>
+            </choose>   			
+   </update>
+   
+   <!-- adjustTreeNodeSilbingPos -->
+   <update id="adjustTreeNodeSilbingPos">
+   		UPDATE METER_TREE 
+   			SET SORT_VALUE=SORT_VALUE+1
+   		WHERE 
+   			PID=#{pid}
+   			<choose>
+	   			<when test="includeStart==1">
+	            	AND
+	   				SORT_VALUE &gt;= #{startSortValue}
+	        	</when>
+	        	<otherwise>
+	            	AND
+	   				SORT_VALUE &gt; #{startSortValue}
+	        	</otherwise>
+        	</choose>        			
+   </update>
+   
+   <!-- //更新子树各结点level -->
+   <update id="updateSubTreeLevel">
+   		<!-- Integer subTreeRootNewLevel,Integer subTreeRootOldLevel,String subTreeRootTraceIds -->
+   		UPDATE METER_TREE 
+   			SET NODE_LEVEL=NODE_LEVEL-#{subTreeRootOldLevel}+#{subTreeRootNewLevel}
+   		WHERE
+   			TRACE_IDS LIKE CONCAT(#{subTreeRootTraceIds},'%')  
+   </update>
+   
+    <!-- 更新子树各结点traceIds -->  	
+  	<update id="updateSubTreeTraceIds">
+   		UPDATE METER_TREE 
+   			SET TRACE_IDS=REPLACE(TRACE_IDS,#{subTreeRootOldTraceIds},#{subTreeRootNewTraceIds})
+   		WHERE
+   			TRACE_IDS LIKE CONCAT(#{subTreeRootTraceIds},'%')  
+   </update>
+   
+   <!-- 查询符合条件的记录,返回第一条记录 -->
+  <select id="getFirstBySearchCond" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		(
+			SELECT
+				L.*,
+				row_number () over ( ORDER BY PID ASC, SORT_VALUE ASC, TRACE_IDS ASC ) rn 
+			FROM
+				METER_TREE L 
+			WHERE
+				<!--删除状态，1=已删除，0=未删除（默认）  -->
+				L.DELETED=0
+				AND (
+					L.NAME LIKE CONCAT('%', CONCAT( UPPER(#{searchCond}), '%' ))
+					)
+				
+		)  
+	where 
+		rn=1
+  
+  </select>
+  
+  <!-- 查询符合条件的记录（根据rowNum返回某一条记录） -->
+  <select id="getOneBySearchCond" resultMap="BaseResultMap">
+  	SELECT
+		p.* 
+	FROM
+		(
+		SELECT
+			L.*,
+			row_number () over ( ORDER BY PID ASC, SORT_VALUE ASC, TRACE_IDS ASC ) rn 
+		FROM
+			METER_TREE L 
+		WHERE
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			DELETED=0
+			AND (
+				L.NAME LIKE CONCAT('%', CONCAT( UPPER(#{searchCond}), '%' ))				
+			)
+		) p 
+	WHERE
+		p.rn = (
+			SELECT
+				p.rn 
+			FROM
+				(
+				SELECT
+					id,
+					row_number () over ( ORDER BY PID ASC, SORT_VALUE ASC, TRACE_IDS ASC ) rn 
+				FROM
+					METER_TREE 
+				WHERE
+					<!--删除状态，1=已删除，0=未删除（默认）  -->
+					DELETED=0
+					AND (
+						NAME LIKE CONCAT('%', CONCAT( UPPER(#{searchCond}), '%' ))						
+					)
+				) p 
+			WHERE
+				p.ID = #{id} 
+			) + #{action}
+    </select>
+     
+  
+</mapper>

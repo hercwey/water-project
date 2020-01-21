@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.NotifyGroupMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.NotifyGroup">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="TYPE" jdbcType="DECIMAL" property="type" />
+    <result column="INCLUDE_FLAG" jdbcType="DECIMAL" property="includeFlag" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="USE_LOCATION" jdbcType="DECIMAL" property="useLocation" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, NAME, TYPE, INCLUDE_FLAG, CUSTOMER_ID, USE_LOCATION 
+  </sql>
+  
+   <select id="searchCond" resultMap="BaseResultMap">
+		SELECT 
+			G.* 
+		FROM NOTIFY_GROUP G
+		LEFT JOIN CUSTOMERS C ON C.ID= G.CUSTOMER_ID
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR G.NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				
+  				)
+  			</if>
+  			<if test="includeFlag!=null">
+				AND G.INCLUDE_FLAG = #{includeFlag}
+			</if>
+		</where>
+		ORDER BY G.id DESC
+  </select>
+</mapper>

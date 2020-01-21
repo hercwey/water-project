@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+<style>
+
+.extra-l  a {
+	color: black;
+}
+
+/* 时间查询条件样式 */
+.extra-l li {
+	float: left;
+	margin: auto 1px;
+	cursor: pointer;
+}
+
+/* placeholder color */
+/* chrome浏览器 */
+#search-cond::-webkit-input-placeholder{
+ color: lightblue; 
+}
+#search-cond:-moz-placeholder{
+color: lightblue;
+}
+#search-cond::-moz-placeholder{
+color: lightblue;
+}
+#search-cond:-ms-input-placeholder{
+color: lightblue;
+}
+
+</style>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+</head>
+<body>
+
+	<br>
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label detail-main">
+		<div class="col-md-12 column">
+
+			<div class="card-body" id="customer-detail-body" th:include="customers/detail/detail_table::dialog">
+				<!-- 客户档案详细信息 -->
+			</div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		
+		/**
+		 * 	加载客户档案详细信息
+		 */
+		function loadCustomerDetailTable(){
+			var parms = new Object();
+			parms.id = getCustomerIdFn();//获取客户ID
+			//加载客户档案详细信息
+			var url = BASE_CONTEXT_PATH + "/customer-detail/table"
+			$("#customer-detail-body").load(url, parms, function(res){
+				//加载表计档案详细信息完成
+			});
+		}
+		$(function() {
+			loadCustomerDetailTable();
+		});
+		//---------------------------------------------
+		
+		$(function() {
+			/* 
+				加载用户框架页
+			*/
+			function loadList(parms, callback) {
+				var url = "/customer-detail/detailtabs";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			//loadList(null, null);
+		})
+		
+
+		
+		
+	</script>
+
+
+
+</body>
+</html>

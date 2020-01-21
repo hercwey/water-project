@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>金税盘状态查询-结果页</title>
+</head>
+<!-- JSON格式化 -->
+<link rel="stylesheet" href="/jsonview/jquery.jsonview.css" />
+<body>
+	<!-- <span id="resultJSON"></span> -->	
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span12">
+				<!-- 选项卡标签 -->
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item"><a class="nav-link active" id="tab1"
+						data-toggle="tab" href="#jspequip-tab" role="tab" aria-controls="jspinfo-tab"
+						aria-selected="true">
+							<h6>金税设备信息</h6>
+					</a></li>
+					
+					<li class="nav-item"><a class="nav-link " id="tab2"
+						data-toggle="tab" href="#jspinvoice-tab" role="tab" aria-controls="jspinvoice-tab"
+						aria-selected="true">
+							<h6>增值税专用发票及增值税普通发票</h6>
+					</a></li>
+					
+					<li class="nav-item nav-json"><a class="nav-link" id="tab3"
+						data-toggle="tab" href="#jsonresult-tab" role="tab" aria-controls="jsonresult-tab"
+						aria-selected="false">
+							<h6>JSON格式</h6>
+					</a></li>
+				</ul>
+				
+				<div class="tab-content border border-top-0" id="myTabContent" style="margin-bottom:10px;">
+					<!-- 选项卡-金税盘设备 -->
+					<div class="tab-pane fade show active" id="jspequip-tab" role="tabpanel"
+						aria-labelledby="jspequip-tab">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item">金税盘设备</li>							
+							<li class="list-group-item jspequip-table" >
+								<span th:include="tax/queryjspinfo/jspequip_table" th:remove="tag"></span>
+							</li>
+						</ul>
+					</div>
+					<!-- 选项卡-增值税专用发票及增值税普通发票 -->
+					<div class="tab-pane fade" id="jspinvoice-tab" role="tabpanel"
+						aria-labelledby="jspinvoice-tab">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item">增值税专用发票及增值税普通发票</li>							
+							<li class="list-group-item jspinvoice-table" >
+								<span th:include="tax/queryjspinfo/jspinvoice_table" th:remove="tag"></span>
+							</li>							
+						</ul>
+					</div>
+					<!-- 金税盘状态查询-JSON格式 -->
+					<div class="tab-pane fade" id="jsonresult-tab" role="tabpanel" aria-labelledby="jsonresult-tab">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item">金税盘状态查询-JSON格式</li>							
+							<li class="list-group-item">
+								<span id="resultJSON"></span>
+							</li>
+							
+						</ul>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	
+</body>
+
+<script type="text/javascript" src="/jsonview/jquery.jsonview.js"></script>
+
+<!-- 嵌入式脚本,用于thymeleaf数据传递(json格式) -->
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		//后台向前端直接传递数据
+		var resultObj = [[${resultObj}]];  			//金税盘状态列表
+		var resultJSON = [[${resultJSON}]];  		//金税盘状态JSON格式
+		
+		//console.log("test data is:"+inventoryList[0].RETCODE);  //error-not defined
+		//console.log("test data is:"+inventoryList[0].retcode);  //ok
+		//console.log("the result is:"+JSON.stringify(inventoryList));  //全部小字 生成的JSON字段均为小写
+		
+	/*]]>*/
+</script>
+	
+<script type="text/javascript">
+
+	/*
+		金税盘状态查询结果对象
+		参数:
+			jsonResult:金税盘状态JSON格式数据
+	*/
+	function QueryJSPInfoResult(jsonResult){
+		this.jsonResult=jsonResult;
+	}
+	
+	/*
+	对象初始化(选项卡点击时)
+*/
+QueryJSPInfoResult.prototype.init=function(){
+	var self=this;
+	
+	const  NAVI_CLASS_NAME=".nav-item";
+	$(NAVI_CLASS_NAME).on('click',tabNaviClick);
+	
+	/*
+		只所以调用此函数,滚动条刷新.
+	*/
+	function tabNaviClick(){
+		console.log("tab navi is clicked!");			
+		var hasClass=$(this).hasClass("nav-json");
+		if(hasClass){				
+			 setTimeout(function(){
+				console.log("timer event execute");
+				triggerWindowEvent()
+				}, 200);  
+		}
+	}
+	
+	/*
+		触发window resize event
+	*/
+	function triggerWindowEvent(){
+		//console.log("dispatch window resize event");
+		var myEvent = new Event('resize');
+        window.dispatchEvent(myEvent);
+	}
+}
+	
+	/*
+		显示JSON格式的数据
+	*/
+	QueryJSPInfoResult.prototype.showJSONResult=function(){
+		var self=this;
+		const containerId="#resultJSON";
+		$(containerId).JSONView(self.jsonResult);
+	}
+
+	//Create:  查询结果前台对象(Front JS Object)
+	var queryJSPInfoResult=new QueryJSPInfoResult(resultJSON);
+	
+	$(function(){	
+		queryJSPInfoResult.init();
+		queryJSPInfoResult.showJSONResult();
+	});
+</script>	
+
+
+</html>

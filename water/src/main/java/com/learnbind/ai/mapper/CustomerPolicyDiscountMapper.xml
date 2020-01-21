@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerPolicyDiscountMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerPolicyDiscount">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="WATER_NUM" jdbcType="VARCHAR" property="waterNum" />
+    <result column="DISCOUNT_NUM" jdbcType="VARCHAR" property="discountNum" />
+    <result column="BASE_PRICE" jdbcType="DECIMAL" property="basePrice" />
+    <result column="TREATMENT_FEE" jdbcType="DECIMAL" property="treatmentFee" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, PERIOD, WATER_NUM, DISCOUNT_NUM, BASE_PRICE, TREATMENT_FEE
+  </sql>
+</mapper>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<!-- ZTree CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.exedit.js}"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<link rel="stylesheet"	href="/css/meterrecordbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label record-main">
+		<div class="col-md-12 column">
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block" id="general-search-form">
+				<ul class="extra-l" style="list-style: none;">
+				
+					<!-- 面板:增加/删除 -->
+					<!-- <li>
+						<button type="button" class="btn btn-danger btn-sm"
+							id="btn-del">
+							<i class="fa fa-remove" aria-hidden="true"><span>删除</span>
+							</i>
+						</button>
+					</li> -->
+					<li class="input-group-sm">
+						<input type="text" class="form-control Wdate record-period" readonly="readonly" style="width: 100px;"
+								id="record-period" name="period"
+								onClick="WdatePicker({dateFmt:'yyyy-MM',onpicked: setBackGround});"
+								placeholder="期间" title="期间" />
+					</li>
+					<!-- 地理位置查询条件 -->
+					<li class="input-group-sm">
+						<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher')" th:remove="tag"></div>
+					</li>
+					<li class="input-group-sm">
+						<!-- 开账状态，是否已开账：0=未开账（默认值）；1=已开账 -->
+						<select class="form-control btn-sm is-make-bill" id="is-make-bill" name="isMakeBill">
+							<option value="">—开账状态—</option>
+							<option value="0">未开账</option>
+							<option value="1">已开账</option>
+						</select>
+					</li> 
+					<!-- 面板:查询 -->
+					<li class="input-group-sm">
+						<input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入业主姓名/手机号/客户编号" title="请输入客户姓名、手机号、编号等查询">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						
+						<button type="button" class="btn btn-warning btn-sm btn-general-search-reset" id="btn-general-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+					<li class="input-group-sm">
+						<button type="button" class="btn btn-success btn-sm" id="btn-show-hide-advanced-search">
+							<i class="fa fa-search" aria-hidden="true"></i><span>高级查询</span></i>
+						</button>
+					</li>
+					
+					<li>
+						<div class="dropdown">
+							<button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+								 操作
+							</button>
+							<div class="dropdown-menu">
+								<a class="dropdown-item btn-sm btn-batch-generator-bill">
+									<i class="fa fa-magic" aria-hidden="true">
+										<span>批量开账</span>
+									</i>
+								</a>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+
+			<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+			<!-- 抄表记录列表 -->
+			<div class="row clearfix" id="meter-record-item">
+				<div class="col-md-3 column" style="padding-right:1px;">					
+					<div class="card">
+						<div class="card-body" id="location-body" style="padding-top:10px;padding-bottom:10px">
+							<!-- 地理位置列表 -->
+							<!-- 加载方式 -->
+							<div th:include="component/locationtree/location_tree::tree('location-generate-bill-tree')" th:remove="tag"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-9 column" style="padding-left:1px;">
+					<div class="card">
+						<div class="card-body meter-record-table" id="meter-record-body" style="padding-left:10px;padding-right:10px;">
+							<!-- 表计列表 -->
+						</div>
+					</div>
+				</div>
+				
+			</div>
+			
+		</div>
+	</div>
+
+	<!--  -->
+	<!-- 高级查询页面 -->
+	<div th:include="generator_bill/advanced_search_page" th:remove="tag"></div>
+	<!-- 地理位置treeJS -->
+	<script type="text/javascript"	th:src="@{/js/component/locationtree/LocationTree1.js}"></script>
+	<!-- 地理位置下拉框查询JS -->
+	<script type="text/javascript"	th:src="@{/js/component/districtsearcher/DistrictSearcher.js}"></script>
+	<!-- 地理位置树自适应JS -->
+	<script type="text/javascript"	th:src="@{/js/location_tree_adaptive/location_tree_adaptive.js}"></script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------------是否已开账常量-----------------------------------------------------------------------
+		//是否已开账：0=未开账（默认值）；1=已开账
+		const G_MAKE_BILL_NO = 0;//是否已开账：0=未开账（默认值）
+		const G_MAKE_BILL_YES = 1;//是否已开账：1=已开账
+	
+		//---------------------------记录查询方式------------------------------------------------------------------------------------------
+		//记录查询方式，0是普通查询；1是高级查询；2是点击地理位置树查询
+		var G_GENERAL_SEARCH = "0";
+		var G_SELECTED_PW_ID_ARR = new Array();//保存用户选择的分水量记录，批量开账时需要选择验证此数组是否为空
+		
+		/*
+			设置日期选择input背景色
+		*/
+		function setBackGround() {
+			$("#record-period").css("background-color", "white");
+		}
+		/**
+		 * 	获取当前系统月份（表示为抄表记录中的期间）
+		 */
+		function getCurrSysMonth(){
+			var date = new Date();
+			var year = date.getFullYear();    //获取完整的年份(4位,1970-????)
+			var month = date.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+			if(month<10){
+				month = "0"+month;
+			}
+			return year+"-"+month;
+		}
+		/**
+		 * 	设置账单期间默认值为系统月份
+		 */
+		function setBillPeriodDefault(){
+			$("#record-period").val(getCurrSysMonth());
+		}
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchMeterRecord(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/generator-bill/table"
+			$(".meter-record-table").load(url, parms, triggerResize);
+		}
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+
+		//----------------------------------------------------------------------------
+		//------------------------------	获取查询参数	------------------------------
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchGenerateParams(){
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var traceIds = null;
+			var locaBlockTraceIds = locationSearcher.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationSearcher.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationSearcher.getUnitId();//地理位置-单元traceIds
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			var searchCond=$("#general-search-form .search-cond").val();
+			var isMakeBill = $("#is-make-bill").val();//是否开账
+			var period = $("#general-search-form .record-period").val();
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.traceIds=traceIds;
+			parms.searchCond=searchCond;
+			parms.isMakeBill=isMakeBill;
+			parms.period=period;
+			return parms;
+		}
+		//----------------------------------地理位置tree实例---------------------------------------------------------------------
+		var locationTree = new LocationTree('location-generate-bill-tree');
+		//地理位置下拉框件实例
+		var locationSearcher = new DistrictSearcher("location-searcher", locationSelectSearchCallback); //此处searcher的ID和回调函数
+		
+		/*
+			ztree树click某节点后的回调函数
+		*/
+		function clickZTreeNodeCallback(treeNode) {
+			
+			if(treeNode==null){
+				return false;
+			}
+			var traceIds = treeNode.traceIds;//获取点击节点的traceIds
+			
+			//清除查询条件
+			$('#general-search-form .btn-general-search-reset').click();
+			advancedSearchParams.reset();//重新高级查询条件
+			
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var searchCond=$("#general-search-form .search-cond").val();
+			var isMakeBill = $("#is-make-bill").val();//是否开账
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			parms.isMakeBill=isMakeBill;
+			searchMeterRecord(parms);
+			G_GENERAL_SEARCH = "2";//记录是普通查询还是高级查询
+		}
+		
+		function getZTreeSearchParam(){//获取点击地理位置树的traceIds
+			var traceIds = null;
+			if(locationTree.getSelectedTreeNode() != null){
+				traceIds = locationTree.getSelectedTreeNode().traceIds;
+			}
+			
+			var parms = new Object();
+			parms.traceIds = traceIds;
+			return parms;
+		}
+		
+		/**
+		 * 	地理位置下拉查询组件回调函数
+		 */
+		function locationSelectSearchCallback(){
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			defaultSearchMeterRecord();//查询客户
+			G_GENERAL_SEARCH = "0";
+		}
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchMeterRecord() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			if(G_GENERAL_SEARCH == "0"){
+				parms = getSearchGenerateParams();//获取普通查询参数（不包括分页信息）
+			}else if (G_GENERAL_SEARCH == "1"){
+				parms = advancedSearchParams.getParams();//获取高级查询参数
+			}else {
+				parms = getZTreeSearchParam();//获取ztree查询参数
+			}
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchMeterRecord(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchMeterRecordClick() {
+			
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchGenerateParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchMeterRecord(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPageClickPageNum(searchCond,pageNum,pageSize) {
+			
+			//获取参数
+			var parms = null;
+			if(G_GENERAL_SEARCH == "0"){
+				parms = getSearchGenerateParams();//获取普通查询参数（不包括分页信息）
+			}else if (G_GENERAL_SEARCH == "1"){
+				parms = advancedSearchParams.getParams();//获取高级查询参数
+			}else {
+				parms = getZTreeSearchParam();//获取ztree查询参数
+			}
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			console.log(G_GENERAL_SEARCH);
+			searchMeterRecord(parms);
+		}
+
+		/**
+		 * 	绑定开账状态，是否已开账的change事件
+		 */
+		$('#is-make-bill').on('change',function() {
+			
+			var isMakeBill = $(this).val();
+			locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+			advancedSearchParams.reset();//重新高级查询条件
+			G_GENERAL_SEARCH = "0";//记录是普通查询还是高级查询
+			defaultSearchMeterRecord();//查询抄表记录
+		});
+		
+		//-------------------------------------------批量开账请求-----------------------------------------------------------------------------------
+		/**
+		 * 	批量开账请求
+		 */
+		function batchGeneratorBillReq(){
+			var parms = null;//获取查询参数（不包括分页信息）
+			parms = getSearchGenerateParams();//获取普通查询参数（不包括分页信息）
+			
+			
+			var traceIds = parms.traceIds;
+			var pwIds = G_SELECTED_PW_ID_ARR;//用户选择的需要开账的分水量ID记录
+			
+			if((pwIds==null || pwIds.length<=0) && (traceIds==null || traceIds=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("请选择需要开账的记录或地理位置!", null, "warning");
+				return false;
+			}
+			var searchCond = $("#search-cond").val();
+
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH+"/generator-bill/batch-generate-bill";
+
+			var parms = new Object();
+			parms.traceIds = traceIds;
+			parms.searchCond = searchCond;
+			//parms.pwIds = pwIds.toString();
+			parms.pwIds = JSON.stringify(pwIds);
+			console.log(JSON.stringify(pwIds))
+			$.post(url, parms, function(res) {
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						loadPageClickPageNum(); //	重新刷新当前页面
+						util.message(res.result_msg, null, "success");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg, null, "warning");
+					}
+				}
+			});
+		}
+		
+		//------------------------------	加载地理位置列表	------------------------------
+		/* 
+		 *	加载通用地理位置页面
+		 * 		domId:需要加入此页面的dom节点ID
+		 * 		callback:页面加载完成后的回调
+		 */
+		function loadGlobalLocationPage(domId, callback) {
+			var url = "/location/load-global-location-page";
+			var callbackFunc = callback;
+			var containerId = "#"+domId;
+			loadPage(containerId, url, null, callbackFunc);
+		}
+		/**
+		 * 	加载地理位置后的回调
+		 */
+		function loadLocationListCallback(){
+			//主页:默认查询(加载默认列表)
+			defaultSearchMeterRecord();//查询抄表记录
+		}
+		
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//设置账单期间默认值为系统月份
+			setBillPeriodDefault();
+			//------------init-------------
+			//加载通用地理位置页面
+		 	locationTree.initTree();  //初始化树.		
+			locationTree.setClickOuterFunction(clickZTreeNodeCallback);  //设置外部业务函数
+			//地理位置下拉组件初始化
+			locationSearcher.init();
+			defaultSearchMeterRecord();
+		
+			//---------事件绑定--------------
+			$("#tab-user-item-li").on("click", function(){
+				hideMeterRecordPhoto();
+			});
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#btn-general-search').on('click', function() {
+				locationTree.cancelAllSelectedNode();//取消ztree的选中状态
+				advancedSearchParams.reset();//重新高级查询条件
+				G_GENERAL_SEARCH = "0";//记录是普通查询还是高级查询
+				defaultSearchMeterRecord();//查询抄表记录
+			});
+			/*
+				绑定高级查询按钮的click事件
+			*/
+			$('#btn-show-hide-advanced-search').on('click', function() {
+				
+				showHideAdvancedSearch.toggle();//显示/隐藏高级查询
+	
+			});
+
+			/*
+				查询条件复位按钮CLICK
+			 */
+			$('#general-search-form .btn-general-search-reset').on('click', function() {
+				$("#general-search-form .search-cond").val("");
+				$("#general-search-form .search-cond").focus();//获得焦点
+
+				$("#general-search-form .location-block").val("");//设置地理位置-小区值为空
+				$("#general-search-form .location-building").val("");//设置地理位置-楼号值为空
+				$("#general-search-form .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$("#general-search-form .location-unit").val("");//设置地理位置-单元值为空
+				$("#general-search-form .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+				
+			});
+
+			/*
+				查询条件输入框 KEYUP
+			 */
+			$('#search-cond').on('keyup', function(event) {
+				if (event.keyCode == 13) {
+					$('#btn-general-search').trigger("click");
+				}
+			});
+
+			/**
+			 * 	绑定批量开账按钮的click事件
+			 */
+			$(".btn-batch-generator-bill").on("click", function() {
+				
+				var parms = getSearchGenerateParams();//获取查询参数（不包括分页信息）
+				var traceIds = parms.traceIds;
+				var pwIds = G_SELECTED_PW_ID_ARR;//用户选择的需要开账的分水量ID记录
+				
+				if((pwIds==null || pwIds.length<=0) && (traceIds==null || traceIds=="")){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要开账的记录或地理位置!", null, "warning");
+					return false;
+				}
+				
+				util.delConfirm("确认批量开账?", "", "batchGeneratorBillReq");
+				
+			});
+			/*
+				自动调整树的高度.
+			*/
+			var tableContainerId = "meter-record-body";
+			LocationTreeAdaptive.adaptive(tableContainerId);
+
+		});
+	</script>
+
+
+
+</body>
+</html>

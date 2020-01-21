@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!-- 规则编辑组件 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<th:block th:fragment="ruleEditor(editorId)">
+  
+  <!-- <div class="row">
+		操作面板部分
+		<div class="col-md-12" >
+			<div class="btn-group btn-group-sm" role="group" style="float:left;">				 
+				<button class="btn btn-secondary" type="button">
+					<i class="fa fa-tachometer" aria-hidden="true" style="color:yellow;"></i>
+				</button> 
+				<button class="btn btn-secondary" type="button">
+					<i class="fa fa-rmb" aria-hidden="true" style="color:yellow;"></i>
+				</button>
+			</div>
+		</div>
+	</div> -->
+	<!-- 规则表达式部分. -->
+	<!-- <div class="row">
+		<div class="col-md-12"> -->
+			<div class="form-group form-inline" th:id="'rule-'+${editorId}">
+				<!-- <label for="know-type" class="control-label">规则</label> -->
+				<input type="text" th:id="'rule-input-'+${editorId}" value="" data-role="tagsinput" />	
+				<button class="btn btn-secondary btn-sm" type="button"  th:id="'btn-search-meter'+${editorId}">
+					<i class="fa fa-tachometer" aria-hidden="true" style="color:yellow;"></i>
+				</button> 			
+			</div>				
+		<!-- </div>
+	</div> -->  <!-- end of row -->
+  
+  
+</th:block>
+</body>
+</html>

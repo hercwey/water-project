@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<th:block th:fragment="table">
+		<table class="table table-sm" id="meter-record-table">
+		<thead>
+			<tr>
+				<th>业主姓名</th>
+				 <th>业主电话</th>
+				 <th>业主地址</th>
+				<th>抄表期间</th>
+				<th>本期抄表日期</th>
+				<th>本期抄表底数</th>
+				<th>上期抄表日期</th>
+				<th>上期抄表底数</th>
+				<th>本期水量</th>
+				<th>抄表类型</th>
+			</tr>
+		</thead>
+		<tbody>
+		                                     
+			<span th:each="item,iterStat: ${readRecordList}" th:remove="tag">
+				<tr>
+				<!-- 业主姓名 -->
+				<td th:text="${item.CUSTOMER_NAME}"></td>
+				 <!-- 业主电话 -->
+				<td  th:text="${item.CUSTOMER_TEL}"></td>
+				 <!-- 业主地址-->
+				<td  th:text="${item.ADDRESS}"></td>
+				<!-- 抄表期间-->
+				<td th:text="${item.PERIOD}">抄表期间</td>				
+				<!-- 本期抄表日期 -->
+				<td th:text="${#dates.format(item.CURR_DATE, 'yyyy-MM-dd HH:mm:ss')}">本期抄表日期</td>
+				<!-- 本期抄表底数-->
+				<td th:text="${item.CURR_READ}">本期抄表底数</td>
+				<!-- 上期抄表日期 -->
+				<td th:text="${#dates.format(item.PRE_DATE, 'yyyy-MM-dd HH:mm:ss')}">上期抄表日期</td>
+				<!-- 上期抄表底数-->
+				<td th:text="${item.PRE_READ}">上期抄表底数</td>
+				<!-- 本期水量-->
+				<td th:text="${item.CURR_AMOUNT}">本期水量</td>
+				<!-- 抄表类型 -->
+				<td th:text="${item.READ_MODE}">抄表类型</td>
+				<!-- <td>
+					<font th:if="${record.readType==0}" th:text="${record.readTypeStr}"></font>
+					<b><font color="green" th:if="${record.readType==1}" th:text="${record.readTypeStr}"></font></b>
+					<b><font color="red" th:if="${record.readType==2}" th:text="${record.readTypeStr}"></font></b>
+				</td> -->
+				
+				</tr>
+			</span>
+		</tbody>
+	</table>
+	</th:block>
+</body>
+</html>

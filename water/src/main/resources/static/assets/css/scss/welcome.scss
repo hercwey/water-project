@@ -1,0 +1,46 @@
+/*
+ * @Description: 
+ * @Author: Wang Rfan
+ * @Date: 2019-08-13 17:51:40
+ */
+
+
+html,body{
+  height: 100%;
+}
+.welcome {
+  background-color: #fff;
+
+  .wel-wrap {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+
+    .wel-img {
+      position: relative;
+      width: 80%;
+      max-height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      p {
+        position: absolute;
+        top: 5%;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 30px;
+        color: #287dfe;
+        letter-spacing: 5px;
+      }
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+}

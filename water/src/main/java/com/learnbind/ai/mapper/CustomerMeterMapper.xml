@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerMeterMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerMeter">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="BIND_TIME" jdbcType="TIMESTAMP" property="bindTime" />
+    <result column="UNBIND_TIME" jdbcType="TIMESTAMP" property="unbindTime" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="DEFAULT_CUSTOMER" jdbcType="DECIMAL" property="defaultCustomer" />
+    <result column="METER_STATUS" jdbcType="DECIMAL" property="meterStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, METER_ID, REMARK, BIND_TIME, UNBIND_TIME, DELETED, DEFAULT_CUSTOMER, METER_STATUS
+  </sql>
+  
+  <!-- 根据地理位置ID查询
+	 	客户-表计关系表（customer_meter）和地理位置-表计关系表（location_meter）多表关联查询 -->
+  <select id="getListByLocationIdList" resultMap="BaseResultMap">
+	SELECT
+		CM.* 
+	FROM
+		CUSTOMER_METER CM
+		LEFT JOIN LOCATION_METER LM ON CM.METER_ID = LM.METER_ID 
+	WHERE
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		CM.DELETED = 0 
+		AND LM.DELETED = 0 
+		<!-- 默认客户，1=否；0=是（默认） -->
+		AND CM.DEFAULT_CUSTOMER = 0
+		AND LM.LOCATION_ID IN 
+		<foreach close=")" collection="locationIdList" index="index" item="item" open="(" separator=",">  
+	　　　　#{item}  
+	　　</foreach>
+	ORDER BY
+		CM.ID DESC
+  </select>
+  
+  <select id="selectCustomerCountByMeter" resultMap="BaseResultMap">
+  	SELECT
+		cm.* 
+	FROM
+		CUSTOMER_METER CM 
+	<where>
+		DELETED = 0 
+		AND CM.METER_ID IN ( SELECT CM1.METER_ID FROM CUSTOMER_METER CM1 
+		<where>
+		DELETED = 0 
+		<if test="customerId!=null and customerId!=''">
+		AND CM1.CUSTOMER_ID = #{customerId} 
+		</if>
+		</where>)
+	</where>
+  </select>
+  
+  <!-- 获取分账的客户ID集合 -->
+  <select id="getSubAccountCustomerId" resultType="Long">
+  	SELECT
+		CM.CUSTOMER_ID 
+	FROM
+		CUSTOMER_METER CM 
+	WHERE
+		DELETED = 0 
+		AND CM.METER_ID IN ( 
+			SELECT 
+				CM1.METER_ID 
+			FROM 
+				CUSTOMER_METER CM1 
+			WHERE 
+				DELETED = 0 
+				AND CM1.CUSTOMER_ID = #{customerId} 
+		) 
+	GROUP BY
+		CM.CUSTOMER_ID
+  </select>
+  
+  <select id="getCustomerBindedMeter" resultType="Integer">
+  	SELECT
+		count(*)
+	FROM
+		customer_meter cm 
+	WHERE
+		EXISTS ( SELECT * FROM ( SELECT * FROM location_meter WHERE location_id = #{locationId} ) lm WHERE cm.meter_id = lm.meter_id ) 
+		AND deleted =0
+  </select>
+  
+  
+  <select id="getCustomerByMeterId" resultMap="BaseResultMap">
+  	SELECT
+		*
+	FROM
+		CUSTOMER_METER 
+	<where>
+		DELETED = 0 
+		AND DEFAULT_CUSTOMER=0
+
+		<if test="meterId!=null and meterId!=''">
+		AND METER_ID = #{meterId} 
+		</if>
+
+	</where>
+  </select>
+  
+   <select id="getCustomerMeterData" resultMap="BaseResultMap">
+  	SELECT
+		*
+	FROM
+		CUSTOMER_METER 
+	<where>
+		<if test="customerId!=null and customerId!=''">
+		AND CUSTOMER_ID = #{customerId} 
+		</if>
+
+	</where>
+  </select>
+  
+   <select id="getCustomerHistoryMessage"  resultMap="BaseResultMap">
+  	SELECT
+		CM.* 
+	FROM
+		CUSTOMERS C left join customer_meter CM ON C.id = CM.CUSTOMER_ID
+	<where>
+		<!-- cm.deleted=0 -->
+		<if test="meterId!=null and meterId!=''">
+		AND CM.METER_ID = #{meterId} 
+		</if>
+		<if test="searchCond!=null and searchCond!='' ">
+			AND (
+			C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+			OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+			OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+			OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+			OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+			OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+			OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+			OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+			)
+		</if>
+	</where>
+	order by CM.BIND_TIME, CM.ID, CM.UNBIND_TIME DESC
+  </select>
+  
+      <select id="getMeterHistoryMessage"  resultMap="BaseResultMap">
+  	SELECT
+		CM.*
+	FROM
+		meters M left join customer_meter CM ON M.id = CM.meter_id
+	<where>
+		<!-- cm.deleted=0 -->
+		<if test="customerId!=null and customerId!=''">
+		AND CM.CUSTOMER_ID = #{customerId} 
+		</if>
+		<if test="searchCond!=null and searchCond!='' ">
+			AND (
+				M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+				OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+				OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+				OR M.FACTORY LIKE concat(concat('%',#{searchCond}),'%')
+			)
+		</if>
+	</where>
+	order by CM.BIND_TIME, CM.ID, CM.UNBIND_TIME DESC
+  </select>
+  
+  <!-- 获取表计的生产厂家 -->
+  <select id="getMeterFactory" resultType="String">
+  	SELECT
+		FACTORY 
+	FROM
+		(
+	SELECT
+		M.FACTORY,
+		COUNT( 1 ) AS COUNT 
+	FROM
+		CUSTOMER_METER CM LEFT JOIN METERS M ON CM.METER_ID = M.ID 
+	WHERE
+		CM.DELETED = 0 
+		<if test="cmIdList!=null and cmIdList.size>0">
+			AND CM.ID IN 
+			<foreach item="item" index="index" collection="cmIdList" open="(" separator="," close=")">  
+				#{item}  
+			</foreach>
+		</if>
+	GROUP BY
+		M.FACTORY 
+	ORDER BY
+		COUNT DESC 
+		) T 
+	WHERE
+		ROWNUM =1
+  </select>
+  
+  <!-- 获取表计的抄表方式 -->
+  <select id="getMeterReadMode" resultType="String">
+  	SELECT
+		READ_MODE 
+	FROM
+		(
+	SELECT
+		M.READ_MODE,
+		COUNT( 1 ) AS COUNT 
+	FROM
+		CUSTOMER_METER CM LEFT JOIN METERS M ON CM.METER_ID = M.ID 
+	WHERE
+		CM.DELETED = 0 
+		<if test="cmIdList!=null and cmIdList.size>0">
+			AND CM.ID IN 
+			<foreach item="item" index="index" collection="cmIdList" open="(" separator="," close=")">  
+				#{item}  
+			</foreach>
+		</if>
+	GROUP BY
+		M.READ_MODE 
+	ORDER BY
+		COUNT DESC 
+		) T 
+	WHERE
+		ROWNUM =1
+  </select>
+  
+</mapper>

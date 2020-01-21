@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<th:block th:fragment="table">
+		<table class="table table-sm" id="meter-record-table">
+		<thead>
+			<tr>
+				<th>抄表情况</th>  <!-- 全部表计数量,已抄表计数量,未抄表计数量 -->
+				<th>数量</th>				 
+			</tr>
+		</thead>
+		<tbody>
+				                                     
+			<span th:each="item,iterStat: ${readRateList}" th:remove="tag">
+				<tr>
+					<!-- 抄表情况 -->
+					<td th:text="${item.readType}"></td>
+					 <!-- 数量 -->
+					<td  th:text="${item.amount}"></td>			 
+				</tr>
+			</span>
+		</tbody>
+	</table>
+	</th:block>
+</body>
+</html>

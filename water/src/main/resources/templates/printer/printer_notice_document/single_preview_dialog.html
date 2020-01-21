@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-single-dialog-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>选择通知单类型</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="customers-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									<input type="hidden" id="customers-name" name="" th:value="${currItem==null ? '' : currItem.customerName}" />
+									<input type="hidden" id="period" name="" th:value="${period}" />
+									<input type="hidden" id="place" name="" th:value="${place}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 通知单类型-->
+													<div class="form-group form-inline">
+														<label for="user-sex" class="col-sm-4 control-label">通知单类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control " id="notice-type" name="noticceType"  required>
+																<!-- 默认选择第一个 -->
+																<option value="1" th:attr="selected=( ${noticceType==1} )? 'selcted' ">欠费通知单</option>
+																<option value="2" th:attr="selected=( ${noticceType==2} )? 'selcted' ">停水通知单</option>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr id="deduct-date-tr">
+												<td>
+													<!-- 扣费日期-->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">扣费日期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="date" class="form-control Wdate"
+																	id="deduct-date" name="deductDate"		
+																	th:value="${deductDate}"				
+																	onClick="WdatePicker({dateFmt:'yyyy-MM-dd',onpicked: setBackGround});"
+																	placeholder="扣费日期" style="background-color: white;" title="请选择扣费日期" >
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr id="end-date-tr" style="display:none">
+												<td>
+													<!-- 缴费截止日期-->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label"> 缴费截止日期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="date" class="form-control Wdate"
+																	id="end-date" name="endDate"		
+																	th:value="${endDate}"				
+																	onClick="WdatePicker({dateFmt:'yyyy-MM-dd',onpicked: setBackGround});"
+																	placeholder="缴费截止日期" style="background-color: white;" title="请选择缴费截止日期" >
+														</span>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								 
+								<button type="button" class="btn btn-primary btn-modify-and-back" id="btn-modify-and-back">
+									确定
+								</button> 
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">
+									关闭
+								</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+			var period=[[${period}]];
+			var place=[[${place}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		/*
+			设置input背景色
+		*/
+		function setBackGround() {
+			$("#deduct-date").css("background-color", "white");
+			$("#end-date").css("background-color", "white");
+		}
+		//------------------业务操作----------------------
+		
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH + "/print-notice/single-preview-notice";
+			
+			var customerId= $("#customers-id").val();
+			var noticeType= $("#notice-type").val();
+			var deductDate= $("#deduct-date").val();
+			var endDate= $("#end-date").val();
+			var customerName= $("#customers-name").val();
+			var period= $("#period").val();
+			var place= $("#place").val();
+			var parms = new Object();
+			parms.customerId = customerId;
+			parms.noticeType = noticeType;
+			parms.deductDate = deductDate;
+			parms.endDate = endDate;
+			parms.customerName = customerName;
+			parms.period = period;
+			parms.place = place;
+			$.post(url, parms, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						previewSingleNotice(customerName,period);  //预览
+						closeSinglePreviewDialog();
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+	
+		/*
+			功能:
+				btn-pdf-preview
+				PDF 预览
+			参数:			
+				bottleLabelSerialNo:瓶签序号
+				pageNo:页码(注:自1开始计数)
+		*/
+		function previewSingleNotice(customerName,period){
+			var curWwwPath=window.document.location.href;
+			var pathName=window.document.location.pathname;
+			var pos=curWwwPath.indexOf(pathName);
+			var localhostPath=curWwwPath.substring(0,pos);
+			
+			var attachmentUrl="";
+			var pdfFileName=customerName+"_"+period+".pdf";
+			
+			var url="/pdfjs/web/viewer.html?file=";
+			var parms="/preview?fileName%3D";   //"%3D"即是 =  的URL编码
+			
+			
+			console.log("PDF FILE NAME IS:"+pdfFileName);
+			console.log("url is:"+ localhostPath+url+attachmentUrl + "/preview?fileName%3D"+pdfFileName);
+			
+			window.open(localhostPath+url+attachmentUrl + "/preview?fileName%3D"+pdfFileName,"new window");
+		
+		};
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			//通知单类型下拉框改变事件
+			$("#notice-type").on('change',function() {
+				var noticeType= $("#notice-type").val();
+				if(noticeType==1){//选择的是欠费通知
+					$('#end-date-tr').hide(); //隐藏id为trid1的元素。
+			        $('#deduct-date-tr').show(); //显示id为trid2的元素。
+				} else {
+					$('#deduct-date-tr').hide(); //隐藏id为trid1的元素。
+			        $('#end-date-tr').show(); //显示id为trid2的元素。
+				}
+			});
+			//---------------click event process binding---------------
+
+			/*
+			修改对话框-保存按钮-CLICK
+			保存所修改的条目
+		*/
+		$('#btn-modify-and-back').on('click',function() {
+			modiItem(true);				
+		});
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

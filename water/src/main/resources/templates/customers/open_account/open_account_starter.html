@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('立户')" th:remove="tag"></div>
+
+</head>
+<body>
+	<!-- 参数配置主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<div>
+					<h4 class="panel-title">立户</h4>
+					<hr style="height:1px;border:none;border-top:1px solid blue;">
+				</div>
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var g_displayMode = [[${displayMode}]];//显示方式：DISPLAY_SEARCH（显示方式-查询，前端只可查询不能编辑）和DISPLAY_EDIT（显示方式-编辑，前端可查询可编辑）
+		/*]]>*/
+	</script>
+	
+	<script type="text/javascript">
+		$(function() {
+			/* 
+				加载用户框架页
+			*/
+			function loadList(parms, callback) {
+				var url = "/customers/tabs";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			var params = {"displayMode":g_displayMode}//parms.displayMode=g_displayMode;//显示方式：DISPLAY_SEARCH（显示方式-查询，前端只可查询不能编辑）和DISPLAY_EDIT（显示方式-编辑，前端可查询可编辑）
+			loadList(params, null);
+		})
+	</script>
+
+</body>
+</html>

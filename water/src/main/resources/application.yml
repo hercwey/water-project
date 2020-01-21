@@ -1,0 +1,123 @@
+#服务器端口名称
+server:
+  #port: 8888
+  port: 80
+  servlet:
+    session:
+      timeout: -1
+  tomcat:
+    uri-encoding: UTF-8
+#eureka: 
+#  client: 
+#    service-url: 
+#      defaultZone: http://localhost:8000/eureka/
+#    healthcheck: 
+#      enabled: true #开启健康检查        
+#spring配置 
+spring:
+  application:
+    name: wsd-client
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+      enabled: false      
+  banner:
+    charset: UTF-8
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true    
+  messages:
+    encoding: UTF-8
+     
+  #数据源
+  datasource:
+    name: mysql_wsd
+    type: com.alibaba.druid.pool.DruidDataSource
+    
+    #连接pool
+    druid:
+     #Oracle 9 以前推荐使用oracle.jdbc.driver.OracleDriver
+     #driver-class-name: oracle.jdbc.driver.OracleDriver
+     #Oracle 9 以后推荐使用oracle.jdbc.OracleDriver
+     driver-class-name: oracle.jdbc.OracleDriver
+     #水司生产数据库连接
+     #url: jdbc:oracle:thin:@192.168.55.39:1521:ORCL   
+     #阿里云
+     url: jdbc:oracle:thin:@39.107.230.168:1521:ORCL
+     #url: jdbc:oracle:thin:@127.0.0.1:1521:ORCL     
+     
+     #阿里云  && 本地
+     username: wsd
+     password: wsd
+     
+     filters: stat
+     initial-size: 1
+     min-idle: 1
+     max-active: 20
+     max-wait: 60000
+     time-between-eviction-runs-millis: 60000
+     min-evictable-idle-time-millis: 300000
+     #validation-query: SELECT 'x'
+     validation-query: SELECT 1 FROM DUAL
+     test-while-idle: true
+     test-on-borrow: false
+     test-on-return: false
+     pool-prepared-statements: false
+     max-pool-prepared-statement-per-connection-size: 20
+    
+  #模板配置
+  thymeleaf:
+    cache: false
+    #mode: HTML
+    mode: LEGACYHTML5
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    prefix: classpath:/templates/
+    suffix: .html
+  #资源文件  
+  resources:
+    chain:
+      strategy:
+        content:
+          enabled: true
+          paths: /**
+  #AOP
+  aop:
+    auto: true #启动aop配置
+  #RabbitMQ
+#  rabbitmq:
+#    host: 127.0.0.1
+#    port: 5672
+#    username: guest
+#    password: guest
+  #security
+    #user
+      #name:admin
+      #password:123456
+#mybatis配置
+mybatis:
+  mapper-locations: classpath*:com/learnbind/ai/mapper/*.xml
+  type-aliases-package: com.learnbind.ai.model
+  configuration:    
+    callSettersOnNulls: true
+          #注意，单引号
+    jdbc-type-for-null: 'null'
+#pagehelper配置
+pagehelper:
+  helperDialect: oracle
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+  returnPageInfo: check
+#打印日志
+logging:
+  #pattern: 
+    #console: "%d{yyyy/MM/dd-HH:mm:ss} [%thread] %-5level %logger- %msg%n"
+  level:
+    #root: debug
+    com.learnbind.ai: debug
+    #com.learnbind.ai.dao: debug

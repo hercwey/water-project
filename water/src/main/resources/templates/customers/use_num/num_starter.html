@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('用水人数更改')" th:remove="tag"></div>
+
+</head>
+<body>
+	<!-- 参数配置主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<div>
+					<h4 class="panel-title">用水人数更改</h4>
+					<hr style="height:1px;border:none;border-top:1px solid blue;">
+				</div>
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		$(function() {
+			/* 
+				加载用户框架页
+			*/
+			function loadList(parms, callback) {
+				var url = "/use-num/main";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			loadList(null, null);
+		})
+	</script>
+
+</body>
+</html>

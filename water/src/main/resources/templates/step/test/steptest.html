@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<div th:include="common/common_head::headx('jquery向导测试页')" th:remove="tag"></div>
+<!-- styles  -->
+	<link rel="stylesheet" href="/css/jquerystep/normalize.css">
+    <link rel="stylesheet" href="/css/jquerystep/main.css">
+    <link rel="stylesheet" href="/css/jquerystep/jquery.steps.css">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- guide测试 -->
+				<div id="example-basic">
+					<h5>Keyboard</h5>
+					<section>
+						<p>Try the keyboard navigation by clicking arrow left or
+							right!</p>
+					</section>
+					<h5>Effects</h5>
+					<section>
+						<p>Wonderful transition effects.</p>
+					</section>
+					<h5>Pager</h5>
+					<section>
+						<p>The next and previous buttons help you to navigate through
+							your content.</p>
+					</section>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</body>
+
+<!-- 加入相应的jquery guide -->
+
+<script src="/js/jquerystep/jquery.steps.js"></script>
+
+
+<script type="text/javascript">
+
+$("#example-basic").steps({
+    headerTag: "h5",
+    bodyTag: "section",
+    transitionEffect: "slideLeft",
+    autoFocus: true
+});
+
+
+</script>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!-- 小区客户查询组件 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 
+		参数说明:
+		searcherId:  查询组件名称. 
+	-->
+	<th:block th:fragment="searcher(searcherId)">
+		
+		<div th:id="${searcherId}" class="input-group-sm" >			
+				<!-- <input type="text" 
+					class="form-control search-cond" 
+					id="search-cond" 
+					style="width:auto;display:inline-block;"
+					placeholder="客户姓名/电话/手机号/客户编号" 
+					title="请输入客户姓名、电话、手机号、客户编号等查询"> -->
+				<select class="form-control input-sm location-block"
+					name="locationBlock"	
+					style="width:auto;display:inline-block;"														
+					data-location-curr-node-type="BLOCK"
+					data-location-next-node-type="BUILDING">
+					<option value="" data-location-traceids=''>—小区—</option>
+					<!-- <option value="" data-location-traceids=''>——如园——</option> -->
+					<!-- <span th:each="item,iterStat: ${locationList}" th:remove="tag">
+						<option th:value="${item.id}"
+							th:attr="data-location-traceids=${item.traceIds}, data-location-code=${item.code},data-location-name=${item.name}"
+							th:text="${item.name}">小区名称</option>
+					</span> -->
+				</select>			 
+				<select class="form-control input-sm location-building"
+					name="locationBuilding"		
+					style="width:auto;display:inline-block;"			
+					data-location-curr-node-type="BUILDING"
+					data-location-next-node-type="UNIT" 
+					disabled="disabled"	>
+					<option value="" data-location-traceids=''>—楼号—</option>
+				</select>
+							
+				<select class="form-control input-sm location-unit" 
+					name="locationUnit"					
+					style="width:auto;display:inline-block;" 
+					data-location-curr-node-type="UNIT"
+					data-location-next-node-type="ROOM" 
+					disabled="disabled"	>
+					<option value="" data-location-traceids=''>—单元—</option>
+				</select>			
+			
+		</div>
+		
+	</th:block>
+</body>
+</html>

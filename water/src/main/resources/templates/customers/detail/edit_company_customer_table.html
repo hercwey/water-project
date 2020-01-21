@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+								
+		<!-- 表单内容 -->
+		<!-- form-inline -->
+
+		<!-- 收费方式，0：合并收费(默认值)，1单独收费；针对一表多户 -->
+		<input type="hidden" id="customers-charge-mode" name="chargeMode" value="1" >
+											
+		<!-- 采用表格进行布局 -->
+		<table class="table">
+			<tbody>
+				<tr>
+					<td>客户编号：</td>
+					<td th:text="${customer==null ? '' : customer.customerCode}"></td>
+					<td>立户时间：</td>
+					<td th:text="${customer==null ? '' : customer.settleTimeStr}"></td>
+				</tr>
+				<tr>
+					<td>单位名称：</td>
+					<td th:text="${customer==null ? '' : customer.customerName}"></td>
+					<td>单位电话：</td>
+					<td th:text="${customer==null ? '' : customer.customerTel}"></td>
+				</tr>
+				<tr>
+					<td>联系人手机：</td>
+					<td th:text="${customer==null ? '' : customer.customerMobile}"></td>
+					<td>邮箱 ：</td>
+					<td th:text="${customer==null ? '' : customer.customerEmail}"></td>
+				</tr>
+				<tr>
+					<td>地址：</td>
+					<td th:text="${customer==null ? '' : customer.address}"></td>
+					<td>行业性质 ：</td>
+					<td th:text="${customer==null ? '' : customer.industryValue}"></td>
+				</tr>
+				<tr>
+					<td>水价分类 ：</td>
+					<td th:text="${customer==null ? '' : customer.waterUseValue}"></td>
+					<td>水价 ：</td>
+					<td th:text="${customer==null ? '' : customer.waterPriceName}"></td>
+				</tr>
+					<td>通知方式 ：</td>
+					<td th:text="${customer==null ? '微信' : customer.notifyModeStr}"></td>
+					<td>用水状态 ：</td>
+					<td th:text="${customer==null ? '停水' : customer.waterStatusStr}"></td>
+				</tr>
+				<tr>
+					<td>是否分水量 ：</td>
+					<td th:text="${customer==null ? '否' : customer.isPartWaterStr}"></td>
+					<td>地理位置  ：</td>
+					<td th:text="${locationName}"></td>
+				</tr>
+				<tr>
+					<td>备注 ：</td>
+					<td th:text="${customer==null ? '' : customer.remark}"></td>
+					<td></td>
+					<td></td>
+				</tr>
+				
+			</tbody>
+		</table>
+																					
+	<!-- 选择地理位置页面 -->
+	<!-- <div th:include="customers/location_select" th:remove="tag"></div> -->
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			
+			
+			
+			
+			//---------------click event process binding---------------
+			
+		});
+	</script>
+	
+	
+	</th:block>
+	
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-addsub-dialog"
+					role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header"
+								style="background-color: #a5f1b6; height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>追加减免水量</span> <i class="fa fa-tags fa-1x"
+										aria-hidden="true" style="color: blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close"
+									data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+								
+									<!-- 采用表格进行布局 -->
+									<table class="table-layout table">
+										<tbody id="addsub-water-body">
+											<tr>
+												<td>
+													<!-- 当前总水量 -->
+													<div class="form-group form-inline">
+														<label for="water-amount-before" class="col-sm-4 control-label">总水量</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" readonly="readonly"
+																	th:value="${totalWaterAmount==null ? '0.00' : totalWaterAmount}" 
+																	id="water-amount-before" name="waterAmountBefore" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="总水量"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 追加/减免水量 -->
+													<div class="form-group form-inline">
+														<label for="engineering-organization" class="col-sm-4 control-label">追加/减免水量</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	id="addsub-compensation" name="compensation" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="追加/减免水量"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm"
+									data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm"
+									id="btn-modify-and-back">保存&返回</button>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+		/*]]>*/
+	</script>
+
+		<script>
+		//------------------业务操作----------------------
+		
+		function getAddsubWaterParms(){
+			
+			//var isContinue = true;
+			//var addsubWaterArr = new Array();
+			/* $("#addsub-water-body tr").each(function(){
+				var compensation = $(this).find(".addsub-water").val();//追加减免水量
+				var waterBefore = $(this).find(".addsub-water").attr("data-water-before");//追加减免水量前的水量
+				var partitionWaterId = $(this).find(".addsub-water").attr("data-partition-water-id");//分水量ID
+				
+				if(parseFloat(compensation)+parseFloat(waterBefore)<0){
+					isContinue = false;
+					//dialog type: success warning info error,默认为info
+					util.message("减免水量必须小于本期水量！",null,"warning");
+					return false;
+				}
+				
+				var obj = new Object();
+				obj.compensation = compensation;
+				obj.waterBefore = waterBefore;
+				obj.partitionWaterId = partitionWaterId;
+				addsubWaterArr.push(obj);
+			}); */
+			/* if(!isContinue){
+				return false;
+			} */
+			
+			var waterBefore = $("#addsub-water-body #water-amount-before").val();//追加减免之前的水量
+			var compensation = $("#addsub-water-body #addsub-compensation").val();//追加减免的水量
+			if(compensation==null || compensation=="" || compensation==0){
+				//dialog type: success warning info error,默认为info
+				util.message("追加减免水量不能为空且不能等于零！",null,"warning");
+				return false;
+			}
+			//获取追加减免水量对象
+			var addsubWaterObj = new Object();
+			addsubWaterObj.compensation = compensation;
+			addsubWaterObj.waterBefore = waterBefore;
+			var addsubWaterJSON = JSON.stringify(addsubWaterObj);
+			console.log(addsubWaterJSON);
+			
+			var partWaterId = getPartitionWaterIdFn();//获取当前所操作的分水量记录ID
+			//var customerId = getCustomerIdFn();//获取当前操作的客户ID
+			//var period = getPeriodFn();//获取当前操作的期间
+			//var recordIds = getRecordIdsFn();//获取当前操作的抄表记录ID
+			//var meterIds = getMeterIdsFn();//获取当前操作的表计ID
+			
+			var params = new Object();
+			params.partWaterId = partWaterId;
+			//params.customerId = customerId;
+			//params.period = period;
+			//params.recordIds = recordIds;
+			//params.meterIds = meterIds;
+			params.addsubWaterJSON = addsubWaterJSON;
+			return params;
+			
+		}
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function addsubWaterAjaxReq(closeDialogFlag) {
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH + "/partition-water/save-addsub-water";
+			var parms = getAddsubWaterParms();
+			if(!parms){
+				return false;
+			}
+			
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						closeAddsubWaterDialog();
+						loadPageClickPageNum();
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"success");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				addsubWaterAjaxReq(true);				
+			});
+
+		});
+	</script>
+
+
+
+	</th:block>
+
+</body>
+</html>

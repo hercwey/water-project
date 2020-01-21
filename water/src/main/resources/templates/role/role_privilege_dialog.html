@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<!-- 菜单权限选择对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-role-privilege-auth-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>菜单权限选择</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="role-privilege-dialog-form">
+									
+									<!-- 需要编辑菜单权限的角色ID -->
+									<input type="hidden" id="save-auth-role-id" th:value="${roleId}" />
+									
+									<div class="row clearfix medic-label">
+										<div class="col-md-12 column">
+											<ul id="privilege-ztree" class="ztree"></ul>
+										</div>
+									</div>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary" id="btn-save-auth-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<!-- JS Scripts-->
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var zNodes = [[${rightList}]];
+			/* var zNodes = [{"id":1, "pId":0, "name":"test1"},
+		    {"id":11, "pId":1, "name":"test11"},
+		    {"id":12, "pId":1, "name":"test12"},
+		    {"id":111, "pId":11, "name":"test111"}]; */
+		    //var zNodes = [{"createTime":"1523362262000","icon":"/index/images/li1.png","isHttps":0,"level":1,"module":"业务管理","name":"业务管理","parentId":0,"privilegeCode":"PIVAS_MENU_1","privilegeId":1,"seq":1,"sysCode":1,"type":0}];
+			//console.log("zNodes:"+zNodes);
+			//console.log("zNodes:"+JSON.stringify(zNodes));
+		/*]]>*/
+	</script>
+
+	<SCRIPT type="text/javascript">
+		var g_privilege_arr = new Array();//保存选择的菜单权限
+		
+		var setting = {
+			check: {
+				enable: true,
+				chkStyle: "checkbox",
+			},
+			data: {
+				key: {
+					name: "rightName",
+				},
+				simpleData: {
+					enable:true,
+					idKey: "id",
+					pIdKey: "pid",
+					rootPId: 0
+				}
+			},
+			callback: {
+				//onClick: zTreeOnClick,//节点被点击的事件回调函数
+				onCheck: zTreeOnCheck,//checkbox / radio 被勾选 或 取消勾选的事件回调函数
+				onClick: zTreeOnClick,//节点被点击的事件回调函数
+			},
+		};
+		
+		/*
+		 *	checkbox / radio 被勾选 或 取消勾选的事件回调函数
+		 */
+		function zTreeOnCheck(event, treeId, treeNode) {
+			//console.log("check:"+JSON.stringify(treeNode));
+			//g_privilege_arr = g_privilege_arr.unique3();
+			
+			try{
+
+				itrGetParentNodePrivilege(treeNode);
+				itrGetChildNodePrivilege(treeNode);
+				
+				/* var isParent = treeNode.isParent;
+				if(isParent){
+					itrGetChildNodePrivilege(treeNode);
+				}else{
+					itrGetParentNodePrivilege(treeNode);
+				} */
+			}catch(err){
+				console.log("捕捉到例外，开始执行catch块语句 --->");
+			 	console.log("错误名称: " + err.name+" ---> ");
+				console.log("错误信息: " + err.message+" ---> ");
+			}
+			
+			//console.log("菜单权限："+g_privilege_arr);
+			g_privilege_arr = g_privilege_arr.unique3();
+			//console.log("去重后的菜单权限："+g_privilege_arr);
+			
+			/* var treeObj = $.fn.zTree.getZTreeObj("category-ztree");
+		    var sNodes = treeObj.getSelectedNodes();
+		    console.log("sNodes:"+JSON.stringify(sNodes));
+		    if (sNodes.length > 0) {
+		    	var node = sNodes[0].getParentNode();
+		    	console.log("node:"+JSON.stringify(node));
+		    	var nodeArr = node.children;
+		    	var isChecked = true;
+		    	for(var i=0; i<nodeArr.length; i++){
+		    		console.log("nodeArr["+i+"]:"+nodeArr[i].checked);
+		    	
+		    		if(!nodeArr[i].checked){
+		    			isChecked = false;
+		    			break;
+		    		}
+		    	}
+		    	if(isChecked){
+		    		idArr.push(node.id);
+		    	}else{
+		    		for(var i=0; i<idArr.length; i++){
+			    		if(idArr[i]==node.id){
+			    			idArr.splice(i, 1);
+				    		break;
+			    		}
+			    	}
+		    	}
+		    }
+		    
+			console.log("treeId:"+treeId);
+			console.log("check:"+JSON.stringify(treeNode));
+		    console.log(treeNode.id + ", " + treeNode.name + "," + treeNode.checked);
+		    //console.log("children:"+JSON.stringify(treeNode.children)+", length:"+treeNode.children.length);
+		    console.log("isParent:"+treeNode.isParent);
+		    
+		    if(treeNode.checked){
+		    	idArr.push(treeNode.id);
+		    	addNodeId(treeNode);
+		    }else{
+		    	for(var i=0; i<idArr.length; i++){
+		    		if(idArr[i]==treeNode.id){
+		    			idArr.splice(i, 1);
+			    		break;
+		    		}
+		    	}
+		    	removeNodeId(treeNode);
+		    }
+		    
+		    console.log(idArr); */
+		};
+		
+		/**
+		 *	如果选择的当前节点没有子节点，遍历并获取当前节点的菜单权限，和所有父节点的菜单权限
+		 */
+		function itrGetParentNodePrivilege(treeNode){
+			//console.log("====================遍历父节点菜单："+JSON.stringify(treeNode));
+			//console.log("去重后的菜单权限："+g_privilege_arr.unique3());
+			
+			/* var isParent = treeNode.isParent;
+			if(isParent){//isParent=true时，表示当前节点有子节点，直接返回
+				return false;
+			} */
+			
+			var privilegeId = treeNode.id;
+			var parentId = treeNode.pid;
+			var flag = treeNode.checked;
+			if(parentId>0){//根节点parentId=0
+				var treeObj = $.fn.zTree.getZTreeObj("privilege-ztree");//获取菜单权限zTree对象
+				var nodes = treeObj.getNodesByParam("id", treeNode.pid, null);//获取需要设置的zTree对象节点（集合[{}]）
+				var currNode = nodes[0];
+				//console.log("父节点菜单："+JSON.stringify(currNode));
+				
+				itrGetParentNodePrivilege(currNode);
+			}
+			
+			if(privilegeId!=null && privilegeId>0){
+				g_privilege_arr = g_privilege_arr.unique3();
+				//console.log("去重后的菜单权限："+g_privilege_arr);
+				//console.log("节点菜单ID："+privilegeId+"，节点菜单的选择状态："+flag);
+				if(flag){
+					g_privilege_arr.push(privilegeId);
+				}else{
+					g_privilege_arr.remove3(privilegeId);
+				}
+			}
+		}
+		
+		/**
+		 *	如果选择的当前节点有子节点，遍历并获取当前节点的菜单权限，和所有子节点的菜单权限
+		 */
+		function itrGetChildNodePrivilege(treeNode){
+			//console.log("====================遍历子节点菜单："+JSON.stringify(treeNode));
+			//console.log("去重后的菜单权限："+g_privilege_arr.unique3());
+			
+			var isParent = treeNode.isParent;
+			if(!isParent){//isParent=false时，表示当前节点没有子节点，直接返回
+				return false;
+			}
+			
+			var privilege_id = treeNode.id;
+			
+			var childrenNode = treeNode.children;
+			var len = childrenNode.length;
+			for(var i=0; i<len; i++){
+				var privilege = childrenNode[i];
+				
+				//console.log("====================三级菜单："+JSON.stringify(privilege));
+				
+				var child_privilege_id = privilege.id;
+				var parent_id = privilege.pid;
+				var flag = privilege.checked;
+				
+				if(child_privilege_id!=null && child_privilege_id!=null && child_privilege_id>0){
+					g_privilege_arr = g_privilege_arr.unique3();
+					//console.log("去重后的菜单权限："+g_privilege_arr);
+					//console.log("节点菜单ID："+privilege_id+"，子节点菜单ID："+child_privilege_id+"，节点菜单的选择状态："+flag);
+					if(flag){
+						g_privilege_arr.push(privilege_id);
+						g_privilege_arr.push(child_privilege_id);
+					}else{
+						g_privilege_arr.remove3(privilege_id);
+						g_privilege_arr.remove3(child_privilege_id);
+					}
+				}
+				
+				var isParent = privilege.isParent;
+				if(isParent){
+					//console.log("====================继续遍历子节点");
+					itrGetChildNodePrivilege(privilege);
+				}
+			}
+		}
+		
+		/*
+		 * 	节点被点击的事件回调函数
+		 */
+		function zTreeOnClick(event, treeId, treeNode) {
+			//console.log("click:"+JSON.stringify(treeNode));
+			//console.log(treeNode.menuId + ", " + treeNode.menuName + ", " + treeNode.parentId);
+		    //$("#add-btn").attr("onclick", "javascript:add(&quot;"+treeNode.id+"&quot;);");
+		    
+		    /* var params = '"privilegeId":'+treeNode.privilegeId+', "type":'+treeNode.type+', "name":'+treeNode.name+', "description":'+treeNode.description+', "parentId":'+treeNode.parentId+', "href":'+treeNode.href+', "seq":'+treeNode.seq;
+			$("#add-btn").attr("onclick", "javascript:add("+treeNode.privilegeId+", '"+treeNode.name+"', '"+treeNode.parentId+"');");//修改添加按钮click事件
+			$("#edit-btn").attr("onclick", "javascript:edit("+JSON.stringify(treeNode)+");");//修改编辑按钮click事件
+			$("#del-btn").attr("onclick", "javascript:del("+treeNode.privilegeId+", '"+treeNode.name+"', '"+treeNode.parentId+"');");//修改删除按钮click事件 */
+		}
+		
+		$(function(){
+			console.log("start init complete!");
+			$.fn.zTree.init($("#privilege-ztree"), setting, zNodes);
+		});
+		
+		/* ====================	数组操作：数组去重；数组中删除指定元素；	==================== */
+		/*
+		 * 数组去重
+		 * 		调用方法：array.unique3();
+		 */
+		Array.prototype.unique3 = function(){
+				var res = [];
+				var json = {};
+				for(var i = 0; i < this.length; i++){
+					if(!json[this[i]]){
+						res.push(this[i]);
+						json[this[i]] = 1;
+					}
+				}
+				return res;
+			}
+		/*
+		 * 数组中删除指定元素
+		 * 		调用方法：array.remove3("str");
+		 * 		参数：要删除的对象
+		 */
+		Array.prototype.remove3 = function(str){
+			 	if(str==null || str==""){
+			 		return false;
+			 	}
+			 	var flag = false;
+				for(var i=0; i<this.length; i++){
+					if(this[i]==str){
+						this.splice(i,1);
+						flag = true;
+						break;
+					}
+				}
+				return flag;
+			}
+	</SCRIPT>
+	<script type="text/javascript">
+	/*
+		角色授权对话框-保存按钮-CLICK
+		保存授权信息
+	*/
+	$('#btn-save-auth-and-back').on('click',function() {
+		//需要提交的url	
+		var urlStr = BASE_CONTEXT_PATH + "/role/insert-role-privilege";
+		
+		var roleId = $("#save-auth-role-id").val();
+
+		var params = {"roleId": roleId, "privilegeIds": g_privilege_arr.toString()};
+		//console.log(params);
+		//return false;
+		
+		$.post(urlStr, params, function(res){
+			console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+			if (res != null && res != "") {
+				//var obj = $.parseJSON(res);						
+				if (res.result_code == "success") {
+					//console.log(res.result_msg);
+					//loadPage();//重新刷新当前页面
+					closePrivilegeAuthDialog();//关闭对话框
+				} else {
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"warning");
+				}
+			}
+		});				
+	});
+	</script>
+	</th:block>
+	
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('发票批量查询条件对话框-TEST')" th:remove="tag"></div>
+<title>发票批量查询条件对话框</title>
+</head>
+<body>
+<div class="container-fluid">
+	<div class="row-fluid">
+		<!-- 对话框容器 -->
+		<div class="span12">
+			<!-- 对话框1 -->
+			<span th:include="component/batchqueryinvoiceconddialog/batch_query_invoice_cond_dialog::dialog('dialog1')"  th:remove='tag'></span>			
+		</div>
+		<div class="span12">
+			 <button class="btn btn-primary" type="button" id="button1">发票批量查询条件对话框-打开</button>			 
+		</div>
+	</div>
+</div>
+</body>
+
+<!-- 通用对话框工具JS -->
+<!-- <script type="text/javascript" th:src="js/component/dialogutil/DialogUtil.js"></script> -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+<!-- 打印对话框组件JS部分 -->
+<script type="text/javascript" th:src="@{/js/component/batchqueryinvoiceconddialog/BatchQueryInvoiceCondDialog.js}"></script>
+
+
+<script type="text/javascript">
+
+	var batchQueryInvoiceCondDialog=new BatchQueryInvoiceCondDialog("dialog1");
+	//set callback function
+	batchQueryInvoiceCondDialog.setButtonOkCallback(buttonOkCallback);
+	batchQueryInvoiceCondDialog.setButtonCancelCallback(buttonCancelCallback);
+	
+	var todayx=new Date();			
+	setQueryDateStart(todayx);  //set object's properties  起始日期
+	setQueryDateEnd(todayx);  //set object's proerties 终止日期
+	
+	
+	
+	//BUTTON OK,OUTER BUSINESS FUNC
+	function buttonOkCallback(){
+		console.log("button ok callback is executed");
+	}
+	
+	//BUTTON CANCEL,OUTER BUSINESS FUNC
+	function buttonCancelCallback(){
+		console.log("button cancel callback is executed");
+	}
+	
+	/*
+		注:公共函数
+		功能:返回指定日期相应月份的第一天的日期
+		返回:月份的第一天的日期
+		
+	*/
+	function getFirstDayDateOfMonth(datex){
+		var today=new Date(datex);
+		var year=today.getFullYear();		
+		console.log("year is:"+year);		
+		var month=today.getMonth()+1;		
+		var dateStart=year+'-'+month+'-'+'01';
+		return dateStart;
+	}
+	
+	/*
+		注:公共函数
+		功能:返回指定日期相应月份的最后一天的日期
+		返回:月份的最后一天的日期
+	*/
+	function getLastDayDateOfMonth(datex){
+		var today=new Date(datex);
+		var year=today.getFullYear();
+		var month=today.getMonth()+1;		
+		var days=getMonthDays(year,month);
+		
+		var dateEnd=year+'-'+month+'-'+days;
+		
+		return dateEnd;
+	}
+	
+	//业务相关-设置开票日期起
+	function setQueryDateStart(datex){				
+		var dateStart=getFirstDayDateOfMonth(datex);		
+		console.log("date start is:"+dateStart);		
+		batchQueryInvoiceCondDialog.setKPRQQ(dateStart);  
+	}
+	
+	//业务相关-设置开票日期止
+	function setQueryDateEnd(datex){
+		var dateEnd=getLastDayDateOfMonth(datex);
+		console.log("date end is:"+dateEnd);
+		batchQueryInvoiceCondDialog.setKPRQZ(dateEnd);
+	}
+	
+	/*
+		函数:获取指定年份,月份的最大天数.
+		天 的值是0，js会返回指定月份的最后一天，即最大天数。
+	*/
+	function getMonthDays(year,month){
+		return new Date(year, month, 0).getDate();		
+	}	
+
+	$(function(){
+		
+		$("#button1").on('click',function(){
+			batchQueryInvoiceCondDialog.show();
+			
+		});
+		
+		
+	});
+
+</script>
+
+
+</html>

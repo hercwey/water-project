@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-apply-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>申请完成:工单</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="work-order-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table-sm">
+										<tbody>
+										
+											<tr>
+												<td>
+													<!-- 工单编号-->
+													<div class="form-group form-inline">
+														<label for="" class="control-label col-sm-4">工单编号：</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"  disabled="disabled"
+																th:value="${currItem==null ? '' : currItem.serialNum}" 
+																id="work-serial-num" name="serialNum" 
+																maxlength=20 title="请输入1-20位字符" placeholder="工单编号"/>
+														</span>
+													</div>
+												</td>												
+												<td>
+													<!-- 工单标题-->
+													<div class="form-group form-inline">
+														<label for="" class="control-label col-sm-4" >工单标题：</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"  disabled="disabled"
+																th:value="${currItem==null ? '' : currItem.name}" 
+																id="work-name" name="name" 
+																maxlength=20 title="请输入1-20位字符" placeholder="工单标题"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td colspan="2">
+													<div class="form-group form-inline">
+														<label for="" class="control-label col-sm-2">工单执行情况：</label>
+														<span class="input-group-sm col-sm-10">
+															<textarea rows="3" cols="85" class="form-control" 
+																id="work-apply-situation" name="dealSituation" 
+																th:text="${currItem==null ? '' : currItem.dealSituation}" 
+																maxlength=1000 title="请输入1-1000位字符" placeholder="工单执行情况"></textarea>
+														</span>
+													</div>
+												</td>
+											</tr>		
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm"	id="btn-modify-and-back-apply">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		 function modiApplyItem(closeDialogFlag) {
+				//需要提交的url	
+				var url = BASE_CONTEXT_PATH + "/work-order-allot/apply-work";
+				var workOrderId= $("#work-order-id").val();
+				var dealSituation = $("#work-apply-situation").val();
+				var parms = new Object();
+				parms.workOrderId = workOrderId;
+				parms.dealSituation = dealSituation;
+				$.post(url, parms, function(res){
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							closeApplyDialog();
+							loadWorkOrderAllotPage();
+							util.message(res.result_msg,null,"success");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				});
+			 }
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back-apply').on('click',function() {
+				modiApplyItem(true);				
+			});
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

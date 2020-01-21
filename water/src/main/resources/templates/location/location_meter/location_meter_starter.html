@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('地理位置——表计')" th:remove="tag"></div>
+
+<!-- 
+	包装页面,也可以不使用此页面,直接使用内容页面.
+	_starter:页面为包装页面,用于加载_search
+	_main:主页面包括:操作面板(增加,删除,查询)+数据列表容器
+	_table:页面:数据列表页面
+	_dialog_add:增加对话框
+	_dialog_modi:修改对话框
+		
+	_starter页面---load---_main页面---load---_table页面
+	 
+-->
+
+</head>
+<body>
+	<!-- 批次管理主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<div>
+					<h4 class="panel-title">地理位置管理</h4>
+					<hr style="height:1px;border:none;border-top:1px solid blue;">
+				</div>
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+				<hr style="height:1px;border:none;border-top:1px solid blue;">
+			</div>
+		</div>
+		
+	</div>
+
+	<script>
+		$(function() {
+			/* 
+				加载框架页
+			*/
+			function loadMainPage(parms, callback) {
+				var url = "/location-meter/main";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			loadMainPage(null, null);
+		})
+	</script>
+
+
+</body>
+</html>

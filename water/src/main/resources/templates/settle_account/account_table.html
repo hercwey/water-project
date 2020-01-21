@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+
+	<!-- 当前所编辑的客户ID -->
+	<input type="hidden" id="overdue-customer-id" name="" value="" />
+	<!-- 当前所编辑的账单ID -->
+	<input type="hidden" id="overdue-account-item-id" name="" value="" />
+	<!-- 账单列表 -->
+	<table class="table table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>地理位置</th> 
+				<th>业主名称</th>
+				<th>期间</th>
+				<th>科目</th>
+				<th>账单金额</th>
+				<th>违约金总金额</th>
+				<th>已充值金额</th>
+				<th>欠费金额</th>
+				<th>记账日期</th>
+				<th>结算状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${accountItemList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.ID},data-bind=${item.ID}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.ID}"></label>
+					</div> 
+				</td>
+				<!-- 地理位置 -->
+				<td th:text="${item.LONG_CODE}">地理位置</td>
+				<!-- 客户名称 -->
+				<td th:text="${item.PROP_NAME}">客户名称</td>
+				<!-- 期间-->
+				<td th:text="${item.PERIOD}">期间</td>
+				<!-- 科目 -->
+				<td th:text="${item.CREDIT_SUBJECT}">科目</td>
+				<!-- 账单金额 -->
+				<td th:text="${item.CREDIT_AMOUNT}">账单金额</td>
+				<!-- 违约金总金额 -->
+				<td th:text="${item.overdueValue}">违约金总金额</td>
+				<!-- 已充值金额 -->
+				<td th:text="${item.DEBIT_AMOUNT}">已充值金额</td>
+				<!-- 欠费金额 -->
+				<td th:text="${item.arrearsValue}">欠费金额</td>
+				<!--记账日期-->
+				<td th:text="${item.ACCOUNT_DATE_STR}">记账日期</td>
+				<!--结算状态-->
+				<td th:attr="title=${item.SETTLEMENT_STATUS==2 ? item.SETTLEMENT_ERR_MSG : ''}">
+					<!-- 自动扣费结算状态 0=默认值；1=结算成功；2=结算失败 -->
+					<span th:if="${item.SETTLEMENT_STATUS==0}">默认值</span>
+					<span th:if="${item.SETTLEMENT_STATUS==1}">交易成功</span>
+					<span th:if="${item.SETTLEMENT_STATUS==2}">交易失败</span>
+				</td>
+				<!-- 操作列 -->
+				<td>
+					<ul class="nav">
+						<li class="nav-item dropdown ml-md-auto">
+							<a class="nav-link dropdown-toggle" id="navbarOperateMenu" data-toggle="dropdown">操作</a>
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+								<!-- <div class="dropdown-divider"></div> -->
+								<!-- 详情 -->
+								<a class="dropdown-item account-detail-single" th:attr="bind-id=${item.ID}">
+									<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>详情</span>
+								</a> 
+								<!-- 删除 -->
+								<a class="dropdown-item account-del-single" th:attr="bind-id=${item.ID}">
+									<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>删除</span>
+								</a>
+								<!-- 计算违约金 -->
+								<a type="button" class="dropdown-item generate-overdue-single" th:attr="bind-id=${item.ID}">
+									<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>计算违约金</span>
+								</a> 
+								<!-- 减免违约金 -->
+								<a class="dropdown-item overdue-reduce-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}">
+									<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>违约金减免</span>
+								</a> 
+								<!-- 减免水费 -->
+								<a class="dropdown-item water-fee-reduce-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}">
+									<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>水费减免</span>
+								</a> 
+							</div>
+						</li>
+					</ul>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager::pager" class="pagerx"
+		style="float: right; margin-right: 100px;"></div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	//-----------------打开详情对话框------------------
+	
+		
+		/* 
+			加载客户账单详细信息 
+		*/
+		$('.account-detail-single').on('click',function() {
+			
+			var id = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.id = id;
+			loadAccountItemDetailList(parms, loadItemDetailCallback);
+		});
+		//跳转详情信息选项卡
+		function loadItemDetailCallback(){
+			showAccountItemDetailTab();
+		}
+		
+		
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.account-del-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //分录ID
+			//console.log("itemId:" + itemId);
+			util.delConfirm("确认删除此条目?", itemId, "deleteSingleAccount");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteSingleAccount(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delBatchItemAccount(idsArr);
+		}
+		
+		/*
+		功能说明:
+			删除所选条目(通用删除函数)
+		参数说明:
+			ids:所要删除的条目ID数组,(可使函数更具通用性.)
+	*/
+	function delBatchItemAccount(ids) {
+		var urlStr = BASE_CONTEXT_PATH+"/settle-account/delete"; // 需要提交的url
+		
+		$.ajax({
+			type : "POST", // 提交方式 get/post
+			url : urlStr,
+			contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+			//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+			data : JSON.stringify(ids),
+			success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+				//console.log(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						loadAccountItemPage();
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				util.message("AJAX请求时发生错误!");
+			}
+		});
+	}
+	//-----------------打开违约金减免对话框------------------
+		/* 
+			计算违约金按钮
+		*/
+		$('.generate-overdue-single').on('click',function() {
+			var accountItemId = $(this).attr("bind-id");
+			util.delConfirm("确认生成违约金账单?", accountItemId, "generateOverdueFn");
+		});
+		
+		/**
+		 * 	生成账单
+		 */
+		function generateOverdueFn(accountItemId){
+			var url = BASE_CONTEXT_PATH+'/settle-account/generate-overdue-fine';
+			var parms = new Object(); //参数
+			parms.accountItemId = accountItemId;
+			console.log(parms)
+			
+			$.post(url, parms, function(res){
+				//console.log(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						loadAccountItemPage();//重新加载抄表记录列表
+						util.message(res.result_msg,null,"warning");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+	//-----------------打开违约金减免对话框------------------
+	
+	
+		/* 
+			加载违约金减免对话框 
+		*/
+		$('.overdue-reduce-single').on('click',function() {
+			var customerId = $(this).attr("data-customer-id");
+			var period = $(this).attr("data-period");
+			var accountItemId = $(this).attr("bind-id");
+			
+			$("#overdue-customer-id").val(customerId);
+			$("#overdue-account-item-id").val(accountItemId);
+			
+			var url = BASE_CONTEXT_PATH+'/settle-account/loadoverduereducedialog';
+			var parms = new Object(); //参数
+			parms.customerId = customerId;
+			parms.period = period;
+			parms.accountItemId = accountItemId;
+			
+			$("#overdue-reduce-dialog").load(url, parms,openOverdueReduceDialog); //加载完毕后显示 
+		});
+	
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openOverdueReduceDialog() {
+			//	可拖拽
+			$("#modal-container-overdue-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-overdue-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeOverdueReduceDialog() {
+			$("#modal-container-overdue-dialog").modal("hide");
+		}
+		
+		
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+			//======================分页（页码导航）========================
+
+			/*
+			 	【分页】导航： 当点击页号时读取需要导航到的页码及每页记录数（pageNum,pageSize）
+			 	 data-bind:pageNum-pageSize形式 
+			 	 如果data-bind为空字符串，不做动作 
+			 	 当用户点击某页时，	 则发送请求
+			*/
+			$(".pagination li a").on('click', function(e) {
+				var dataBind = $(this).attr("data-bind");
+				//当dataBind有数据时处理
+				if (dataBind != "") {
+					var pageArr = new Array();
+					pageArr = dataBind.split("-");
+					// 置分页数据
+					curr_pageNum = pageArr[0];
+					curr_pageSize = pageArr[1];
+					//加载页
+					loadAccountItemPage(); 
+				}
+
+			});
+
+		});
+	</script>
+</body>
+</html>

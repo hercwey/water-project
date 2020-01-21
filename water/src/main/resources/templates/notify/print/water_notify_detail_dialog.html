@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+
+</style>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-water-notify-detail-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>通知单明细</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+							
+							<div class="meter-sort-table table-container" id="meter-book-body">
+								<table class="table table-hover table-sm " id="meter-select-item-table">
+									<thead>
+										<tr>
+											<th>基础水价</th>
+											<th>污水处理费单价</th>
+											<th>水量</th>
+										</tr>
+									</thead>
+									<tbody  class="sortable">
+										<tr th:each="item,iterStat: ${detailList}">
+											<td th:text="${item.basePrice}">基础水价</td>
+											<td th:text="${item.sewagePrice}">污水处理费单价</td>
+											<td th:text="${item.realWaterAmount}">水表位置</td>
+										</tr>
+									</tbody>
+								</table>
+								<!-- 尾部 -->
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								</div>
+							</div>
+							<!-- 主体(用于展示表单) -->
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+		
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var detailList=[[${detailList}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			
+			
+			
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

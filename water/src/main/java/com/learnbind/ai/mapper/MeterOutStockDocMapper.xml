@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterOutStockDocMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterOutStockDoc">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="KNOCK_DOWN_UNIT" jdbcType="VARCHAR" property="knockDownUnit" />
+    <result column="METER_NO" jdbcType="VARCHAR" property="meterNo" />
+    <result column="CONSTRUCTION_COMPANY" jdbcType="VARCHAR" property="constructionCompany" />
+    <result column="METER_BOTTOM" jdbcType="VARCHAR" property="meterBottom" />
+    <result column="OUT_STOCK_DATE" jdbcType="TIMESTAMP" property="outStockDate" />
+    <result column="CALIBER" jdbcType="VARCHAR" property="caliber" />
+    <result column="YYC_PEOPLE" jdbcType="VARCHAR" property="yycPeople" />
+    <result column="WZC_PEOPLE" jdbcType="VARCHAR" property="wzcPeople" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="METER_PLACE" jdbcType="VARCHAR" property="meterPlace" />
+    <result column="CONSTRUCTION_PEOPLE" jdbcType="VARCHAR" property="constructionPeople" />
+    <result column="STORAGE_RECEIVE_PEOPLE" jdbcType="VARCHAR" property="storageReceivePeople" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, METER_ID, KNOCK_DOWN_UNIT, METER_NO, CONSTRUCTION_COMPANY, METER_BOTTOM, OUT_STOCK_DATE, 
+    CALIBER, YYC_PEOPLE, WZC_PEOPLE, REMARK, METER_PLACE, CONSTRUCTION_PEOPLE, STORAGE_RECEIVE_PEOPLE
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchCond" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM METER_OUT_STOCK_DOC M
+		<where>
+			M.METER_ID=#{meterId}
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					M.KNOCK_DOWN_UNIT LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.CONSTRUCTION_COMPANY LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+</mapper>

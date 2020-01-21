@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<!-- 表计列表 -->
+	<table class="table  table-hover table-sm" id="meter-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>编号</th>
+				<th>钢印号</th>
+				<th>表计位置</th>
+				<th>生产厂家</th>
+				<th>抄表方式</th>
+				<th>表地址</th>
+				<th>停/复水</th>
+				<th style="width:100px;">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${meterList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 编号 -->
+				<td th:text="${item.meterNo}">编号</td>
+				<!-- 钢印号 -->
+				<td th:text="${item.steelSealNo}">钢印号</td>
+				<!-- 表计位置 -->
+				<td th:text="${item.place}">表计位置</td>
+				<!-- 生产厂家 -->
+				<td th:text="${item.factoryValue}">生产厂家</td>
+				<!-- 抄表方式 -->
+				<td th:text="${item.readModeValue}">抄表方式 </td>
+				<!-- 表地址 -->
+				<td th:text="${item.meterAddress}">表地址</td>
+				<!-- 停/复水 -->
+				<td th:id="'meter-status-'+${item.id}" th:text="${item.meterStatusStr}">停/复水</td>
+				<!-- 操作列 -->
+				<td>
+					<div class="dropdown">
+					    <button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+					      	操作
+					    </button>
+					    <div class="dropdown-menu">
+					    	<!-- 表计基本信息 -->
+							<a class="dropdown-item btn-info-detail-single btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="bind-id=${item.id}">
+								<i class="fa fa-file-o" aria-hidden="true"></i><span>详情</span>
+							</a>
+							<!-- 编辑表计基本信息 -->
+							<!-- <a class="dropdown-item btn-edit-meter-single btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="bind-id=${item.id}">
+								<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i><span>编辑</span>
+							</a> -->
+							<!-- 销户拆表 -->
+							<a class="dropdown-item btn-destory-single btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="bind-id=${item.id}">
+								<i class="fa fa-wrench" aria-hidden="true"></i><span>销户拆表</span>
+							</a>
+							<!-- <!-- 停/复水-正常（复水） --
+							<a class="dropdown-item btn-meter-enable btn-sm" th:attr="bind-id=${item.id}">
+								<i class="fa fa-play" aria-hidden="true"><span>正常</span></i>
+							</a>
+							停/复水-停水
+							<a class="dropdown-item btn-meter-disable btn-sm" th:attr="bind-id=${item.id}">
+								<i class="fa fa-stop" aria-hidden="true"><span>停水</span></i>
+							</a> -->
+							<!-- 删除 -->
+							<!-- <a class="dropdown-item btn-delete-meter btn-sm" th:attr="bind-id=${item.id}">
+								<i class="fa fa-remove" aria-hidden="true"><span>删除</span></i>
+							</a> -->
+					    </div>
+					</div>
+					
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		var g_is_edit = true;//全局变量是否是编辑操作
+		
+		//------------------------------	销户拆表部分	------------------------------
+		/**
+		 * 	绑定销户拆表按钮的click事件
+		 */
+		$(".btn-destory-single").on("click", function(){
+			var meterId = $(this).attr("bind-id");//客户ID
+			
+			//验证欠费金额，验证通过后执行回调，否则提示
+			verifyOwedAmount(meterId,destoryConfirmCallback);
+			
+		});
+		
+		/**
+		 * 	销户拆表确认回调函数
+		 */
+		function destoryConfirmCallback(meterId){
+			//console.log("meterId"+meterId);
+			//注: 回调函数需要采用引号引起来
+			util.confirm("请确认已结清所有欠款，确认继续？", meterId, "destoryAjaxRequestFn", "cancel_callback_name");//销户拆表确认
+		}
+		/**
+		 * 	销户拆表ajax请求处理
+		 */
+		function destoryAjaxRequestFn(meterId){
+			var url = BASE_CONTEXT_PATH+'/meter-destory/destory';
+			var parms = {"meterId": meterId};
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res!=null && res!="") {
+					if (res.result_code == "success") {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"success");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		/**
+		 * 确认框取消回调
+		 */
+		function cancel_callback_name(){
+			console.log("取消");
+		}
+		
+		//------------------------------	验证欠费金额部分	------------------------------
+		/**
+		 * 	验证欠费金额，true表示无欠费金额，false表示有欠费金额（此处有提示）
+		 */
+		function verifyOwedAmount(meterId,callback){
+			var url = BASE_CONTEXT_PATH+'/meters/verify-owed-amount';
+			var parms = {"meterId": meterId};
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res!=null && res!="") {
+					if (res.result_code == "success") {
+						callback(meterId);//验证欠费金额通过后的回调
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		//------------------------------	停/复水操作	------------------------------
+		/* 
+			正常按钮 
+		*/
+		$('.btn-meter-enable').on('click',function() {
+	
+			var meterId = $(this).attr("bind-id");
+			updateEnabledStatus(meterId, G_ENABLED);//修改停/复水状态
+			
+		});
+		/* 
+			停水按钮
+		*/
+		$('.btn-meter-disable').on('click',function() {
+	
+			var meterId = $(this).attr("bind-id");
+			updateEnabledStatus(meterId, G_DISABLED);//修改启用禁用状态
+			
+		});
+		
+		//-----------------停水复水------------------
+		var G_ENABLED = 0;//停/复水状态：0=正常（默认）；1=停水
+		var G_DISABLED = 1;//停/复水状态：0=正常（默认）；1=停水
+		/**
+		 * 修改用水状态
+		 */
+		function updateEnabledStatus(meterId, meterStatus){
+			
+			var url = BASE_CONTEXT_PATH+'/meter-destory/update-status';
+			
+			var parms = new Object(); //参数
+			parms.meterId = meterId;
+			parms.meterStatus = meterStatus;
+			
+			$.post(url, parms, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						//设置操作行的停/复水状态
+						$("#meter-status-"+meterId).text(getMeterStatusStr(meterStatus));
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			})
+			
+		}
+		/**
+		 * 获取用水状态字符串
+		 */
+		function getMeterStatusStr(meterStatus){
+			
+			var getMeterStatusStr = "正常";
+			if(meterStatus==G_DISABLED){
+				getMeterStatusStr = "停水";
+			}
+			return getMeterStatusStr;
+		}
+		
+		//------------------------	删除功能业务处理	-------------------------------
+		//单个删除-确认回调函数
+		function deleteSingle(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delBatchItem(idsArr);
+		}
+		
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function delBatchItem(ids) {
+			var urlStr = BASE_CONTEXT_PATH + "/meters/delete";
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadPageClickPageNum();
+							util.message(res.result_msg,null,"success");
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+			
+		}
+		
+		//--------------批量删除-----------------
+		/*
+			批量删除确认
+		*/
+		function deleteConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录？", "xxx", "ok_callback_name", "cancel_callback_name")			
+		}
+		
+		/*
+			批量删除确认:确认(回调)
+		*/
+		function ok_callback_name(id){
+			var ids=getSelectedMeterIds();  //此函数定义于_table.html中
+			delBatchItem(ids);
+		}
+		
+		/*
+			批量删除确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedMeterIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$("#meter-table .item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			//------------------------------	表计档案详情功能	------------------------------
+			/**
+			 * 绑定详情按钮的click事件，查看表计档案
+			 */
+			$(".btn-info-detail-single").on("click", function(){
+				
+				var meterId = $(this).attr("bind-id");//表计ID
+				setMeterIdFn(meterId);//设置用户当前编辑的表计ID
+				
+				var params = {"functionModule" : getFunctionModuleFn(), "meterId":meterId};
+					
+				loadMeterBaseList(params, loadMeterBaseListCallback);//加载表计基本信息
+				
+			});
+			/**
+			 * 加载表计基本信息回调
+			 */
+			function loadMeterBaseListCallback(){
+				showMeterDetailTab();//显示表计档案选项卡
+				transferTabs(G_TABS_METER_ITEM_NAV, G_METERS_DETAIL_TAB, "show");//显示表计档案选项卡
+				transferTabs(G_TABS_METER_DETAIL_NAV, G_METER_BASE_DETAIL_TAB, "show");//显示表计档案选项卡中的表计基本信息选项卡
+			}
+			
+			//------------------------------	编辑功能	------------------------------
+			/**
+			 * 	绑定编辑按钮的click事件
+			 */
+			$(".btn-edit-meter-single").on("click", function(){
+				
+				g_is_add = false;//用于保存增加、编辑操作，是增加操作，还是编辑操作
+				
+				var meterId = $(this).attr("bind-id");//表计ID
+				setMeterIdFn(meterId);//设置用户当前编辑的表计ID
+				
+				var url = BASE_CONTEXT_PATH + "/meter-destory/load-edit-dialog";
+				var parms = {"meterId": meterId};
+				$("#meters-edit-dialog").load(url, parms, function(){
+					//编辑对话框加载完成
+					editCallback();
+				});
+			});
+			/**
+			 * 编辑操作回调函数
+			 */
+			function addCallback(){
+				$("#modal-title-span").text("编辑：表计信息");
+				editCallback();
+			}
+			
+			//------------------------------	删除功能	------------------------------
+			/**
+			 * 绑定删除按钮的click事件
+			 */
+			$(".btn-delete-meter").on("click", function(){
+				
+				var itemId = $(this).attr("bind-id"); //分录ID
+				//console.log("itemId:" + itemId);
+				util.delConfirm("确认删除此条目？", itemId, "deleteSingle");
+				
+			});
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

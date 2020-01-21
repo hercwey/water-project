@@ -1,0 +1,76 @@
+<html> 
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>
+<style type="text/css" mce_bogus="1">
+@page{
+	size:70mm 90mm;
+	margin:0px;
+}
+/* .reciverTable{width: 100%;text-align: left; table-layout:fixed; word-break:break-strict;}
+.reciverTable thead tr th{padding-bottom: 8px;}
+.reciverTable tbody tr{height: 25px;}
+.first{width: 35%;}
+.odd{background-color: #e8e8e8;}
+.odd td{border-top: 1px solid #CFCFCF; border-bottom: 1px solid #CFCFCF;}
+.even{} */
+.bodyStyle{
+	/* border:1px solid #999999; */
+	font-family: SimSun;
+	font-size:15px;
+	margin:0px auto;
+	/* margin-top:100px; */
+	width: 100%;
+	text-align: left;
+	word-break:break-strict;
+}
+
+#detailTable th{
+    font-weight: normal;
+}
+
+
+#bottomClass span{
+line-height:25px;
+}
+</style>
+</head>
+<body style="padding-top:10px;">
+
+<div class="bodyStyle">
+	
+	<div style="text-align:center;" >
+		<span>PIVAS成品输液交接单</span>
+	</div>
+	
+	<div style="text-align:center;font-size:54px;margin-top:20px;">
+		#if(${wardName})<span >${wardName}</span>#end
+	</div>
+	
+	<table  style="margin-top:40px;text-align: center;" width="100%" id="detailTable">
+		#foreach($batch in $ydMainCount)
+		<tr>
+			<td style="width: 45%;font-size:36px;">${batch.name_}</td>
+			<td style="width: 30%;font-size:36px;border-bottom: 1px solid black;">${batch.reserve3_}</td>
+			<td style="width: 25%;font-size:36px;">袋</td>
+		</tr>
+		#end
+	</table>
+	
+	<table style="margin-top:40px;border-collapse: separate;border-spacing: 0px 20px;" width="100%">
+		<tr>
+			<td style="width: 15%;">核对人</td>
+			<td style="width: 30%;border-bottom: 1px solid black;"></td>
+			<td style="width: 5%;"></td>
+			<td style="width: 15%;">承运人</td>
+			<td style="width: 30%;border-bottom:1px solid black;"></td>
+		</tr>
+	</table>
+	
+	<div style="margin-top:10px;margin-bottom:10px;text-align: center;" id="bottomClass">
+		$sysDate 下午14:30
+	</div>
+</div>
+	
+</body>
+</html>

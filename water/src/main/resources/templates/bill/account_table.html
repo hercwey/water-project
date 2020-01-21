@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>账单列表</title>
+</head>
+<body>
+	
+	<!-- 当前所编辑的客户ID -->
+	<input type="hidden" id="overdue-customer-id" name="" value="" />
+	<!-- 当前所编辑的账单ID -->
+	<input type="hidden" id="overdue-account-item-id" name="" value="" />
+	<!-- 账单列表 -->
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>地理位置</th> 
+				<th>客户名称</th>
+				<th>期间</th>
+				<th>科目</th>
+				<th>账单金额</th>
+				<th>违约金总金额</th>
+				<th>已充值金额</th>
+				<th>欠费金额</th>
+				<th>记账日期</th>
+				<th>结算状态</th>
+				<th>追加减免水量</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${accountItemList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.ID},data-bind=${item.ID}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.ID}"></label>
+					</div> 
+				</td>
+				<!-- 地理位置 -->
+				<td th:text="${item.place}">地理位置</td>
+				<!-- 客户名称 -->
+				<td th:text="${item.meterPlace}">客户名称</td>
+				<!-- 期间-->
+				<td th:text="${item.PERIOD}">期间</td>
+				<!-- 科目 -->
+				<td th:text="${item.creditSubject}">科目</td>
+				<!-- 账单金额 -->
+				<td th:text="${item.CREDIT_AMOUNT}">账单金额</td>
+				<!-- 违约金总金额 -->
+				<td th:text="${item.overdueValue}">违约金总金额</td>
+				<!-- 已充值金额 -->
+				<td th:text="${item.DEBIT_AMOUNT}">已充值金额</td>
+				<!-- 欠费金额 -->
+				<td th:text="${item.totalOweAmount}">欠费金额</td>
+				<!--记账日期-->
+				<td th:text="${item.ACCOUNT_DATE_STR}">记账日期</td>
+				<!--结算状态-->
+				<td th:attr="title=${item.SETTLEMENT_STATUS==2 ? item.SETTLEMENT_ERR_MSG : ''}">
+					<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算 -->
+					<span th:if="${item.SETTLEMENT_STATUS==0}">
+						<span class="badge badge-secondary">未结算</span>
+					</span>
+					<span th:if="${item.SETTLEMENT_STATUS==1}">
+						<!-- <span class="badge badge-success">交易成功</span> -->
+						<span class="badge badge-success">全部结算</span>
+					</span>
+					<span th:if="${item.SETTLEMENT_STATUS==2}">
+						<!-- <span class="badge badge-danger">交易失败</span> -->
+						<span class="badge badge-danger">结算失败</span>
+					</span>
+					<span th:if="${item.SETTLEMENT_STATUS==3}">
+						<span class="badge badge-warning">部分结算</span>
+					</span>
+				</td>
+				<td>
+					<span th:if=${item.isAddSubWater}>
+						<span class="badge badge-success" title="已追加减免水量">是</span>
+					</span>
+				</td>
+				<!-- 操作列 -->
+				<td>
+					<div class="dropdown">
+						<button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">操作</button>
+						<div class="dropdown-menu">
+							<!-- 结算（缴费） -->
+							<a class="dropdown-item btn-sm btn-settle-bill-single" th:attr="bind-id=${item.ID}">
+								<i class="fa fa-money" aria-hidden="true"></i> <span>缴费</span>
+							</a>
+							
+							<!-- 详情 -->
+							<a class="dropdown-item btn-sm account-detail-single" th:attr="bind-id=${item.ID}">
+								<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i><span>详情</span>
+							</a> 
+							
+							<!-- 结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算 -->
+							<!-- 删除 -->
+							<a class="dropdown-item btn-sm account-del-single" th:attr="bind-id=${item.ID}, data-settlement-status=${item.SETTLEMENT_STATUS}">
+								<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>删除</span>
+							</a>
+								
+							<!-- 计算违约金 -->
+							<!-- <a class="dropdown-item btn-sm generate-overdue-single" th:attr="bind-id=${item.ID}, data-settlement-status=${item.SETTLEMENT_STATUS}">
+								<i class="fa fa-credit-card-alt" aria-hidden="true"></i> <span>计算违约金</span>
+							</a>  -->
+							<!-- 减免违约金 -->
+							<a class="dropdown-item btn-sm overdue-reduce-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}, data-settlement-status=${item.SETTLEMENT_STATUS}">
+								<i class="fa fa-sort-amount-desc" aria-hidden="true"></i> <span>违约金减免</span>
+							</a> 
+							<!-- 减免水费 -->
+							<a class="dropdown-item btn-sm water-fee-reduce-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}, data-settlement-status=${item.SETTLEMENT_STATUS}">
+								<i class="fa fa-sort-amount-desc" aria-hidden="true"></i> <span>水费减免</span>
+							</a> 
+							
+							<!-- 分账单 -->
+							<!-- account_status 账目状态（只针对水费账单，充值记录默认为null），0=不需要分账；1=未分账；2=已分账 -->
+							<span th:if="${item.ACCOUNT_STATUS==1}">
+								<a class="dropdown-item btn-sm sub-account-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}, data-settlement-status=${item.SETTLEMENT_STATUS}">
+									<i class="fa fa-files-o" aria-hidden="true"></i> <span>分账</span>
+								</a>
+							</span>
+							<!-- 撤销分账单 -->
+							<!-- account_status 账目状态（只针对水费账单，充值记录默认为null），0=不需要分账；1=未分账；2=已分账 -->
+							<span th:if="${item.ACCOUNT_STATUS==2}">
+								<a class="dropdown-item btn-sm cancel-sub-account-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}, data-settlement-status=${item.SETTLEMENT_STATUS}">
+									<i class="fa fa-file-o" aria-hidden="true"></i> <span>撤销分账</span>
+								</a>
+							</span>
+							<!-- 发送短信 -->
+							<!-- <a class="dropdown-item btn-sm send-sms-notify" th:attr="bind-id=${item.ID}, data-settlement-status=${item.SETTLEMENT_STATUS}" title="发送短信通知">
+								<i class="fa fa-comments-o" aria-hidden="true"></i> <span>发送短信通知</span>
+							</a>
+							微信提醒
+							<a class="dropdown-item btn-sm" th:attr="bind-id=${item.ID}, data-settlement-status=${item.SETTLEMENT_STATUS}" title="发送微信通知">
+								<i class="fa fa-weixin" aria-hidden="true"></i> <span>发送微信通知</span>
+							</a> -->
+						</div>
+					</div>
+				</td>
+
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td style="font-weight: bold;">统计：</td>
+				<td style="font-weight: bold;" th:text="${billTotalPrice}">账单总金额</td>
+				<td></td>
+				<td style="font-weight: bold;" th:text="${rechargeTotalPrice}">充值总金额</td>
+				<td style="font-weight: bold;" th:text="${oweTotalPrice}">欠费总金额</td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		//-----------------结算状态常量------------------------------------------------------------------------------------
+		//结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算
+		var G_SETTLEMENT_STATUS_NORMAL = 0;//结算状态 0=未结算（默认值）；
+		var G_SETTLEMENT_STATUS_SUCCESS = 1;//结算状态 1=结算成功；
+		var G_SETTLEMENT_STATUS_PART = 3;//结算状态 3=部分结算
+	
+		//-----------------------账单结算（缴费）部分-----------------------------------------------------------------------------
+		/**
+		 * 	绑定按账单结算的click事件
+		 */
+		function bindBillSettleClickEvent(self){
+			//var self = $(this);
+			//self.unbind("click");  //移除click事件
+			
+			var accountItemId = self.attr("bind-id"); //条目ID
+			
+			setCurrEditAccountItemId(accountItemId);//设置当前编辑账单的ID
+			
+			var url = BASE_CONTEXT_PATH+'/account-item/loadsettleaccountdialog';
+			var parms = new Object(); //参数
+			parms.accountItemId = accountItemId;
+			$("#settle-account-dialog").load(url, parms,function(){
+				
+				//重新绑定click事件
+				//self.on('click', bindBillSettleClickEvent);
+				//加载完毕后显示 
+				openSettleAccountDialog();//打开结算对话框
+			});
+		}
+		
+		//==========防止重复提交
+		var t = throttle(bindBillSettleClickEvent, 200);
+		function clickSubmit(){
+			console.log("----------submit");
+			var self = $(this);
+			t(self);
+		}
+		//按账单结算
+		$('.btn-settle-bill-single').on('click', clickSubmit);
+		//----------结算对话框打开/关闭-----------
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openSettleAccountDialog() {
+			//	可拖拽
+			$("#modal-container-settle-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-settle-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeSettleAccountDialog() {
+			$("#modal-container-settle-dialog").modal("hide");
+		}
+		
+		//-----------------打开详情对话框------------------
+	
+		/* 
+			加载客户账单详细信息 
+		*/
+		$('.account-detail-single').on('click',function() {
+			
+			var id = $(this).attr("bind-id"); //条目ID
+			
+			setCurrEditAccountItemId(id);//设置当前编辑账单的ID
+			
+			var parms = new Object(); //参数
+			parms.id = id;
+			loadAccountItemDetailList(parms, loadItemDetailCallback);
+		});
+		//跳转详情信息选项卡
+		function loadItemDetailCallback(){
+			showAccountItemDetailTab();
+		}
+		
+		
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.account-del-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //分录ID
+			var settlementStatus = $(this).attr("data-settlement-status");//结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算
+			/* if(settlementStatus!=G_SETTLEMENT_STATUS_NORMAL){
+				//dialog type: success warning info error,默认为info
+				util.message("账单已结算，不允许删除！", null, "warning");
+				return false;
+			} */
+			
+			//console.log("itemId:" + itemId);
+			util.delConfirm("确认删除此条目?", itemId, "deleteSingleAccount");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteSingleAccount(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delBatchItemAccount(idsArr);
+		}
+		
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function delBatchItemAccount(ids) {
+			var urlStr = BASE_CONTEXT_PATH+"/account-item/delete"; // 需要提交的url
+			
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadPageClickPageNum();//重新加载账单列表
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+		//-----------------打开违约金减免对话框------------------
+		/* 
+			计算违约金按钮
+		*/
+		$('.generate-overdue-single').on('click',function() {
+			var accountItemId = $(this).attr("bind-id");
+			var settlementStatus = $(this).attr("data-settlement-status");//结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算
+			if(settlementStatus==G_SETTLEMENT_STATUS_SUCCESS){
+				//dialog type: success warning info error,默认为info
+				util.message("账单已全部结算，不需要产生违约金！", null, "warning");
+				return false;
+			}
+			
+			util.delConfirm("确认生成违约金账单?", accountItemId, "generateOverdueFn");
+		});
+		
+		/**
+		 * 	生成账单
+		 */
+		function generateOverdueFn(accountItemId){
+			var url = BASE_CONTEXT_PATH+'/account-item/generate-overdue-fine';
+			var parms = new Object(); //参数
+			parms.accountItemId = accountItemId;
+			console.log(parms)
+			
+			$.post(url, parms, function(res){
+				//console.log(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						loadPageClickPageNum();//重新加载账单列表
+						util.message(res.result_msg,null,"warning");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		//-----------------打开违约金减免对话框------------------
+	
+	
+		/* 
+			加载违约金减免对话框 
+		*/
+		$('.overdue-reduce-single').on('click',function() {
+			var customerId = $(this).attr("data-customer-id");
+			var period = $(this).attr("data-period");
+			var accountItemId = $(this).attr("bind-id");
+			
+			var settlementStatus = $(this).attr("data-settlement-status");//结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算
+			if(settlementStatus==G_SETTLEMENT_STATUS_SUCCESS){
+				//dialog type: success warning info error,默认为info
+				util.message("账单已全部结算，不需要违约金减免！", null, "warning");
+				return false;
+			}
+			
+			$("#overdue-customer-id").val(customerId);
+			$("#overdue-account-item-id").val(accountItemId);
+			
+			var url = BASE_CONTEXT_PATH+'/account-item/loadoverduereducedialog';
+			var parms = new Object(); //参数
+			parms.customerId = customerId;
+			parms.period = period;
+			parms.accountItemId = accountItemId;
+			
+			$("#overdue-reduce-dialog").load(url, parms,openOverdueReduceDialog); //加载完毕后显示 
+		});
+		
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openOverdueReduceDialog() {
+			//	可拖拽
+			$("#modal-container-overdue-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-overdue-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeOverdueReduceDialog() {
+			$("#modal-container-overdue-dialog").modal("hide");
+		}
+		
+		//-----------------打开水费减免对话框------------------
+		
+		
+		/* 
+			加载水费减免对话框 
+		*/
+		$('.water-fee-reduce-single').on('click',function() {
+			var customerId = $(this).attr("data-customer-id");
+			var period = $(this).attr("data-period");
+			var accountItemId = $(this).attr("bind-id");
+			
+			var settlementStatus = $(this).attr("data-settlement-status");//结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算
+			if(settlementStatus==G_SETTLEMENT_STATUS_SUCCESS){
+				//dialog type: success warning info error,默认为info
+				util.message("账单已全部结算，不需要水费减免！", null, "warning");
+				return false;
+			}
+			
+			$("#overdue-customer-id").val(customerId);
+			$("#overdue-account-item-id").val(accountItemId);
+			
+			var url = BASE_CONTEXT_PATH+'/account-item/loadwaterfeereducedialog';
+			var parms = new Object(); //参数
+			parms.customerId = customerId;
+			parms.period = period;
+			parms.accountItemId = accountItemId;
+			
+			$("#water-fee-reduce-dialog").load(url, parms,openWaterFeeReduceDialog); //加载完毕后显示 
+		});
+	
+	
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openWaterFeeReduceDialog() {
+			//	可拖拽
+			$("#modal-container-water-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-water-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeWaterFeeReduceDialog() {
+			$("#modal-container-water-dialog").modal("hide");
+		}
+		
+		//-----------------打开分账单对话框------------------
+		
+		/* 
+			加载分账单对话框 
+		*/
+		$('.sub-account-single').on('click',function() {
+			var customerId = $(this).attr("data-customer-id");
+			var period = $(this).attr("data-period");
+			var accountItemId = $(this).attr("bind-id");
+			
+			var settlementStatus = $(this).attr("data-settlement-status");//结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算
+			if(settlementStatus!=G_SETTLEMENT_STATUS_NORMAL){
+				//dialog type: success warning info error,默认为info
+				util.message("账单已结算，不允许分账！", null, "warning");
+				return false;
+			}
+			
+			$("#overdue-customer-id").val(customerId);
+			$("#overdue-account-item-id").val(accountItemId);
+			
+			var url = BASE_CONTEXT_PATH+'/account-item/load-sub-account-dialog';
+			var parms = new Object(); //参数
+			parms.customerId = customerId;
+			parms.period = period;
+			parms.accountItemId = accountItemId;
+			
+			$("#sub-account-dialog").load(url, parms,openSubAccountDialog); //加载完毕后显示 
+		});
+		
+		/**
+		  	打开分账单参话框
+		  	@returns
+		 */
+		function openSubAccountDialog() {
+			//	可拖拽
+			$("#modal-container-sub-account-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-sub-account-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			close dialog:分账单对话框 
+		*/
+		function closeSubAccountDialog() {
+			$("#modal-container-sub-account-dialog").modal("hide");
+		}
+		
+		//-------------------------------------------撤销分账单-------------
+		/* 
+			加载撤销分账单对话框 
+		*/
+		$('.cancel-sub-account-single').on('click',function() {
+			var customerId = $(this).attr("data-customer-id");
+			var period = $(this).attr("data-period");
+			var accountItemId = $(this).attr("bind-id");
+			
+			var settlementStatus = $(this).attr("data-settlement-status");//结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算
+			if(settlementStatus!=G_SETTLEMENT_STATUS_NORMAL){
+				//dialog type: success warning info error,默认为info
+				util.message("账单已结算，不允许撤销分账！", null, "warning");
+				return false;
+			}
+			
+			$("#overdue-customer-id").val(customerId);
+			$("#overdue-account-item-id").val(accountItemId);
+			
+			var url = BASE_CONTEXT_PATH+'/account-item/load-cancel-sub-account-dialog';
+			var parms = new Object(); //参数
+			parms.customerId = customerId;
+			parms.period = period;
+			parms.accountItemId = accountItemId;
+			
+			$("#cancel-sub-account-dialog").load(url, parms,openCancelSubAccountDialog); //加载完毕后显示 
+		});
+		
+		/**
+		  	打开撤销分账单参话框
+		  	@returns
+		 */
+		function openCancelSubAccountDialog() {
+			//	可拖拽
+			$("#modal-container-cancel-sub-account-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-cancel-sub-account-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			close dialog:撤销分账单对话框 
+		*/
+		function closeCancelSubAccountDialog() {
+			$("#modal-container-cancel-sub-account-dialog").modal("hide");
+		}
+		
+		//------------------------------发送短信通知-------------------------------------------------------------
+		/* 
+			加载撤销分账单对话框 
+		*/
+		$('.send-sms-notify').on('click',function() {
+			
+			var settlementStatus = $(this).attr("data-settlement-status");//结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算
+			if(settlementStatus==G_SETTLEMENT_STATUS_SUCCESS){
+				//dialog type: success warning info error,默认为info
+				util.message("账单已全部结算，不需要发送短信通知！", null, "warning");
+				return false;
+			}
+			
+			var accountItemId = $(this).attr("bind-id");//账目ID
+			util.delConfirm("确认发送短信通知?", accountItemId, "sendSmsNotifyRequest");
+			 
+		});
+		
+		/**
+		 * 	发送短信通知
+		 */
+		function sendSmsNotifyRequest(accountItemId){
+			
+			var url = BASE_CONTEXT_PATH+'/account-item/send-sms-notify';
+			var parms = new Object(); //参数
+			parms.accountItemId = accountItemId;
+			
+			$.post(url, parms, function(res){
+				//console.log(res);
+				if (res!=null && res!="") {
+					if (res.result_code=="success") {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"success");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedIds(){
+			var idArr = new Array();
+		
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+		
+	</script>
+</body>
+</html>

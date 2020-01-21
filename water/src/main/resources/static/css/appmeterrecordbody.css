@@ -1,0 +1,73 @@
+@charset "UTF-8";
+#app-meter-record-body > table thead tr th{
+	border-top:#FF0000 solid 0px;
+	border-bottom:#00F solid 1px;   
+	background-color: white;
+	vertical-align:middle;
+}
+
+/*  table 容器的padding */
+#app-meter-record-body{
+	padding-top:10px;
+	padding-top:10px;
+}
+
+#app-meter-record-body > table button{
+	font-size:12px;
+}
+
+/*
+	设置表格的行的padding-top及 padding-bottom 
+ */
+#app-meter-record-body > table tr td{
+	padding-top:2px;
+	padding-bottom:2px;
+}
+
+/*
+	设置表格的行的padding-top及 padding-bottom 
+ */
+#app-meter-record-body > table tr td{
+	padding-top:2px;
+	padding-bottom:2px;
+}
+
+#app-meter-record-body > table tbody tr:hover{
+	background-color:#8FBC8F;
+}
+
+/* 设置表格中按钮的字体大小为12px */
+#app-meter-record-body > table button{
+	font-size:12px;
+}
+
+/* 弹出面析背景色及边框 */
+div.dropdown-menu{
+	border:1px solid #4169E1;
+	background-color:#F5F5DC;"
+}
+/* 弹出面板菜单项MOUSE形状及hover时color */
+div.dropdown-menu a:hover{		
+	cursor:pointer;
+	background-color:	#8FBC8F;
+	color:	#F8F8FF !important;				
+}
+
+/*显示为小手形状*/
+div.dropdown-menu a:hover{
+	cursor:pointer;
+}
+
+/* 选项卡标签未选定时color */
+a.nav-link {
+	color:#495057;		
+}	
+/* 选项卡标签MOUSE经过时 */
+a.nav-link:hover {		   
+	background-color: 	#4682B4;
+	color:	#FFFAFA;				
+}	
+/* 选项卡active时 */
+.nav-tabs .nav-link.active{
+	color:#007bff;		
+}

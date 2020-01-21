@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/meterbookbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-12 column">
+			<div class="card" style="height:100%;">
+				<h5 class="card-header">
+					未选择的表计列表
+				</h5>
+				<div class="card-body">
+					<!-- 操作面板 -->
+					<div class="unselected-meter-search-div" style="display: inline-block">
+						<ul class="extra-l" style="list-style: none;">
+						
+							<!-- 面板:查询 -->
+							<li class="input-group-sm"><input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入业主名称/水表位置">
+							</li>
+							<!-- 查询按钮 -->
+							<li>
+								<button type="button" class="btn btn-success btn-sm" id="btn-search">
+									<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+								</button>
+								<button type="button" class="btn btn-warning btn-sm" id="btn-search-reset">
+									<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+								</button>
+							</li>
+							<li>
+								<button type="button" class="btn btn-success btn-sm" id="btn-selected-meter" title="添加">
+									<i class="fa fa-long-arrow-left" aria-hidden="true"></i>
+								</button>
+							</li>
+						</ul>
+					</div>
+					<div class="card">
+						<!-- 容器:字典列表 -->
+						<div class="unselected-meter-table table-container"></div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchUnselectedGroupMeter(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/water-notify-group/load-unselected-meter-table"
+			$(".unselected-meter-table").load(url, parms, triggerResize);
+		}
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		/**
+		 * 	获取查询条件参数
+		 */
+		function getSearchUnselectedMeterParms(){
+			//var groupId = getNotifyGroupId();//获取分组ID
+			var customerId = getCustomerIdFn();//获取客户ID
+			var includeFlag = getIncludeFlagFn();//获取当前分组的包含标志
+			var searchCond = $(".unselected-meter-search-div .search-cond").val();
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.customerId = customerId;
+			parms.includeFlag = includeFlag;
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchUnselectedMeter() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchUnselectedMeterParms();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchUnselectedGroupMeter(parms);
+
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchUnselectedGroupMeterClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchUnselectedMeterParms();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchUnselectedGroupMeter(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadUnselectedGroupMeterPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchUnselectedMeterParms();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchUnselectedGroupMeter(parms);
+		}
+
+		
+		
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchUnselectedMeter();
+
+			//---------事件绑定--------------
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('.unselected-meter-search-div #btn-search').on('click', function() {
+				btnSearchUnselectedGroupMeterClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('.unselected-meter-search-div #btn-search-reset').on('click', function() {
+				$(".unselected-meter-search-div #search-cond").val("");
+				$(".unselected-meter-search-div #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('.unselected-meter-search-div #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('.unselected-meter-search-div #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/**
+			 * 	添加客户未选择的表计到已选择表计列表
+			 */
+			$('.unselected-meter-search-div #btn-selected-meter').on('click', function(event) {
+				var groupId = getNotifyGroupId();//获取分组ID
+				var meterIds = getUnselectedMeterSelectedIds();//用户已选择的表计ID
+				if(meterIds==null || meterIds.length<=0){
+					util.message("请选择需要添加的表计！",null,"warnning");
+					return false;
+				}
+				
+				var parms = new Object();
+				parms.groupId = groupId;
+				parms.meterIds = JSON.stringify(meterIds);
+				console.log("----------添加："+JSON.stringify(parms));
+				
+				var url = BASE_CONTEXT_PATH+"/water-notify-group/selected-meter"; // 需要提交的url
+				$.post(url, parms, function(res){
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							util.message(res.result_msg,null,"success");
+							loadSelectedGroupMeterPage();//重新加载已选择的表计列表
+							loadUnselectedGroupMeterPage();//重新加载未选择的表计列表
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				});
+			});
+			
+		});
+	</script>
+
+</body>
+</html>

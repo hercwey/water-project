@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+
+<style type="text/css">
+.font-color-yellow{
+	color: yellow;
+}
+.font-color-red{
+	color: red;
+}
+.table tbody td{
+	/* text-align:center; *//* 设置水平居中 */
+	vertical-align:middle;/* 设置垂直居中 */
+}
+</style>
+
+<!-- 图片查看器 CSS,JS -->
+<link rel="stylesheet" th:href="@{/viewer/css/viewer.min.css}" />
+<script type="text/javascript" th:src="@{/viewer/js/viewer-jquery.min.js}"></script>
+
+</head>
+<body>
+
+	<!-- 当前所操作的客户ID -->
+	<input type="hidden" id="record-customer-id" name="" value="" />
+	<!-- 当前所操作的抄表记录ID -->
+	<input type="hidden" id="record-ids" name="" value="" />
+	<!-- 当前所操作的表计ID -->
+	<input type="hidden" id="record-meter-ids" name="" value="" />
+	<!-- 当前所操作的期间 -->
+	<input type="hidden" id="record-period" name="" value="" />
+	<!-- 批次列表 -->
+	<table class="table  table-hover table-sm" id="meter-record-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>地理位置</th> 
+				<th>名称</th> 
+				<th>抄表期间</th>
+				<th>上期抄表日期</th>
+				<th>上期抄表底数</th>
+				<th>本期抄表日期</th>
+				<th>本期抄表底数</th>
+				<th>本期水量</th>
+				<th>抄表类型</th>
+				<th>抄表照片</th>
+				<th>分水量状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<span th:each="item,iterStat: ${customerList}">
+			
+				<tr>
+				
+				<!-- 条目选择器 -->
+				<td class="" th:attr="rowspan=${item.METER_SIZE}">
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.CUSTOMER_ID}+'-'+${item.PERIOD},data-customer-id=${item.CUSTOMER_ID},data-period=${item.PERIOD}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.CUSTOMER_ID}+'-'+${item.PERIOD}"></label>
+					</div> 
+				</td>
+				<!-- 位置 -->
+				<td class="" th:attr="rowspan=${item.METER_SIZE}" th:text="${item.place}">位置</td> 
+				<!-- 业主姓名 -->
+				<td class="" th:attr="rowspan=${item.METER_SIZE}">
+					<span th:text="${item.CUSTOMER_NAME}">客户姓名</span>
+					
+					<!-- 是否需要分水量，0=否（默认值）；1=是 -->
+					<!-- <span th:if="${item.CUST_PART_WATER!=null && item.CUST_PART_WATER==1}">
+						<span class="badge badge-warning" title="是否需要分水量">是</span>
+					</span> -->
+					<!--	<span th:if="${item.IS_PART_WATER!=null && item.IS_PART_WATER==0}">
+						<span class="badge badge-warning" title="是否已分水量">自动</span>
+					</span> -->
+					<!-- <span th:if="${item.IS_PART_WATER!=null && item.IS_PART_WATER==1}">
+						<span class="badge badge-warning" title="已分水量">是</span>
+					</span> -->
+					
+					<!-- 是否已追加/减免水量，，0=否（默认值）；1=是 -->
+					<!-- <span th:if="${item.IS_ADD_SUB_WATER!=null && item.IS_ADD_SUB_WATER==0}">
+						<span class="badge badge-danger" title="是否已追加/减免水量">否</span>
+					</span> -->
+					<!-- <span th:if="${item.IS_ADD_SUB_WATER!=null && item.IS_ADD_SUB_WATER==1}">
+						<span class="badge badge-danger" title="是否已追加减免水量">是</span>
+					</span> -->
+				</td> 
+				<!-- 抄表期间-->
+				<td class="" th:attr="rowspan=${item.METER_SIZE}" th:text="${item.PERIOD}">抄表期间</td>
+				
+				<span th:each="record,iterStatus: ${item.recordList}">
+					<span th:if="${iterStatus.index==0}">
+						
+						<!-- 上期抄表日期 -->
+						<td th:text="${record.preDateStr}">上期抄表日期</td>
+						<!-- 上期抄表底数-->
+						<td th:text="${record.preRead}">上期抄表底数</td>
+						<!-- 本期抄表日期 -->
+						<td th:text="${record.currDateStr}">本期抄表日期</td>
+						<!-- 本期抄表底数-->
+						<td th:text="${record.currRead}">本期抄表底数</td>
+						<!-- 本期水量-->
+						<td th:text="${record.currAmount}">本期水量</td>
+						<!-- 抄表类型 -->
+						<td>
+							<font th:if="${record.readType==0}" th:text="${record.readTypeStr}"></font>
+							<b><font color="green" th:if="${record.readType==1}" th:text="${record.readTypeStr}"></font></b>
+							<b><font color="red" th:if="${record.readType==2}" th:text="${record.readTypeStr}"></font></b>
+						</td>
+						<!-- 抄表照片 -->
+						<td class="read-td" style="text-align: center;">
+							<!-- <img style="display:none;" class="read-img" th:attr="data-original='\upload/img/20190721/2019072110220944025843.jpg',title='\upload/img/20190721/2019072110220944025843.jpg',alt='表计照片'" src="" />
+							<i class="fa fa-picture-o" aria-hidden="true"></i> -->
+							<!-- <span th:if="${record.imagePath==null}">
+								<i class="fa fa-exclamation-triangle" aria-hidden="true" title="此记录无照片"></i>
+							</span> -->
+							<span th:if="${record.imagePath!=null}">
+								<img style="display:none;" class="read-img" th:attr="data-original=${record.imagePath},title=${record.imagePath},alt='表计照片'" src="" />
+								<i class="fa fa-picture-o" aria-hidden="true"></i>
+							</span>
+						</td>
+						<td>
+							<span th:if="${item.IS_PART_WATER==0}">
+								<span class="badge badge-warning">未分水量</span>
+							</span>
+							<span th:if="${item.IS_PART_WATER==1}">
+								<span class="badge badge-success">已分水量</span>
+							</span>
+						</td>
+					</span>
+				</span>
+				
+				<!-- 操作列 -->
+				<td class="" th:attr="rowspan=${item.METER_SIZE}">
+					<div class="dropdown">
+					    <button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+					      	操作
+					    </button>
+					    <div class="dropdown-menu">
+							
+							<!-- 是否已分水量，0=否（默认值）；1=是 -->
+							<a class="dropdown-item btn-sm btn-generator-part-water" title="生成分水量记录"
+								th:attr="data-customer-id=${item.CUSTOMER_ID},data-period=${item.PERIOD},data-record-ids=${item.RECORD_IDS},data-meter-ids=${item.METER_IDS},data-is-part-water=${item.IS_PART_WATER}">
+								<i class="fa fa-share-alt" aria-hidden="true">
+									<span>生成分水量记录</span>
+								</i>
+							</a>
+							<!-- 照片上传 -->
+							<a class="dropdown-item btn-sm btn-upload-photo" title="照片"
+								th:attr="data-customer-id=${item.CUSTOMER_ID},data-period=${item.PERIOD},data-record-ids=${item.RECORD_IDS},data-meter-ids=${item.METER_IDS}">
+								<i class="fa fa-picture-o" aria-hidden="true">
+									<span>照片</span>
+								</i>
+							</a>
+							<!-- 删除 -->
+							<a class="dropdown-item btn-sm del-record-single" title="删除"
+								th:attr="data-customer-id=${item.CUSTOMER_ID},data-period=${item.PERIOD},data-is-part-water=${item.IS_PART_WATER}">
+								<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>删除</span>
+							</a>
+					    </div>
+					</div>
+					
+				</td>
+				
+				</tr>
+			
+				<span th:each="record,iterStatus: ${item.recordList}">
+					<span th:if="${iterStatus.index!=0}">
+					<tr>
+						
+						<!-- 上期抄表日期 -->
+						<td th:text="${record.preDateStr}">上期抄表日期</td>
+						<!-- 上期抄表底数-->
+						<td th:text="${record.preRead}">上期表底数</td>
+						<!-- 本期抄表日期 -->
+						<td th:text="${record.currDateStr}">本期抄表日期</td>
+						<!-- 本期抄表底数-->
+						<td th:text="${record.currRead}">本期表底数</td>
+						<!-- 本期水量-->
+						<td th:text="${record.currAmount}">本期水量</td>
+						<!-- 抄表类型 -->
+						<td>
+							<font th:if="${record.readType==0}" th:text="${record.readTypeStr}"></font>
+							<b><font color="green" th:if="${record.readType==1}" th:text="${record.readTypeStr}"></font></b>
+							<b><font color="red" th:if="${record.readType==2}" th:text="${record.readTypeStr}"></font></b>
+						</td>
+						<!-- 抄表照片 -->
+						<td class="read-td" style="text-align: center;">
+							<!-- <img style="display:none;" class="read-img" th:attr="data-original='\upload/img/20190721/2019072110220944025843.jpg',title='\upload/img/20190721/2019072110220944025843.jpg',alt='表计照片'" src="" />
+							<i class="fa fa-picture-o" aria-hidden="true"></i> -->
+							<!-- <span th:if="${record.imagePath==null}">
+								<i class="fa fa-exclamation-triangle" aria-hidden="true" title="此记录无照片"></i>
+							</span> -->
+							<span th:if="${record.imagePath!=null}">
+								<img style="display:none;" class="read-img" th:attr="data-original=${record.imagePath},title=${record.imagePath},alt='表计照片'" src="" />
+								<i class="fa fa-picture-o" aria-hidden="true"></i>
+							</span>
+						</td>
+						<td>
+							<span th:if="${record.isPartWater==0}">
+								<span class="badge badge-warning">未分水量</span>
+							</span>
+							<span th:if="${record.isPartWater==1}">
+								<span class="badge badge-success">已分水量</span>
+							</span>
+						</td>
+					</tr>
+					</span>
+				</span>
+				
+			</span>
+			
+		</tbody>
+	</table>
+	
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		var curr_readType=[[${readType}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	//------------------------------	设置/获取当前操作的客户ID、抄表记录ID、表计ID、期间	------------------------------
+	/**
+	 * 	获取当前所操作的客户ID
+	 */
+	function getCustomerIdFn(){
+		return $("#record-customer-id").val();
+	}
+	/**
+	 * 	设置当前所操作的客户ID
+	 */
+	function setCustomerIdFn(customerId){
+		$("#record-customer-id").val(customerId);
+	}
+	/**
+	 * 	获取当前所操作的抄表记录ID
+	 */
+	function getRecordIdsFn(){
+		return $("#record-ids").val();
+	}
+	/**
+	 * 	设置当前所操作的抄表记录ID
+	 */
+	function setRecordIdsFn(recordIds){
+		$("#record-ids").val(recordIds);
+	}
+	/**
+	 * 	获取当前所操作的表计ID
+	 */
+	function getMeterIdsFn(){
+		return $("#record-meter-ids").val();
+	}
+	/**
+	 * 	设置当前所操作的表计ID
+	 */
+	function setMeterIdsFn(meterIds){
+		$("#record-meter-ids").val(meterIds);
+	}
+	/**
+	 * 	获取当前所操作的期间
+	 */
+	function getPeriodFn(){
+		return $("#record-period").val();
+	}
+	/**
+	 * 	设置当前所操作的期间
+	 */
+	function setPeriodFn(period){
+		$("#record-period").val(period);
+	}
+	
+	
+	
+	
+	var g_is_edit = true;//全局变量是否是编辑操作
+		
+	/*
+		功能说明:
+			删除所选条目(通用删除函数)
+		参数说明:
+			ids:所要删除的条目ID数组,(可使函数更具通用性.)
+	*/
+	function delBatchItem(delConds) {
+		
+		console.log(delConds);
+				
+		var url = BASE_CONTEXT_PATH+"/meter-record/delete"; // 需要提交的url
+		var params = new Object();
+		params.delConds = JSON.stringify(delConds);
+		
+		$.post(url, params, function(res){
+			//console.log(res);
+			if (res != null && res != "") {
+				if (res.result_code == "success") {
+					loadPageClickPageNum();//重新加载抄表记录列表
+				} else {
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"warning");
+				}
+			}
+		});
+	}
+
+	//--------------批量删除-----------------
+	
+	/*
+		批量删除确认
+	*/
+	function deleteConfirm(){			
+		//注: 回调函数需要采用引号引起来
+		util.confirm("删除所选择的记录? ", "xxx", "ok_callback_name", "cancel_callback_name")			
+	}
+	
+	/*
+		批量删除确认:确认(回调)
+	*/
+	function ok_callback_name(id){
+		var delConds=getSelectedDelConds();  //此函数定义于_table.html中
+		delBatchItem(delConds);
+	}
+	
+	/*
+		批量删除确认:取消(回调)  桩函数
+	*/
+	function cancel_callback_name(){
+		console.log('cancel!');
+	}
+	
+	/**
+	 * 	获取选中的复选框的删除条件
+	 * 		一个Array，内容包括客户ID和期间；如：[{"customerId":1, "period":"2019-06"},...]
+	 */
+	function getSelectedDelConds(){
+		var delCondArr = new Array();//包括客户ID和期间
+
+		// 扫描用户所选择条目ID
+		$(".item-selector").each(function(index, elem) {
+			if (this.checked) { // 对于己选条目
+				
+				var customerId = $(this).attr("data-customer-id"); //客户ID
+				var period = $(this).attr("data-period"); //期间
+				
+				var obj = new Object();
+				obj.customerId = customerId;
+				obj.period = period;
+				delCondArr.push(obj);
+			}
+		}); // end of item-selector
+		return delCondArr;
+	}
+	
+	//------------------单个删除------------------
+	
+	/* 
+		单个删除 
+	*/
+	$('.del-record-single').on('click', function() {
+		
+		//是否已分水量，0=否（默认值）；1=是
+		var isPartWater = $(this).attr("data-is-part-water");
+		if(isPartWater==G_PART_WATER_YES){
+			//dialog type: success warning info error,默认为info
+			util.message("此记录已分水量，不需要重复生成分水量！",null,"warning");
+			return false;
+		}
+		
+		var customerId = $(this).attr("data-customer-id"); //客户ID
+		var period = $(this).attr("data-period"); //期间
+		
+		setCustomerIdFn(customerId);//设置当前操作的客户ID
+		setPeriodFn(period);//设置当前操作的期间
+		
+		util.delConfirm("确认删除此条目?", "xxx", "deleteSingle");
+	})
+	
+	//单个删除-确认回调函数
+	function deleteSingle(id){
+		
+		var delCondArr=new Array();
+		
+		var customerId = getCustomerIdFn();//设置当前操作的客户ID
+		var period = getPeriodFn();//设置当前操作的期间
+		
+		var obj = new Object();
+		obj.customerId = customerId;
+		obj.period = period;
+		delCondArr.push(obj);
+		
+		delBatchItem(delCondArr);
+	}
+	
+	/**
+	 * 	生成分水量记录
+	 */
+	$('.btn-generator-part-water').on('click',function() {
+		
+		
+		//是否已分水量，0=否（默认值）；1=是
+		var isPartWater = $(this).attr("data-is-part-water");
+		if(isPartWater==G_PART_WATER_YES){
+			//dialog type: success warning info error,默认为info
+			util.message("此记录已分水量，不需要重复生成分水量！",null,"warning");
+			return false;
+		}
+		
+		var url = BASE_CONTEXT_PATH+'/meter-record/generator-part-water';
+
+		var recordIds = $(this).attr("data-record-ids"); //抄表记录ID
+		var parms = {"recordIds":recordIds};
+		$.post(url, parms, function(res){
+			//console.log(res);
+			if (res != null && res != "") {
+				if (res.result_code == "success") {
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"success");
+					loadPageClickPageNum();//重新加载抄表记录列表
+				} else {
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"warning");
+				}
+			}
+		});
+		
+	});
+	//------------------------	加载分水量按钮	---------------------------
+	/* 
+		加载修分水量对话框 
+	*/
+	$('.btn-partition-water').on('click',function() {
+		var url = BASE_CONTEXT_PATH+'/meter-record/loadpartitiondialog';
+
+		var customerId = $(this).attr("data-customer-id"); //客户ID
+		var period = $(this).attr("data-period"); //期间
+		var recordIds = $(this).attr("data-record-ids"); //抄表记录ID
+		var meterIds = $(this).attr("data-meter-ids"); //表计ID
+		
+		setCustomerIdFn(customerId);//设置当前操作的客户ID
+		setPeriodFn(period);//设置当前操作的期间
+		setRecordIdsFn(recordIds);//设置当前操作的抄表记录ID
+		setMeterIdsFn(meterIds);//设置当前操作的表计ID
+		
+		var parms = new Object(); //参数
+		parms.customerId = customerId;
+		parms.period = period;
+		parms.recordIds = recordIds;
+
+		$("#partition-dialog-edit").load(url, parms,openPartitionDialog); //加载完毕后显示 
+		
+	});
+	
+	/**
+	  	打开分水量对话框
+	  	@returns
+	 */
+	function openPartitionDialog() {
+		//	可拖拽
+		$("#modal-container-partition-dialog").draggable({
+			cursor : "move",
+			handle : '.modal-header'
+		}); 
+	
+		$('#modal-container-partition-dialog').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+	}
+
+	/* 
+		close dialog:关闭分水量对话框
+	*/
+	function closePartitionDialog() {
+		$("#modal-container-partition-dialog").modal("hide");
+	}
+		
+	//--------加载追加减免水量按钮-------------------------------
+	/* 
+		加载追加减免水量对话框 
+	*/
+	$('.btn-addsub-water').on('click',function() {
+		var url = BASE_CONTEXT_PATH+'/meter-record/loadaddsubwaterdialog';
+
+		var customerId = $(this).attr("data-customer-id"); //客户ID
+		var period = $(this).attr("data-period"); //期间
+		var recordIds = $(this).attr("data-record-ids"); //抄表记录ID
+		var meterIds = $(this).attr("data-meter-ids"); //表计ID
+		
+		setCustomerIdFn(customerId);//设置当前操作的客户ID
+		setPeriodFn(period);//设置当前操作的期间
+		setRecordIdsFn(recordIds);//设置当前操作的抄表记录ID
+		setMeterIdsFn(meterIds);//设置当前操作的表计ID
+		
+		var parms = new Object(); //参数
+		parms.customerId = customerId;
+		parms.period = period;
+		parms.recordIds = recordIds;
+
+		$("#addsub-water-dialog").load(url, parms,openAddsubWaterDialog); //加载完毕后显示 
+		
+	});
+	
+	/**
+	  	打开追加减免水量对话框
+	  	@returns
+	 */
+	function openAddsubWaterDialog() {
+		//	可拖拽
+		$("#modal-container-addsub-dialog").draggable({
+			cursor : "move",
+			handle : '.modal-header'
+		}); 
+	
+		$('#modal-container-addsub-dialog').modal({
+			backdrop : 'static',
+			keyboard : false
+		});
+	}
+
+	/* 
+		close dialog:关闭追加减免水量对话框
+	*/
+	function closeAddsubWaterDialog() {
+		$("#modal-container-addsub-dialog").modal("hide");
+	}
+	
+	//--------上传照片---------
+	/* 
+		绑定查看抄表记录照片
+	*/
+	$(".btn-upload-photo").on('click',function() {
+		var customerId = $(this).attr("data-customer-id"); //客户ID
+		var period = $(this).attr("data-period"); //期间
+		var recordIds = $(this).attr("data-record-ids");//抄表记录ID
+		var meterIds = $(this).attr("data-meter-ids"); //表计ID
+		
+		setCustomerIdFn(customerId);//设置当前操作的客户ID
+		setPeriodFn(period);//设置当前操作的期间
+		setRecordIdsFn(recordIds);//设置当前操作的抄表记录ID
+		setMeterIdsFn(meterIds);//设置当前操作的表计ID
+		
+		var parms = new Object(); //参数
+		parms.customerId = customerId;
+		parms.period = period;
+		parms.recordIds = recordIds;
+		parms.meterIds = meterIds;
+		searchMeterRecordPhoto(parms);
+		
+	});
+	/*	
+		公共查询函数
+		
+		查询核对类型列表
+	*/
+	function searchMeterRecordPhoto(parms) {
+		//var parms = new Object();
+		//parms.id = id;
+		//加载字典列表页面
+		var url = BASE_CONTEXT_PATH+'/meter-record/load-meter-record-photo-item';
+		$("#meter-record-photo").load(url, parms,showMeterRecordPhoto); //加载完毕后显示 
+	}
+			
+	
+	//-----------------page loaded ready------------------
+	$(function() {
+		
+		/**
+		 * 	初始化协议图片查看器插件
+		 */
+		var $imageViewer = $("#meter-record-table .read-img");
+		$imageViewer.viewer({
+			url: 'data-original',
+			//navbar: false,//不显示缩略图导航
+			//title: false,//不显示当前图片的标题（现实 alt 属性及图片尺寸）
+		});
+		/**
+		 * 绑定图片logo的click事件，点击的可查看抄表照片
+		 */
+		$("#meter-record-table .read-td i.fa-picture-o").on("click", function(){
+			var viewer = $imageViewer.data('viewer');
+			viewer.show();
+		});
+		
+		/*
+			选择/取消选择  当前页记录
+			select all  or  deselect all			 	
+		*/
+		$("#select-all-toggle").on('click', function(e) {
+			var prefix = "item-selector-";
+	
+			if (this.checked) {					
+				//查询列表中的项目
+				$(".item-selector").each(function(index, elem) {
+					this.checked = true;
+					var surfix = $(this).attr("data-bind");  //item'id
+					var rowId = prefix + surfix; 
+					$('#' + rowId).addClass("selected");
+				});
+			} 
+			else{
+				$(".item-selector").each(function(index, elem) {
+					this.checked = false;
+					var surfix = $(this).attr("data-bind");
+					var rowId = prefix + surfix;
+					$('#' + rowId).removeClass("selected");
+				});
+			} // end of else
+		});
+
+	});
+	//创建分页组件实例
+	var pager=new Pager("pager1");
+	$(function(){			
+		pager.init(loadPageClickPageNum,curr_searchCond);			
+	});
+</script>
+</body>
+</html>

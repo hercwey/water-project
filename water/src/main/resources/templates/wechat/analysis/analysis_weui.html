@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<!-- wechat-用户编号结果列表 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')"	th:remove="tag"></div> -->
+<title>石家庄高新区供水排水公司</title>
+   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+   <meta name="context-path" content="/" />
+
+
+<link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body ontouchstart>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div th:include="wechat/public_page/header::header('用水分析')"
+					th:remove="tag"></div>
+				<div class="page-bd-15" id="chart-container" style="margin: 0 auto;">
+					<span th:each="consumption,iter:${waterConsumptionList}"
+						th:remove="tag">
+						<canvas th:attr="id='chart'+${iter.count}" height="260"></canvas>
+						<div style="text-align: center; font-size: 14px;">
+							<spant th:text="${consumption.location}">图表1
+					</span>
+				</div>
+				
+
+			</div>
+		</div>
+		<div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:系统自动查询最近6个月的用水情况.')" th:remove="tag"></div>
+		</div>
+		
+	</div>
+	
+	<script type="text/javascript" src="/weui/js/zepto.min.js"></script>
+	<script src="/weui/js/f2.min.js"></script>
+	
+	<script type="text/javascript">
+		var BASE_CONTEXT_PATH = $('meta[name=context-path]')
+				.attr("content");
+		console.log("BASE_CONTEXT_PATH0:"+BASE_CONTEXT_PATH) ;
+		BASE_CONTEXT_PATH = BASE_CONTEXT_PATH.substr(0,BASE_CONTEXT_PATH.length - 1);
+		console.log("BASE_CONTEXT_PATH1:"+BASE_CONTEXT_PATH) ;
+	</script>
+	
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var waterConsumptionList=[[${waterConsumptionList}]];
+		/*]]>*/
+	</script>
+	
+	<script type="text/javascript">
+	
+		/*
+			用水分析对象
+			构造函数参数:
+				waterConsumptionList:客户消费水量列表(最近6个月)
+		*/
+		function Analysis(waterConsumptionList){
+					
+			this.consumptionList=waterConsumptionList;
+			
+			this.showChart=function(){
+				for(var i=0;i<this.consumptionList.length;i++){
+					var canvasId=getChartId(i);
+					var chartData=this.consumptionList[i].partList;
+					showOneChart(chartData,canvasId);
+				}
+			}
+			
+			/*
+				生成canvasId(用于生成图表时使用)
+			*/
+			getChartId=function(idx){
+				var suffix=idx+1;
+				var chartId='chart'+suffix;
+				console.log('getchartId'+chartId);
+				return chartId;
+			}
+			
+			/*
+				功能:
+					显示图表
+				参数:
+					chartData  图表数据
+					canvasId   canvas  ID
+			*/
+			showOneChart=function(chartData,canvasId){
+					
+				console.log("chart data is:"+JSON.stringify(chartData));
+				
+				var chartDataArr=new Array();				
+				for(var i=0;i<chartData.length;i++){
+					var tempObj=new Object();
+					tempObj.genre=''+chartData[i].genre;
+					tempObj.sold=parseInt(chartData[i].sold);   //此处必须转换成数类型,否则显示不正常.
+					chartDataArr.push(tempObj);
+				}
+					
+				//对象数组
+				//对象结构:
+				//	genre
+				//	sold
+				/*  const data = [ 
+							{genre : '1月',	sold : 5}, 
+							{genre : '2月',	sold : 11}, 
+							{genre : '3月',     sold : 20}, 
+							{genre : '4月',	sold : 35}, 
+							{genre : '5月',	sold : 20},
+							{genre : '6月',	sold : 55},
+						]; 
+				
+				 const data1 = [ 
+						{genre : '2019-01',	sold : 5}, 
+						{genre : '2019-02',	sold : 11}, 
+						{genre : '2019-03', sold : 20}, 
+						{genre : '2019-04',	sold : 35}, 
+						{genre : '2019-05',	sold : 20},
+						{genre : '2019-06',	sold : 55},
+					];  */
+				 
+				console.log("transfered chart data is:"+JSON.stringify(chartDataArr));
+
+				// Step 1: 创建 Chart 对象
+				const chart = new F2.Chart({
+					id : canvasId,
+					pixelRatio : window.devicePixelRatio  // 指定分辨率
+				});
+
+				// Step 2: 载入数据源
+				chart.source(chartDataArr);
+				
+				// Step 3：创建图形语法，绘制柱状图，由 genre 和 sold 两个属性决定图形位置，genre 映射至 x 轴，sold 映射至 y 轴
+				chart.interval().position('genre*sold').color('genre');
+
+				// Step 4: 渲染图表
+				chart.render();
+			}
+			
+			/*
+				设置图表的宽度
+			*/
+			this.setCanvasWidth =function(){
+				//获取图表容器的宽度
+				var width=$("#chart-container").width();
+				console.log("width is :"+width);
+				
+				//设置所有图表的宽度(可能多个)
+				               
+				for(var i=0;i<this.consumptionList.length;i++){
+					var idx=i+1;
+					var suffix=''+idx;
+					var chatId='#chart'+suffix;
+					
+					$(chatId).width(width);	
+				}				
+			}
+		}
+	
+		$(function(){
+			var analysis=new Analysis(waterConsumptionList);
+			
+			analysis.setCanvasWidth();  
+			analysis.showChart();
+			
+		});
+	
+	</script>
+
+</body>
+</html>

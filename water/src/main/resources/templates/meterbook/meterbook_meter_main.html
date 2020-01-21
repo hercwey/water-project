@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/meterbookbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-12 column">
+			<div class="card" style="height:100%;">
+				<h5 class="card-header" th:text="${unitName}">
+					表计列表
+				</h5>
+				<div class="card-body">
+					<!-- 操作面板 -->
+					<div class="meter-book-bind-meter-search" style="display: inline-block">
+						<ul class="extra-l" style="list-style: none;">
+						
+							<!-- 面板:查询 -->
+							<li class="input-group-sm"><input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入业主名称/水表位置">
+							</li>
+							<!-- 查询按钮 -->
+							<li>
+								<button type="button" class="btn btn-success btn-sm" id="btn-search">
+									<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+								</button>
+								<button type="button" class="btn btn-warning btn-sm" id="btn-search-reset">
+									<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+								</button>
+							</li>
+						</ul>
+					</div>
+					<div class="card">
+						<!-- 容器:字典列表 -->
+						<div class="meter-book-meter-table table-container" id="meter-book-body"></div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchMeterBookMeter(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meter-book/meter-book-meter-table"
+			$(".meter-book-meter-table").load(url, parms, triggerResize);
+		}
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchMeterBookMeterParams(){
+			var meterBookId = getMeterBookId();
+			var searchCond = $(".meter-book-bind-meter-search .search-cond").val();
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.meterBookId = meterBookId;
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchMeterBookMeter() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchMeterBookMeterParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchMeterBookMeter(parms);
+
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchMeterBookMeterClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchMeterBookMeterParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchMeterBookMeter(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadMeterBookMeterPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchMeterBookMeterParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchMeterBookMeter(parms);
+		}
+
+		
+		
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchMeterBookMeter();
+
+			//---------事件绑定--------------
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('.meter-book-bind-meter-search #btn-search').on('click', function() {
+				btnSearchMeterBookMeterClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('.meter-book-bind-meter-search #btn-search-reset').on('click', function() {
+				$(".meter-book-bind-meter-search #search-cond").val("");
+				$(".meter-book-bind-meter-search #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('.meter-book-bind-meter-search #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('.meter-book-bind-meter-search #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			
+		});
+	</script>
+
+</body>
+</html>

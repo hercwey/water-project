@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/meterbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label">
+		<div class="col-md-12 column">
+
+			<div class="tabbable" id="tabs-know-library">
+				<ul class="nav nav-tabs">
+					<li class="nav-item" id="tab-know-library-item-li">
+						<a class="nav-link active" href="#tab-know-library-item" data-toggle="tab" th:text="${title}+'列表'"></a>
+					</li>
+					<li class="nav-item" id="tab-add-know-library-li" style="display:none">
+						<a class="nav-link" href="#tab-add-know-library" data-toggle="tab" >编辑知识库</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab-know-library-item">
+						<!-- 操作面板 -->
+						<div class="know-library-search" style="display: inline-block">
+							<ul class="extra-l" style="list-style: none;">
+							<span th:if="${knowType!='KNOW_LIBRARY_SELECT'}" th:remove="tag">
+								<!-- 面板:增加/删除 -->
+								<li value="0">
+									<button type="button" class="btn btn-primary btn-sm"
+										id="btn-add">
+										<i class="fa fa-plus" aria-hidden="true"> 
+											<!-- <span style="color:black">增加</span> -->
+											<span>增加</span>
+										</i>
+									</button>
+								</li>
+								<li value="1">
+									<button type="button" class="btn btn-danger btn-sm"
+										id="btn-del">
+										<i class="fa fa-remove" aria-hidden="true"> <span>删除</span>
+										</i>
+									</button>
+								</li>
+							</span>
+								<!-- 面板:查询 -->
+								<li class="input-group-sm"><input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入标题名称">
+								</li>
+								<!-- 查询按钮 -->
+								<li>
+									<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+									<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+								</li>
+							</ul>
+						</div>
+						
+						<div class="card">
+							<!-- 容器:字典列表 -->
+							<div class="know-table table-container" id="meters-body"></div>
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-add-know-library">
+						<div id="add-know-library">
+							<!-- 表计列表 -->
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var title = [[${title}]];//模块功能标识，用于页面显示不同功能，或发送请求时当参数使用
+		var knowType = [[${knowType}]];//模块功能标识，用于页面显示不同功能，或发送请求时当参数使用
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		/**
+		 * 	隐藏表计列表
+		 */
+		function hideAddKnowLibrary(){
+			$("#tab-add-know-library-li").hide();
+		}
+		/**
+		 * 	显示表册列表
+		 */
+		function showAddKnowLibrary(){
+			$("#tab-add-know-library-li").show();
+			$("#tabs-know-library a[href='#tab-add-know-library']").tab("show");//跳转到增加修改知识库选项卡
+		}
+		/*
+			增加核对类型按钮CLICK
+		*/
+		$('#btn-add').on('click', function() {
+			//改变标签名称
+			$("#tab-add-know-library-li").find('a').text("增加知识库");
+			
+			var url = BASE_CONTEXT_PATH+'/know-content/load-add-item';
+			var parms = new Object();
+			parms.knowType= getTypeFn();
+			$("#add-know-library").load(url, parms,showAddKnowLibrary); //加载完毕后显示
+		});
+		
+		
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchKnowLibrary(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/know-content/table"
+			$(".know-table").load(url, parms, customerResizeFuncx);
+		}
+		
+		function customerResizeFuncx(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchParams(){
+			var parms = new Object();
+			var searchCond = $("#tab-know-library-item .search-cond").val();
+			parms.searchCond=searchCond;
+			parms.knowType= getTypeFn();
+			
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchKnowLibrary() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchKnowLibrary(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchKnowLibraryClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchKnowLibrary(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadSearchKnowLibraryPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchKnowLibrary(parms);
+		}
+		
+
+	
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			defaultSearchKnowLibrary();
+			//---------事件绑定--------------
+			$("#tab-know-library-item-li").on("click", function(){
+				hideAddKnowLibrary();
+				customerResizeFuncx();
+			});
+			
+			//---------事件绑定--------------
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('.know-library-search #btn-search').on('click', function() {
+				btnSearchKnowLibraryClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('.know-library-search #btn-search-reset').on('click', function() {
+				$(".know-library-search #search-cond").val("");
+				$(".know-library-search #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('.know-library-search #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('.know-library-search #btn-search').trigger("click");	                
+	            }	
+			});
+			/*
+				btn-del
+				批量删除按钮
+			*/
+			$('.know-library-search #btn-del').on('click', function() {				
+				deleteConfirm();  //显示删除确认对话框
+			});
+		});
+	</script>
+
+
+
+</body>
+</html>

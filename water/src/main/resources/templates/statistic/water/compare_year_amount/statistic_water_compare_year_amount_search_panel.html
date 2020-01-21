@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 统计-查询面板 -->
+	<th:block th:fragment="searchPanel">
+		<div class="" style="display: inline-block; float:right; margin-right:100px; margin-top:5px;margin-bottom:5px;" id="search-div">
+			<ul class="extra-l" style="list-style: none;">
+				<!-- 查询面板 -->
+				<!-- 起始期间 -->
+				<li><label for="search-date" style="margin-top: 5px;">起始年份</label>
+				</li>
+				<li class="input-group-sm"><input type="text"
+					class="form-control Wdate" readonly="readonly"
+					style="width: 100px;" id="search-date-start"
+					name="search-date-start"
+					onclick="WdatePicker({dateFmt:'yyyy',isShowClear:false,onpicked: setBackGround});"
+					placeholder="起始年份" title="起始年份"></li>
+
+				<!-- 结束期间 -->
+				<li><label for="search-date" style="margin-top: 5px;">结束年份</label>
+				</li>
+				<li class="input-group-sm"><input type="text"
+					class="form-control Wdate" readonly="readonly"
+					style="width: 100px;" id="search-date-end" name="search-date-end"
+					onclick="WdatePicker({dateFmt:'yyyy',isShowClear:false,onpicked: setBackGround});"
+					placeholder="结束年份" title="结束年份"></li>
+				<!-- 地理位置查询 -->
+
+				<li class="input-group-sm">
+					<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher')" th:remove="tag"></div>
+				</li>
+				<!-- 查询按钮 -->
+				<li>
+					<button type="button" class="btn btn-success btn-sm" id="btn-search">
+						<i class="fa fa-search" aria-hidden="true"> 
+							<span>查询</span>
+						</i>
+					</button>
+				</li>
+				<li>
+					<button type="button" class="btn btn-warning btn-sm"  id="btn-search-reset">
+						<i class="fa fa-undo" aria-hidden="true"> 
+							<span>清除</span>
+						</i>
+					</button>
+				</li>
+			</ul>
+		</div>
+	</th:block>
+</body>
+</html>

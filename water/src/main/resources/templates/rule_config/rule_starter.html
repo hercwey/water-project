@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<div th:include="common/common_head::headx('客户档案')" th:remove="tag"></div>  
+</head>
+<body>
+<div class="container-fluid">	
+	<!-- 规则编辑器 -->
+	<div th:include="rule_config/rule_config_fragment::ruleEditor('editor1')" th:remove="tag"></div>
+	<!-- 测试按钮 -->
+	<div>				
+		<button type="button"  id="btn-get-value" class="btn btn-success btn-sm">
+			获取值(业务中暂未使用)
+		</button>		
+		<button type="button"  id="btn-get-item" class="btn btn-success btn-sm">
+			获取列表(数组类型-业务中暂未用)
+		</button>
+		<button type="button"  id="btn-get-item-text" class="btn btn-success btn-sm">
+			获取列表(字符串类型-可使用)
+		</button>		
+		<button type="button"  id="btn-get-item-valid" class="btn btn-success btn-sm">
+			获取规则有效性(业务中可使用)
+		</button>
+		
+	</div>
+	
+</div>	
+</body>
+
+<!-- 引入INPUT输入多标签的JS -->
+<script th:src="@{/bootstrap-tagsinput-latest/dist/bootstrap-tagsinput.js}" type="text/javascript"></script>
+<!-- 规则编辑器组件JS -->
+<script th:src="@{/js/rule_config/RuleConfig.js}" type="text/javascript"></script>
+
+<script type="text/javascript">
+	
+	//----------------test--------------------
+	//(0)生成对象.
+	var ruleConfig=new RuleConfig('editor1');
+	ruleConfig.init();  //(1)初始化
+	
+	/*  var elt=$("#rule-input-editor1");
+	elt.tagsinput(
+			{
+				allowDuplicates: true,
+				itemValue: 'value',
+				itemText: 'text',				
+			}
+	);  */
+
+	//(init value)设置规则字符串
+	//此函数可用
+	function setRule(){
+		var rule="(,meter_100,+,meter_200,),*,0.75";
+		ruleConfig.setRule(rule);
+	}
+	
+	//外部查询函数
+	//触发外部业务逻辑
+	function searchFuncx(){
+		console.log("searchFunc is called!");
+	}
+	
+	
+	$(function(){		
+		setRule();			//(2)设置规则字符串(写)
+		ruleConfig.setSearchMeterFunc(searchFuncx);  //设置外部函数
+		
+		
+		//(3)读测试1   返回item array
+		$("#btn-get-item").on("click",function(){
+			var tokenArr=ruleConfig.getInputItems();
+			console.log("tokenArr is:"+JSON.stringify(tokenArr));
+		 });
+		
+		//(4)读测试2  返回item text 即规则字符串
+		$("#btn-get-item-text").on("click",function(){
+			var ruleStr=ruleConfig.getInputItemsText();
+			console.log("ruleStr is:"+ruleStr);
+		 });
+		
+		//(5)读取规则的有效性
+		$("#btn-get-item-valid").on("click",function(){
+			var valid=ruleConfig.getValid();
+			console.log("valid is:"+valid);
+		 });
+		
+	});
+
+
+
+</script>
+
+
+</html>

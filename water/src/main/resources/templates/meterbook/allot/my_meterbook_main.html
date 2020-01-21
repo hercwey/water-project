@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/meterbookbody.css" />
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="meter-book-search" style="display: inline-block" id="meter-book-search">
+				<ul class="extra-l" style="list-style: none;">
+				
+					<!-- 地理位置查询条件 -->
+					<li class="input-group-sm">
+						<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher-my')" th:remove="tag"></div>
+					</li>
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入编码/名称">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm" id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						<button type="button" class="btn btn-warning btn-sm" id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+						<button type="button" class="btn btn-success btn-sm" id="btn-remove-meter-book" title="从我的表册移除">
+							<i class="fa fa-arrow-right" aria-hidden="true"></i>
+						</button>
+						<button type="button" class="btn btn-success btn-sm" id="btn-remove-all-meter-book" title="从我的表册移除">
+							<i class="fa fa-arrow-right" aria-hidden="true"><span>批量移除表册</span></i>
+						</button>
+					</li>
+				</ul>
+			</div>
+
+
+			<!-- 容器:字典列表 -->
+			<div class="meter-book-table table-container" id="meter-book-body"></div>
+
+		</div>
+	</div>
+
+	<!-- 地理位置下拉框查询JS -->
+	<script type="text/javascript"	th:src="@{/js/component/districtsearcher/DistrictSearcher.js}"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchReaderMeterBook(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meter-book-allot/my-meter-book-table"
+			$(".meter-book-table").load(url, parms, triggerResize);
+		}
+		
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		//获取我的表册查询参数
+		function getSearchAllotParams(){
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var traceIds = null;
+			var locaBlockTraceIds = locationSearcherMy.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationSearcherMy.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationSearcherMy.getUnitId();//地理位置-单元traceIds
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			var searchCond=$(".meter-book-search #search-cond").val();
+			var readerId = getMeterReaderId();
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.readerId = readerId;
+			parms.traceIds = traceIds;
+			return parms;
+		}
+		
+		//地理位置下拉框件实例
+		var locationSearcherMy = new DistrictSearcher("location-searcher-my", locationSelectSearchMyCallback); //此处searcher的ID和回调函数
+		
+		/**
+		 * 	地理位置下拉查询组件回调函数
+		 */
+		function locationSelectSearchMyCallback(){
+			defaultSearchReaderMeterBook();//查询客户
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchReaderMeterBook() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchAllotParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchReaderMeterBook(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchReaderMeterBookClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchAllotParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchReaderMeterBook(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadReaderMeterBookPage(searchCond,pageNum,pageSize) {
+			//获取参数
+			var parms = null;
+			var parms = getSearchAllotParams();//获取查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchReaderMeterBook(parms);
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		/*		
+			加载(Load): 增加/编辑对话框
+			将对话框内容加载到指定的容器中
+		 */
+		function loadEditDialog() {
+			var url = BASE_CONTEXT_PATH + '/meter-book/load-edit-dialog';
+			$("#meterbook-dialog-edit").load(url, null, openEditDialog); //加载完毕后显示
+		}
+		
+		//-------------------	对话框操作	--------------------
+		/**
+		  	打开编辑对话框
+		  	@returns
+		 */
+		function openEditDialog() {
+			//	可拖拽
+			$("#modal-container-meterbook-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-meterbook-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:关闭编辑对话框 
+		*/
+		function closeEditDialog() {
+			$("#modal-container-meterbook-dialog").modal("hide");
+		}
+		
+		//--------------------------------批量移除表册----------------------
+		/**
+		 *  	批量移除表册
+		 */
+		$("#btn-remove-all-meter-book").on("click", function(){
+			
+			batchRemoveMeterBookConfirm();//批量移除表册确认
+		});
+		/*
+			批量移除表册确认:确认(回调)
+		*/
+		function ok_callback_remove_book_name(id){
+			batchRemoveMeterBook();	
+		}
+		/*
+			批量移除表册确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_remove_book_name(){
+			console.log('cancel!');
+		}
+	
+		/*
+			批量移除表册确认
+		*/
+		function batchRemoveMeterBookConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("确定移除查询出的所有表册? ", "xxx", "ok_callback_remove_book_name", "cancel_callback_remove_book_name")			
+		}
+		function batchRemoveMeterBook(){
+			var parms = getSearchAllotParams();
+			var url = BASE_CONTEXT_PATH + "/meter-book-allot/all-meter-remove";
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						defaultSearchReaderMeterBook();//加载我的表册
+						defaultSearchAllMeterBook();
+						util.message(res.result_msg,null,"warning");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//地理位置下拉组件初始化
+			locationSearcherMy.init();
+			//主页:默认查询(加载默认列表)
+			defaultSearchReaderMeterBook();
+
+			//---------事件绑定--------------
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('.meter-book-search #btn-search').on('click', function() {
+				btnSearchReaderMeterBookClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('.meter-book-search #btn-search-reset').on('click', function() {
+				$(".meter-book-search #search-cond").val("");
+				$(".meter-book-search #search-cond").focus();  //	获得焦点
+				
+				$(".meter-book-search .location-block").val("");//设置地理位置-小区值为空
+				$(".meter-book-search .location-building").val("");//设置地理位置-楼号值为空
+				$(".meter-book-search .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$(".meter-book-search .location-unit").val("");//设置地理位置-单元值为空
+				$(".meter-book-search .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('.meter-book-search #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('.meter-book-search #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			
+			/**
+			 * 	分配表册，从我的表册移除
+			 */
+			$("#btn-remove-meter-book").on("click", function(){
+				var meterBookIds = getMyMeterBookSelectedIds();
+				if(meterBookIds==null || meterBookIds.length<=0){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择表册！",null,"warning");
+					return;
+				}
+				
+				var readerId = getMeterReaderId();
+				
+				//初始化请求参数
+				var params = new Object();
+				params.userId=readerId;
+				params.meterBookIds=meterBookIds.toString();
+
+				//加载字典列表页面
+				var url = BASE_CONTEXT_PATH + "/meter-book-allot/remove";
+				$.post(url, params, function(res){
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							defaultSearchReaderMeterBook();//加载我的表册
+							defaultSearchAllMeterBook();
+							util.message(res.result_msg,null,"warning");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				});
+				
+			});
+			
+		});
+	</script>
+
+</body>
+</html>

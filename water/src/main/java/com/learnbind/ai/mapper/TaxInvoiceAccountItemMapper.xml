@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.TaxInvoiceAccountItemMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.TaxInvoiceAccountItem">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="COMBIN_ACCOUNT_ITEM" jdbcType="VARCHAR" property="combinAccountItem" />
+    <result column="COMBIN_ACCOUNT_ITEM_SUM" jdbcType="DECIMAL" property="combinAccountItemSum" />
+    <result column="USE_PRICE" jdbcType="DECIMAL" property="usePrice" />
+    <result column="INVOICE_AMOUNT" jdbcType="DECIMAL" property="invoiceAmount" />
+    <result column="WATER_NOTIFY_IDS" jdbcType="VARCHAR" property="waterNotifyIds" />
+    <result column="INVOICES" jdbcType="VARCHAR" property="invoices" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, COMBIN_ACCOUNT_ITEM, COMBIN_ACCOUNT_ITEM_SUM, USE_PRICE, INVOICE_AMOUNT, WATER_NOTIFY_IDS, 
+    INVOICES, DELETED
+  </sql>
+</mapper>

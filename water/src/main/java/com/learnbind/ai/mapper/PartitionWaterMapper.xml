@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.PartitionWaterMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.PartitionWater">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="METER_ID" jdbcType="VARCHAR" property="meterId" />
+    <result column="RECORD_ID" jdbcType="VARCHAR" property="recordId" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="WATER_AMOUNT" jdbcType="DECIMAL" property="waterAmount" />
+    <result column="WATER_USE" jdbcType="VARCHAR" property="waterUse" />
+    <result column="WATER_PRICE" jdbcType="DECIMAL" property="waterPrice" />
+    <result column="WATER_FEE" jdbcType="DECIMAL" property="waterFee" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="START_TIME" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="BASE_PRICE" jdbcType="DECIMAL" property="basePrice" />
+    <result column="TREATMENT_FEE" jdbcType="DECIMAL" property="treatmentFee" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="IS_MAKE_BILL" jdbcType="DECIMAL" property="isMakeBill" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="PID" jdbcType="DECIMAL" property="pid" />
+    <result column="ACCOUNT_ITEM_ID" jdbcType="DECIMAL" property="accountItemId" />
+    <result column="REAL_WATER_AMOUNT" jdbcType="DECIMAL" property="realWaterAmount" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, METER_ID, RECORD_ID, PERIOD, WATER_AMOUNT, WATER_USE, WATER_PRICE, WATER_FEE, 
+    OPERATOR_NAME, OPERATOR_ID, OPERATION_TIME, REMARK, START_TIME, END_TIME, CUSTOMER_ID, BASE_PRICE, TREATMENT_FEE, CREATE_TIME, IS_MAKE_BILL,
+    DELETED, PID, ACCOUNT_ITEM_ID, REAL_WATER_AMOUNT 
+  </sql>
+  
+  <!-- 查询年总用水量 -->
+  <select id="getYearWaterAmount" resultType="BigDecimal">
+  	SELECT
+		NVL( SUM( WATER_AMOUNT ), 0 ) AS YEAR_WATER_AMOUNT 
+	FROM
+		PARTITION_WATER 
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		DELETED=0
+		<if test="customerId!=null">
+			AND CUSTOMER_ID = #{customerId}
+		</if>
+		<if test="year!=null and year!=''">
+			AND TO_CHAR( TO_DATE( PERIOD, 'yyyy-MM' ), 'yyyy' ) = #{year}
+		</if>
+		<if test="period!=null and period!=''">
+			AND PERIOD != #{period}
+		</if>
+	</where>
+  </select>
+  
+  <!--
+  	获取最近6个月的水量
+  	查询条件 :客户ID-customerId 
+   -->
+  <select id="getRecentlySixMonthAmount" resultType="map">
+  	SELECT
+		PERIOD,
+		SUM( WATER_AMOUNT ) WATER_AMOUNT 
+	FROM
+		PARTITION_WATER
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		DELETED=0
+		<if test="customerId!=null">
+			AND CUSTOMER_ID = #{customerId}
+		</if>
+		AND ROWNUM &lt;=6
+	</where>	
+	GROUP BY
+		PERIOD
+	ORDER BY 
+		PERIOD DESC  
+  </select>
+  
+  
+  <!-- 根据条件查询分水量map集合 -->
+  <select id="getPartitionWaterMapList" resultType="map">
+  	SELECT
+		PW.*, 
+		C.CUSTOMER_NAME, 
+		C.CUSTOMER_TYPE,
+		LC.TRACE_IDS 
+	FROM
+		PARTITION_WATER PW
+		LEFT JOIN CUSTOMERS C ON PW.CUSTOMER_ID = C.ID
+		LEFT JOIN METERS M ON PW.METER_ID = M.ID
+		<!-- LEFT JOIN LOCATION_CUSTOMER LC ON PW.CUSTOMER_ID = LC.CUSTOMER_ID -->
+		LEFT JOIN LOCATION_METER LC ON PW.METER_ID = LC.METER_ID
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		PW.DELETED=0 AND LC.DELETED!=1 AND C.DELETED=0 AND M.DELETED=0
+		<!-- modified by tom on 2019/10/23 --> 
+		<!-- AND C.DELETED=0 
+		AND LC.DELETED=0 -->
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+ 				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+ 				<!-- OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%') -->
+ 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+ 				
+ 				OR M.METER_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.STEEL_SEAL_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.DESCRIPTION LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.PLACE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+ 			)
+ 		</if>
+ 		<!-- 按时间查询账单日期 -->
+		<if test="startDate!=null and startDate!=''">
+			AND PW.OPERATION_TIME &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			AND PW.OPERATION_TIME &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<!-- 按期间查询 -->
+		<if test="period!=null and period!=''">
+			AND PW.PERIOD = #{period}
+		</if>
+ 		<!-- 操作员ID -->
+ 		<if test="operatorId!=null">
+ 			AND PW.OPERATOR_ID = #{operatorId}
+ 		</if>
+ 		<!-- 开账状态，是否已开账：0=未开账（默认值）；1=已开账 -->
+ 		<if test="isMakeBill!=null">
+ 			AND PW.IS_MAKE_BILL = #{isMakeBill}
+ 		</if>
+ 		<if test="isPartWater!=null">
+			AND C.IS_PART_WATER = #{isPartWater}
+		</if>
+	</where>
+	ORDER BY 
+		PW.PERIOD DESC, PW.CUSTOMER_ID DESC
+  </select>
+  <!-- 根据条件查询分水量集合,与开账查询列表SQL相同，此处返回实体类集合，方便操作 -->
+  <select id="getPartitionWaterList" resultMap="BaseResultMap">
+  
+  	SELECT
+		PW.* 
+	FROM
+		PARTITION_WATER PW
+		LEFT JOIN CUSTOMERS C ON PW.CUSTOMER_ID = C.ID
+		<!-- LEFT JOIN LOCATION_CUSTOMER LC ON PW.CUSTOMER_ID = LC.CUSTOMER_ID -->
+		LEFT JOIN LOCATION_METER LC ON PW.METER_ID = LC.METER_ID
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		PW.DELETED=0 and C.DELETED=0 and LC.DELETED!=1
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+ 				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+ 			)
+ 		</if>
+ 		<!-- 按时间查询账单日期 -->
+		<!-- <if test="startDate!=null and startDate!=''">
+			AND PW.OPERATION_TIME &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			AND PW.OPERATION_TIME &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if> -->
+ 		<!-- 操作员ID -->
+ 		<if test="operatorId!=null">
+ 			AND PW.OPERATOR_ID = #{operatorId}
+ 		</if>
+ 		<!-- 开账状态，是否已开账：0=未开账（默认值）；1=已开账 -->
+ 		<if test="isMakeBill!=null">
+ 			AND PW.IS_MAKE_BILL = #{isMakeBill}
+ 		</if>
+ 		<!-- <if test="isPartWater!=null">
+			AND C.IS_PART_WATER = #{isPartWater}
+		</if> -->
+	</where>
+	ORDER BY 
+		PW.PERIOD DESC, PW.CUSTOMER_ID DESC
+  
+  	<!-- SELECT
+		PW.* 
+	FROM
+		PARTITION_WATER PW
+		LEFT JOIN CUSTOMERS C ON PW.CUSTOMER_ID = C.ID
+		LEFT JOIN LOCATION_METER LM ON PW.METER_ID = LM.METER_ID
+		
+	<where>
+		删除状态，1=已删除，0=未删除（默认）
+		PW.DELETED=0 and C.DELETED=0 and LM.DELETED=0
+		地理位置痕迹ID(ID-ID-ID-ID)
+		<if test="traceIds!=null and traceIds!=''">
+			AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		查询条件（匹配业主姓名和客户姓名）
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+ 				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+ 			)
+ 		</if>
+ 		操作员ID
+ 		<if test="operatorId!=null">
+ 			AND PW.OPERATOR_ID = #{operatorId}
+ 		</if>
+ 		开账状态，是否已开账：0=未开账（默认值）；1=已开账
+ 		<if test="isMakeBill!=null">
+ 			AND PW.IS_MAKE_BILL = #{isMakeBill}
+ 		</if>
+	</where>
+	ORDER BY 
+		PW.PERIOD DESC -->
+  </select>
+  
+  <!-- 获取某用户某期的未开账的分水量 -->
+  <select id="getCurrWaterAmount" resultType="BigDecimal">
+  	SELECT
+		NVL(SUM(WATER_AMOUNT), 0) AS CURR_WATER_AMOUNT 
+	FROM
+		PARTITION_WATER 
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		DELETED=0
+		<!-- 是否已开账：0=未开账（默认值）；1=已开账 -->
+		AND IS_MAKE_BILL=0
+		<if test="customerId!=null">
+			AND CUSTOMER_ID = #{customerId}
+		</if>
+		<if test="period!=null and period!=''">
+			AND PERIOD = #{period}
+		</if>
+	</where>
+	ORDER BY 
+		CREATE_TIME DESC 
+  </select>
+  
+  <!-- 根据条件查询分水量map集合 -->
+  <select id="getPartitionWaterStatisticMap" resultType="map">
+  	SELECT
+		sum(water_fee) as TOTAL_WATER_FEE,
+		sum(REAL_WATER_AMOUNT) as TOTAL_WATER_AMOUNT
+	FROM
+		PARTITION_WATER PW
+		LEFT JOIN CUSTOMERS C ON PW.CUSTOMER_ID = C.ID
+		<!-- LEFT JOIN LOCATION_CUSTOMER LC ON PW.CUSTOMER_ID = LC.CUSTOMER_ID -->
+		LEFT JOIN LOCATION_METER LC ON PW.METER_ID = LC.METER_ID
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		PW.DELETED=0 and C.DELETED=0 and LC.DELETED!=1
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+ 				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+ 			)
+ 		</if>
+ 		<!-- 按时间查询账单日期 -->
+		<if test="startDate!=null and startDate!=''">
+			AND PW.OPERATION_TIME &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			AND PW.OPERATION_TIME &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<!-- 按期间查询 -->
+		<if test="period!=null and period!=''">
+			AND PW.PERIOD = #{period}
+		</if>
+ 		<!-- 操作员ID -->
+ 		<if test="operatorId!=null">
+ 			AND PW.OPERATOR_ID = #{operatorId}
+ 		</if>
+ 		<!-- 开账状态，是否已开账：0=未开账（默认值）；1=已开账 -->
+ 		<if test="isMakeBill!=null">
+ 			AND PW.IS_MAKE_BILL = #{isMakeBill}
+ 		</if>
+ 		<if test="isPartWater!=null">
+			AND C.IS_PART_WATER = #{isPartWater}
+		</if>
+	</where>
+	ORDER BY 
+		PW.PERIOD DESC, PW.CUSTOMER_ID DESC
+  </select>
+  
+  	  
+   <select id="getPartWaterMessage" resultMap="BaseResultMap">
+  
+  	SELECT
+		PW.* 
+	FROM
+		PARTITION_WATER PW
+		LEFT JOIN CUSTOMERS C ON PW.CUSTOMER_ID = C.ID
+		LEFT JOIN LOCATION_METER LC ON PW.METER_ID = LC.METER_ID
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		PW.DELETED=0 and C.DELETED=0 and LC.DELETED!=1
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<if test="customerId!=null and customerId!=''">
+			AND PW.CUSTOMER_ID=#{customerId}
+		</if>
+		<if test="period!=null and period!=''">
+			AND PW.PERIOD=#{period}
+		</if>
+	</where>
+	ORDER BY 
+		PW.PERIOD DESC, PW.CUSTOMER_ID DESC
+  
+  </select>
+  
+  <!-- 根据表计ID集合、客户、期间查询分水量记录 -->
+  <select id="getCustomerPartWater" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM PARTITION_WATER M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			M.deleted = 0 
+  			<if test="meterIdList!=null and meterIdList.size>0">
+					AND M.METER_ID IN 
+				<foreach item="item" index="index" collection="meterIdList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="period!=null and period!=''">
+				AND M.PERIOD=#{period}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND M.CUSTOMER_ID=#{customerId}
+			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  
+   <!-- 根据表计ID集合、客户、期间查询往期分水量记录 -->
+  <select id="getCustomerPastPartWater" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM PARTITION_WATER M
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			M.deleted = 0 
+  			<if test="meterIdList!=null and meterIdList.size>0">
+					AND M.METER_ID IN 
+				<foreach item="item" index="index" collection="meterIdList" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<if test="period!=null and period!=''">
+				AND M.PERIOD &lt; #{period}
+			</if>
+			<if test="customerId!=null and customerId!=''">
+				AND M.CUSTOMER_ID=#{customerId}
+			</if>
+		</where>
+		ORDER BY M.id DESC
+  </select>
+  
+  <!-- 根据条件查询分水量map集合 -->
+  <select id="searchCustomerAccountItemErrorFee" resultType="map">
+  	SELECT
+		PW.*, 
+		C.CUSTOMER_NAME, 
+		C.CUSTOMER_TYPE,
+		LC.TRACE_IDS 
+	FROM
+		PARTITION_WATER PW
+		LEFT JOIN CUSTOMERS C ON PW.CUSTOMER_ID = C.ID
+		LEFT JOIN METERS M ON PW.METER_ID = M.ID
+		<!-- LEFT JOIN LOCATION_CUSTOMER LC ON PW.CUSTOMER_ID = LC.CUSTOMER_ID -->
+		LEFT JOIN LOCATION_METER LC ON PW.METER_ID = LC.METER_ID
+	<where>
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		PW.DELETED=0 AND LC.DELETED!=1 AND C.DELETED=0 AND M.DELETED=0
+		<!-- modified by tom on 2019/10/23 --> 
+		<!-- AND C.DELETED=0 
+		AND LC.DELETED=0 -->
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+ 				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+ 				<!-- OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%') -->
+ 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+ 				
+ 				OR M.METER_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.STEEL_SEAL_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.DESCRIPTION LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR M.PLACE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+ 			)
+ 		</if>
+ 		<!-- 按时间查询账单日期 -->
+		<if test="startDate!=null and startDate!=''">
+			AND PW.OPERATION_TIME &gt;= to_date(#{startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			AND PW.OPERATION_TIME &lt;= to_date(#{endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+		</if>
+		<!-- 按期间查询 -->
+		<if test="period!=null and period!=''">
+			AND PW.PERIOD = #{period}
+		</if>
+ 		<!-- 操作员ID -->
+ 		<if test="operatorId!=null">
+ 			AND PW.OPERATOR_ID = #{operatorId}
+ 		</if>
+ 		<!-- 开账状态，是否已开账：0=未开账（默认值）；1=已开账 -->
+ 		<if test="isMakeBill!=null">
+ 			AND PW.IS_MAKE_BILL = #{isMakeBill}
+ 		</if>
+ 		<if test="isPartWater!=null">
+			AND C.IS_PART_WATER = #{isPartWater}
+		</if>
+			AND (PW.WATER_FEE <![CDATA[> ]]> (select upper_bound from ABNORMAL_QUANTITY where type=1 ) or PW.WATER_FEE <![CDATA[< ]]>(select lower_bound from ABNORMAL_FEE where type=1))
+	</where>
+	ORDER BY 
+		PW.PERIOD DESC, PW.CUSTOMER_ID DESC
+  </select>
+  <!-- 获取卡表金额 -->
+  <!-- <select id="getCardMeterAmount" resultType="BigDecimal">
+  	
+  </select> -->
+</mapper>

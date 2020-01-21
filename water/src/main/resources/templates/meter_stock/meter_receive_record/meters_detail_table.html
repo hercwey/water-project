@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>表计档案详细信息</title>
+
+</head>
+
+<body>
+
+	<th:block th:fragment="dialog">
+		<br>
+		<table class="table" id="meter-detail-table">
+			<tbody>
+				<tr>
+					<td>水表口径：</td>
+					<td th:text="${meter==null ? '' : meter.caliberValue}"></td>
+					<td>水表编号：</td>
+					<td th:text="${meter==null ? '' : meter.meterNo}"></td>
+				</tr>
+				<tr>
+					<td>水表位置：</td>
+					<td th:text="${meter==null ? '' : meter.place}"></td>
+					<td>水表厂家：</td>
+					<td th:text="${meter==null ? '' : meter.factoryValue}"></td>
+				</tr>
+				<tr>
+					<td>水表厂家电话：</td>
+					<td th:text="${meter==null ? '' : meter.factoryPhone}"></td>
+					<td>水表检定证书编号：</td>
+					<td th:text="${meter==null ? '' : meter.certificateNo}"></td>
+				</tr>
+				<tr>
+					<td>水表检定日期：</td>
+					<td th:text="${meter==null ? '' : meter.checkDateStr}"></td>
+					<td>水表有效日期：</td>
+					<td th:text="${meter==null ? '' : meter.effectiveDateStr}"></td>
+				</tr>
+				<tr>
+					<td>水表钢印号：</td>
+					<td th:text="${meter==null ? '' : meter.steelSealNo}"></td>
+					<td>新表表底数：</td>
+					<td th:text="${meter==null ? '' : meter.newMeterBottom}"></td>
+				</tr>
+				<tr>
+					<td>拆换表表底数：</td>
+					<td th:text="${meter==null ? '' : meter.changeMeterBottom}"></td>
+					<td>水表用途：</td>
+					<td th:text="${meter==null ? '' : meter.meterUseValue}"></td>
+				</tr>
+				<tr>
+					<td>水表类型：</td>
+					<td th:text="${meter==null ? '' : meter.meterTypeValue}"></td>
+					<td>轮换上限：</td>
+					<td th:text="${meter==null ? '' : meter.upperLimit}"></td>
+				</tr>
+				<tr>
+					<td>表计状态：</td>
+					<td th:text="${meter==null ? '' : meter.meterStatusStr}"></td>
+					<td>水表型号：</td>
+					<td th:text="${meter==null ? '' : meter.meterModelValue}"></td>
+				</tr>
+				<tr>
+					<td>抄表方式：</td>
+					<td th:text="${meter==null ? '' : meter.readModeValue}"></td>
+					<td>备注：</td>
+					<td th:text="${meter==null ? '' : meter.remark}"></td>
+				</tr>
+				<tr>
+					<td>采集器地址：</td>
+					<td th:text="${meter==null ? '' : meter.collectorAddr}"></td>
+					<td>表地址</td>
+					<td th:text="${meter==null ? '' : meter.meterAddress}"></td>
+				</tr>
+				<tr>
+					<td>水表生命周期状态：</td>
+					<td th:text="${meter==null ? '' : meter.cycleStatusStr}"></td>
+					<td>地理位置：</td>
+					<td th:text="${locationName}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</th:block>
+	
+</body>
+</html>

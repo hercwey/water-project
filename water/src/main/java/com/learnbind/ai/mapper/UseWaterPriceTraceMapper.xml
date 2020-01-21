@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.UseWaterPriceTraceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.UseWaterPriceTrace">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PRICE_TYPE_NAME" jdbcType="VARCHAR" property="priceTypeName" />
+    <result column="PRICE_TYPE_CODE" jdbcType="VARCHAR" property="priceTypeCode" />
+    <result column="PRICE_CODE" jdbcType="VARCHAR" property="priceCode" />
+    <result column="LADDER_NAME" jdbcType="VARCHAR" property="ladderName" />
+    <result column="LADDER_START" jdbcType="VARCHAR" property="ladderStart" />
+    <result column="LADDER_END" jdbcType="VARCHAR" property="ladderEnd" />
+    <result column="BASE_PRICE" jdbcType="DECIMAL" property="basePrice" />
+    <result column="TREATMENT_FEE" jdbcType="DECIMAL" property="treatmentFee" />
+    <result column="TOTAL_PRICE" jdbcType="DECIMAL" property="totalPrice" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="PARTITION_WATER_ID" jdbcType="DECIMAL" property="partitionWaterId" />
+    <result column="ACCOUNT_ITEM_ID" jdbcType="DECIMAL" property="accountItemId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, PRICE_TYPE_NAME, PRICE_TYPE_CODE, PRICE_CODE, LADDER_NAME, LADDER_START, LADDER_END, 
+    BASE_PRICE, TREATMENT_FEE, TOTAL_PRICE, REMARK, PARTITION_WATER_ID, ACCOUNT_ITEM_ID
+  </sql>
+</mapper>

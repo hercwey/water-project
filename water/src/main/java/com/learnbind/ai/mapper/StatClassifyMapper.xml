@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.StatClassifyMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.StatClassify">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CLASSIFY_NAME" jdbcType="VARCHAR" property="classifyName" />
+    <result column="CLASSIFY_TYPE" jdbcType="DECIMAL" property="classifyType" />
+    <result column="LOCATION_ID" jdbcType="DECIMAL" property="locationId" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="PID" jdbcType="DECIMAL" property="pid" />
+    <result column="TRACE_IDS" jdbcType="VARCHAR" property="traceIds" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CLASSIFY_NAME, CLASSIFY_TYPE, LOCATION_ID, DELETED, PID, TRACE_IDS
+  </sql>
+  
+  <!-- 根据id查询子节点集合 -->
+  <select id="getChildListById" resultType="com.learnbind.ai.bean.StatClassifyBean">
+  	SELECT
+		L.ID AS id,
+		L.CLASSIFY_NAME AS classifyName,
+		L.CLASSIFY_TYPE AS classifyType,
+		L.LOCATION_ID AS locationId,
+		L.PID AS pid,
+		L.TRACE_IDS AS traceIds,
+		L.DELETED AS deleted,
+		( CASE WHEN ( EXISTS ( SELECT * FROM STAT_CLASSIFY WHERE PID = L.ID )) THEN 'true' ELSE 'false' END ) isParent 
+	FROM
+		STAT_CLASSIFY L 
+	WHERE
+		L.DELETED=0
+		AND L.PID = #{id}
+	ORDER BY L.ID ASC
+  </select>
+  
+  <!-- 根据id查询子节点集合 -->
+  <select id="getChildList" resultMap="BaseResultMap">
+  	SELECT
+		L.*
+	FROM
+		STAT_CLASSIFY L 
+	WHERE
+		L.DELETED=0
+		AND L.PID = #{id}
+	ORDER BY L.ID ASC
+  </select>
+  
+</mapper>

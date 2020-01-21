@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	
+	<!-- tabs容器-->
+	<div class="row clearfix">
+		<div class="col-md-12">
+			<div class="tabbable" id="tabs-customers">
+				<ul class="nav nav-tabs" id="tabs-customers-nav">
+					<li class="nav-item" id="customers-item-tab">
+						<a class="nav-link active show" href="#customers-tab" data-toggle="tab">客户管理</a>
+					</li>
+					<li class="nav-item" id="customer-detail-item-tab" style="display:none;">
+						<a class="nav-link" href="#customer-detail-tab" data-toggle="tab" id="tabs-customers-detail-customer-name">客户档案</a>
+					</li>
+					<li class="nav-item" id="edit-customer-detail-item-tab" style="display:none;">
+						<a class="nav-link" href="#edit-customer-detail-tab" data-toggle="tab">客户档案</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="customers-tab">
+						<!-- 客户管理信息 -->
+					</div>
+					<div class="tab-pane" id="customer-detail-tab">
+						<br>
+						<!-- 客户档案详细信息 -->
+						<div class="tabbable" id="tabs-customers-detail">
+							
+							<ul class="nav nav-tabs" id="tabs-customers-detail-nav">
+								<li class="nav-item" id="detail-item-tab" style="">
+									<a class="nav-link active show" href="#detail-tab" data-toggle="tab">基本信息</a>
+								</li>
+								<li class="nav-item" id="bind-meter-item-tab" style="">
+									<a class="nav-link" href="#bind-meter-tab" data-toggle="tab">绑定/解绑表计</a>
+								</li>
+								<li class="nav-item" id="banks-item-tab" style="">
+									<a class="nav-link" href="#banks-tab" data-toggle="tab">银行信息</a>
+								</li>
+								<li class="nav-item" id="bills-item-tab" style="">
+									<a class="nav-link" href="#bills-tab" data-toggle="tab">开票信息</a>
+								</li>
+								<li class="nav-item" id="people-item-tab" style="">
+									<a class="nav-link" href="#people-tab" data-toggle="tab">人口调整</a>
+								</li>
+								<li class="nav-item" id="pledge-item-tab" style="">
+									<a class="nav-link" href="#pledge-tab" data-toggle="tab">押金信息</a>
+								</li>
+								<li class="nav-item" id="account-item-tab" style="">
+									<a class="nav-link" href="#account-tab" data-toggle="tab">账户信息</a>
+								</li>
+								<li class="nav-item" id="agreement-item-tab" style="">
+									<a class="nav-link" href="#agreement-tab" data-toggle="tab">电子档案</a>
+								</li>
+								<li class="nav-item" id="meter-history-item-tab" style="">
+									<a class="nav-link" href="#meter-history-tab" data-toggle="tab">表计历史</a>
+								</li>
+							</ul>
+							<div class="tab-content">
+								<div class="tab-pane active" id="detail-tab">
+									<!-- 客户基本信息 -->
+								</div>
+								<div class="tab-pane" id="bind-meter-tab">
+									<!-- 绑定/解绑表计信息 -->
+								</div>
+								<div class="tab-pane" id="banks-tab">
+									<!-- 客户-银行信息 -->
+								</div>
+								<div class="tab-pane" id="bills-tab">
+									<!-- 客户-开票信息 -->
+								</div>
+								<div class="tab-pane" id="people-tab">
+									<!-- 多人口调整 -->
+								</div>
+								<div class="tab-pane" id="pledge-tab">
+									<!-- 押金信息 -->
+								</div>
+								<div class="tab-pane" id="account-tab">
+									<!-- 账户信息 -->
+								</div>
+								<div class="tab-pane" id="agreement-tab">
+									<!-- 协议信息 -->
+								</div>
+								<div class="tab-pane" id="meter-history-tab">
+									<!-- 表计历史 -->
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="edit-customer-detail-tab">
+						<!-- 增加客户档案 -->
+						<div id="edit-customer-detail-base-table">
+							<!-- 客户档案基本信息 -->
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+	
+	<script type="text/javascript">
+	
+	/**
+	 * 	id：要显示选项卡的ID
+	 *	href：要显示选项卡的href
+	 *	status：show/hide
+	 */
+	function transferTabs(id, href, status){
+		//console.log("$(+id+' a[href="'+href+'"]').tab(status)");
+		$(id+' a[href="'+href+'"]').tab(status);
+		//$("#tabs-customers-nav a[href='#customer-detail-tab']").tab("show");//跳转到详细信息选项卡
+	}
+	
+	/**
+	 * 	清除绑定/解绑表计选项卡html内容
+	 */
+	function clearBindMeterTabContent(){
+		$("#bind-meter-tab").empty();
+	}
+	
+	/**
+	 * 	显示账户信息选项卡
+	 */
+	function showCustomerAccountTab(){
+		$("#account-item-tab").show();
+	}
+	/**
+	 * 	隐藏账户信息选项卡
+	 */
+	function hideCustomerAccountTab(){
+		$("#account-item-tab").hide();
+	}
+	
+	
+	/**
+	 * 	隐藏银行信息、开票信息、多人口调整信息、押金信息等选项卡
+	 */
+	function hideOtherTabs(){
+		$("#customer-detail-item-tab").hide();//隐藏详情信息选项卡
+		$("#edit-customer-detail-item-tab").hide();//隐藏编辑客户详情选项卡
+	}
+	
+	function hideAddCustomerTabs(){
+		$("#edit-customer-detail-item-tab").hide();//隐藏编辑客户详情选项卡
+	}
+	
+	/* 
+		加载客户管理页
+	*/
+	function loadCustomerList(parms, callback) {
+		var url = BASE_CONTEXT_PATH+"/customers/main";
+		var callbackFunc = callback;
+		var containerId = "#customers-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+	/* 
+		加载客户表单信息
+	*/
+	function loadCustomerFormFn(parms, callback) {
+		var url = BASE_CONTEXT_PATH+"/customers/load-customer-form";
+		var callbackFunc = callback;
+		var containerId = "#edit-customer-detail-base-table";
+		//$(containerId).load(url, parms, callbackFunc);
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+	/* 
+		加载客户档案详情信息
+	*/
+	function loadDetailList(parms, callback) {
+		parms.customerId = getCustomerIdFn();//获取客户ID
+		console.log(parms.customerId)
+		var url = BASE_CONTEXT_PATH+"/customer-detail/load-customer-detail-table";
+		var callbackFunc = callback;
+		var containerId = "#detail-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+		windowResize();
+	}
+	function windowResize(){
+		var myEvent = new Event('resize');
+        window.dispatchEvent(myEvent);
+	}
+	/**
+	 * 	加载绑定/解绑表计页面
+	 */
+	function loadBindMeterPage(){
+		
+		var parms = new Object();
+		parms.customerId = getCustomerIdFn();//获取客户ID
+		var url = BASE_CONTEXT_PATH+"/customers/customer-unbindmeter-main";
+		var callbackFunc = null;
+		var containerId = "#bind-meter-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+		
+	/* 
+		加载银行信息页
+	*/
+	function loadBankList(parms, callback) {
+		var url = BASE_CONTEXT_PATH+"/customer-bank/main";
+		var callbackFunc = callback;
+		var containerId = "#banks-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+	
+	/* 
+		加载开票信息页
+	*/
+	function loadBillList(parms, callback) {
+		var url = BASE_CONTEXT_PATH+"/customer-bill/main";
+		var callbackFunc = callback;
+		var containerId = "#bills-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+	
+	/* 
+		加载多人口调整信息页
+	*/
+	function loadPeopleList(parms, callback) {
+		var url = BASE_CONTEXT_PATH+"/customer-people/main";
+		var callbackFunc = callback;
+		var containerId = "#people-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+	
+	/* 
+		加载银行信息页
+	*/
+	function loadPledgeList(parms, callback) {
+		parms.customerId = getCustomerIdFn();//获取客户ID
+		var url = BASE_CONTEXT_PATH+"/customer-pledge/main";
+		var callbackFunc = callback;
+		var containerId = "#pledge-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+	
+	/* 
+		加载账户信息页
+	*/
+	function loadCustomerAccountList(parms, callback) {
+		var url = BASE_CONTEXT_PATH+"/customer-account/main";
+		var callbackFunc = callback;
+		var containerId = "#account-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+	
+	/* 
+		加载客户协议信息页
+	*/
+	function loadCustomerAgreementList(parms, callback) {
+		var url = BASE_CONTEXT_PATH+"/customer-agreement/agreement-main";
+		var callbackFunc = callback;
+		var containerId = "#agreement-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+	
+	/**
+	 * 	加载客户绑定的表计历史页面
+	 */
+	function loadCustomerMeterHistoryPage(){
+		
+		var parms = new Object();
+		parms.customerId = getCustomerIdFn();//获取客户ID
+		var url = BASE_CONTEXT_PATH+"/customer-meter-history/customer-meter-main";
+		var callbackFunc = null;
+		var containerId = "#meter-history-tab";
+		loadPage(containerId, url, parms, callbackFunc);
+	}
+
+	/**
+	 * 	重新加载客户列表，并根据客户ID加载客户详细信息，用户立户保存时专用
+	 */
+	function reloadCustomersAndDetailFn(customerId, showAccountTabCallback){
+		
+		var params = new Object();//参数：功能模块标识
+		
+		var url = BASE_CONTEXT_PATH+"/customers/main";
+		var containerId = "#customers-tab";
+		$(containerId).load(url, params, function(){
+			setCustomerIdFn(customerId)//设置客户ID
+			loadCustomerAccountList(params, showAccountTabCallback);//加载客户账户信息
+			
+		});
+		
+	}
+	/**
+	 * 	重新加载客户详细信息
+	 */
+	function reloadCustomerDetailFn(){
+		
+		var params = new Object();//参数：功能模块标识
+		
+		loadDetailList(params, loadDetailListCallback);//加载某客户的详细信息
+		
+		showCustomerAccountTab();//显示账户信息选项卡
+		
+	}
+	
+	/**
+	 * 	页面加载完成后执行
+	 */
+	function initLoad(){
+		var params = new Object();
+		loadCustomerList(params, null);
+	}
+	
+	$(function() {
+		
+		initLoad();//初始化
+		
+		/**
+		 * 	绑定客户档案选项卡的click事件
+		 */
+		$("#customers-item-tab").on("click", function(){
+			//loadCustomerList(null, null);//加载客户列表
+			hideOtherTabs();//隐藏银行信息、开票信息、多人口调整信息、押金信息四个选项卡
+			resizeFuncx();
+		});
+		
+		function resizeFuncx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		/**
+		 * 	绑定客户基本信息选项卡的click事件
+		 */
+		$("#detail-item-tab").on("click", function(){
+			
+			var params = new Object();//参数：功能模块标识
+			loadDetailList(params, null);//加载某客户的详细信息
+			
+		});
+		/**
+		 * 	绑定绑定/解绑表计选项卡的click事件
+		 */
+		$("#bind-meter-item-tab").on("click", function(){
+			
+			var params = new Object();//参数：功能模块标识
+			loadBindMeterPage();//加载绑定/解绑表计页面
+			
+		});
+		/**
+		 * 	绑定银行选项卡的click事件
+		 */
+		$("#banks-item-tab").on("click", function(){
+			
+			var params = new Object();//参数：功能模块标识
+			loadBankList(params, null);//加载某客户的银行信息
+			
+		});
+		/**
+		 * 	绑定开票信息选项卡的click事件
+		 */
+		$("#bills-item-tab").on("click", function(){
+			
+			var params = new Object();//参数：功能模块标识
+			loadBillList(params, null);//加载某客户的银行信息
+			
+		});
+		/**
+		 * 	绑定多人口调整选项卡的click事件
+		 */
+		$("#people-item-tab").on("click", function(){
+			
+			var params = new Object();//参数：功能模块标识
+			loadPeopleList(params, null);//加载某客户的多人口调整信息
+			
+		});
+		/**
+		 * 	绑定押金信息选项卡的click事件
+		 */
+		$("#pledge-item-tab").on("click", function(){
+			
+			var params = new Object();//参数：功能模块标识
+			loadPledgeList(params, null);//加载某客户的押金信息
+			
+		});
+		/**
+		 * 	绑定账户信息选项卡的click事件
+		 */
+		$("#account-item-tab").on("click", function(){
+			
+			var params = new Object();//参数：功能模块标识
+			loadCustomerAccountList(params, null);//加载客户账户信息
+			
+		});
+		/**
+		 * 	绑定协议信息选项卡的click事件
+		 */
+		$("#agreement-item-tab").on("click", function(){
+			
+			var params = new Object();//参数：功能模块标识
+			loadCustomerAgreementList(params, null);//加载客户协议信息
+			
+		});
+		/**
+		 * 	绑定表计历史选项卡的click事件
+		 */
+		$("#meter-history-item-tab").on("click", function(){
+			var params = new Object();//参数：功能模块标识
+			loadCustomerMeterHistoryPage(params, null);//加载客户绑定的表计历史
+		});
+		
+	})
+	
+	</script>
+	
+</body>
+</html>

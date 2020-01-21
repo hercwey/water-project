@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<!-- wechat-内容详情页 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')"  th:remove="tag"></div> -->
+<title>石家庄高新区供水排水公司</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta name="context-path" content="/" />
+
+
+<link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+
+
+<script>
+	$(function() {
+		$(".weui-c-like .icon").click(function() {
+			if ($(this).hasClass('on')) {
+				$(this).removeClass('on')
+			} else {
+				$(this).addClass('on')
+			}
+		})
+
+	});
+</script>
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body ontouchstart>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h5 style="text-align: center; margin-top: 10px;">用户编号</h5>
+				<hr class="style-two" /> -->
+				<div th:include="wechat/public_page/header::header('文章详情')"
+					th:remove="tag"></div>
+				<div class="weui-content">
+					<div class="weui-c-inner">
+						<div class="weui-c-content">
+							<!-- 文章标题 -->
+							<h2 class="weui-c-title" th:text="${article.title}">Flutter是谷歌的移动UI框架，可以快速在iOS和Android上构建高质量的原生用户界面</h2>
+							<!-- 作者及发布时间 -->
+							<div class="weui-c-meta">
+								<span class="weui-c-nickname"><a href="javascript:;"><span th:text="${article.author}">Yoby开发者<span></a></span>
+								<em class="weui-c-nickname" th:text="${#dates.format(article.publicDate,'yyyy-MM-dd HH:mm')}">2018-10-10 10:10</em>
+							</div>
+							<!-- 文章主体 -->
+							<div class="weui-c-article" th:utext="${article.content}">
+								<!-- <p>Flutter是谷歌的移动UI框架 [4] ，可以快速在iOS和Android上构建高质量的原生用户界面。
+									Flutter可以与现有的代码一起工作。在全世界，Flutter正在被越来越多的开发者和组织使用，并且Flutter是完全免费、开源的。它也是构建未来的Google
+									Fuchsia [1] 应用的主要方式。</p>
+								<p>
+									<img th:src="@{/images/logo1.png}">
+								</p>
+								<p>
+									Flutter组件采用现代响应式框架构建，这是从React中获得的灵感，中心思想是用组件(widget)构建你的UI。
+									组件描述了在给定其当前配置和状态时他们显示的样子。当组件状态改变，组件会重构它的描述(description)，Flutter会对比之前的描述，
+									以确定底层渲染树从当前状态转换到下一个状态所需要的最小更改。</p>
+								<p>
+									<img th:src="@{/images/logo1.png}">
+								</p>
+								<p>Flutter是谷歌的移动UI框架，可以快速在iOS和Android上构建高质量的原生用户界面。
+									Flutter可以与现有的代码一起工作。在全世界，Flutter正在被越来越多的开发者和组织使用，并且Flutter是完全免费、开源的。</p> -->
+
+							</div>
+						</div>
+						<!-- 阅读次数 -->
+						<div class="weui-c-tools">
+							<!-- <a href="javascript:;">阅读原文</a>
+							<div class="weui-c-readnum">
+								阅读<span id="readnum">10000+</span>
+							</div>
+							<div class="weui-c-like">
+								<i class="icon"></i> <span id="likenum">1000</span>
+							</div> -->
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+		<!-- <div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')"
+				th:remove="tag"></div>
+		</div> -->
+		<div class="weui-footer ">
+			<p class="weui-footer__links" style="margin-bottom:5px;">
+				<a href="#" class="weui-footer__link">石家庄高新区供水排水公司</a>
+			</p>
+			<p class="weui-footer__links" style="margin-bottom:5px;">
+				<a href="#" class="weui-footer__link">供水热线:69099838</a>
+			</p>
+			<!-- <p class="weui-footer__text">Copyright &copy; 石家庄高新区供排水公司</p> -->
+		</div>
+			
+	</div>
+
+	<script type="text/javascript" src="/weui/js/zepto.min.js"></script>
+	
+	<script type="text/javascript">
+			var BASE_CONTEXT_PATH = $('meta[name=context-path]')
+					.attr("content");
+			console.log("BASE_CONTEXT_PATH0:"+BASE_CONTEXT_PATH) ;
+			BASE_CONTEXT_PATH = BASE_CONTEXT_PATH.substr(0,BASE_CONTEXT_PATH.length - 1);
+			console.log("BASE_CONTEXT_PATH1:"+BASE_CONTEXT_PATH) ;
+	</script>
+	
+	
+	
+
+
+</body>
+</html>

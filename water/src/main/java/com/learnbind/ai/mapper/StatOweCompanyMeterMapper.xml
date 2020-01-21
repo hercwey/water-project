@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.StatOweCompanyMeterMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.StatOweCompanyMeter">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="OWE_TOTAL_AMOUNT" jdbcType="DECIMAL" property="oweTotalAmount" />
+    <result column="PRE_OWE_AMOUNT" jdbcType="DECIMAL" property="preOweAmount" />
+    <result column="CURR_OWE_AMOUNT" jdbcType="DECIMAL" property="currOweAmount" />
+    <result column="SEWAGE_OWE_AMOUNT" jdbcType="DECIMAL" property="sewageOweAmount" />
+    <result column="WATER_RESOURCE" jdbcType="DECIMAL" property="waterResource" />
+    <result column="REAMRK" jdbcType="VARCHAR" property="reamrk" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, PERIOD, NAME, OWE_TOTAL_AMOUNT, PRE_OWE_AMOUNT, CURR_OWE_AMOUNT, SEWAGE_OWE_AMOUNT, 
+    WATER_RESOURCE, REAMRK, CREATE_TIME
+  </sql>
+</mapper>

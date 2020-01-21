@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>顾客信息汇总表</title>
+<div th:include="common/common_head::headx('顾客信息汇总表')" th:remove="tag"></div>
+</head>
+	<body>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<h3 class="text-center">
+						顾客信息汇总表
+					</h3>
+					<!-- <p>
+						<span style="float: left;"></span>
+						<span style="float: right;">2018年11月1日</span>
+					</p> -->
+					<div class="page-header">
+						<h4>
+							<small style="float: left;">填报单位：营业处</small>
+							<small style="float: right;">2018年11月1日</small>
+						</h4>
+					</div>
+					<table class="table table-bordered table-sm">
+						<thead>
+							<tr>
+								<th>
+									序号
+								</th>
+								<th>
+									用户名
+								</th>
+								<th>
+									用户电话
+								</th>
+								<th>
+									反映问题
+								</th>
+								<th>
+									解决情况
+								</th>
+								<th>
+									是否回复
+								</th>
+								<th>
+									顾客满意否
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									1
+								</td>
+								<td>
+									红石原著4-1-303
+								</td>
+								<td>
+									xxx
+								</td>
+								<td>
+									水表自转
+								</td>
+								<td>
+									己加装止回阀，并与用户核算补水量
+								</td>
+								<td>
+									是
+								</td>
+								<td>
+									满意
+								</td>
+							</tr>
+							<tr>
+								<td>
+									2
+								</td>
+								<td>
+									主语城18-2-1604
+								</td>
+								<td>
+									xxx
+								</td>
+								<td>
+									查欠费，卡里有钱
+								</td>
+								<td>
+									欠308.1，用户卡内余额不足
+								</td>
+								<td>
+									
+								</td>
+								<td>
+									
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<p>
+						<span style="float: left;">部门负责人：</span>
+						<span style="float: right;">填报人：xxx</span>
+					</p>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

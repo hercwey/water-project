@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<!-- wechat-查询用户编号 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')" th:remove="tag"></div> -->
+
+<!-- <link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+<script type="text/javascript" src="/weui/js/zepto.min.js"></script> -->
+
+<style>
+hr.style-one { /*内嵌水平线*/
+	width: 70%;
+	margin: 0 auto;
+	margin-bottom: 10px; border : 0;
+	height: 0;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+	border: 0;
+}
+
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+hr.style-three { /*渐变*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background: #333;
+	background-image: linear-gradient(to right, #ccc, #333, #ccc);
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h5 style="text-align: center; margin-top: 10px;">查询用户编号</h5>
+				<hr class="style-two" /> -->
+				<!-- <div th:include="wechat/public_page/header::header('查询用户编号')" th:remove="tag"></div> -->
+
+				<div class="weui-cells weui-cells_form">
+					<div class="weui-cell">
+						<div class="weui-cell__hd">
+							<label class="weui-label">电话号码</label>
+						</div>
+						<div class="weui-cell__bd">
+							<input class="weui-input" pattern="[0-9]*" id="cond-telno"
+								placeholder="请输入开户时的电话号码" type="number">
+						</div>
+					</div>
+
+					<div class="weui-cell">
+						<div class="weui-cell__hd">
+							<label class="weui-label">姓名</label>
+						</div>
+						<div class="weui-cell__bd">
+							<input class="weui-input" pattern="" id="cond-customer-name"
+								placeholder="请输入开户时的用户姓名" type="text">
+						</div>
+					</div>
+
+				</div>
+				<!--提交按钮-->
+				<div class="weui-btn-area">
+    				<a class="weui-btn bg-blue" href="javascript:" id="btnSearchCustomerNo">开始查询</a>
+    				<!-- <button type="button" id="btnSearchCustomerNo" name="btnSearchCustomerNo"	class="btn btn-primary  btn-block">开始查询</button> -->
+				</div>
+			</div>
+		</div>
+		<!-- <div class="row">
+			<div th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')" th:remove="tag"></div>
+		</div> -->
+		
+		<div class="row" id="search-result-container">
+			
+		</div>
+		
+		
+	</div>
+	
+	<script>
+	
+		/*
+			查询客户编号对象
+		*/
+		function SearchCustomerNo(){
+			var url=BASE_CONTEXT_PATH+'/wechat/customernolist';
+			var containerId="#search-result-container";			
+			
+			/*
+				功能说明:
+					查询客户编号
+				参数说明:
+					parms:查询参数   telno   customerName	
+			*/
+			this.search= function(){
+				var parms=this.getRequestParms();
+				this.loadPagex(containerId,parms,url);
+			}
+			
+			/*
+				功能说明:
+					校验用户输入
+					
+			*/
+			this.verifyInput=function(){
+				var verifyResult=true;
+				
+				//校验用户电话
+				var telNo = $("#cond-telno").val();
+                if(telNo==""){
+                    $.toptip("用户电话不能为空");
+                    verifyResult=false;                    
+                }
+                
+                //校验用户姓名
+                var customerName=$("#cond-customer-name").val();
+                if(customerName==""){
+                    $.toptip("用户姓名不能为空");
+                    verifyResult=false;                    
+                }
+                
+                return verifyResult;
+			}
+			
+			/*
+				功能:
+					收集请求参数
+				返回:
+					请求参数对象   telNo customerName
+			*/
+			this.getRequestParms=function(){
+				var telNo = $("#cond-telno").val();  //用户电话              
+                var customerName=$("#cond-customer-name").val();  //用户姓名
+                
+                var parms=new Object();
+                parms.telNo=telNo;
+                parms.customerName=customerName;
+                
+                return parms;
+			}
+			
+			/*
+			功能说明:
+				在指定的容器中加载页面
+			参数说明: 
+				containerId:容器ID
+				parms:请求参数
+				url:请求的URL
+			 */
+			this.loadPagex = function(containerId,parms,url) {
+				//var parms = null
+				var callbackFunc = null
+				$(containerId).load(url, parms, callbackFunc);
+			};
+			
+		}
+		
+		var searchCustomerNo=new SearchCustomerNo();
+		//page loaded ready 
+		$(function(){
+			//var searchCustomerNo=new SearchCustomerNo();
+			
+			/*
+				查询客户编号按钮-click event handler
+			*/
+			$('#btnSearchCustomerNo').on('click',function(){
+				var verifyResult=searchCustomerNo.verifyInput();
+				if(verifyResult==true){
+					console.log("verifyResult:"+verifyResult);
+					searchCustomerNo.search();
+				}
+				
+			});
+			
+			//解决表单控件不能回弹 只有微信ios有这个问题
+           $("input,select,textarea").blur(function(){
+				setTimeout(() => {
+				const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+				window.scrollTo(0, Math.max(scrollHeight - 1, 0));
+				}, 100);
+			});
+			
+		})
+	</script>
+
+
+
+</body>
+</html>

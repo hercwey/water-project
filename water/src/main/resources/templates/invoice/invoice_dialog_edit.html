@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+
+</script>
+
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>编辑:单据信息</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="invoice-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 发票号码 -->
+													<div class="form-group form-inline">
+														<label for="invoice-no" class="col-sm-4 control-label">发票号码</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.invoiceNo}" 
+																	id="invoice-no" name="invoiceNo" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="发票号码"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!--单位名称 -->
+													<div class="form-group form-inline">
+														<label for="invoice-company-name" class="col-sm-4 control-label">单位名称</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.companyName}" 
+																	id="company-name" name="companyName" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="单位名称"/>
+														</span>
+													</div>
+												</td>		
+											</tr>
+											<tr>	
+												<td>
+													<!-- 税号 -->
+													<div class="form-group form-inline">
+														<label for="invoice-tax-no" class="col-sm-4 control-label">税号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.taxNo}" 
+																	id="tax-no" name="taxNo" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="税号"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!--开户行 -->
+													<div class="form-group form-inline">
+														<label for="invoice-bank-name" class="col-sm-4 control-label">开户行</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.bankName}" 
+																	id="bank-name" name="bankName" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="开户行"/>
+														</span>
+													</div>
+												</td>										
+											</tr>
+											<tr>	
+												<td>
+													<!-- 开户账号 -->
+													<div class="form-group form-inline">
+														<label for="invoice-bank-no" class="col-sm-4 control-label">开户账号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.bankNo}" 
+																	id="bank-no" name="bankNo" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="开户账号"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!--开票日期 -->
+													<div class="form-group form-inline">
+														<label for="invoice-date" class="col-sm-4 control-label">开票日期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control input-sm Wdate" readonly="readonly"
+																id="invoice-date" name="invoiceDate"		
+																th:value="${currItem==null ? '' : currItem.invoiceDateStr}"				
+																onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});"
+																placeholder="开票日期" style="background-color: white;" title="开票日期">
+														</span>
+													</div>
+												</td>										
+											</tr>
+											<tr>
+												<td>
+													<!-- 开票类型-->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">开票类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control " id="invoice-type" name="invoiceType" th:value="${currItem==null ? 1 : currItem.invoiceType}">
+																<!-- 默认选择第一个 -->
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.invoiceType==1} )? 'selcted' ">专用发票</option>
+																<option value="2" th:attr="selected=( ${currItem!=null && currItem.invoiceType==2} )? 'selcted' ">普通发票</option>
+																<option value="3" th:attr="selected=( ${currItem!=null && currItem.invoiceType==3} )? 'selcted' ">手工发票</option>												
+															</select>
+														</span>
+													</div>          
+ 												</td>
+ 												<td>
+													<!-- 价税合计 -->
+													<div class="form-group form-inline">
+														<label for="invoice-total-amount" class="col-sm-4 control-label">价税合计</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.totalAmount}" 
+																	id="total-amount" name="totalAmount" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="价税合计"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>	
+												<td>
+													<!-- 费用金额 -->
+													<div class="form-group form-inline">
+														<label for="invoice-fee-amount" class="col-sm-4 control-label">费用金额</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.feeAmount}" 
+																	id="fee-amount" name="feeAmount" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="费用金额"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!--税率 -->
+													<div class="form-group form-inline">
+														<label for="invoice-tax-rate" class="col-sm-4 control-label">税率</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.taxRate}" 
+																	id="tax-rate" name="taxRate" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="税率"/>
+														</span>
+													</div>
+												</td>										
+											</tr>
+											
+											<tr>	
+												<td>
+													<!--税额 -->
+													<div class="form-group form-inline">
+														<label for="invoice-use" class="col-sm-4 control-label">税额</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.taxAmount}" 
+																	id="invoice-tax-amount" name="taxAmount" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="税额"/>
+														</span>
+													</div>
+												</td>	
+												<td>
+													<!-- 期间 -->
+													<div class="form-group form-inline">
+														<label for="invoice-period" class="col-sm-4 control-label">期间</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control input-sm Wdate" readonly="readonly"
+																id="invoice-period" name="period"		
+																th:value="${currItem==null ? '' : currItem.period}"				
+																onClick="WdatePicker({dateFmt:'yyyy-MM'});"
+																placeholder="期间" style="background-color: white;" title="期间">
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!--发票用途 -->
+													<div class="form-group form-inline">
+														<label for="invoice-use" class="col-sm-4 control-label">发票用途</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.invoiceUse}" 
+																	id="invoice-use" name="invoiceUse" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="发票用途"/>
+														</span>
+													</div>
+												</td>
+												<td></td>
+											
+											</tr>
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		/*
+			设置input背景色
+		*/
+		function setBackGround() {
+			$("#invoice-date").css("background-color", "white");
+			$("#invoice-period").css("background-color", "white");
+		}
+		/*
+	
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/invoice/insert";
+			
+			var printerId= $("#invoice-id").val();
+			if(printerId!=null && printerId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/invoice/update";
+			}
+			var form=new FormData($("#dialog-modi-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeEditDialog();
+							}
+							util.message(res.result_msg,null,"warning");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				modiItem(true);				
+			});
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

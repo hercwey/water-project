@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>类型编码</th>
+				<th>类型名称</th>
+				<th>KEY</th>
+				<th>VALUE</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${dictList}">
+			
+				<td th:text="${item.id}">角色ID</td>
+				<td th:text="${item.typeCode}">类型编码</td>
+				<td th:text="${item.typeName}">类型名称</td>
+				<td th:text="${item.key}">KEY</td>
+				<td th:text="${item.value}">VALUE</td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 修改 -->
+					<button type="button" class="modi-btn-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id},data-dict-type-code=${item.typeCode},data-dict-type-name=${item.typeName}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>编辑</span>
+					</button> 
+					<!-- 删除 -->
+					<button type="button" class="del-btn-single btn btn-secondary btn-sm"
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>删除</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- <hr style="height: 1px; border: none; border-top: 1px solid blue;"> -->
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerData')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function delItemFn(ids) {
+			var urlStr = BASE_CONTEXT_PATH+"/data-dict/delete"; // 需要提交的url
+			
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadPage();
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+	
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.del-btn-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //分录ID
+			//console.log("itemId:" + itemId);
+			util.delConfirm("确认删除此条目?", itemId, "deleteSingleFn");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteSingleFn(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delItemFn(idsArr);
+		}
+				
+		
+		//--------单个修改---------
+		/* 
+			加载修改批次对话框 
+		*/
+		$('.modi-btn-single').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/data-dict/loadmodidialog';
+
+			var itemId = $(this).attr("bind-id"); //条目ID	
+			
+			var currTypeCode = $(this).attr("data-dict-type-code");//字典类型编码
+			//var currTypeName = $(this).attr("data-dict-type-name");//字典类型名称
+			
+			var parms = new Object();//参数
+			parms.itemId = itemId;
+
+			$("#dict-dialog-edit").load(url, parms,function(){
+				$("#data-dict-type").val(currTypeCode).trigger("change");//设置当前的类型编码
+				openModiDialogFn();//加载完毕后显示
+			});
+			
+		});
+		
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openModiDialogFn() {
+			//	可拖拽
+			$("#modal-container-dict-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-dict-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeModiDialogFn() {
+			$("#modal-container-dict-dialog").modal("hide");
+		}
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+
+		});
+		var pager=new Pager("pagerData");
+		$(function(){			
+			pager.init(loadPage,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

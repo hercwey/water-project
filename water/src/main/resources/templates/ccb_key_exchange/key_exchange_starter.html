@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('中国建设银行秘钥交换')" th:remove="tag"></div>
+
+</head>
+<body>
+	<!-- 参数配置主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<div>
+					<h4 class="panel-title">中国建设银行秘钥交换</h4>
+					<hr style="height:1px;border:none;border-top:1px solid blue;">
+				</div>
+				<!-- 业务页面 -->
+				<div id="container">
+					<button type="button" class="btn btn-success" id="btn-create-local-rsa">
+						<span>生成本地RSA密钥对</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-get-ccb-des-to-save">
+						<span>获取CCB-DES密钥并保存</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-get-ccb-rsa-public-key-to-save">
+						<span>获取CCB-RSA公钥并保存</span>
+					</button>
+					<br>
+					<br>
+					<button type="button" class="btn btn-success" id="btn-login">
+						<span>签到</span>
+					</button>
+					<button type="button" class="btn btn-success" id="btn-logout">
+						<span>签退</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	
+		function ajax(url, params){
+			//var url = BASE_CONTEXT_PATH + "/location/updatePidById";
+			//var params = {"updateDataListJSON":updateDataListJSON};
+			$.post(url, params, function(res){
+				console.log(res);
+				if(res!=null){
+					var obj = res;//$.parseJSON(res);
+					if(obj.result_code=="success"){
+						util.message(obj.result_msg);
+					}else{
+						util.message(obj.result_msg);
+					}
+				}
+			});
+		}
+	
+		$(function() {
+			//==========主要业务部分==========
+			/**
+			 * 	生成本地RSA钥匙对
+			 */
+			$("#btn-create-local-rsa").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-key-exchange/create-local-rsa";
+				ajax(url, null);
+			});
+			/**
+			 * 	获取CCB-DES密钥并保存
+			 */
+			$("#btn-get-ccb-des-to-save").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-key-exchange/get-ccb-des-to-save";
+				ajax(url, null);
+			});
+			/**
+			 * 	获取CCB-RSA公钥并保存
+			 */
+			$("#btn-get-ccb-rsa-public-key-to-save").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-key-exchange/get-ccb-rsa-public-key-to-save";
+				ajax(url, null);
+			});
+			/**
+			 * 	签到
+			 */
+			$("#btn-login").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-key-exchange/login";
+				ajax(url, null);
+			});
+			/**
+			 * 	签退
+			 */
+			$("#btn-logout").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/ccb-key-exchange/logout";
+				ajax(url, null);
+			});
+		})
+	</script>
+
+</body>
+</html>

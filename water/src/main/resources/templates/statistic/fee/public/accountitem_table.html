@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<th:block th:fragment="table">
+		<table class="table table-sm" id="meter-record-table">
+		
+		<!-- 
+		
+			基础数据表格样式.
+			C.CUSTOMER_NAME,   //用户名称
+			C.ADDRESS,		   //用户地址
+			C.ROOM,			   //用户房号
+			P.START_TIME,      //抄表起始时间
+			P.END_TIME,		   //抄表结束时间
+			P.PERIOD,			//期间
+			P.BASE_PRICE,	   //水价-基础水价
+			P.TREATMENT_FEE,   //水价-污水处理费
+			P.WATER_PRICE,     //水价-综合水价=基础水价+污水处理费
+			P.WATER_AMOUNT,	   //水量	
+			P.WATER_AMOUNT * P.BASE_PRICE BASE_AMOUNT,  //基础水价-水费
+			P.WATER_AMOUNT * P.TREATMENT_FEE TREATMENT_AMOUNT,//污水处理费-水费
+			A.CREDIT_AMOUNT   //自帐务中获取的应收水费	
+		 -->
+		
+		<thead>
+			<tr>
+				<th>名称</th>
+				<th>地址</th>
+				<th>房号(小区户)</th>
+				<th>抄表起始</th>
+				<th>抄表结束</th>	
+				<th>期间</th>			
+				<th>价-基础</th>
+				<th>价-污水</th>
+				<th>价-综合</th>
+				<th>水量</th>
+				<th>费-基础</th>
+				<th>费-污水</th>
+				<th>费-综合</th>
+			</tr>
+		</thead>
+		<tbody>
+		                                     
+			<span th:each="item,iterStat: ${dataList}" th:remove="tag">
+			
+			 
+			
+			<!-- 
+		
+			基础数据表格样式.
+			C.CUSTOMER_NAME,   //用户名称
+			C.ADDRESS,		   //用户地址
+			C.ROOM,			   //用户房号
+			P.START_TIME,      //抄表起始时间
+			P.END_TIME,		   //抄表结束时间
+			P.PERIOD,			//期间
+			P.BASE_PRICE,	   //水价-基础水价
+			P.TREATMENT_FEE,   //水价-污水处理费
+			P.WATER_PRICE,     //水价-综合水价=基础水价+污水处理费
+			
+			P.WATER_AMOUNT,	   //水量
+				
+			P.WATER_AMOUNT * P.BASE_PRICE BASE_AMOUNT,  //基础水价-水费
+			P.WATER_AMOUNT * P.TREATMENT_FEE TREATMENT_AMOUNT,//污水处理费-水费
+			A.CREDIT_AMOUNT   //自帐务中获取的应收水费	
+		 -->
+			
+			
+			
+				<tr>
+				<!-- 业主姓名 -->
+				<td th:text="${item.CUSTOMER_NAME}"></td>
+				 <!-- 业主电话 -->
+				<td  th:text="${item.ADDRESS}"></td>
+				 <!-- 业主地址-->
+				<td  th:text="${item.ROOM}"></td>
+				<!-- 抄表期间-->
+				<td  th:text="${item.PERIOD}"></td>
+				<td th:text="${#dates.format(item.START_TIME, 'yyyy-MM-dd HH:mm:ss')}">抄表起始日期</td>				
+				<!-- 本期抄表日期 -->
+				<td th:text="${#dates.format(item.END_TIME, 'yyyy-MM-dd HH:mm:ss')}">抄表结束日期</td>				
+				<!-- 本期水量-->
+				<td th:text="${item.BASE_PRICE}">基础水价</td>
+				<td th:text="${item.TREATMENT_FEE}">污水处理费</td>
+				<td th:text="${item.WATER_PRICE}">综价</td>				
+				
+				<td th:text="${item.WATER_AMOUNT}">水量</td> 
+				<td th:text="${item.BASE_AMOUNT}">水费-基价</td>
+				<td th:text="${item.TREATMENT_AMOUNT}">水费-污水处理费</td>
+				<td th:text="${item.CREDIT_AMOUNT}">水费-综价</td>
+				
+								
+				<!-- <td>
+					<font th:if="${record.readType==0}" th:text="${record.readTypeStr}"></font>
+					<b><font color="green" th:if="${record.readType==1}" th:text="${record.readTypeStr}"></font></b>
+					<b><font color="red" th:if="${record.readType==2}" th:text="${record.readTypeStr}"></font></b>
+				</td> -->
+				
+				</tr>
+			</span>
+		</tbody>
+	</table>
+	</th:block>
+</body>
+</html>

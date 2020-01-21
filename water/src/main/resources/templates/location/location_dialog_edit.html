@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 编辑菜单权限:对话框 -->
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-location-edit" role="dialog"	aria-labelledby="myModalLabelPrivilegeEdit" aria-hidden="true">
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabelPrivilegeEdit">
+									<span id="modal-title-span">编辑:地理位置</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<div class="row clearfix">
+									<div class="col-md-12 column">
+										<form id="location-form">
+											<!-- 表单内容 -->
+											<!-- form-inline -->
+											<input type="hidden" id="location-id" name="id" value="" placeholder="ID" />
+											<input type="hidden" id="location-level" name="locationLevel" value="0" placeholder="级别：0=一级 1=二级 2三级。。。" />
+											<table class="table-layout table">
+												<tbody>
+													<tr >
+														<td>
+															<div class="form-group form-inline">
+																<label class="col-sm-4 control-label">父节点</label>
+																<span class="input-group-sm col-sm-8">
+																	<input type="hidden" id="location-pid" name="pid" th:value="${parentLocation==null ? '0' : parentLocation.id}" placeholder="当前选择的父节点地理位置ID" />
+																	<input type="text" onclick="showHideLocationTree.show(&apos;location-parent-name&apos;); return false;" id="location-parent-name" class="form-control select-ztree-btn" readonly 
+																		th:value="${locationFullname==null ? '' : locationFullname}" placeholder="父节点（默认为根节点）" title="请选择父节点地理位置" />
+																</span>
+															</div>
+														</td>
+													</tr>
+													<!-- <tr >
+														<td>
+															<div class="form-group form-inline">
+																<label class="col-sm-4 control-label">编码</label>
+																<span class="input-group-sm col-sm-8">
+																	<input type="text" class="form-control" id="location-code" name="code" value="" placeholder="编码" />
+																</span>
+															</div>
+														</td>
+													</tr> -->
+													<tr >
+														<td>
+															<div class="form-group form-inline">
+																<label class="col-sm-4 control-label">名称</label>
+																<span class="input-group-sm col-sm-8">
+																	<input type="text" class="form-control" id="location-name" name="name" value="" placeholder="名称" />
+																</span>
+															</div>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<div class="form-group form-inline">
+																<label class="col-sm-4 control-label">编号</label>
+																<span class="input-group-sm col-sm-8">
+																	<input type="text" class="form-control" id="location-code" name="code" value="" placeholder="编号，用于生成客户编号" />
+																</span>
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group form-inline">
+																<label class="col-sm-4 control-label">节点类型</label>
+																<span class="input-group-sm col-sm-8">
+																	<select class="form-control" id="location-node-type" name="localNodeType">
+																		<option value="" selected="selected">——请选择节点类型——</option>
+																		<span th:each="dict,iterStat: ${dictList}" th:remove="tag">
+																			<option th:value="${dict.key}" th:attr="selected=${childNodeType!=null && childNodeType==dict.key ? 'true' : 'false'}" th:text="''+${dict.value}">节点类型值</option>
+																		</span>
+																	</select>
+																</span>
+															</div>
+														</td>
+													</tr>
+													<!-- <tr id="location-engineering-tr" th:attr="style=${engineeringId==null ? 'display:none' : ''}">
+														<td>
+															<div class="form-group form-inline">
+																<label class="col-sm-4 control-label">工程</label>
+																<span class="input-group-sm col-sm-8">
+																	<input type="hidden" id="old-engineering-id" name="oldEngineeringId" th:value="${engineeringId==null ? '' : engineeringId}" />
+																	<select class="form-control" id="location-engineering" name="engineeringId">
+																		<option value="" th:attr="selected=${engineering==null ? 'true' : 'false'}">请选择工程</option>
+																		<span th:each="engineering,iterStat: ${engineeringList}" th:remove="tag">
+																			<option th:value="${engineering.id}" th:attr="selected=${engineeringId!=null && engineeringId==engineering.id ? 'true' : 'false'}" th:text="''+${engineering.address}">工程地址</option>
+																		</span>
+																	</select>
+																</span>
+															</div>
+														</td>
+													</tr> -->
+													<tr >
+														<td>
+															<div class="form-group form-inline">
+																<label class="col-sm-4 control-label">描述</label>
+																<span class="input-group-sm col-sm-8">
+																	<input type="text" class="form-control" id="location-remark" name="remark" value="" placeholder="描述" />
+																</span>
+															</div>
+														</td>
+													</tr>
+													<!-- <tr>
+														<td>
+															<div class="form-group form-inline">
+																<label class="col-sm-4 control-label">排序</label>
+																<span class="input-group-sm col-sm-8">
+																	<input type="text" class="form-control" id="location-sortvalue" name="sortValue" value="" placeholder="排序" />
+																</span>
+															</div>
+														</td>
+													</tr> -->
+												</tbody>
+											</table>
+										</form>  
+									</div>
+								</div>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="saveandback-btn">保存&返回</button>
+								<button type="button" class="btn btn-success"	id="saveandcont-btn">保存&继续</button>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+	<!-- 选择地理位置页面 -->
+	<div th:include="location/global_location_select_page" th:remove="tag"></div>
+	
+	<script type="text/javascript">
+	
+	/**
+	 * 	用户点击树节点的回调函数
+	 */
+	function clickZTreeNodeCallback(locationId, traceIds, fullname){
+		console.log("nodeId:"+locationId+", traceIds:"+traceIds+", fullname:"+fullname);
+		$("#location-pid").val(locationId);//设置地理位置ID
+		$("#location-parent-name").val(fullname);//设置地理位置全名称
+		showHideLocationTree.hide();//隐藏地理位置选择框
+	}
+	
+	/**
+	 * 设置父节点ID（pid）的disabled属性，如果是增加操作可编辑，如果是编辑操作不可编辑
+	 */
+	function setLocationPidDisabled(flag){
+		$("#location-pid").attr("disabled", flag);
+	}
+	/**
+	 * 	绑定上级节点的change事件
+	 */
+	/* $("#modal-container-location-edit #location-pid").on("change", function(){
+		//console.log("change");
+		var level = $(this).find("option:selected").attr("data-location-level");
+		$("#location-level").val(level);//设置级别
+	}); */
+	
+	/* $("#location-form #location-node-type").on("change", function(){
+		//console.log("change");
+		var nodeType = $(this).val();
+		if(nodeType=="BLOCK"){//如果节点类型选择小区，则显示选择工程下拉框，否则不显示
+			$("#location-form #location-engineering-tr").show();
+		}else{
+			$("#location-form #location-engineering-tr").hide();
+		}
+	}); */
+	
+	/**
+	 * 	绑定保存&返回按钮的click事件
+	 */
+	$("#modal-container-location-edit #saveandback-btn").on("click", function(){
+		save(false);//保存菜单权限
+	});
+	/**
+	 * 	绑定保存&继续按钮的click事件
+	 */
+	$("#modal-container-location-edit #saveandcont-btn").on("click", function(){
+		save(true);//保存菜单权限
+	});
+	
+	/**
+	 * 	保存菜单权限
+	 */
+	function save(isContinue){
+		
+		var pid = $("#location-form #location-pid").val();
+		console.log("-----"+pid);
+		
+		//return false;
+		
+		
+		var locationName = $("#location-form #location-name").val();//名称
+		if(locationName==null || locationName==""){
+			//dialog type: success warning info error,默认为info
+			util.message("名称不能为空！",null,"warning");
+			return;
+		}
+		
+		var id = $("#location-form #location-id").val();
+		var url = BASE_CONTEXT_PATH + "/location/insert";
+		if(id!=null && id!=""){
+			url = BASE_CONTEXT_PATH + "/location/update";
+		}
+		
+		var parms = {"pid": pid};
+		$("#modal-container-location-edit #location-form").ajaxSubmit({
+			type:"post",
+			url:url,
+			data:parms,
+			success : function(res) {
+				console.log(res);
+				if(res!=null){
+					var obj = res;//$.parseJSON(res);
+					if(obj.result_code=="success"){
+						//reloadInfoFun();
+						if(g_is_add){
+							var newNodes = obj.newNodes;
+							addNodes(newNodes);//在某个父节点上增加节点数据
+						}else{
+							var newNodes = obj.newNodes;
+							updateNodes(newNodes);//更新某节点
+							nodeId = newNodes.id;//取消当前选中的节点（去掉class）所需要的节点ID参数
+						}
+						if(isContinue){//提交&继续
+							saveToContinueResetForm();//点击保存并继续按钮后reset表单中部分内容
+							return;
+						}
+						closeEditDialog();//关闭对话框
+						/* if(isContinue){//提交&继续
+							resetFun();
+							if(g_is_add){
+								var newNodes = obj.newNodes;
+								addNodes(newNodes);//在某个父节点上增加节点数据
+							}else{
+								var newNodes = obj.newNodes;
+								updateNodes(newNodes);//更新某节点
+								nodeId = newNodes.id;//取消当前选中的节点（去掉class）所需要的节点ID参数
+							}
+						}else{//提交&返回
+							//reloadInfoFun();
+							if(g_is_add){
+								var newNodes = obj.newNodes;
+								addNodes(newNodes);//在某个父节点上增加节点数据
+							}else{
+								var newNodes = obj.newNodes;
+								updateNodes(newNodes);//更新某节点
+								nodeId = newNodes.id;//取消当前选中的节点（去掉class）所需要的节点ID参数
+							}
+							if(isContinue){//提交&继续
+								saveToContinueResetForm();
+								return;
+							}
+							closeEditDialog();//关闭对话框
+						} */
+						
+						initButtonClickEvent();//取消当前选中的节点，并且初始化增加按钮、修改按钮和删除按钮的click事件参数
+					}else{
+						util.message(obj.result_msg);
+					}
+				}
+			},
+		});
+	}
+	
+	/**
+	 * 	点击保存并继续按钮后reset表单中部分内容
+	 */
+	function saveToContinueResetForm(){
+		$("#location-form #location-name").val("");//名称
+		$("#location-form #location-remark").val("");//描述
+	}
+	
+	/*
+	 * 	重新加载当前菜单内容
+	 */
+	function reloadInfoFun(){
+		//操作成功后重新加载
+		var href = "/location/starter";
+		//parent.window.iframeShowPage(href);//调用主页面中的在iframe中加载内容的方法
+		location.href = href;//重新加载页面
+	}
+	
+	</script>
+	
+	</th:block>
+
+</body>
+</html>

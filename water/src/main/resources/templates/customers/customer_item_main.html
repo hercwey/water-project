@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户列表主界面</title>
+
+
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block" id="customer-item-search">
+				<ul class="extra-l" style="list-style: none;">
+				
+					<!-- 面板:查询 -->
+					<li class="input-group-sm">
+						<input type="text" class="form-control" id="search-cond" placeholder="请输入关键字">
+					</li>
+					<li class="input-group-sm">
+						<select class="form-control btn-sm location-block" id="" name="locationBlockId" data-location-curr-node-type="BLOCK" data-location-next-node-type="BUILDING" style="display:inline-block;">
+							<option value="" data-location-traceids=''>——小区——</option>
+							<span th:each="item,iterStat: ${locationList}" th:remove="tag">
+								<option th:value="${item.id}" th:attr="data-location-traceids=${item.traceIds}, data-location-code=${item.code},data-location-name=${item.name}"
+										th:text="${item.name}">小区名称</option>
+							</span>
+						</select>
+					</li>
+					<li class="input-group-sm">	
+						<select class="form-control btn-sm location-building" id="" name="locationBuildingId" data-location-curr-node-type="BUILDING" data-location-next-node-type="UNIT" disabled="disabled" style="display:inline-block;">
+							<option value="" data-location-traceids=''>——楼号——</option>
+						</select>
+					</li>
+					<li class="input-group-sm">
+						<select class="form-control btn-sm location-unit" id="" name="locationUnitId" data-location-curr-node-type="UNIT" data-location-next-node-type="ROOM" disabled="disabled" style="display:inline-block;">
+							<option value="" data-location-traceids=''>——单元——</option>
+						</select>
+					</li>
+					<li class="input-group-sm">
+						<!-- 客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户； -->
+						<select class="form-control btn-sm" id="customer-status" name="customerStatus" style="display:inline-block;">
+							<!-- 客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户； -->
+							<option value="">——状态——</option>
+							<option value="-1">未立户</option>
+							<option value="0,3">已立户</option>
+							<option value="1">已销户</option>
+							<option value="2">已过户</option>
+							<option value="3">过户</option>
+						</select>
+					</li>
+					<li class="input-group-sm">
+						<!-- 用户性质：1=个人；2=单位；3=水司； -->
+						<select class="form-control btn-sm" id="customer-type" name="customerType" style="display:inline-block;">
+							<option value="">—用户性质—</option>
+							<option value="1">个人</option>
+							<option value="2">单位</option>
+							<option value="3">水司</option>
+						</select>
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+				</ul>
+			</div>
+			<br>
+			<!-- 容器:字典列表 -->
+			<div class="customer-item-table-container"></div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------针对客户ID的操作------------------------------------------------
+		/**
+		 * 	获取客户ID
+		 */
+		function getCustomerIdFn(){
+			return $(G_CUSTOMER_ID).val();
+		}
+		/**
+		 * 	设置客户ID
+		 */
+		function setCustomerIdFn(customerId){
+			$(G_CUSTOMER_ID).val(customerId);//设置全局客户ID
+		}
+		
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchCustomerItem(searchCond, pageNum, pageSize) {
+
+			var traceIds = null;//地理位置痕迹ID（ID-ID-ID-ID）
+			var locaUnitTraceIds = getCustomerItemUnitId();
+			var locaBuildingTraceIds = getCustomerItemBuildingId();
+			var locaBlockTraceIds = getCustomerItemBlockId();
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			
+			//客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户；
+			//当用户选择已立户时，查询已立户和过户的客户
+			var customerStatus = $("#customer-item-search #customer-status").val();
+			<!-- 用户性质：1=个人；2=单位；3=水司； -->
+			var customerType = $("#customer-item-search #customer-type").val();
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			parms.customerStatus=customerStatus;//客户状态
+			parms.customerType=customerType;//客户性质
+			
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/customers/customer-item-table"
+			$(".customer-item-table-container").load(url, parms, null);
+		}
+
+		//------------------业务操作根据地理位置查询客户----------------------
+		/**
+		 * 	获取小区ID
+		 */
+		function getCustomerItemBlockId(){
+			return $('#customer-item-search .location-block').find("option:selected").attr("data-location-traceids");
+		}
+		/**
+		 * 	获取小区楼号ID
+		 */
+		function getCustomerItemBuildingId(){
+			return $('#customer-item-search .location-building').find("option:selected").attr("data-location-traceids");
+		}
+		/**
+		 * 	获取小区楼号单元ID
+		 */
+		function getCustomerItemUnitId(){
+			return $('#customer-item-search .location-unit').find("option:selected").attr("data-location-traceids");
+		}
+	
+		/**
+		 * 	绑定地理位置-小区的change事件
+		 */
+		$('#customer-item-search .location-block').on('change',function() {
+			
+			$("#customer-item-search .location-building").val("");//设置地理位置-楼号值为空
+			$("#customer-item-search .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+			$("#customer-item-search .location-unit").val("");//设置地理位置-单元值为空
+			$("#customer-item-search .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			
+			var locationId = $(this).val();
+			if(locationId!=null && locationId!=""){
+				var nextNodeType = $(this).attr("data-location-next-node-type");
+				getCustomerItemLocationFn(locationId, nextNodeType);
+			}
+					
+		});
+		
+		/**
+		 * 	绑定地理位置-楼号的change事件
+		 */
+		$('#customer-item-search .location-building').on('change',function() {
+			
+			$("#customer-item-search .location-unit").val("");//设置地理位置-单元值为空
+			$("#customer-item-search .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+			
+			var locationId = $(this).val();
+			var nextNodeType = $(this).attr("data-location-next-node-type");
+			getCustomerItemLocationFn(locationId, nextNodeType);				
+		});
+		/**
+		 * 	绑定地理位置-楼号的change事件
+		 */
+		$('#customer-item-search .location-unit').on('change',function() {
+			
+			var locationId = $(this).val();
+			var nextNodeType = $(this).attr("data-location-next-node-type");
+		});
+		/**
+		 * 	查询地理位置-小区/楼号/单元
+		 */
+		function getCustomerItemLocationFn(locationId, nodeType){
+			var url = BASE_CONTEXT_PATH + "/location/get-block-building-unit";
+			var params = new Object();
+			params.locationId = locationId;
+			params.nodeType = nodeType;
+			$.post(url, params, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						var locationList = res.locationList;
+						if(nodeType=="BUILDING"){
+							setCustomerItemLocationBuildingHtml(locationList);
+						}else{
+							setCustomerItemLocationUnitHtml(locationList);
+						}
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				} 
+			});
+		}
+		/**
+		 * 	设置地理位置-楼号的下拉列表
+		 */
+		function setCustomerItemLocationBuildingHtml(locationList){
+			
+			$("#customer-item-search .location-building").attr("disabled", false);//设置地理位置-楼号可编辑
+			
+			var html = "<option value='' data-location-traceids=''>——楼号——</option>";
+			$.each(locationList, function(){
+				html = html + "<option value='"+this.id+"' data-location-traceids='"+this.traceIds+"' data-location-code='"+this.code+"' data-location-name='"+this.name+"'>"+this.name+"</option>";
+			});
+			$('#customer-item-search .location-building').html(html);
+		}
+		/**
+		 * 	设置地理位置-单元的下拉列表
+		 */
+		function setCustomerItemLocationUnitHtml(locationList){
+			
+			$("#customer-item-search .location-unit").attr("disabled", false);//设置地理位置-单元可编辑
+			
+			var html = "<option value='' data-location-traceids=''>——单元——</option>";
+			$.each(locationList, function(){
+				html = html + "<option value='"+this.id+"' data-location-traceids='"+this.traceIds+"' data-location-code='"+this.code+"' data-location-name='"+this.name+"'>"+this.name+"</option>";
+			});
+			$('#customer-item-search .location-unit').html(html);
+		}
+		
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchCustomerItem() {
+			var pageNum = 0;
+			var pageSize = 0;
+			var searchCond="";
+
+			searchCustomerItem(searchCond, pageNum, pageSize);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchCustomerItemClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			var searchCond=$("#customer-item-search #search-cond").val();
+
+			searchCustomerItem(searchCond, pageNum, pageSize);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadCustomerItemClickPageNum() {
+			var pageNum = customer_item_pageNum;
+			var pageSize = customer_item_pageSize;
+			var searchCond=customer_item_searchCond;
+
+			searchCustomerItem(searchCond, pageNum, pageSize);
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchCustomerItem();
+
+			//---------事件绑定--------------
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#customer-item-search #btn-search').on('click', function() {
+				btnSearchCustomerItemClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#customer-item-search #btn-search-reset').on('click', function() {
+				$("#customer-item-search #search-cond").val("");
+				$("#customer-item-search #search-cond").focus();//获得焦点
+				//设置小区-楼号-单元下拉框为未选择
+				$("#customer-item-search .location-block").val("");//设置地理位置-小区值为空
+				$("#customer-item-search .location-building").val("");//设置地理位置-楼号值为空
+				$("#customer-item-search .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$("#customer-item-search .location-unit").val("");//设置地理位置-单元值为空
+				$("#customer-item-search .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+				
+				//设置客户状态为空
+				$("#customer-item-search #customer-status").val("");//客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户；
+				$("#customer-item-search #customer-type").val("");
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#customer-item-search #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#customer-item-search #btn-search').trigger("click");	                
+	            }	
+			});
+			
+		});
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<!-- 批次列表 -->
+	<table class="table  table-hover table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>客户名称</th>
+				<th>客户手机号</th>
+				<th>身份证号</th>
+				<th>地址</th>
+				<th>用水状态</th>
+				<th>状态</th>
+				<th style="width:100px;">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${customersList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 业主姓名 -->
+				<td th:text="${item.customerName}">业主姓名</td>
+				<!-- 客户电话 -->
+				<td th:text="${item.customerTel}">业主手机</td>
+				<!-- 用水性质 -->
+				<td th:text="${item.idNo}">身份证号 </td>
+				<!-- 地址 -->
+				<td th:text="${item.address}">地址</td>
+				<!-- 用水状态 -->
+				<td th:attr="id='water-status-'+${item.id}" th:text="${item.waterStatusStr}">用水状态 </td>
+				<!-- 客户状态 -->
+				<td th:attr="id='customer-status-'+${item.id}" th:text="${item.statusStr}">客户状态 </td>
+				<!-- 操作列 -->
+				<td>
+					<div class="dropdown">
+					    <button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+					      	操作
+					    </button>
+					    <div class="dropdown-menu">
+					    	<!-- 客户基本信息 -->
+							<a class="dropdown-item info-detail-single btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="bind-id=${item.id}, data-customer-status=${item.status}, data-customer-name=${item.customerName}">
+								<i class="fa fa-file-o" aria-hidden="true"></i><span>详情</span>
+							</a>
+					      	
+							<!-- status 客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户； -->
+							<span th:if="${item.status==0 || item.status==1 || item.status==3}">
+								<!-- 过户 -->
+								<a class="dropdown-item btn-transfer-account-single btn-sm"
+									th:attr="bind-id=${item.id}">
+									<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>过户</span>
+								</a>
+								</span>
+					    </div>
+					</div>
+					
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+	
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+	
+
+	<!--  -->
+	<script th:inline="javascript">
+		var curr_searchCond=[[${searchCond}]];
+	</script>
+
+
+	<script type="text/javascript">
+		var G_CUSTOMER_TYPE_PERSION = "1";//客户类型-个人
+		var G_CUSTOMER_TYPE_COMPANY = "2";//客户类型-单位
+		var g_is_edit = true;//全局变量是否是编辑操作
+		
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function delBatchItem(ids) {
+			var urlStr = BASE_CONTEXT_PATH+"/customers-settle-account/delete"; // 需要提交的url
+			
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadPageClickPageNum();
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+	
+		//--------------批量删除-----------------
+		
+		/*
+			批量删除确认
+		*/
+		function deleteConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录？", "xxx", "ok_callback_name", "cancel_callback_name")			
+		}
+		
+		/*
+			批量删除确认:确认(回调)
+		*/
+		function ok_callback_name(id){
+			var ids=getSelectedIds();  //此函数定义于_table.html中
+			delBatchItem(ids);
+		}
+		
+		/*
+			批量删除确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.del-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //分录ID
+			util.delConfirm("确认删除此条目？", itemId, "deleteSingle");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteSingle(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delBatchItem(idsArr);
+		}
+			
+		/**
+		 * 	绑定过户按钮的click事件
+		 */
+		$(".btn-transfer-account-single").on("click", function(){
+			var customerId = $(this).attr("bind-id");//客户ID
+			//console.log(customerId);
+			setCustomerIdFn(customerId);//设置客户ID
+			
+			//验证欠费金额，验证通过后执行回调，否则提示
+			verifyOwedAmount(customerId,transferAccountConfirmCallback);
+			
+		});
+		/**
+		 * 	过户确认回调函数
+		 */
+		function transferAccountConfirmCallback(customerId){
+			//console.log("customerId"+customerId);
+			//注: 回调函数需要采用引号引起来
+			util.confirm("请确认已结清所有欠款，确认继续？", customerId, "transferLoadCustomerItem", "cancel_callback_name");//过户确认
+		}
+		/**
+		 * 	过户时加载选择客户列表
+		 */
+		function transferLoadCustomerItem(){
+			var url = BASE_CONTEXT_PATH+'/customers-transfer-account/customer-item-main';
+			var parms = null;
+			$("#modal-container-customer-item #customer-item-dialog-body").load(url, parms,function(){
+				//加载完毕后显示
+				openDialogFn("modal-container-customer-item");//打开对话框
+			}); 
+		}
+		
+		/**
+		 * 	验证欠费金额，true表示无欠费金额，false表示有欠费金额（此处有提示）
+		 */
+		function verifyOwedAmount(customerId,callback){
+			var url = BASE_CONTEXT_PATH+'/customers-transfer-account/verify-owed-amount';
+			var parms = {"customerId": customerId};
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res!=null && res!="") {
+					if (res.result_code == "success") {
+						callback(customerId);//验证欠费金额通过后的回调
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		/*
+			编辑核对类型按钮CLICK
+		*/
+		$('.modi-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //条目ID	
+			var customerType = $(this).attr("data-customer-type"); //客户类型
+			setCustomerIdFn(itemId)//设置客户ID
+			clearNotAddBindMeterContent();//清理非增加的绑定/解绑表计功能的html部分
+			if(customerType == G_CUSTOMER_TYPE_PERSION){//个人用户
+				loadCustomerFormFn(null, loadPersionCustomerFormCallback);
+			} else if (customerType == G_CUSTOMER_TYPE_COMPANY){//单位客户
+				
+				loadCustomerFormFn(null, loadCompanyCustomerFormCallback);
+			}
+			
+		});
+		//--------------查看客户档案详情页信息--------------
+		$('.info-detail-single').on('click',function() {
+			var itemId = $(this).attr("bind-id"); //条目ID
+			setCustomerIdFn(itemId)//设置客户ID
+			
+			var customerStatus = $(this).attr("data-customer-status");//客户状态：-1=未立户；0=已立户；1=已销户；2=已过户
+			var customerName = $(this).attr("data-customer-name");
+			
+			$("#tabs-customers-detail-customer-name").text('客户档案（'+customerName+'）');//客户档案选项卡显示的客户名称
+			var params = new Object();//参数：功能模块标识
+			params.customerId = itemId;
+			loadDetailList(params, loadDetailListCallback);//加载某客户的详细信息
+			
+			//客户状态：-1=未立户；0=已立户；1=已销户；2=已过户
+			if(customerStatus==-1){
+				hideCustomerAccountTab();//隐藏账户信息选项卡
+			}else{
+				showCustomerAccountTab();//显示账户信息选项卡
+			}
+			
+		});
+		
+		/**
+		 * 	加载某客户详情信息回调
+		 */
+		function loadDetailListCallback(){
+			$("#customer-detail-item-tab").show();//显示客户档案信息选项卡
+			$("#tabs-customers-nav a[href='#customer-detail-tab']").tab("show");//跳转到详细信息选项卡
+			$("#tabs-customers-detail-nav a[href='#detail-tab']").tab("show");//跳转到客户详细信息选项卡
+		}
+		
+		
+		
+		//-----------------立户/销户/恢复业务处理------------------
+		
+		//客户-账户状态：-1=未立户；0=已立户；1=已销户；2=已过户
+		var G_CUSTOMER_ACCOUNT_NO = -1;//未立户
+		var G_CUSTOMER_ACCOUNT_OPEN = 0;//已立户
+		var G_CUSTOMER_ACCOUNT_CLOSE = 1;//已销户
+		var G_CUSTOMER_ACCOUNT_TRANSFER = 2;//已过户
+		
+		/**
+		 * 	修改客户-账户状态
+		 * 		客户-账户状态：-1=未立户；0=已立户；1=已销户；2=已过户
+		 */
+		function updateCustomerAccountStatusFn(customerId, accountStatus){
+			var url = BASE_CONTEXT_PATH+'/customer-account/update-status';
+			var parms = {"customerId": customerId, "accountStatus": accountStatus};
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res!=null && res!="") {
+					if (res.result_code == "success") {
+						var params = new Object();;
+						loadCustomerList(params, null);
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		
+		function loadCustomerListDialog(){
+			//transfer-account-dialog-edit
+		}
+		
+		/**
+		 * 	绑定立户按钮的click事件
+		 */
+		$(".btn-open-account-single").on("click", function(){
+			var customerId = $(this).attr("bind-id");//客户ID
+			
+			var url = BASE_CONTEXT_PATH+'/customer-account/load-account-dialog';
+			var parms = {"customerId": customerId};
+			$("#open-account-dialog-edit").load(url, parms,function(){
+				//加载完毕后显示
+				openDialogFn("modal-container-customer-account");
+			}); 
+		});
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

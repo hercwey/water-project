@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('首页')" th:remove="tag"></div>
+<link href="/index/css/index.css" rel="stylesheet" />
+<!-- <link href="/index/css/popup.css" rel="stylesheet" /> -->
+<style type="text/css">
+.popup div.row div.column span.ui-combobox a{height: 24px;}
+#bottomMenu{
+	border-radius:5px 0px 0 5px;
+}
+#bottomMenu li{
+	width:175px;
+	float:left;
+}
+#bottomMenu li ul{
+}
+#bottomMenu li ul li{
+	background:url(/index/images/shaixuan_er.png) left no-repeat;
+	margin-top:-5px;
+	border-bottom:none;
+}
+#bottomMenu li a,#bottomMenu li ul li a{
+	float:left;
+	width:100%;}
+#bottomMenu li span{
+	font-size: 0.75em;
+    color: #000000;
+    }
+.ui-dialog .ui-dialog-titlebar{
+	height: 28px;
+}
+.menu_div{
+	height:46px;
+	line-height:46px;
+	font-size:15px;
+	font-weight:700;
+	text-indent:53px;
+}
+.span1 {
+	word-break:break-all;
+	float:left;
+	width:135px;
+}
+.span2 {
+	/* word-break:break-all; */
+	margin-top:3px;
+	float:left;
+	width:40px;
+	height:20px;
+	background:#39aeaa;
+	border-radius:5px;
+	line-height:20px;
+}
+</style>
+</head>
+<body style="overflow:-Scroll;overflow-y:hidden;">
+<div class="top-div">
+	<div class="piva-logo">
+			<!-- 智慧营收系统 -->
+			<img alt="智慧营收系统" src="/images/logo.jpg">
+	</div>
+    <div class="top-menu">
+        <ul class="menu-items">
+        	<!-- <c:forEach items="${subSysList}" var="sysRow" varStatus="status1" >
+        		<li id="menu_${status1.count}" onclick="menuShowSub('menu_${status1.count}')" <c:if test="${status1.index==0}">class="selected" </c:if> >
+					<span class="lt-menu-icon"><img src="${pageContext.request.contextPath}/assets/pivas/images/li${status1.count}.png"></span>
+					<a style="<c:if test="${status1.index==0}">cursor: default;</c:if>" >${sysRow.sysName}</a>
+				</li>
+            </c:forEach> -->
+            <!-- type 类型，0:菜单目录 1:菜单 2:功能 -->
+            <span th:each="item,iterStat : ${privilegeList}" th:remove="tag">
+            	<span th:if="${item.rightLevel==0}" th:remove="tag">
+		            <li th:id="'menu_'+${item.id}" th:onclick="'menuShowSub(&quot;menu_'+${item.id}+'&quot;)'">
+						<!-- <span class="lt-menu-icon"><img th:src="'/index/images/li'+${iterStat.count}+'.png'"></span> -->
+						<span class="lt-menu-icon"><img th:src="${item.rightIcon}"></span>
+						<a style="cursor: default;color: white;" th:text="${item.rightName}">业务管理</a>
+					</li>
+				</span>
+            </span>
+			<!-- <li id="menu_1" onclick="menuShowSub('menu_1');">
+				<span class="lt-menu-icon"><img src="/index/images/li1.png"></span>
+				<a style="cursor: default;color: white;" >业务管理</a>
+			</li>
+			<li id="menu_2" onclick="menuShowSub('menu_2');">
+				<span class="lt-menu-icon"><img src="/index/images/li2.png"></span>
+				<a style="cursor: default;color: white;" >日常维护</a>
+			</li>
+			<li id="menu_3" onclick="menuShowSub('menu_3');">
+				<span class="lt-menu-icon"><img src="/index/images/li3.png"></span>
+				<a style="cursor: default;color: white;" >统计中心</a>
+			</li>
+			<li id="menu_4" onclick="menuShowSub('menu_4');">
+				<span class="lt-menu-icon"><img src="/index/images/li4.png"></span>
+				<a style="cursor: default;color: white;" >工作排班</a>
+			</li>
+			<li id="menu_5" onclick="menuShowSub('menu_5');">
+				<span class="lt-menu-icon"><img src="/index/images/li5.png"></span>
+				<a style="cursor: default;color: white;" >数据配置</a>
+			</li>
+			<li id="menu_6" onclick="menuShowSub('menu_6');">
+				<span class="lt-menu-icon"><img src="/index/images/li6.png"></span>
+				<a style="cursor: default;color: white;" >系统管理</a>
+			</li> -->
+        </ul>
+		<div class="user-tool">
+			<div class="top_right">
+				<div class="top_right_two">
+					<span id="dynTime">正在载入，请等待...</span>
+				</div>
+			</div>
+			<div class="top_right">
+				<div class="top_right_one">
+					<div id="menu_8" onclick="initUserInfo()">【&nbsp;<i><b><span th:text="${userName}">用户名</span></b></i>&nbsp;】欢迎登录！</div>
+				</div>
+				<div class="top_right_one" id="" onclick="changepass()">
+					<a style="">修改密码</a>
+				</div>
+				<div class="top_right_one" id=""  onclick="openLogout()">
+					<a style="">退出</a>
+				</div>
+			</div>
+		</div>
+    </div>
+
+</div>
+
+<div class="main-div" style="width:100%;top:65px;position: absolute;">
+	
+    <div class="left-menu">
+		<div class="user-info-menu">
+		</div>
+        <div style="height:100%;overflow-y: auto;" id="topMenu">
+        	<span th:each="item,iterStat : ${privilegeList}" th:remove="tag">
+	            <!-- <li th:id="'menu_'+${item.id}" th:onclick="'menuShowSub(menu_'+${item.id}+')'">
+					<span class="lt-menu-icon"><img th:src="'/index/images/li'+${iterStat.count}+'.png'"></span>
+					<a style="cursor: default;color: white;" th:text="${item.rightName}">业务管理</a>
+				</li> -->
+				
+				<span th:if="${item.rightLevel==1}" th:remove="tag">
+					<div th:id="'menu_'+${item.pid}+'_'+${iterStat.count}" th:attr="data-parent-id=menu_+${item.pid}" class="menu-block config menu2" >
+			        	<div class="menu_div hover" onclick="showMenu(this)">
+			  				<span style="display:none">down</span>
+			  	 			<span style="font-family: 微软雅黑;" th:text="${item.rightName}">菜单目录</span>
+			  				<a style="margin-left: 30px;text-decoration:none;" >
+			  					<img width="15px" height="15px" src="/index/images/left_button_open.png">
+			  				</a>
+			  			</div>
+			   			<ul>
+			   				<span th:each="privilege,iterStatus : ${privilegeList}" th:remove="tag">
+			   					<span th:if="${privilege.rightLevel==2 && item.id==privilege.pid}" th:remove="tag">
+			   						<li class="menu3" th:id="'menu_'+${privilege.id}+'_'+${iterStatus.count}" th:onclick="'menuShowPage(&quot;&quot;, &quot;menu_'+${privilege.id}+'_'+${iterStatus.count}+'&quot;)'" th:attr="path='当前位置：<span>FIRST_MENU_NAME</span> > <span>'+${item.rightName}+'</span> > <span>'+${privilege.rightName}+'</span>', url=${privilege.rightLink}"><a th:text="${privilege.rightName}">菜单功能</a></li>
+			   						<!-- <li class="menu3" th:id="'menu_'+${privilege.id}+'_'+${iterStatus.count}"  onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" ><a th:text="${privilege.rightName}">三级目录名称</a></li> -->
+			   					</span>
+			   				</span>
+			   				<!-- <li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>1</a></li>
+			   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>2</a></li>
+			   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>3</a></li>
+			   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>4</a></li> -->
+			       		</ul>
+			        </div>
+		        </span>
+            </span>
+	        <!-- <div id="menu_1_1" name="menu_1" class="menu-block config menu2" >
+	        	<div class="menu_div hover" onclick="showMenu(this)">
+	  				<span style="display:none">down</span>
+	  	 			<span style="font-family: 微软雅黑;">业务管理</span>
+	  				<a style="margin-left: 30px;text-decoration:none;" >
+	  					<img width="15px" height="15px" src="/index/images/left_button_open.png">
+	  				</a>
+	  			</div>
+	   			<ul>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>1</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>2</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>3</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>4</a></li>
+	       		</ul>
+	        </div>
+	        <div id="menu_2_1" name="menu_2" class="menu-block config menu2" >
+	        	<div class="menu_div hover" onclick="showMenu(this)">
+	  				<span style="display:none">down</span>
+	  	 			<span style="font-family: 微软雅黑;">日常维护</span>
+	  				<a style="margin-left: 30px;text-decoration:none;" >
+	  					<img width="15px" height="15px" src="/index/images/left_button_open.png">
+	  				</a>
+	  			</div>
+	   			<ul>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>1</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>2</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>3</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>4</a></li>
+	       		</ul>
+	        </div>
+	        <div id="menu_3_1" name="menu_3" class="menu-block config menu2" >
+	        	<div class="menu_div hover" onclick="showMenu(this)">
+	  				<span style="display:none">down</span>
+	  	 			<span style="font-family: 微软雅黑;">统计中心</span>
+	  				<a style="margin-left: 30px;text-decoration:none;" >
+	  					<img width="15px" height="15px" src="/index/images/left_button_open.png">
+	  				</a>
+	  			</div>
+	   			<ul>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>1</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>2</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>3</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>4</a></li>
+	       		</ul>
+	        </div>
+	        <div id="menu_4_1" name="menu_4" class="menu-block config menu2" >
+	        	<div class="menu_div hover" onclick="showMenu(this)">
+	  				<span style="display:none">down</span>
+	  	 			<span style="font-family: 微软雅黑;">工作排班</span>
+	  				<a style="margin-left: 30px;text-decoration:none;" >
+	  					<img width="15px" height="15px" src="/index/images/left_button_open.png">
+	  				</a>
+	  			</div>
+	   			<ul>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>1</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>2</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>3</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>4</a></li>
+	       		</ul>
+	        </div>
+	        <div id="menu_5_1" name="menu_5" class="menu-block config menu2" >
+	        	<div class="menu_div hover" onclick="showMenu(this)">
+	  				<span style="display:none">down</span>
+	  	 			<span style="font-family: 微软雅黑;">数据配置</span>
+	  				<a style="margin-left: 30px;text-decoration:none;" >
+	  					<img width="15px" height="15px" src="/index/images/left_button_open.png">
+	  				</a>
+	  			</div>
+	   			<ul>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>1</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>2</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>3</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>4</a></li>
+	       		</ul>
+	        </div>
+	        <div id="menu_6_1" name="menu_6" class="menu-block config menu2" >
+	        	<div class="menu_div hover" onclick="showMenu(this)">
+	  				<span style="display:none">down</span>
+	  	 			<span style="font-family: 微软雅黑;">系统管理</span>
+	  				<a style="margin-left: 30px;text-decoration:none;" >
+	  					<img width="15px" height="15px" src="/index/images/left_button_open.png">
+	  				</a>
+	  			</div>
+	   			<ul>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>1</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>2</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>3</a></li>
+	   				<li class="menu3" id="menu_" onclick="menuShowPage('','menu_')" path="当前位置：<span>1</span> > <span>2</span> ><span> 3</span>" url="" ><a>4</a></li>
+	       		</ul>
+	        </div> -->
+		</div>
+		<div id="bottomMenu" style="border-radius:5px 0 0 5px;" >
+         		<div id="bottomMenuTitle" class="menu_div_new ui-tabs-panel">
+         			<span style="vertical-align:middle;color:white;">病区筛选</span>
+         		</div>
+         		<div id="bingqu" style="height:40%;overflow-y: auto;background:#cccccc" ></div>
+         </div>
+
+    </div>
+    <div class="dl-second-slib" style="height:100px"></div>
+    
+    <div>
+    <div class="path"><a id="aMenuPath" style="padding-left: 10px;" href="javascript:backMain()"></a></div><!-- ${NAVIGATION_NAME} -->
+	    <iframe id="mainFrame" style="margin-left:10px;" frameborder="no" border="0" marginwidth="0" marginheight="0">
+	    </iframe>
+    </div>
+
+<script type="text/javascript">
+$(function(){
+	
+	onLoadWin();
+	
+	var firstMenuDom = $(".top-menu ul.menu-items li").eq(0);
+	console.log(firstMenuDom);
+	if(firstMenuDom.length>0){
+		var firstMenuDomId = firstMenuDom.attr("id");
+		if(firstMenuDomId.length>0){
+			menuShowSub(firstMenuDomId);
+			//menuShowSub('menu_1');
+		}
+	}
+	//initLeafMenuCss();
+	
+	setInterval("tick()", 1000);
+	
+});
+
+/**
+ *	页面加载完成后初始化页面CSS
+ */
+function onLoadWin(){
+	var top = 65;
+	if(parseFloat($(".left-menu").css("width"))>0){
+		var width = $(window).width();
+		var height = $(window).height();
+		height = height-top;
+		if(window.navigator.userAgent.indexOf("Firefox") >= 0){
+            //$('#bg').css({'width':w+'px'});
+			$("#mainFrame").css("width",width-224+"px").css("height",height-20-15-32.5+"px");
+			if($(document).height()>1000){
+                $(".left-menu").css("height",height+"px");
+			}else{
+                $(".left-menu").css("height",height+"px");
+			}
+			$(".dl-second-slib").css("height","100");
+            $("#body_new").css("background","url(/index/images/main_bg.png) #f5f5f5 left repeat-y");
+            $(".path").css("margin","20px 0 15px 217px");
+		}else{
+			$("#mainFrame").css("width",width-224+"px").css("height",height-20-15-32.5+"px");
+			$(".left-menu").css("height",height);
+			$(".dl-second-slib").css("height","100");
+            $("#body_new").css("background","#f5f5f5");
+            $(".path").css("margin","20px 0 15px 217px");
+		}
+		$(".left-menu").show();
+	}else{
+		if(window.navigator.userAgent.indexOf("Firefox") >= 0){
+			$("#mainFrame").css("width","98%");
+			$("#mainFrame").css("height","50%");
+            $("#body_new").css("background","#f5f5f5");
+            $(".path").css("margin","20px 0 15px 5px");
+		}else {
+			$("#mainFrame").css("width","98%");
+            $("#body_new").css("background","#f5f5f5");
+            $(".path").css("margin","20px 0 15px 5px");
+		}
+		$(".left-menu").hide();
+	}
+}
+
+/**
+ * 	初始化左侧菜单CSS
+ */
+function initLeafMenuCss(){
+	var totalMenuHeight=$(".left-menu").height();
+	//alert($(".left-menu #menu_").outerHeight());
+	var topMenuHeight=$(".left-menu #menu_").outerHeight(true);//+$(".left-menu #menu_").outerHeight(true);
+	//alert(topMenuHeight);
+	$("#topMenu").height(topMenuHeight);
+	$("#bingqu").height(totalMenuHeight-topMenuHeight-$("#bottomMenuTitle").outerHeight(true)-80);
+	$("#topMenu").css("overflow-y","hidden");
+	//$("#bottomMenu").show();
+	$("#bottomMenu").hide();
+}
+
+/**
+ *	绑定左侧菜单开关按钮的click事件
+ */
+$(".dl-second-slib").on("click",function(){
+	if(parseFloat($(".left-menu").css("width"))>19){
+		$(".left-menu").css("width","10");
+		$(".dl-second-slib").css("left","0").css("background","url('/index/images/left-slib.gif') no-repeat -6px center transparent");
+		$("#mainFrame").css("width","98%");
+		$("#body_new").css("background","#f5f5f5");
+		$(".path").css("margin","20px 0 15px 5px");
+		$(".left-menu").hide();
+		//$("#mainFrame").css("height",$(window).height()-80);
+	}else{
+		$(".left-menu").css("width","208");
+		$(".dl-second-slib").css("left","204px").css("background","url('/index/images/left-slib.gif') no-repeat 0px center transparent");
+		$("#mainFrame").css("width",$(window).width()-260);
+		$("#body_new").css("background","url(/index/images/main_bg.png) #f5f5f5 left repeat-y");
+		$(".path").css("margin","20px 0 15px 217px");
+		$(".left-menu").show();
+	}
+});
+
+/**
+ * 	一级菜单的点击事件函数
+ */
+function menuShowSub(menuid){
+	$(".top-menu ul li").each(function(){
+		$(this).removeClass("selected");
+    });
+	$("#"+menuid).addClass("selected");
+	
+	$(".menu2").each(function(){
+		if($(this).attr("data-parent-id")==menuid){
+			$(this).show();
+		}else{
+			$(this).hide();
+		}
+	})
+	
+	var firstMenu = $("#"+menuid+"_7").children().children("span").eq(1).text();
+	//alert(firstMenu);
+	if(firstMenu=="业务管理"){
+		var totalMenuHeight=$(".left-menu").height();
+		var topMenuHeight=$("#menu_984_7").outerHeight(true);//+$("#menu_1_2").outerHeight(true);
+		$("#topMenu").height(topMenuHeight);
+		$("#bingqu").height(totalMenuHeight-topMenuHeight-$("#bottomMenuTitle").outerHeight(true)-80);
+		$("#topMenu").css("overflow-y","hidden");
+		$("#bottomMenu").show();
+	}else{
+		$("#topMenu").height("100%");
+		$("#topMenu").css("overflow-y","auto");
+		$("#bottomMenu").hide();
+	}
+	
+	clickMenu3First();
+	
+}
+
+/**
+ * 二级菜单的click事件
+ */
+function showMenu(docObj){
+	
+	var v=$(docObj).children().first().text();
+	if(v == 'down'){
+	    $(docObj).removeClass("hover");
+		$(docObj).children().last().children("img").attr("src","/index/images/left_button_close.png");
+		$(docObj).next().hide();
+		$(docObj).children().first().text("up");
+	}else if(v=='up'){
+        $(docObj).addClass("hover");
+		$(docObj).children().last().children("img").attr("src","/index/images/left_button_open.png");
+		$(docObj).next().show();
+		$(docObj).children().first().text("down");
+	}
+	
+	/* var firstMenu= $(docObj).children("span").eq(1).text();
+	if( firstMenu =="任务管理" ){
+		var totalMenuHeight=$(".left-menu").height();
+		var topMenuHeight=$("#menu_1_1").outerHeight(true)+$("#menu_1_2").outerHeight(true);
+		$("#topMenu").height(topMenuHeight);
+		$("#bingqu").height(totalMenuHeight-topMenuHeight-$("#bottomMenuTitle").outerHeight(true));
+	}else{
+		$("#topMenu").height("100%");
+		$("#topMenu").css("overflow-y","auto");
+	} */
+}
+
+/**
+ * 	js模仿用户点击三级菜单的第一个菜单
+ */
+function clickMenu3First(){
+	//循环每一个class为menu2的节点
+	$(".main-div .left-menu .menu2").each(function(){
+		var that = $(this);
+		//判断每一个class为menu2的节点，其css中display是否为block
+	    if(that.css("display")=="block"){
+	    	//console.log("menu2Node:"+that);
+	    	var menu3Node = that.find("ul").find("li.menu3").first();
+	    	//console.log("menu3Node:"+menu3Node);
+	    	if(menu3Node.length>0){
+	    		var menu3Id = menu3Node.attr("id");
+	    		//console.log(menu3Id);
+	    		$("#"+menu3Id).click();
+	    	}
+	    	return false;//跳出循环
+	    }
+	});
+	
+}
+/**
+ * 	把当前时间经过格式化后写入页面
+ */
+function tick(){
+    var today = new Date();
+    $("#dynTime").html(showLocale(today));
+}
+/**
+ *	格式化日期、时间、星期，并组合成字符串返回
+ */
+function showLocale(objD){
+    var str,colorhead,colorfoot;
+    var yy = objD.getYear();
+    if(yy<1900) yy = yy+1900;
+    var MM = objD.getMonth()+1;
+    if(MM<10) MM = '0' + MM;
+    var dd = objD.getDate();
+    if(dd<10) dd = '0' + dd;
+    var hh = objD.getHours();
+    if(hh<10) hh = '0' + hh;
+    var mm = objD.getMinutes();
+    if(mm<10) mm = '0' + mm;
+    var ss = objD.getSeconds();
+    if(ss<10) ss = '0' + ss;
+    var ww = objD.getDay();
+    if  ( ww==0 )  colorhead="<font color=\"white\">";
+    if  ( ww > 0 && ww < 6 )  colorhead="<font color=\"white\">";
+    if  ( ww==6 )  colorhead="<font color=\"white\">";
+    if  (ww==0)  ww="星期日";
+    if  (ww==1)  ww="星期一";
+    if  (ww==2)  ww="星期二";
+    if  (ww==3)  ww="星期三";
+    if  (ww==4)  ww="星期四";
+    if  (ww==5)  ww="星期五";
+    if  (ww==6)  ww="星期六";
+    colorfoot="</font>"
+    str = colorhead + yy + "-" + MM + "-" + dd + " " + hh + ":" + mm + ":" + ss + "  " + ww + colorfoot;
+    return(str);
+};
+
+/**
+ * 显示点击菜单的功能页面
+ */
+function menuShowPage(sysid,menuId){
+
+	$(".menu3").removeClass("selected");
+	var obj = $("#"+menuId);
+	$(obj).addClass("selected");
+	
+	var navPath = $(obj).attr("path");
+	var firstMenuName = "";
+    $(".top-menu ul.menu-items li").each(function(){
+    	var flag = $(this).hasClass("selected");
+    	if(flag){
+    		var menuName = $(this).find("a").text();
+    		firstMenuName = menuName;
+    		return false;
+    	}
+    });
+    if(firstMenuName!=null && firstMenuName!=""){
+    	navPath = navPath.replace("FIRST_MENU_NAME", firstMenuName);
+    }
+	$("#aMenuPath").html(navPath);
+	
+	var url = $(obj).attr("url");
+	var text = $(obj).text();
+	/* if(startsWith(url, "fun:")){
+		 var funName = eval(url.replace("fun:",""));
+		 new funName();
+		 return ;
+	} */
+	/* <%--if(startsWith(url, "schedule/")){--%>
+		 <%--$("#mainFrame").attr("src","http://${serverName}:${httpPort}/"+url);--%>
+		 <%--return ;--%>
+	<%--}--%> */
+	if(url && url!=undefined && url!="" ){
+		
+		//加载病区list
+		//loadInpatient(text);
+		
+		if(url.substring(0,4)=="http"){
+			//$("#mainFrame").attr("src",url);
+			iframeShowPage(url);
+		}else{
+			//$("#mainFrame").attr("src",url);
+			iframeShowPage(url);
+			jspURL = "/"+url;
+		}
+		//resizeMainFrame();
+		//$("#mainFrame").attr("src","http://127.0.0.1:8080/schedule/user/edit"); 
+	}else{
+		//$("#mainFrame").attr("src","/error/404");
+		iframeShowPage("/error/404");
+	}
+}
+
+/*
+ * 点击左侧菜单时，在右侧iframe中加载相关内容
+ */
+function iframeShowPage(href){
+	//util.loading();
+	var iframe = document.getElementById("mainFrame");
+	iframe.src = href;
+	if (!/*@cc_on!@*/0) { //if not IE
+		iframe.onload = function(){
+			console.log("Local iframe is now loaded.");
+			//console.log('加载完毕');
+			util.loaded();
+		};
+	} else {
+		iframe.onreadystatechange = function(){
+			if (iframe.readyState == "complete"){
+				console.log("Local iframe is now loaded.");
+				//console.log('加载完毕');
+				util.loaded();
+			}
+		};
+	}
+	util.loaded();
+}
+
+/**
+ * 登出
+ */
+function openLogout(){
+	//location.href=BASE_CONTEXT_PATH + "/user-logout";
+	location.href=BASE_CONTEXT_PATH + "/logout";
+}
+
+/**
+ * 	加载病区
+ */
+/* function loadInpatient(value){
+	
+	$.ajax({
+		type : 'POST',
+		url : '${pageContext.request.contextPath}/mainMenu/init',
+		dataType : 'html',
+		cache : false,
+		//async : true,
+		data : {"menu" : value},
+		success : function(data) {
+			$("#bingqu").html(data);
+		},
+		error : function(data){
+            layer.alert("获取病区信息错误", {'title': '提示', icon: 0});
+		}
+	});
+	
+}  */
+
+</script>
+<script type="text/javascript">
+$(function(){
+	//---------事件绑定--------------
+	
+	/**
+	 * 	绑定签到按钮的click事件
+	 */
+	$("#start-sign-btn").on("click", function(){
+		
+		var urlStr = BASE_CONTEXT_PATH+"/sign/insert"; // 需要提交的url
+		$.ajax({
+			type : "POST", // 提交方式 get/post
+			url : urlStr,
+			contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+			//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+			data : {},
+			success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+				//console.log(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"success");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				util.message("AJAX请求时发生错误!");
+			}
+		});
+	});
+});
+</script>
+</div>
+
+</body>
+</html>

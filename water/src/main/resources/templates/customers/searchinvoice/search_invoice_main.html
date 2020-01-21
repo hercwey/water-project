@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>开票信息页面</title>
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+<style type="text/css">
+	/* 客户开票信息列表选中行的颜色 */
+	.selected-color{
+		background: #8FBC8F;
+		color: #fff
+	}
+	#customer-invoice-table tbody tr:hover{
+		cursor: default;
+		background: #8FBC8F;
+		color: #fff
+	}
+</style>
+
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label search-customer-invoice-main" id="search-customer-invoice-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block; width:100%;padding-right:40px;" id="search-customer-invoice-div">
+				<ul class="extra-l" style="list-style: none;">
+				
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入客户名称、开票名称、税号、开户行及账号、地址及电话" title="请输入客户名称、开票名称、税号、开户行及账号、地址及电话" />
+					</li>
+					<!-- 开票类型 -->
+					<li class="input-group-sm">
+						<!-- 开票类型；1：专用发票，2：普通发票，3：手工发票 -->
+						<select class="form-control btn-sm bill-type" id="bill-type" name="billType">
+							<!-- 开票类型；1：专用发票，2：普通发票，3：手工发票 -->
+							<option value="">—开票类型—</option>
+							<option value="1">专用发票</option>
+							<option value="2">普通发票</option>
+							<option value="3">手工发票</option>
+						</select>
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm" id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm" id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+					
+				</ul>
+			</div>
+
+			<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+
+			<!-- 容器:字典列表 -->
+			<div class="customer-invoice-body table-container" id="customer-invoice-body"></div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+	
+	<!-- 查询客户开票信息JS -->
+	<script type="text/javascript" src="/js/searchinvoice/SearchCustomerInvoice.js"></script>
+	
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+		var containerId = "search-customer-invoice-main";
+		/**
+		 * 	用户选择开票信息的回调函数
+		 */
+		function searchInvoiceCallback(invoice){
+			console.log("----------selected callback");
+			console.log("user selected invoice id is : "+JSON.stringify(invoice));
+		}
+	
+		//创建实例
+		var searchCustomerInvoice = new SearchCustomerInvoice(containerId, searchInvoiceCallback);
+		
+		$(function(){
+			console.log("dialog id is : "+searchCustomerInvoice.containerId);
+			searchCustomerInvoice.defaultSearchCustomerInvoice();//主页:默认查询(加载默认列表)
+		});
+		
+	</script>
+
+</body>
+</html>

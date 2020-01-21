@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>开票操作面板-专票及普票开据时使用</title>
+</head>
+<body>
+<th:block th:fragment="panel">
+	<!-- 操作面板 -->
+	<div class="col-12  issue-invoice-panel" style="width:1000px;margin:auto;padding-left:0px;padding-right:0px;" >
+		<!-- 按钮组 -->
+		<div  style="width:1000px; display:inline-block">
+			<div  class="btn-group btn-group-sm" style="float:right;" >
+				<button type="button" class="btn   btn-secondary" id="btn-invoice-customer"><i class="fa fa-user-circle" aria-hidden="true" style="color:lightcyan;"></i>&nbsp;客户</button>
+				<!-- <button type="button" class="btn btn-secondary" style="color:lightgreen">|</button>
+				<button type="button" class="btn btn-secondary" id="btn-copy-invoice"><i class="fa fa-copy" aria-hidden="true" style="color:blue;"></i>&nbsp;复制</button>
+				<button type="button" class="btn btn-secondary" id="btn-invoice-red"><i class="fa fa-dedent" aria-hidden="true" style="color:red;"></i>&nbsp;红字</button>
+				<button type="button" class="btn btn-secondary" id="btn-invoice-list"><i class="fa fa-list-ul" aria-hidden="true" style="color:orange;"></i>&nbsp;清单</button>
+				<button type="button" class="btn btn-secondary" id="btn-invoice-discount"><i class="fa fa-percent" aria-hidden="true" style="color:cyan;"></i>&nbsp;折扣</button>
+				<button type="button" class="btn btn-secondary" id="btn-invoice-price">	<i class="fa fa-cny" aria-hidden="true" style="color:yellow;"></i>&nbsp;价格</button> -->
+				<button type="button" class="btn btn-secondary" style="color:lightgreen">|</button>
+				<button type="button" class="btn btn-secondary" id="btn-add-row" disabled><i class="fa fa-plus-square-o" aria-hidden="true" style="color:lightgreen;"></i>&nbsp;增加行</button>
+				<button type="button" class="btn btn-secondary" id="btn-del-row" disabled><i class="fa fa-minus-square-o" aria-hidden="true" style="color:red;"></i>  &nbsp;减少行</button>
+				<button type="button" class="btn btn-secondary" style="color:lightgreen">|</button>
+				<button type="button" class="btn btn-secondary" id="btn-print-invoice" disabled><i class="fa fa-print" aria-hidden="true" style="color:lightblue;"></i>&nbsp;打印</button>				
+			</div>
+				<!-- 预生成的发票列表,需要动态生成 -->				
+				<div class="pre-invoice-list"	style="float: left; height: 32px; line-height: 32px;">
+							<h5 style="margin-bottom:0px;">										
+							<span class="badge badge-pill badge-success" id="pre-invoice-1">&nbsp;1&nbsp;</span>
+							<span class="badge badge-pill badge-info">&nbsp;2&nbsp; </span>
+							<span class="badge badge-pill badge-info"> &nbsp;3&nbsp; </span>
+							<span class="badge badge-pill badge-info">&nbsp;4&nbsp;</span>
+							<span class="badge badge-pill badge-info">&nbsp;5&nbsp;</span>
+							<span class="badge badge-pill badge-info">&nbsp;6&nbsp;</span>
+							</h5>			
+				</div>
+				
+
+				<div class="btn-group btn-group-sm pre-invoice-operate-panel"
+					style="float: left; margin-left: 10px;">
+					<button type="button" class="btn btn-outline-primary btn-sm  modify-remark"  style="margin-left:5px;margin-right:5px;">修改备注</button>
+					<div class="dropdown">
+						<button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle"
+							data-toggle="dropdown">操作</button>
+						<div class="dropdown-menu">
+							<span class="dropdown-item confirm-and-print" href="#"><i class="fa fa-print" aria-hidden="true" style="color:black;"></i>确认而后打印</span>
+							<span class="dropdown-item  comfirm-and-not-print" href="#"><i class="fa fa-check" aria-hidden="true" style="color:black;"></i>确认但不打印</span>
+							<span class="dropdown-item  cancel-pre-invoice " href="#"><i class="fa fa-window-close" aria-hidden="true" style="color:black;"></i>取消本次生成</span>
+						</div>
+					</div>
+					
+				</div>
+
+
+
+			</div>
+			
+			
+	</div>
+</th:block>
+</body>
+</html>

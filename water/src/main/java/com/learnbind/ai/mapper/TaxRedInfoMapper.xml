@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.TaxRedInfoMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.TaxRedInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="SQFMC" jdbcType="VARCHAR" property="sqfmc" />
+    <result column="SQFSH" jdbcType="VARCHAR" property="sqfsh" />
+    <result column="KPDH" jdbcType="VARCHAR" property="kpdh" />
+    <result column="SBBH" jdbcType="VARCHAR" property="sbbh" />
+    <result column="XXBLSH" jdbcType="VARCHAR" property="xxblsh" />
+    <result column="XXBLX" jdbcType="VARCHAR" property="xxblx" />
+    <result column="DYLPDM" jdbcType="VARCHAR" property="dylpdm" />
+    <result column="DYLPHM" jdbcType="VARCHAR" property="dylphm" />
+    <result column="SZLB" jdbcType="VARCHAR" property="szlb" />
+    <result column="DSLBZ" jdbcType="VARCHAR" property="dslbz" />
+    <result column="TKRQ" jdbcType="TIMESTAMP" property="tkrq" />
+    <result column="GFMC" jdbcType="VARCHAR" property="gfmc" />
+    <result column="GFSH" jdbcType="VARCHAR" property="gfsh" />
+    <result column="XFMC" jdbcType="VARCHAR" property="xfmc" />
+    <result column="XFSH" jdbcType="VARCHAR" property="xfsh" />
+    <result column="HJJE" jdbcType="DECIMAL" property="hjje" />
+    <result column="SLV" jdbcType="DECIMAL" property="slv" />
+    <result column="HJSE" jdbcType="DECIMAL" property="hjse" />
+    <result column="SQSM" jdbcType="VARCHAR" property="sqsm" />
+    <result column="CZR" jdbcType="VARCHAR" property="czr" />
+    <result column="CZRQ" jdbcType="TIMESTAMP" property="czrq" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="HZFPDM" jdbcType="VARCHAR" property="hzfpdm" />
+    <result column="HZFPHM" jdbcType="VARCHAR" property="hzfphm" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, SQFMC, SQFSH, KPDH, SBBH, XXBLSH, XXBLX, DYLPDM, DYLPHM, SZLB, DSLBZ, TKRQ, GFMC, GFSH, 
+    XFMC, XFSH, HJJE, SLV, HJSE, SQSM, CZR, CZRQ, DELETED, HZFPDM, HZFPHM
+  </sql>
+</mapper>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+<style type="text/css">
+	/* 客户开票信息列表选中行的颜色 */
+	.selected-color{
+		background: #8FBC8F;
+		color: #fff
+	}
+	#tax-invoice-table tbody tr:hover{
+		cursor: default;
+		background: #8FBC8F;
+		color: #fff
+	}
+</style>
+</head>
+<body>
+
+	
+
+	<div class="table-responsive">
+	
+	<!-- 列表 -->
+	<table class="table table-hover table-sm" style="width:2800px" id="tax-invoice-table">
+		<thead>
+			<tr>
+				<!-- <th>
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th> -->
+				<!-- <th>客户开票名称</th> -->
+				<th>发票种类</th>
+				<th>发票代码</th>
+				<th>发票号码</th>
+				<th>合计金额</th>
+				<th>合计税额</th>
+				<th>开票日期</th>
+				<th>购方名称</th>
+				<th>购方税号</th>
+				<th>购方地址及电话</th>
+				<th>购方银行及账户</th>
+				<th>备注</th>
+				<th>作废标志</th>
+				<th>作废日期</th>
+				<th>作废人</th>
+				<th>打印标志</th>
+				<th>打印日期</th>
+				<th>打印人</th>
+				<th>冲红标志</th>
+				<th>冲红日期</th>
+				<th>冲红人</th>
+				<th>销方名称</th>
+				<th>销方税号</th>
+				<th>销方地址及电话</th>
+				<th>销方银行及账户</th>
+				<th>收款人</th>
+				<th>复核人</th>
+				<th>开票人</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${invoiceList}" th:attr="data-bind=${item.id},data-fpzl=${item.fpzl},data-chbz=${item.chbz},data-zfbz=${item.zfbz},data-fpdm=${item.fpdm},data-fphm=${item.fphm}">
+			
+				<!-- 条目选择器 -->
+				<!-- <td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id},data-fpzl=${item.fpzl},data-chbz=${item.chbz},data-zfbz=${item.zfbz},data-fpdm=${item.fpdm},data-fphm=${item.fphm}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td> -->
+				
+				<!-- <td th:text="${item.customerName}">客户名称</td> -->
+				<td th:text="${item.fpzlValue}">发票种类</td>
+				<td  th:attr="data-fpdm=${item.fpdm}, data-fphm=${item.fphm}, data-chbz=${item.chbz}" >
+					<!-- 发票冲红时显示红色字体，作废时显示灰色字体 -->
+					<span th:if="${item.chbz==1}">
+						<span class="badge badge-danger" name="redInfoFpdm" th:text="${item.fpdm}" style="cursor: pointer;"></span>
+					</span>
+					<span th:if="${item.zfbz==1}">
+						<span class="badge badge-secondary" name="redInfoFpdm" th:text="${item.fpdm}" style="cursor: pointer;"></span>
+					</span>
+					<span th:if="${item.chbz!=1 && item.zfbz!=1}">
+						<span th:text="${item.fpdm}"></span>
+					</span>
+				</td>
+				<td  th:attr="data-fpdm=${item.fpdm}, data-fphm=${item.fphm}, data-chbz=${item.chbz}" >
+					<!-- 发票冲红时显示红色字体 -->
+					<span th:if="${item.chbz==1}">
+						<span class="badge badge-danger" name="redInfoFphm" th:text="${item.fphm}" style="cursor: pointer;"></span>
+					</span>
+					<span th:if="${item.zfbz==1}">
+						<span class="badge badge-secondary" name="redInfoFphm" th:text="${item.fphm}" style="cursor: pointer;"></span>
+					</span>
+					<span th:if="${item.chbz!=1 && item.zfbz!=1}">
+						<span th:text="${item.fphm}"></span>
+					</span>
+				</td>
+				<!-- <td th:text="${item.fpdm}">发票代码</td> -->
+				<!-- <td th:text="${item.fphm}">发票号码</td> -->
+				<td th:text="${item.hjje}">合计金额</td>
+				<td th:text="${item.hjse}">合计税额</td>
+				<td th:text="${item.kprqStr}">开票日期</td>
+				<td th:text="${item.gfmc}">购方名称</td>
+				<td th:text="${item.gfsh}">购方税号</td>
+				<td th:text="${item.gfdzdh}">购方地址及电话</td>
+				<td th:text="${item.gfyhzh}">购方银行及账户</td>
+				<td th:text="${item.bz}">备注</td>
+				<td>
+					<!-- 作废标志， 未作废不显示 -->
+					<span th:if="${item.zfbz==1}">
+						<span class="badge badge-secondary">已作废</span>
+					</span>
+				</td>
+				<td th:text="${item.zfrqStr}">作废日期</td>
+				
+				<td th:text="${item.zfr}">作废人</td>
+				<td>
+					<!-- 打印标志，未打印不显示 -->
+					<span th:if="${item.dybz=='1'}">
+						<span>已打印</span>
+					</span>
+				</td>
+				<td th:text="${item.dyrqStr}">打印日期</td>
+				<td th:text="${item.dyr}">打印人</td>
+				<td  th:attr="data-fpdm=${item.fpdm}, data-fphm=${item.fphm}, data-chbz=${item.chbz}">
+					<!-- 冲红标志, 未冲红不显示 -->
+					<span th:if="${item.chbz==1}">
+						<span class="badge badge-danger" name="redInfoChbz" style="cursor: pointer;">已冲红</span>
+					</span>
+				</td>
+				<td th:text="${item.chrqStr}">冲红日期</td>
+				<td th:text="${item.chr}">冲红人</td>
+				<td th:text="${item.xfmc}">销方名称</td>
+				<td th:text="${item.xfsh}">销方税号</td>
+				<td th:text="${item.xfdzdh}">销方地址及电话</td>
+				<td th:text="${item.xfyhzh}">销方银行及账户</td>
+				<td th:text="${item.skr}">收款人</td>
+				<td th:text="${item.fhr}">复核人</td>
+				<td th:text="${item.kpr}">开票人</td>
+				<td th:text="${item.xsdjbh}">销售单据编号</td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+	
+	<!-- Tooltip -->
+	<div id="customer-notify-tooltip" class="well rounded  border border-secondary" style="padding:10px; width:700px">
+	    <div class="water-fee-notify-container">此处显示发票的红字信息</div>
+	</div>
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerTaxInvoice')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+	<!-- jQuery Popup Overlay -->
+	<script type="text/javascript" src="/jquery/jquery-popup/jquery.popupoverlay.js"></script>
+	<link rel="stylesheet" href="/css/components/invoicenotifytooltip/tooltip.css" />
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		/* var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]]; */
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			/* $("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			}); */
+		});
+		
+		//创建分页组件实例
+		var pager=new Pager("pagerTaxInvoice");
+		$(function(){			
+			pager.init(loadPage,null);			
+		});
+	</script>
+</body>
+</html>

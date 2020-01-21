@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('红字信息表下载查询条件设置-TEST')" th:remove="tag"></div>
+<title>红字信息表下载查询条件设置111</title>
+</head>
+<body>
+<div class="container-fluid">
+	<div class="row-fluid">
+		<!-- 对话框容器 -->
+		<div class="span12">
+			<!-- 对话框1 -->
+			<span th:include="component/downloadredinfodialog/download_redinfo_dialog::dialog('dialog1')"  th:remove='tag'></span>			
+		</div>
+		<div class="span12">
+			 <button class="btn btn-primary" type="button" id="button1">红字下载条件设置对话框-打开</button>			 
+		</div>
+	</div>
+</div>
+</body>
+
+<!-- 通用对话框工具JS -->
+<!-- <script type="text/javascript" th:src="js/component/dialogutil/DialogUtil.js"></script> -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+<!-- 打印对话框组件JS部分 -->
+<script type="text/javascript" th:src="@{/js/component/downloadredinfodialog/DownloadRedInfoDialog.js}"></script>
+
+
+<script type="text/javascript">
+
+	var downloadRedInfoDialog=new DownloadRedInfoDialog("dialog1");
+	//set callback function
+	downloadRedInfoDialog.setButtonOkCallback(buttonOkCallback);
+	downloadRedInfoDialog.setButtonCancelCallback(buttonCancelCallback);
+	var todayx=new Date();
+	//set object's properties  起始日期
+	//downloadRedInfoDialog.setQueryDateStart("2019-11-01");
+	setQueryDateStart(todayx);	
+	//downloadRedInfoDialog.setQueryDateEnd("2019-11-30");
+	setQueryDateEnd(todayx);
+	
+	//购方,售方税号
+	downloadRedInfoDialog.setBuyerTaxNo("b-1");
+	downloadRedInfoDialog.setSalerTaxNo("s-1");
+	downloadRedInfoDialog.setRedInfoNo("r-1");  //红字信息表号码
+	
+	//BUTTON OK,OUTER BUSINESS FUNC
+	function buttonOkCallback(){
+		console.log("button ok callback is executed");
+	}
+	
+	//BUTTON CANCEL,OUTER BUSINESS FUNC
+	function buttonCancelCallback(){
+		console.log("button cancel callback is executed");
+	}
+	
+	/*
+		功能:返回指定日期相应月份的第一天的日期
+		公共函数
+	*/
+	function getFirstDayDateOfMonth(datex){
+		var today=new Date(datex);
+		var year=today.getFullYear();		
+		console.log("year is:"+year);		
+		var month=today.getMonth()+1;		
+		var dateStart=year+'-'+month+'-'+'01';
+		return dateStart;
+	}
+	
+	/*
+		功能:返回指定日期相应月份的最后一天的日期
+		公共函数
+	*/
+	function getLastDayDateOfMonth(datex){
+		var today=new Date(datex);
+		var year=today.getFullYear();
+		var month=today.getMonth()+1;		
+		var days=getMonthDays(year,month);
+		
+		var dateEnd=year+'-'+month+'-'+days;
+		
+		return dateEnd;
+	}
+	
+	//业务相关
+	function setQueryDateStart(datex){				
+		var dateStart=getFirstDayDateOfMonth(datex);		
+		console.log("date start is:"+dateStart);		
+		downloadRedInfoDialog.setQueryDateStart(dateStart);
+	}
+	
+	//业务相关
+	function setQueryDateEnd(datex){
+		var dateEnd=getLastDayDateOfMonth(datex);
+		console.log("date end is:"+dateEnd);
+		downloadRedInfoDialog.setQueryDateEnd(dateEnd);
+	}
+		
+	
+	/*
+		生成下载红字信息表查询条件设置对象
+		可用于前台生成红字信息表查询条件设置对象定义.
+		此函数可重用
+	*/
+	function genDownloadRedInfoObject(){
+		var obj=new Object();
+		//可以参见:22.5	红字信息表下载查询条件对话框
+		obj.NSRSBH="";		//纳税人识别号,自金税盘中读取即可 	必选
+		obj.JSPH="";		//金税盘号,自金税盘中读取即可.		必选
+		obj.KPDH="";		//开票点号,自金税盘中读取即可.		必选
+		obj.YQZT="N";		//逾期状态							必选
+		
+		obj.TKRQQ="";		//填开日期起  	用户可配置  	可选
+		obj.TKRQZ="";		//填开日期止  	用户可配置	可选
+		obj.GFSH="";		//购方税号    	用户可配置	可选
+		obj.XFSH="";		//销方税号		用户可配置	可选
+		obj.XXBBH="";		//信息表编号	用户可配置	可选
+		
+		obj.XXBFW="";		//信息表下载范围  用户可配置	必选
+		
+		obj.YH="1";			//页号			设置一固定值即可  必选
+		obj.MYJLS="100";	//每页记录数	设置一固定值即可  必选
+	}
+	
+	/*
+		函数:获取指定年份,月份的最大天数.
+		天 的值是0，js会返回指定月份的最后一天，即最大天数。
+	*/
+	function getMonthDays(year,month){
+		return new Date(year, month, 0).getDate();		
+	}	
+
+	$(function(){
+		
+		$("#button1").on('click',function(){
+			downloadRedInfoDialog.show();
+			var xxbfw=downloadRedInfoDialog.getXXBFW();
+			console.log("信息表范围:"+xxbfw);
+			
+			var days=getMonthDays("2019","11");
+			console.log("2019-11最大的日期是:"+days);
+			
+			var days=getMonthDays("2019","10");
+			console.log("2019-10最大的日期是:"+days);
+			
+			var days=getMonthDays("2019","09");
+			console.log("2019-09最大的日期是:"+days);
+			
+		});
+		
+		
+	});
+
+</script>
+
+
+</html>

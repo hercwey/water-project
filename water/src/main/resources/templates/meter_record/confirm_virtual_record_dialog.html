@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-confirm-virtual-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>确认虚表记录</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!--抄表期间 -->
+													<div class="form-group form-inline">
+														<label for="record.period" class="col-sm-4 control-label">抄表期间</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control Wdate"
+																	id="meter-record-period" name="period"
+																	onClick="WdatePicker({dateFmt:'yyyy-MM',onpicked: setBackGround});"
+																	placeholder="抄表期间" style="background-color: white;" title="抄表期间">
+														</span>
+													</div>
+												</td>
+												<td></td>
+											</tr>
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary" id="btn-confirm-meter-record">确认</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		/**
+		 * 	获取当前系统月份（表示为抄表记录中的期间）
+		 */
+		function getCurrSysMonth(){
+			var date = new Date();
+			var year = date.getFullYear();    //获取完整的年份(4位,1970-????)
+			var month = date.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+			if(month<10){
+				month = "0"+month
+			}
+			return year+"-"+month;
+		}
+		
+		/**
+		 * 	设置期间默认值（系统日期当月）
+		 */
+		function setDefaultPeriod(){
+			$("#meter-record-period").val(getCurrSysMonth());
+		}
+	
+		/*
+		 *	设置日期插件input背景色
+		 */
+		function setBackGround() {
+			$("#meter-record-period").css("background-color", "white");
+		}
+		
+		/**
+		 * 	获取确认抄表记录的查询参数
+		 */
+		function getConfirmVirtualRecordParms(){
+			var parms = new Object();
+			if(G_GENERAL_SEARCH == "0"){
+				parms = getSearchMeterRecordParams();//获取普通查询参数（不包括分页信息）
+			}else if (G_GENERAL_SEARCH == "1"){
+				parms = advancedSearchParams.getParams();//获取高级查询参数
+			}else {
+				parms = getZTreeSearchParam();//获取ztree查询参数
+			}
+			var traceIds=parms.traceIds;
+			var period= $("#meter-record-period").val();
+			
+			parms.traceIds=traceIds;
+			parms.period = period;
+			return parms;
+			
+			
+		}
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function confirmVirtualMeterRecordCallback(closeDialogFlag) {
+			 
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/meter-record/confirm-virtual-record";
+			var parm = getConfirmVirtualRecordParms();
+			if(parm.traceIds == null || parm.traceIds ==""){
+				util.message("确认虚表记录前，请选择小区");
+				return false;
+			}
+			$.post(urlStr, parm, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeConfirmVirtualRecordDialog();
+						loadPageClickPageNum();
+						util.message(res.result_msg,null,"success");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+	
+		/* 
+			关闭(CLOSE) 增加核对类型对话框
+		 */
+		function closeConfirmVirtualRecordDialog() {
+			$("#modal-container-confirm-virtual-dialog").modal("hide");
+		}
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------	init	---------------
+			setDefaultPeriod();//设置期间默认值（系统日期当月）
+			//---------------click event process binding---------------
+			
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-confirm-meter-record').on('click',function() {
+				
+				var period = $("#meter-record-period").val();
+				if(period==null || period==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择抄表期间！",null,"warning");
+					return;
+				}
+				
+				confirmVirtualMeterRecordCallback();
+				
+			});
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

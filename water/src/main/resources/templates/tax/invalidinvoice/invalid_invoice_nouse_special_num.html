@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>作废指定数量空白发票对话框-专用发票</title>
+<div th:include="common/common_head::headx('作废指定数量空白发票对话框(专用发票)-TEST')" th:remove="tag"></div>
+</head>
+<body>
+	
+<div class="container-fluid">
+	<div class="row-fluid">
+		<!-- 对话框容器 -->
+		<div class="span12">
+			<!-- 未使用发票作废对话框-专用发票 -->
+			<span th:include="component/invalidinvoicedialog/invalid_invoice_dialog::dialog('invalid-invoice-dialog')"  th:remove='tag'></span>
+			<!-- 发票作废任务对话框 -->
+			<span th:include="component/invalidinvoiceprogressdialog/invalid_invoice_progress_dialog::dialog('progress-dialog')"  th:remove='tag'></span>
+			<!-- 发票作废任务结果-对话框 -->
+			<span th:include="component/invalidinvoiceresultdialog/invalid_invoice_result_dialog::dialog('result-dialog')"  th:remove='tag'></span>
+		</div>
+		<div class="span12">
+			 <!-- <button class="btn btn-primary" type="button" id="button1">空白专票指定数量作废确认对话框-打开</button>
+			 <button class="btn btn-primary" type="button" id="button2">空白专票指定数量作废确认对话框-打开</button> -->
+		</div>
+	</div>
+</div>
+</body>
+
+<!-- 通用对话框工具JS 打开或关闭对话框 -->
+<!-- <script type="text/javascript" th:src="js/component/dialogutil/DialogUtil.js"></script> -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 未使用发票作废份数录入对话框组件JS部分 -->
+<script type="text/javascript" th:src="@{/js/component/invalidinvoicedialog/InvalidInvoiceDialog.js}"></script>
+<!-- 未使用发票作废任务进度对话框组件JS部分 -->
+<script type="text/javascript" th:src="@{/js/component/invalidinvoiceprogressdialog/InvalidInvoiceProgressDialog.js}"></script>
+<!-- 未使用发票作废作废结果对话框 组件JS部分-->
+<script type="text/javascript" th:src="@{/js/component/invalidinvoiceresultdialog/InvalidInvoiceResultDialog.js}"></script>
+
+<!-- 发票业务部分:发票类型 -->
+<script type="text/javascript" th:src="@{/js/component/invoicepublic/InvoiceType.js}"></script>
+
+
+<script type="text/javascript">
+
+	/*
+		前台操作对象
+	*/
+	function InvalidNoUseSpecialNumInvoice(){
+		//this.dialogId=dialogId;  //对话框ID
+		const INVALID_DIALOG="invalid-invoice-dialog";  //作废对话框
+		const PROGRESS_DIALOG="progress-dialog";		//作废任务对话框
+		const RESULT_DIALOG="result-dialog";			//作废结果对话框		
+		
+		//(1)作废份数对话框
+		this.invalidDialog=new InvalidInvoiceDialog(INVALID_DIALOG);  	 //作废对话框对象
+		this.setInvalidButtonOkCallback();
+		
+		//(2)作废任务进度对话框
+		this.progressDialog=new InvalidInvoiceProgressDialog(PROGRESS_DIALOG);  //进度对话框对象
+		//(3)作废结果对话框
+		this.resultDialog=new InvalidInvoiceResultDialog(RESULT_DIALOG);  //作废结果对话框对象		
+
+
+		this.invoiceType="-1";  //发票类型
+
+
+	}
+	
+	/*
+		设置作废份数对话框中 buttonOk 按钮的call back function
+	*/
+	InvalidNoUseSpecialNumInvoice.prototype.setInvalidButtonOkCallback=function(){
+		var self=this;  //instance of InvalidNoUseSpecialNumInvoice
+
+		this.invalidDialog.setButtonOkCallback(buttonOkCallback);  //设置作废对话框OK按钮回调函数
+
+		function buttonOkCallback(){
+			console.log("button ok callback function is called!");
+			var invalidNum=self.invalidDialog.getInvalidNum();  //作废的发票份数.
+			console.log("invalid invoce number is :"+invalidNum);
+			
+			//开始执行作废任务
+			//(1)关闭作废份数对话框
+			//(1.1)准备请求作废时的数据
+							   
+			var invoiceDM=self.invalidDialog.getInvoiceDM();
+			var invoiceHM=self.invalidDialog.getInvoiceHM();  //初始号码
+			var invoiceType=self.invoiceType;  //发票类型
+			var invalidNum=self.invalidDialog.getInvalidNum();  //作废份数
+
+			self.invalidDialog.close();  
+			//(2)根据份数生成请求数据包			
+			const REQUEST_URL=BASE_CONTEXT_PATH + "/tax/invalidinvoice/invalid/json";
+			
+			/* private String FPZL;
+			private String FPHM;
+			private String FPDM; */
+
+			/* FPZL	发票种类	字符	2	是	固定值：
+						0：专用发票 
+						2：普通发票
+						12：机动车票
+						51：电子发票
+			FPHM	发票号码	字符	20	是	
+			FPDM	发票代码	字符	20	是 */
+
+			var reqArr=new Array();
+			for(var i=0;i<invalidNum;i++){
+				var obj=new Object();
+				obj.FPZL=invoiceType;
+				obj.FPDM=invoiceDM;
+				obj.FPHM=invoiceHM-0+i;
+				reqArr.push(obj);
+			}
+
+			var jsonParam=JSON.stringify(reqArr);
+			console.log("invalid invoice ,request params is:"+jsonParam);
+
+			var param=new Object();
+			param.invoiceListJSON=jsonParam;
+
+
+			//同步调用接口,未采用异步的方式处理.这样程序的结构更加简单一些.
+			$.ajaxSettings.async = false;
+    		$.post(REQUEST_URL,param,function(res){
+    			console.log("invalid invoice response is:"+res);
+    		})
+    		$.ajaxSettings.async = true;    
+			//此处的js将会在上面请求完成后才进行	
+
+
+			//(3)采用同步方式发送请求
+			//(4)分析返回的数据包 如果执行成功,则关闭相应的
+			//
+
+
+
+		}
+
+		
+
+
+
+
+
+
+
+
+	}
+	
+	
+	
+	
+	/*
+		对话框确认按钮click-回调函数
+		在此回调函数中增加启动发票作废业务.
+	*/
+	InvalidNoUseSpecialNumInvoice.prototype.buttonOkCallback=function(){
+		var self=this;		
+		console.log("button ok callback function is called!");
+		var invalidNum=self.getInvalidNum();  //作废的发票份数.
+	}
+	
+	/* 
+		功能:查询发票库存
+		invoiceType:发票类型,参见InvoiceType.js 
+	*/
+	
+	InvalidNoUseSpecialNumInvoice.prototype.queryInventory=function(invoiceType){
+		var self=this;	
+		
+		self.invoiceType=invoiceType;  //发票类型
+
+			
+		const url=BASE_CONTEXT_PATH+"/tax/inventory/query";  //请求地址
+		
+		//发票类型列表
+		var invoiceTypeList=new Array();
+		invoiceTypeList.push(invoiceType);
+		
+		var param=new Object();			
+		param.invoiceTypeList=invoiceTypeList;
+			
+		$.post(url,param,querySpecialSuccess);  //查询发票库存
+		
+		/*
+			查询库存回调函数
+		*/
+		function querySpecialSuccess(resp){
+			console.log("返回的数据是-专用发票:"+resp);			
+			
+			if(resp!=""){
+				console.log("返回数据正常");
+				//将JSON转换为JS数组对象.此处必须将resp转换成JS对象.
+				var inventoryArr=JSON.parse(resp);  				
+				var inventory=inventoryArr[0];
+				
+				/* console.log("发票库存:"+inventory);
+				console.log("发票代码"+inventory.FPDM);
+				console.log("发票号码"+inventory.FPHM);
+				console.log("发票库存"+inventory.KCFPSL); */
+				
+				var fpdm=inventory.FPDM;  	//发票代码
+				var fphm=inventory.FPHM;	//发票号码
+				var kcfpsl=inventory.KCFPSL; //库存发票数量
+				
+				var invoiceTypeName=InvoiceType.getInvoiceName(invoiceType)  //发票类型---->发票类型名称
+				
+				self.invalidDialog.setInvoiceType(invoiceTypeName);
+				self.invalidDialog.setInvoiceDM(fpdm);
+				self.invalidDialog.setInvoiceHM(fphm);
+				self.invalidDialog.setInvoiceNum(kcfpsl);
+				
+				self.invalidDialog.show();				
+			}
+		}
+		
+	}
+
+	//声明前台操作对象
+	var invalidNoUseSpecialNumInvoice=new InvalidNoUseSpecialNumInvoice();	
+	
+	//page loaded ready
+	$(function() {
+		//开始查询库存.
+		invalidNoUseSpecialNumInvoice.queryInventory(InvoiceType.FPZL_SPECIAL_INVOICE);	
+	});
+</script>
+
+</html>

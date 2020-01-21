@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WaterNotifyMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.WaterNotify">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="OPERATOR" jdbcType="VARCHAR" property="operator" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="METER_IDS" jdbcType="VARCHAR" property="meterIds" />
+    <result column="METER_RECORD" jdbcType="VARCHAR" property="meterRecord" />
+    <result column="SUM_BASE_AMOUNT" jdbcType="DECIMAL" property="sumBaseAmount" />
+    <result column="SUM_SEWAGE_AMOUNT" jdbcType="DECIMAL" property="sumSewageAmount" />
+    <result column="PAST_BASE_OWE_AMOUNT" jdbcType="DECIMAL" property="pastBaseOweAmount" />
+    <result column="PAST_SEWAGE_OWE_AMOUNT" jdbcType="DECIMAL" property="pastSewageOweAmount" />
+    <result column="TOTAL_OWE_AMOUNT" jdbcType="DECIMAL" property="totalOweAmount" />
+    <result column="CUSTOMER_BALANCE" jdbcType="DECIMAL" property="customerBalance" />
+    <result column="METER_READER" jdbcType="VARCHAR" property="meterReader" />
+    <result column="USE_LOCATION" jdbcType="DECIMAL" property="useLocation" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="SERIAL_NO" jdbcType="VARCHAR" property="serialNo" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, CREATE_DATE, OPERATOR, PERIOD, METER_IDS, METER_RECORD, SUM_BASE_AMOUNT, 
+    SUM_SEWAGE_AMOUNT, PAST_BASE_OWE_AMOUNT, PAST_SEWAGE_OWE_AMOUNT, TOTAL_OWE_AMOUNT, 
+    CUSTOMER_BALANCE, METER_READER, USE_LOCATION, STATUS, SERIAL_NO, REMARK
+  </sql>
+  
+  <select id="searchCond" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM WATER_NOTIFY W
+		LEFT JOIN CUSTOMERS C ON C.ID = W.CUSTOMER_ID
+		LEFT JOIN CUSTOMER_BILL_INFO B ON B.CUSTOMER_ID = W.CUSTOMER_ID
+		LEFT JOIN (select  REGEXP_SUBSTR(N.METER_IDS,'[^,]+',1,1) AS STR, ID FROM WATER_NOTIFY N) N ON N.ID = W.ID
+		LEFT JOIN METERS M ON M.ID = N.STR
+		<where>
+			W.status=0 
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+  					OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+  					OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR W.SERIAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="period!=null and period!=''">
+				AND W.PERIOD=#{period}
+			</if>
+			<!-- 欠费金额大于0 -->
+			<if test="arrearsAmount!=null and arrearsAmount==1">
+				AND W.TOTAL_OWE_AMOUNT &gt; 0
+			</if>
+			<!-- 欠费金额等于0 -->
+			<if test="arrearsAmount!=null and arrearsAmount==2">
+				AND W.TOTAL_OWE_AMOUNT = 0
+			</if>
+			<!-- 欠费金额小于0 -->
+			<if test="arrearsAmount!=null and arrearsAmount==3">
+				AND W.TOTAL_OWE_AMOUNT &lt; 0
+			</if>
+		</where>
+		<if test="sortMethod!=null and sortMethod==0">
+			ORDER BY M.SORT_VALUE ASC
+		</if>
+		<if test="sortMethod!=null and sortMethod==1">
+			ORDER BY B.BILL_NO ASC
+		</if>
+  </select>
+  
+   <select id="getNotifyMeterIdList" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM WATER_NOTIFY W
+		LEFT JOIN CUSTOMERS C ON C.ID = W.CUSTOMER_ID
+		LEFT JOIN CUSTOMER_BILL_INFO B ON B.CUSTOMER_ID = W.CUSTOMER_ID
+		LEFT JOIN (select  REGEXP_SUBSTR(N.METER_IDS,'[^,]+',1,1) AS STR, ID FROM WATER_NOTIFY N) N ON N.ID = W.ID
+		LEFT JOIN METERS M ON M.ID = N.STR
+		<where>
+			W.status=0 
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+  					OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+  					OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR W.SERIAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="period!=null and period!=''">
+				AND W.PERIOD=#{period}
+			</if>
+			<!-- 欠费金额大于0 -->
+			<if test="arrearsAmount!=null and arrearsAmount==1">
+				AND W.TOTAL_OWE_AMOUNT &gt; 0
+			</if>
+			<!-- 欠费金额等于0 -->
+			<if test="arrearsAmount!=null and arrearsAmount==2">
+				AND W.TOTAL_OWE_AMOUNT = 0
+			</if>
+			<!-- 欠费金额小于0 -->
+			<if test="arrearsAmount!=null and arrearsAmount==3">
+				AND W.TOTAL_OWE_AMOUNT &lt; 0
+			</if>
+		AND N.STR IN (SELECT LM.METER_ID FROM LOCATION_METER LM WHERE LM.DELETED=0 AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%'))
+		</where>
+		<if test="sortMethod!=null and sortMethod==0">
+			ORDER BY M.SORT_VALUE ASC
+		</if>
+		<if test="sortMethod!=null and sortMethod==1">
+			ORDER BY B.BILL_NO ASC
+		</if>
+		
+		
+		
+  </select>
+  
+  
+   <select id="isExistsLocation" resultType="Integer">
+		SELECT 
+			count(*) 
+		FROM LOCATION_METER LM
+		LEFT JOIN METERS M ON M.ID=LM.METER_ID
+		<where>
+			LM.DELETED=0  AND #{meterIdStr} IN
+			(SELECT LM.METER_ID FROM LOCATION_METER WHERE LM.DELETED=0 AND LM.TRACE_IDS LIKE CONCAT(#{traceIds},'%'))
+		</where>
+		<!-- order by M.SORT_VALUE ASC -->
+  </select>
+  
+  <!-- 查询某客户的水费通知单 -->
+  <select id="getList" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		WATER_NOTIFY 
+	<where>
+		<!-- 通知单状态。0正常，1报废 -->
+		STATUS = 0 
+		<if test="customerId!=null and customerId!=''">
+			AND CUSTOMER_ID = #{customerId}
+		</if>
+		<if test="period!=null and period!=''"> 
+			AND PERIOD = #{period} 
+		</if>
+		<if test="searchCond!=null and searchCond!=''">
+			AND SEARCH_COND = #{searchCond}
+		</if>
+	</where>
+  </select>
+</mapper>

@@ -1,0 +1,233 @@
+<html> 
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>
+<style type="text/css" mce_bogus="1">
+@page{
+	size:60mm;
+	margin:0px;
+}
+/* .reciverTable{width: 100%;text-align: left; table-layout:fixed; word-break:break-strict;}
+.reciverTable thead tr th{padding-bottom: 8px;}
+.reciverTable tbody tr{height: 25px;}
+.first{width: 35%;}
+.odd{background-color: #e8e8e8;}
+.odd td{border-top: 1px solid #CFCFCF; border-bottom: 1px solid #CFCFCF;}
+.even{} */
+.bodyStyle{
+	/* border:1px solid #999999; */
+	font-family: SimSun;
+	font-size:12px;
+	margin:0 auto;
+	margin-top:100px;
+	width: 100%;
+	text-align: left;
+	word-break:break-strict;
+}
+
+#detailTable th{
+    font-weight: normal;
+}
+
+
+#bottomClass span{
+line-height:25px;
+}
+</style>
+</head>
+<body>
+#set($n = 0)
+#foreach($element in $wardCodes)
+<div class="bodyStyle">
+	
+	#if($n != 0)
+	<div style="border-top:1px dashed #C0C0C0;margin-bottom:100px;"></div>  
+	#end
+	
+	#set($n=$n+1)
+	<div style="text-align:center;" >
+		<span>PIVAS成品输液交接单</span>
+	</div>
+	
+	<div style="text-align:center;font-size:16px;margin-top:15px;">
+		#if(${element.wardName})<span >${element.wardName}</span>#end
+	</div>
+	
+	<table style="margin-top:5px;border-collapse: separate;border-spacing: 0px 20px;" width="100%">
+		<tr>
+			<td style="width: 15%;">核对人</td>
+			<td style="width: 30%;border-bottom: 1px solid black;"></td>
+			<td style="width: 5%;"></td>
+			<td style="width: 15%;">承运人</td>
+			<td style="width: 30%;border-bottom:1px solid black;"></td>
+		</tr>
+		<tr>
+			<td style="width: 15%;">签收人</td>
+			<td style="width: 30%;border-bottom: 1px solid black;"></td>
+			<td style="width: 5%;"></td>
+			<td colspan="2" style="width: 45%;">$sysDate</td>
+		</tr>
+	</table>
+	
+	<table  style="margin-top:5px;text-align: center;" width="100%" id="detailTable">
+		<tr>
+			<th style="width: 47.5%;border: 1px solid black;background: #ccc;">批次</th>
+			<th style="width: 5%;"></th>
+			<th style="width: 47.5%;border: 1px solid black;background: #ccc;">数量</th>
+		</tr>
+		#foreach($batch in $element.pcList)
+		<tr>
+			<td style="width: 47.5%;border-bottom: 1px solid black;">${batch.name_}</td>
+			<td style="width: 5%;"></td>
+			<td style="width: 47.5%;border-bottom: 1px solid black;">${batch.reserve3_}</td>
+		</tr>
+		#end
+	</table>
+	
+	#if($isDetail)
+	
+	<table  style="margin-top:10px;text-align: center;font-size:16px" width="100%">
+	<tr>
+		<td style="width: 50%;">#if(${element.wardName})<span >${element.wardName}</span>#end</td>
+		<td>明细</td>
+	</tr>
+	</table>
+	
+	<table  style="margin-top:10px;text-align: center;font-size:12px" width="100%" id="detailTable">
+	<tr>
+		<th style="width: 15%;">床号</th>
+		<th style="width: 25%;">病人姓名</th>
+		<th style="width: 15%;">数量</th>
+		<th style="width: 45%;">瓶签号</th>
+	</tr>
+	#foreach($pqBean in $element.pqList)
+		
+		#if(${pqBean.total} == 1)
+		<tr>
+			<td style="width: 15%;">${pqBean.bedNo}</td>
+			<td style="width: 25%;">${pqBean.patname}</td>
+			<td style="width: 15%;">${pqBean.total}</td>
+			<td style="width: 45%;">${pqBean.ydpq}</td>
+		</tr>
+		#else
+		
+		#set($i = 0)
+		
+		#foreach($pqArray in $pqBean.pqArray)
+			#if($i == 0)
+			<tr>
+				<td style="width: 15%;">${pqBean.bedNo}</td>
+				<td style="width: 25%;">${pqBean.patname}</td>
+				<td style="width: 15%;">${pqBean.total}</td>
+				<td style="width: 45%;">${pqArray}</td>
+			</tr>
+			#else
+			<tr>
+				<td style="width: 15%;"></td>
+				<td style="width: 25%;"></td>
+				<td style="width: 15%;"></td>
+				<td style="width: 45%;">${pqArray}</td>
+			</tr>
+			#end
+		#set($i=$i+1)
+		#end
+		
+		#end
+		
+	#end
+	</table>
+	#end
+	
+	<div style="margin-top:20px;margin-bottom:100px;" id="bottomClass">
+	<span>
+	您好！收到药品请尽快核查，如有多送/少送/送错病区，请联系静配中心（85323711）。
+	</span><br />
+	<span>
+	感谢您的合作！
+	</span>
+	<br />
+	<span>
+	欢迎提供宝贵建议！
+	</span>
+	<br />
+	<span>
+	共同为临床用药安全努力！
+	</span>
+	</div>
+</div>
+#end	
+	
+	
+	<!-- <div style="height: 30px;">
+		<span style="float: left;">打印时间:</span>
+		<span style="float: right;">打印人:${printer}</span>
+	</div>
+	
+	<div style="height: 30px;">
+		
+		#if(${batchName})<span style="float: center;min-width:150px;font-size: 18px;margin-left:15px;">批次:${batchName}</span>#end
+		#if(${useDate})<span style="float: right;min-width:150px;font-size: 18px;">用药日期:${useDate}</span>#end
+	</div>
+	
+	<div style="text-align: center;">
+		<h2><span style="font-size: 25px;">#if(${wardName})${wardName}#end</span><span style="font-size: 25px;">药物接收单</span></h2>
+	</div>
+	<div>
+		#foreach($batch in $list)
+			<h4 style="text-align: left;margin-bottom: 20px;">#if($batch.batchName)$batch.batchName#end</h4>
+			
+			<table cellpadding="0" cellspacing="0" class="reciverTable">
+				<thead>
+					<tr>
+						<th >分类名称</th>
+						<th >消耗数量</th>
+					</tr>
+				</thead>
+				<tbody>
+				#foreach($element in $batch.categoryCounts)
+					#if($velocityCount % 2 == 0)
+					<tr>
+					#else
+					<tr class="odd">
+					#end
+						<td  class="first"><span>#if(${element.categoryName})${element.categoryName}#end</span></td>
+						<td>#if(${element.quantity})${element.quantity}#end</td>
+					</tr>
+				#end
+				</tbody>
+			</table>
+			
+			<div style="text-align: center;">
+		 		<br></br>
+	        </div>
+			
+			<table cellpadding="0" cellspacing="0" class="reciverTable">
+				<thead>
+					<tr>
+						<th >病人名称</th>
+						<th >病床号</th>
+						<th style="width:40%">药品名称</th>
+						<th style="width:20%">规格</th>
+						<th >数量</th>
+					</tr>
+				</thead>
+				<tbody>
+				#foreach($element in $batch.medicaments)
+					#if($velocityCount % 2 == 0)
+					<tr>
+					#else
+					<tr class="odd">
+					#end
+						<td  class="first"><span>#if(${element.patName})${element.patName}#end</span></td>
+						<td>#if(${element.bedNo})${element.bedNo}#end</td>
+						<td>#if(${element.drugName})${element.drugName}#end</td>
+						<td>#if(${element.specifications})${element.specifications}#end</td>
+						<td>#if(${element.quantity})${element.quantity}#end</td>
+					</tr>
+				#end
+				</tbody>
+			</table>
+		#end
+	</div> -->
+</body>
+</html>

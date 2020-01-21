@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- ZTree CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<link rel="stylesheet"	href="/css/holdfilebody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label ccb-account-main">
+		<div class="col-md-12 column">
+			<div class="tab-content">
+				<div class="tab-pane active" id="tab-customer-account-item">
+					<!-- 操作面板 -->
+					<div class="" style="display: inline-block" id="with-hold-file-form">
+						<ul class="extra-l" style="list-style: none;">
+							<!-- 期间 -->
+							<li class="input-group-sm">
+								<input type="text" class="form-control Wdate hold-file-period" readonly="readonly" style="width: 100px;"
+										id="hold-file-period" name="period"
+										onClick="WdatePicker({dateFmt:'yyyy-MM',onpicked: setBackGround});"
+										placeholder="期间" title="期间" />
+							</li>
+							<!-- 地理位置查询条件 -->
+							<li class="input-group-sm">
+								<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher-hold')" th:remove="tag"></div>
+							</li>
+							<li class="input-group-sm">
+								<select class="form-control hold-status" id="hold-status" name="holdStatus">
+									<option value="">代扣文件状态</option>
+										<option value="0">已生成</option>
+										<option value="1">已下载</option>
+										<option value="2">已导入回盘</option>
+										<option value="3">已预处理</option>
+										<option value="4">已销账</option>
+								</select>
+							</li>
+							<!-- 面板:查询 -->
+							<li class="input-group-sm">
+								<input type="text" class="form-control search-cond" id="search-cond" placeholder="文件名称/文件SN/凭证ID">
+							</li>
+							<!-- 查询按钮 -->
+							<li>
+								<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
+									<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+								</button>
+								
+								<button type="button" class="btn btn-warning btn-sm btn-general-search-reset" id="btn-general-search-reset">
+									<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+								</button>
+							
+							</li>
+							<!-- 上传代扣文件按钮 -->
+							<!-- <li>
+								<button type="button" class="btn btn-success btn-sm btn-export-with-holding-file" id="btn-export-with-holding-file">
+									<i class="fa fa-download" aria-hidden="true"> <span>导出Excel</span>	</i>
+								</button>
+							</li> -->
+						</ul>
+					</div>
+		
+					<!--客户账单 -->
+					<div class="row clearfix" >
+						<div class="col-md-3 column" style="padding-right:1px;">					
+							<div class="card">
+								<div class="card-body" id="location-body" style="padding-top:10px;padding-bottom:10px">
+									<!-- 地理位置列表 -->
+									<!-- 加载方式 -->
+									<div th:include="component/locationtree/location_tree::tree('location-fold-tree')" th:remove="tag"></div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-9 column" style="padding-left:1px;">
+							<div class="card">
+								<div class="card-body hold-file-table" id="hold-file-body" style="padding-left:10px;padding-right:10px;">
+									<!-- 客户账单列表 -->
+								</div>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	
+	
+	<!-- 地理位置treeJS -->
+	<script type="text/javascript"	th:src="@{/js/component/locationtree/LocationTree1.js}"></script>
+	<!-- 地理位置下拉框查询JS -->
+	<script type="text/javascript"	th:src="@{/js/component/districtsearcher/DistrictSearcher.js}"></script>
+	<!-- 地理位置树自适应JS -->
+	<script type="text/javascript"	th:src="@{/js/location_tree_adaptive/location_tree_adaptive.js}"></script>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+		//记录选择的代扣文件
+		var HOLD_FILE_ID_ARR = new Array();
+		//记录查询方式，0是普通查询；1点击地理位置树查询
+		var G_GENERAL_HOLD_SEARCH = "0";
+		/*
+			设置日期选择input背景色
+		*/
+		function setBackGround() {
+			$("#hold-file-period").css("background-color", "white");
+		}
+		
+		/**
+		 * 	获取当前系统月份（表示为抄表记录中的期间）
+		 */
+		function getCurrSysMonth(){
+			var date = new Date();
+			var year = date.getFullYear();    //获取完整的年份(4位,1970-????)
+			var month = date.getMonth();       //获取当前月份(0-11,0代表1月)
+			if(month<10){
+				month = "0"+month
+			}
+			return year+"-"+month;
+		}
+		/**
+		 * 	设置账单期间默认值为系统月份
+		 */
+		function setHoldFilePeriodDefault(){
+			//期间=系统日期减一个月
+			var period = moment().subtract(1, "months").format("YYYY-MM");
+			$("#hold-file-period").val(period);
+		}
+
+	
+		//--------------------公共查询函数--------------------------
+		
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchHoldFileItem(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/cmbc-cus-account/hold-file-table"
+			$(".hold-file-table").load(url, parms, triggerResize);
+		}
+		function triggerResize(){
+			//console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		//------------------------------	获取查询参数	------------------------------
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchHoldFileParams(){
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var traceIds = null;//树节点的traceIds
+			if(traceIds==null || traceIds==""){
+				var locaBlockTraceIds = locationHoldSearcher.getBlockId();//地理位置-小区traceIds
+				var locaBuildingTraceIds = locationHoldSearcher.getBuildingId();//地理位置-楼号traceIds
+				var locaUnitTraceIds = locationHoldSearcher.getUnitId();//地理位置-单元traceIds
+				if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+					traceIds = locaUnitTraceIds;
+				}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+					traceIds = locaBuildingTraceIds;
+				}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+					traceIds = locaBlockTraceIds;
+				}
+			}
+			
+			var searchCond=$("#with-hold-file-form .search-cond").val();
+			var holdStatus = $("#with-hold-file-form .hold-status").val();
+			var period = $("#with-hold-file-form .hold-file-period").val();//期间
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			parms.holdStatus=holdStatus;
+			parms.period=period;
+			return parms;
+		}
+		//----------------------------------地理位置tree实例---------------------------------------------------------------------
+		var locationHoldTree = new LocationTree('location-fold-tree');
+		//地理位置下拉框件实例
+		var locationHoldSearcher = new DistrictSearcher("location-searcher-hold", locationSelectSearchHoldCallback); //此处searcher的ID和回调函数
+		
+		/*
+			ztree树click某节点后的回调函数
+		*/
+		function clickZTreeNodeCallback(treeNode) {
+			
+			if(treeNode==null){
+				return false;
+			}
+			var traceIds = treeNode.traceIds;//获取点击节点的traceIds
+			var pyCode = treeNode.pycode;//获取用户点击节点的pycode
+			
+			
+			//清除查询条件
+			$('#with-hold-file-form .btn-general-search-reset').click();
+			
+			//地理位置痕迹ID（ID-ID-ID-ID）
+			var searchCond=$("#with-hold-file-form .search-cond").val();
+			var holdStatus = $("#with-hold-file-form .hold-status").val();
+			var period = $("#with-hold-file-form .account-item-period").val();//期间
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			parms.holdStatus=holdStatus;
+			parms.period=period;
+			G_GENERAL_HOLD_SEARCH = "1";//记录是普通查询还是高级查询
+			searchHoldFileItem(parms);
+		}
+		
+		function getZTreeSearchHoldParam(){//获取点击地理位置树的traceIds
+			var traceIds = null;
+			if(locationHoldTree.getSelectedTreeNode() != null){
+				traceIds = locationHoldTree.getSelectedTreeNode().traceIds;
+			}
+			
+			var parms = new Object();
+			parms.traceIds = traceIds;
+			return parms;
+		}
+		/**
+		 * 	地理位置下拉查询组件回调函数
+		 */
+		function locationSelectSearchHoldCallback(){
+			
+			locationHoldTree.cancelAllSelectedNode();//取消ztree的选中状态
+			G_GENERAL_HOLD_SEARCH = "0";
+			defaultSearchHoldFileItem();//查询客户
+		}
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchHoldFileItem() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			
+			if(G_GENERAL_HOLD_SEARCH == "0"){
+				parms = getSearchHoldFileParams();//获取普通查询参数（不包括分页信息）
+			}else if (G_GENERAL_HOLD_SEARCH == "1"){
+				parms = getZTreeSearchHoldParam();//获取ztree查询参数
+			}
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchHoldFileItem(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchHoldFileItemClick() {
+			
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchHoldFileParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchHoldFileItem(parms);
+		}
+	
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadHoldFileItemPage(searchCond,pageNum,pageSize) {
+	
+			//获取参数
+			var parms = null;
+			if(G_GENERAL_HOLD_SEARCH == "0"){
+				parms = getSearchHoldFileParams();//获取普通查询参数（不包括分页信息）
+			}else if (G_GENERAL_HOLD_SEARCH == "1"){
+				parms = getZTreeSearchHoldParam();//获取ztree查询参数
+			}
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchHoldFileItem(parms);
+		}
+		
+		//------------------------------	加载地理位置列表	------------------------------
+		/* 
+		 *	加载通用地理位置页面
+		 * 		domId:需要加入此页面的dom节点ID
+		 * 		callback:页面加载完成后的回调
+		 */
+		function loadGlobalLocationFilePage(domId, callback) {
+			var url = "/cmbc-cus-account/load-global-location-file-page";
+			var callbackFunc = callback;
+			var containerId = "#"+domId;
+			loadPage(containerId, url, null, callbackFunc);
+		}
+		/**
+		 * 	加载地理位置后的回调
+		 */
+		function loadLocationListFileCallback(){
+			//主页:默认查询(加载默认列表)
+			defaultSearchHoldFileItem();//查询客户账单
+		}
+		
+		
+		//----------生成批量代扣文件对话框------------------------
+		
+		/**
+		*上传批量代扣文件，click事件
+		*/
+		$('#with-hold-file-form #btn-export-with-holding-file').on('click',function() {
+			
+			var accountItemIds = HOLD_FILE_ID_ARR;//列表复选框参数
+			var searchParams = getSearchHoldFileParams();//查询参数
+			if(accountItemIds.length<=0){
+				util.confirm("确认导出查询的代扣文件? ","xxxxxxx", "uploadHoldFileItem", "cancel_callback_name")	
+				
+			} else {
+				util.confirm("确认导出所选择的代扣文件? ","xxxxxxx", "uploadHoldFileItem", "cancel_callback_name")	
+			}
+		});
+		/*
+			上传批量代扣文件:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		//------------------上传代扣文件业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function uploadHoldFileItem(accountItemIds) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/cmbc-cus-account/export-holding-file";
+			var parm = new Object();
+			var accountItemIds = HOLD_FILE_ID_ARR;//列表复选框参数
+			parm.holdFileIdStr = accountItemIds.toString();
+			$.post(urlStr, parm, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						util.message("导出批量代扣文件成功");
+						loadHoldFileItemPage();
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			
+			//设置查询的默认期间
+			setHoldFilePeriodDefault()
+			//------------------初始化ztree--------------------------------------------------
+			locationHoldTree.initTree();  //初始化树.		
+			locationHoldTree.setClickOuterFunction(clickZTreeNodeCallback);  //设置外部业务函数
+			//地理位置下拉组件初始化
+			locationHoldSearcher.init();
+			defaultSearchHoldFileItem();
+		
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#with-hold-file-form .btn-general-search').on('click', function() {
+				locationHoldTree.cancelAllSelectedNode();//取消ztree的选中状态
+				G_GENERAL_HOLD_SEARCH = "0";//记录是普通查询还是高级查询
+				defaultSearchHoldFileItem();//查询客户账单
+			});
+			/*
+				查询条件复位按钮CLICK
+			 */
+			$('#with-hold-file-form .btn-general-search-reset').on('click', function() {
+				$("#with-hold-file-form .search-cond").val("");
+				$("#with-hold-file-form .search-cond").focus();//获得焦点
+	
+				$("#with-hold-file-form .location-block").val("");//设置地理位置-小区值为空
+				$("#with-hold-file-form .location-building").val("");//设置地理位置-楼号值为空
+				$("#with-hold-file-form .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$("#with-hold-file-form .location-unit").val("");//设置地理位置-单元值为空
+				$("#with-hold-file-form .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+				
+				$("#with-hold-file-form .hold-status").val("");//设置代扣状态
+	
+			});
+			/*
+				查询条件输入框 KEYUP
+			 */
+			$('#with-hold-file-form .search-cond').on('keyup', function(event) {
+				if (event.keyCode == 13) {
+					$('#with-hold-file-form .btn-general-search').trigger("click");
+				}
+			});
+			/*
+				自动调整树的高度.
+			*/
+			var tableContainerId = "hold-file-body";
+			LocationTreeAdaptive.adaptive(tableContainerId);
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

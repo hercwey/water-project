@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>水表编号</th>
+				<th>水表钢印号</th>
+				<th>水表厂家</th>
+				<th>检修厂家</th>
+				<th>检修类型</th>
+				<th>检修结果</th>
+				<th>检修详情</th>
+				<th>检修时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${checkMeterresultList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 水表ID -->
+				<td th:text="${item.meterNo}">水表编号</td>
+				<!-- 水表钢印号 -->
+				<td th:text="${item.steelSealNo}">水表钢印号</td>
+				<!-- 水表厂家 -->
+				<td th:text="${item.factory}">水表厂家</td>
+				<!-- 检测厂家 -->
+				<td th:text="${item.checkFactory}">检修厂家</td>
+				<td>
+					<span th:if="${item.checkType==1}">
+						<span class="badge badge-warning">水表检测</span>
+					</span>
+					<span th:if="${item.checkType==2}">
+						<span class="badge badge-success">水表检修</span>
+					</span>
+				</td>
+				<td th:text="${item.checkResultTypeStr}">检修结果</td>
+				<!-- 检测结果 -->
+				<td th:text="${item.checkResult}">检修详情</td>
+				<!-- 检测时间 -->
+				<td th:text="${item.checkTimeStr}">检修时间</td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 单据 -->
+					<button type="button" class="check-result-doc-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>单据</span>
+					</button> 
+					<!-- 修改 -->
+					<button type="button" class="modi-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>编辑</span>
+					</button> 
+					<!-- 删除 -->
+					 <button type="button" class="del-single btn btn-secondary btn-sm"
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>删除</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function delBatchItem(ids) {
+			var urlStr = BASE_CONTEXT_PATH+"/check-result/delete"; // 需要提交的url
+			
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadResultPage();//加载当前页
+							util.message(res.result_msg,null,"warning");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+	
+		//--------------批量删除-----------------
+		
+		/*
+			批量删除确认
+		*/
+		function deleteConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录? ", "xxx", "ok_callback_name", "cancel_callback_name")			
+		}
+		
+		/*
+			批量删除确认:确认(回调)
+		*/
+		function ok_callback_name(id){
+			var ids=getSelectedIds();  //此函数定义于_table.html中
+			delBatchItem(ids);
+		}
+		
+		/*
+			批量删除确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.del-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //分录ID
+			//console.log("itemId:" + itemId);
+			util.delConfirm("确认删除此条目?", itemId, "deleteSingle");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteSingle(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delBatchItem(idsArr);
+		}
+				
+		
+		//--------单个修改---------
+		/* 
+			加载修改批次对话框 
+		*/
+		$('.modi-single').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/meter-repair/loadmodidialog';
+
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+
+			$("#result-dialog-edit").load(url, parms,openAddDialog); //加载完毕后显示 
+			
+		});
+		
+		//--------查看单据---------
+		/* 
+			加载单据 
+		*/
+		$('.check-result-doc-single').on('click',function() {
+
+			var itemId = $(this).attr("bind-id"); //条目ID
+			
+			setCheckResultId(itemId);//设置当前编辑的工程信息的ID
+			var eRecordType =1;
+			var url = BASE_CONTEXT_PATH+'/engineering-doc/main';
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+			parms.eRecordType = eRecordType;
+			loadCheckResultErecordMainList(parms, checkResultErecordCallback);//加载检测结果电子档
+			
+		});	
+		
+		function checkResultErecordCallback(){
+			showMeterCheckResultErecordTab();
+		}
+			
+		
+	
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+		});
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(loadPage,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

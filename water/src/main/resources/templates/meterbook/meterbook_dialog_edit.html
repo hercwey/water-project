@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 批次输入布局 */
+.table-layout-batch td{
+	border:0px;
+	padding:0px;
+}
+
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-meterbook-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>表册</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-edit-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="meterbook-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<table class="table table-layout-batch">
+										<tbody>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="meterbook-name" class="col-sm-4 control-label">名称</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																	th:value="${currItem==null ? '' : currItem.name}" 
+																	class="form-control " 
+																	id="meterbook-name" name="name" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="名称" />
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<!-- <tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="meterbook-code" class="col-sm-4 control-label">编码</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																	th:value="${currItem==null ? '' : currItem.code}" 
+																	class="form-control " 
+																	id="meterbook-code" name="code" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="编码" />
+														</span>
+													</div>
+												</td>												
+											</tr> -->
+											<tr>	
+												<td>
+													<div class="form-group form-inline">
+														<label for="engineering-address-label" class="col-sm-4 control-label">表册位置</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="hidden" id="location-id" name="locationId" value="" placeholder="保存地理位置节点">
+															<input type="hidden" id="meterbook-traceids" name="traceIds" th:value="${currItem==null ? '' : currItem.traceIds}" placeholder="保存地理位置traceIds">
+															<input type="text" onclick="showHideLocationTree.show(&apos;engineering-address&apos;); return false;" id="engineering-address" name="address" class="form-control" readonly 
+																th:value="${address}" placeholder="请选择表册位置" title="请选择地理位置" />
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="meterbook-code" class="col-sm-4 control-label">生产厂家</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meterbook-factory" name="factory" th:value="${currItem==null ? '' : currItem.factory}">
+																	<!-- 默认选择第一个 -->
+																	<option value="" >-请选择-</option>
+																	<span th:each="item,iterStat: ${factoryList}" th:remove="tag">
+																		<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.factory ? 'true':'false'}"
+																				th:text="${item.value}">数据字典的值</option>
+																	</span>
+																</select>
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="meterbook-code" class="col-sm-4 control-label">抄表方式</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meterbook-read-mode" name="readMode" th:value="${currItem==null ? '' : currItem.readMode}">
+																	<!-- 默认选择第一个 -->
+																	<option value="" >-请选择-</option>
+																	<span th:each="item,iterStat: ${readModeList}" th:remove="tag">
+																		<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.readMode ? 'true':'false'}"
+																				th:text="${item.value}">数据字典的值</option>
+																	</span>
+																</select>
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="meterbook-code" class="col-sm-4 control-label">表册用户类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meterbook-user-type" name="bookUserType" th:value="${currItem==null ? '' : currItem.bookUserType}">
+																	<!-- 默认选择第一个 -->
+																	<!-- <option value="" >-请选择-</option> -->
+																	<span th:each="item,iterStat: ${bookUserTypeArr}" th:remove="tag">
+																		<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.bookUserType ? 'true':'false'}"
+																				th:text="${item.value}">键值</option>
+																	</span>
+																</select>
+														</span>
+													</div>
+												</td>												
+											</tr>
+											
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+		
+		<!-- 选择地理位置页面 -->
+	<div th:include="location/global_location_select_page" th:remove="tag"></div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	用户点击树节点的回调函数
+		 */
+		function clickZTreeNodeCallback(locationId, traceIds, fullname){
+			console.log("nodeId:"+locationId+", traceIds:"+traceIds+", fullname:"+fullname);
+			$("#location-id").val(locationId);//设置地理位置ID
+			$("#meterbook-traceids").val(traceIds);//设置地理位置traceIds
+			$("#engineering-address").val(fullname);//设置地理位置全名称
+			showHideLocationTree.hide();//隐藏地理位置选择框
+		}
+		
+		
+		
+		
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function saveItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/meter-book/manual-insert";
+			var id = $("#meterbook-id").val();
+			if(id!=null && id!=""){
+				urlStr = BASE_CONTEXT_PATH + "/meter-book/update";
+			}
+			var form=new FormData($("#dialog-edit-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPageClickPageNum(); 
+							//	重新刷新当前页面
+							if (closeDialogFlag){
+								closeEditDialog();
+							}
+							util.message(res.result_msg,null,"warning");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				
+				var locationBlockId = $("#meterbook-traceids").val();
+				if(locationBlockId==null || locationBlockId ==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择地理位置到单元！",null,"warning");
+					return false;
+				}
+				var meterBookName = $("#meterbook-name").val();
+				if(meterBookName == null || meterBookName ==""){
+					util.message("表册名称为空，请重新输入");
+					return false;
+				}
+				
+				
+				saveItem(true);				
+			});
+			
+			
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

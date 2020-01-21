@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-sm">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>ID</th>
+				<th>小区名称</th>
+				<th>单元编码</th>
+				<th>期间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${accountItemList}">
+			
+				<input type="hidden" id="block-name" name="blockName" th:value="${item==null ? '' : item.blockName}" />
+				<input type="hidden" id="long-code" name="longCode" th:value="${item==null ? '' : item.LONG_CODE}" />
+				<!-- 条目选择器 -->
+				<td>
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.ID},data-bind=${item.ID},data-trace-id=${item.TRACE_IDS}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.ID}"></label>
+					</div> 
+				</td>
+				
+				<!-- ID -->
+				<td th:text="${item.ID}">ID</td>
+				<!-- 自定义名称 -->
+				<td th:text="${item.blockName}">小区名称</td>
+				<!-- 打印机名称 -->
+				<td th:text="${item.LONG_CODE}">单元编码</td>
+				<!-- IP地址 -->
+				<td th:text="${item.period}">期间</td>
+				
+				<!-- 操作列 -->
+				<td>
+					<!-- 预览 -->
+					<button type="button" class="generate-notice-single btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.ID}, data-trace-ids=${item.TRACE_IDS}, data-period=${item.period}, data-code=${item.PYCODE}, data-block-name=${item.blockName}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>预览</span>
+					</button> 
+					<!-- 打印 -->
+					<!-- <button type="button" class="print-pdf-single btn btn-secondary btn-sm"
+						th:attr="bind-id=${item.ID}, data-trace-ids=${item.TRACE_IDS}, data-period=${item.period}, data-code=${item.LONG_CODE}">
+						<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>打印</span>
+					</button> -->
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager::pager" class="pagerx"
+		style="float: right; margin-right: 100px;"></div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	
+		
+		
+				
+				
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			
+
+			//======================分页（页码导航）========================
+
+			/*
+			 	【分页】导航： 当点击页号时读取需要导航到的页码及每页记录数（pageNum,pageSize）
+			 	 data-bind:pageNum-pageSize形式 
+			 	 如果data-bind为空字符串，不做动作 
+			 	 当用户点击某页时，	 则发送请求
+			*/
+			$(".pagination li a").on('click', function(e) {
+				var dataBind = $(this).attr("data-bind");
+				//当dataBind有数据时处理
+				if (dataBind != "") {
+					var pageArr = new Array();
+					pageArr = dataBind.split("-");
+					// 置分页数据
+					curr_pageNum = pageArr[0];
+					curr_pageSize = pageArr[1];
+					//加载页
+					loadUnitPage(); 
+				}
+
+			});
+
+		});
+	</script>
+</body>
+</html>

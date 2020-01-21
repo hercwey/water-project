@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterBookMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterBook">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="MODIFIED_DATE" jdbcType="TIMESTAMP" property="modifiedDate" />
+    <result column="FACTORY" jdbcType="VARCHAR" property="factory" />
+    <result column="TYPE_CODE" jdbcType="VARCHAR" property="typeCode" />
+    <result column="TYPE_NAME" jdbcType="VARCHAR" property="typeName" />
+    <result column="READ_MODE" jdbcType="VARCHAR" property="readMode" />
+    <result column="TRACE_IDS" jdbcType="VARCHAR" property="traceIds" />
+    <result column="GENERATE_STATUS" jdbcType="DECIMAL" property="generateStatus" />
+    <result column="BOOK_USER_TYPE" jdbcType="DECIMAL" property="bookUserType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, NAME, CODE, CREATE_TIME, OPERATOR_NAME, OPERATOR_ID, MODIFIED_DATE, FACTORY, 
+    TYPE_CODE, TYPE_NAME, READ_MODE, TRACE_IDS, GENERATE_STATUS, BOOK_USER_TYPE 
+  </sql>
+  <!-- 根据条件查询 -->
+  <select id="getMeterBookByTraceIdsAndSearchCond" resultMap="BaseResultMap">
+  	SELECT
+		*
+	FROM
+		meter_book mb
+		INNER JOIN location l ON mb.TRACE_IDS = l.TRACE_IDS
+	<where>
+		l.deleted = 0
+  		<if test="traceIds!=null and traceIds!=''">
+  		AND l.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+  		</if>
+  		<if test="generateStatus!=null and generateStatus!=''">
+  		AND mb.GENERATE_STATUS =#{generateStatus}
+  		</if>
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				UPPER(mb.CODE) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%')) 
+				OR 
+				UPPER(mb.NAME) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%'))
+			)
+		</if>
+	</where>
+	ORDER BY
+		TO_NUMBER ( REGEXP_REPLACE ( mb.CODE, '[^0-9]' ) ), mb.NAME
+  </select>
+  
+  <!-- 根据条件查询未分配的表册 -->
+  <select id="getUnAllotBookListByCondition" resultMap="BaseResultMap">
+  		SELECT
+		* 
+	FROM
+		meter_book MB 
+		
+	WHERE 
+		 not EXISTS(select * from USER_METER_BOOK UMB where MB.ID = UMB.METER_BOOK_ID AND UMB.USER_ID = #{readerId} )
+		<if test="traceIds!=null and traceIds!=''">
+  		AND  MB.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+  		</if>
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				UPPER(MB.CODE) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%')) 
+				OR 
+				UPPER(MB.NAME) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%'))
+			)
+		</if>
+	ORDER BY
+		TO_NUMBER ( REGEXP_REPLACE ( MB.CODE, '[^0-9]' ) ), MB.NAME
+  </select>
+  
+  <!-- 根据条件查询抄表员表册 -->
+  <select id="getReaderBookListByCondition" resultMap="BaseResultMap">
+  	SELECT
+		B.* 
+	FROM
+		METER_BOOK B 
+	LEFT JOIN USER_METER_BOOK UB ON B.ID=UB.METER_BOOK_ID
+	
+	<where>
+		UB.USER_ID = #{userId} 
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				UPPER(B.CODE) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%')) 
+				OR 
+				UPPER(B.NAME) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%'))
+			)
+		</if>
+	</where>
+	ORDER BY
+		TO_NUMBER ( REGEXP_REPLACE ( B.CODE, '[^0-9]' ) ), B.NAME
+  </select>
+  
+   <select id="getMyMeterBookList" resultMap="BaseResultMap">
+  	SELECT
+		B.* 
+	FROM
+		METER_BOOK B 
+	LEFT JOIN USER_METER_BOOK UB ON B.ID=UB.METER_BOOK_ID
+	
+	<where>
+		UB.USER_ID = #{userId} 
+		AND  B.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				UPPER(B.CODE) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%')) 
+				OR 
+				UPPER(B.NAME) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%'))
+			)
+		</if>
+	</where>
+	ORDER BY
+		TO_NUMBER ( REGEXP_REPLACE ( B.CODE, '[^0-9]' ) ), B.NAME
+  </select>
+  
+  <select id="getMeterBookTypeNameList" resultMap="BaseResultMap">
+  	SELECT DISTINCT
+			TYPE_CODE,
+			TYPE_NAME 
+		FROM
+			METER_BOOK	
+  </select>
+  
+  <select id="getMeterBookIdByCode" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		METER_BOOK 
+	WHERE
+		CODE LIKE CONCAT( #{code}, '%' )
+	ORDER BY
+		TO_NUMBER ( REGEXP_REPLACE ( CODE, '[^0-9]' ) ), NAME
+  </select>
+  
+  <!-- 根据条件查询抄表员表册 -->
+  <select id="getAllotBookListByCondition" resultMap="BaseResultMap">
+  	SELECT
+		B.* 
+	FROM
+		METER_BOOK B 
+	LEFT JOIN USER_METER_BOOK UB ON B.ID=UB.METER_BOOK_ID
+	
+	<where>
+		UB.USER_ID = #{userId} 
+		<if test="traceIds!=null and traceIds!=''">
+  		AND  B.TRACE_IDS LIKE CONCAT(#{traceIds},'%') 
+  		</if>
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				UPPER(B.CODE) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%')) 
+				OR 
+				UPPER(B.NAME) LIKE CONCAT('%', CONCAT(UPPER(#{searchCond}), '%'))
+			)
+		</if>
+	</where>
+	ORDER BY
+		TO_NUMBER ( REGEXP_REPLACE ( B.CODE, '[^0-9]' ) ), B.NAME
+  </select>
+  
+</mapper>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<!-- ZTree CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.exedit.js}"></script> -->
+
+<link rel="stylesheet"	href="/css/meterbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<!-- <div id="engineering-dialog-edit" th:include="engineering/engineering_dialog_edit::dialog"></div> -->
+	<div id="engineering-dialog-edit"></div>
+	<input type="hidden" id="curr-edit-engineering-id" placeholder="当前编辑的工程信息ID" />
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label printer-main">
+		<div class="col-md-12 column">
+			<!-- 工程信息 -->
+			<div class="tabbable" id="tabs-engineering-div">
+				<ul class="nav nav-tabs" id="tabs-engineering-nav">
+					<li class="nav-item" id="engineering-item-tab" style="">
+						<a class="nav-link active show" href="#engineering-tab" data-toggle="tab">工程列表</a>
+					</li>
+					<li class="nav-item" id="engineering-doc-item-tab" style="display:none;">
+						<a class="nav-link" href="#engineering-doc-tab" data-toggle="tab">工程单据信息</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="engineering-tab">
+						<!-- 工程列表 -->
+						<!-- 操作面板 -->
+						<div class="" style="display: inline-block" id="engineering-search-div">
+							<ul class="extra-l" style="list-style: none;">
+							
+								<!-- 面板:增加/删除 -->
+								<li value="0">
+									<button type="button" class="btn btn-primary btn-sm"
+										id="btn-add">
+										<i class="fa fa-plus" aria-hidden="true"> 
+											<!-- <span style="color:black">增加</span> -->
+											<span>增加</span>
+										</i>
+									</button>
+								</li>
+								<li value="1">
+									<button type="button" class="btn btn-danger btn-sm"
+										id="btn-del">
+										<i class="fa fa-remove" aria-hidden="true"> <span>删除</span>
+										</i>
+									</button>
+								</li>
+			
+								<!-- 面板:查询 -->
+								<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入施工地址">
+								</li>
+								<!-- 查询按钮 -->
+								<li>
+									<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+									
+									<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+								
+								</li>
+							</ul>
+						</div>
+			
+						<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+					<div class="card">
+						<!-- 容器:字典列表 -->
+						<div class="printer-table table-container" id="meters-body"></div>
+					</div>
+					</div>
+					
+					<div class="tab-pane" id="engineering-doc-tab">
+					<!-- 工程单据信息 -->
+					</div>
+					
+					
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		var G_TABS_ENGINEERING_NAV_ID="#tabs-engineering-nav";//选项卡ul容器ID
+		var G_ENGINEERING_DOC_TAB_ID="#engineering-doc-item-tab";//工程单据选项卡li的ID
+		var G_ENGINEERING_DOC_TAB="#engineering-doc-tab";//工程单据选项卡a的ID，可用于显示选项卡
+		var g_curr_edit_engineering_id = "#curr-edit-engineering-id";//保存当前编辑的工程信息的ID
+	
+		//--------------------公共查询函数--------------------------
+		
+		/**
+		 * 	id：要显示选项卡的ID
+		 *	href：要显示选项卡的href
+		 *	status：show/hide
+		 */
+		function transferTabs(id, href, status){
+			//console.log("$(+id+' a[href="'+href+'"]').tab(status)");
+			$(id+' a[href="'+href+'"]').tab(status);
+			//$("#tabs-customers-nav a[href='#customer-detail-tab']").tab("show");//跳转到详细信息选项卡
+		}
+		/**
+		 * 	显示单据信息选项卡
+		 */
+		function showEngineeringDocTab(){
+			$("#engineering-doc-item-tab").show();
+		}
+		/**
+		 * 	隐藏单据信息选项卡
+		 */
+		function hideEngineeringDocTab(){
+			$("#engineering-doc-item-tab").hide();
+		}
+		
+		/**
+		 * 	获取当前编辑的工程信息的ID
+		 */
+		function getCurrEditEngineeringId(){
+			return $(g_curr_edit_engineering_id).val();
+		}
+		/**
+		 * 	设置当前编辑的工程信息的ID
+		 */
+		function setCurrEditEngineeringId(engineeringId){
+			$(g_curr_edit_engineering_id).val(engineeringId);
+		}
+		
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function search(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/engineering/table"
+			$(".printer-table").load(url, parms, customerResizeFuncx);
+		}
+		
+		function customerResizeFuncx(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchEngineeringParams(){
+			//初始化请求参数
+			var parms = new Object();
+			var searchCond = $("#search-cond").val();
+			parms.searchCond=searchCond;
+			
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearch() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchEngineeringParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchEngineeringParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchEngineeringParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		/*		
+			加载(Load): 增加/编辑对话框
+			将对话框内容加载到指定的容器中
+		 */
+		function loadDialog() {
+			var url = BASE_CONTEXT_PATH + '/engineering/load-edit-dialog';
+			$("#engineering-dialog-edit").load(url, null, openEditDialog); //加载完毕后显示
+		}
+			
+		/*
+		 * 	打开(Open) 对话框
+		 */
+		function openEditDialog() {
+			//可拖拽
+			$("#modal-container-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$('#modal-container-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			关闭(CLOSE) 对话框
+		 */
+		function closeEditDialog() {
+			$("#modal-container-dialog").modal("hide");
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearch();
+
+			//---------事件绑定--------------
+			
+			/*
+				绑定工程列表选项卡的CLICK事件
+			*/
+			$('#engineering-item-tab').on('click', function() {
+				hideEngineeringDocTab();//隐藏单据信息选项卡
+			}); 
+			
+			/*
+				增加核对类型按钮CLICK
+			*/
+			$('#engineering-search-div #btn-add').on('click', function() {
+				loadDialog();  //先加载后显示对话框
+				//openAddDialog();
+			}); 
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#engineering-search-div #btn-search').on('click', function() {
+				btnSearchClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#engineering-search-div #btn-search-reset').on('click', function() {
+				$("#engineering-search-div #search-cond").val("");
+				$("#engineering-search-div #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#engineering-search-div #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#engineering-search-div #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/*
+				btn-del-
+				批量删除按钮
+			*/
+			$('#engineering-search-div #btn-del').on('click', function() {				
+				deleteConfirm();  //显示删除确认对话框
+			});
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

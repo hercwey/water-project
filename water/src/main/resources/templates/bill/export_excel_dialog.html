@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>确认导出Excel对话框</title>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-export-excel-dialog"
+					role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header"
+								style="background-color: #a5f1b6; height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>导出Excel</span> <i class="fa fa-tags fa-1x"
+										aria-hidden="true" style="color: blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close"
+									data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<div th:each="item,iterStat: ${billColumnList}" id="select-column-table">
+									<div class="custom-control custom-checkbox"
+										style="margin-bottom: -1px !important;">
+										<input type="checkbox" class="custom-control-input item-selector" name="" th:attr="id='item-selector'+'-'+${item.columnCode},data-column-code=${item.columnCode},data-column-name=${item.columnName}">
+										<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.columnCode}" th:text="${item.columnName}"></label>
+									</div>
+								</div> 									
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"
+									id="btn-confirm-export-excel">导出Excel</button>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+		<script>
+		//------------------业务操作----------------------
+		
+		function getParms(){
+			
+			var exportColumnArr = new Array();
+			$("#select-column-table .item-selector").each(function(){
+				
+				if (this.checked) { // 对于己选条目
+					var columnCode = $(this).attr("data-column-code");//
+					var columnName = $(this).attr("data-column-name");//
+					
+					var obj = new Object();
+					obj.columnCode = columnCode;
+					obj.columnName = columnName;
+					
+					exportColumnArr.push(obj);
+				}
+				
+			});
+			
+			if(exportColumnArr==null || exportColumnArr.length<=0){
+				return false;
+			}
+			
+			var exportColumnJSON = JSON.stringify(exportColumnArr);
+			
+			var parms = new Object();
+			parms.exportColumnJSON = exportColumnJSON;
+			return parms;
+			
+		}
+		/**
+		 * 	确认导出excel
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function confirmExportExcel() {
+			
+			var parms = getParms();
+			console.log(parms);
+			
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH + "/account-item/export-excel";
+			$.post(url, parms, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeSubAccountDialog();
+						loadPageClickPageNum(); 
+						util.message(res.result_msg,null,"warning");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/**
+			 * 	绑定确认导出Excel的click事件
+			 */
+			$('#btn-confirm-export-excel').on('click', function() {	
+				confirmExportExcel();
+			});
+	
+		});
+	</script>
+
+	</th:block>
+
+</body>
+</html>

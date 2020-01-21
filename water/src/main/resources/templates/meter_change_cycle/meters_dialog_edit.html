@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-meters-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>编辑:表计档案</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-edit-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="meters-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 地理位置 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">地理位置</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="hidden" id="prev-location-id" name="prevLocationId" th:value="${location==null ? '' : location.id}" placeholder="原来绑定的地理位置ID" />
+															<input type="hidden" id="select-location-id" name="locationId" th:value="${location==null ? '' : location.id}" placeholder="当前选择的地理位置ID" />
+															<input type="hidden" id="location-traceids" name="traceIds" value="" placeholder="保存地理位置traceIds">
+															<input type="text" onclick="showHideLocationTree.show(&apos;select-location-name&apos;); return false;" id="select-location-name" class="form-control select-ztree-btn" readonly 
+																th:value="${place==null ? '' : place}" placeholder="请选择地理位置" title="请选择地理位置" />
+														</span>
+													</div>	
+												</td>
+												<td>
+													<!-- 水表编号 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">水表编号&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.meterNo}" 
+																	id="meters-meter-no" name="meterNo" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="水表编号" required/>
+														</span>
+													</div>
+												</td>
+											</tr>
+														
+											<tr>
+												<td>
+													<!--水表类型-->
+													<div class="form-group form-inline">
+														<label for="meters-name" class="col-sm-4 control-label">水表类型&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-meter-type" name="meterType" th:value="${currItem==null ? '' : currItem.meterType}" required>
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${meterTypeList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterType ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+																
+															</select>
+														</span>
+													</div>
+												</td>												
+												
+												<td>
+													<!-- 水表型号 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">水表型号&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-meter-model" name="meterModel" th:value="${currItem==null ? '' : currItem.meterModel}" required>
+																<!-- 默认选择第一个 -->
+																<option value="">-请选择-</option>
+																<span th:each="item,iterStat: ${meterModelList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterModel ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+																
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 水表口径 -->
+													<div class="form-group form-inline">
+														<label for="meters-name" class="col-sm-4 control-label">水表口径&nbsp<i style="color: red">* </i></label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-caliber" name="caliber" th:value="${currItem==null ? '' : currItem.caliber}" required>
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${waterCaliberList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.caliber ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+																
+															</select>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 水表钢印号 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">水表钢印号 &nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.steelSealNo}" 
+																	id="meters-steel-seal-no" name="steelSealNo" 
+																	maxlength=25 title="请输入1-25个字符" placeholder="水表钢印号 " required/>
+														</span>
+													</div>	
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 水表厂家 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">水表厂家&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-factory" name="factory" th:value="${currItem==null ? '' : currItem.factory}" required>
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${factoryList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.factory ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+																
+															</select>
+														</span>
+													</div>          
+ 												</td>
+											
+												<td>
+													<!-- 厂家联系电话-->
+													<div class="form-group form-inline">
+														<label for="user-sex" class="col-sm-4 control-label">厂家联系电话</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.factoryPhone}" 
+																	id="meters-factory-phone" name="factoryPhone" 
+																	maxlength=20 title="请输入1-20个字符" placeholder="厂家联系电话" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 水表检定证书编号 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">水表检定证书编号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.certificateNo}" 
+																	id="meters-certificate-no" name="certificateNo" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="水表检定证书编号"/>
+														</span>
+													</div>
+												</td>
+											
+												<td>
+													<!-- 水表检定日期-->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">水表检定日期&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control Wdate"
+																	id="meters-check-date" name="checkDate"		
+																	th:value="${currItem==null ? '' : currItem.checkDateStr}"				
+																	onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+																	placeholder="水表检定日期" style="background-color: white;" title="请选择水表检定日期" required>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 水表有效日期-->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">水表有效日期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control Wdate"
+																	id="meters-effective-date" name="effectiveDate"		
+																	th:value="${currItem==null ? '' : currItem.effectiveDateStr}"				
+																	onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+																	placeholder="水表有效日期" style="background-color: white;" title="水表有效日期">
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 水表用途 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">水表用途&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-meter-use" name="meterUse" th:value="${currItem==null ? '' : currItem.meterUse}" required>
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${meterUseList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterUse ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+																
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 新表表底数 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">表底数&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.newMeterBottom}" 
+																	id="meters-new-meter-bottom" name="newMeterBottom" 
+																	maxlength=10 title="请输入1-10个字符" placeholder="表底数" required />
+														</span>
+													</div>	
+												</td>
+												<!-- <td>
+													拆换表表底数
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">拆换表表底数</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.changeMeterBottom}" 
+																	id="meters-change-meter-bottom" name="changeMeterBottom" 
+																	maxlength=15 title="请输入1-15个字符" placeholder="拆换表表底数"/>
+														</span>
+													</div>
+												</td> -->
+												<td>
+													<!-- 表计描述 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">描述</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.description}" 
+																	id="meters-description" name="description" 
+																	maxlength=20 title="请输入1-20个字符" placeholder="描述"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 停复水状态 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">停复水状态&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-meter-status" name="meterStatus" th:value="${currItem==null ? '' : currItem.meterStatus}" required>
+																<!-- 默认选择第一个 -->
+																<option value="0" th:attr="selected=( ${currItem!=null && currItem.meterStatus==0} )? 'selcted' ">正常</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.meterStatus==1} )? 'selcted' ">停水</option>	
+															</select>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 抄表方式-->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">抄表方式&nbsp<i style="color: red">*</i></label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-read-mode" name="readMode" th:value="${currItem==null ? '' : currItem.readMode}" required>
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${readModeList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.readMode ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+																
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 轮换上限 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">轮换上限</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.upperLimit}" 
+																	id="meters-upper-limit" name="upperLimit" 
+																	maxlength=10 title="请输入1-10个字符" placeholder="轮换上限"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 水表位置 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">水表位置</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.place}" 
+																	id="meters-place" name="place" 
+																	maxlength=30 title="请输入1-30位字符" placeholder="水表位置"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 备注-->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">备注</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.remark}" 
+																	id="meters-remark" name="remark" 
+																	maxlength=100 title="请输入1-100个字符" placeholder="备注"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 虚实表 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">虚实表</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-virtual-real" name="virtualReal" th:value="${currItem==null ? '' : currItem.virtualReal}">
+																<!-- 默认选择第一个 -->
+																<option value="0" th:attr="selected=( ${currItem!=null && currItem.virtualReal==0} )? 'selcted' ">实表</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.virtualReal==1} )? 'selcted' ">虚表</option>	
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 表地址 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">表地址</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.meterAddress}" 
+																	id="meters-meter-address" name="meterAddress" 
+																	maxlength=50 title="请输入1-50个字符" placeholder="表地址"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 采集器地址 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">采集器地址</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.collectorAddr}" 
+																	id="meters-bluetooth-name" name="collectorAddr" 
+																	maxlength=20 title="请输入1-20位字符" placeholder="采集器地址"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 通道号 -->
+													<div class="form-group form-inline">
+														<label for="meters-description" class="col-sm-4 control-label">通道号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.channelNo}" 
+																	id="meters-channel-no" name="channelNo" 
+																	maxlength=30 title="请输入1-30个字符" placeholder="通道号"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 生命周期状态 -->
+													<div class="form-group form-inline">
+														<label for="meters-cycle-status" class="col-sm-4 control-label">生命周期状态 </label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-cycle-status" name="cycleStatus" th:value="${currItem==null ? '' : currItem.cycleStatus}">
+																<!-- 默认选择第一个 -->
+																<option value="0" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==0} )? 'selcted' ">待用</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==1} )? 'selcted' ">领用</option>	
+																<option value="2" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==2} )? 'selcted' ">待启用</option>
+																<option value="3" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==3} )? 'selcted' ">使用中</option>	
+																<option value="4" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==4} )? 'selcted' ">待检测</option>
+																<option value="5" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==5} )? 'selcted' ">检测中</option>	
+																<option value="6" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==6} )? 'selcted' ">待检修</option>
+																<option value="7" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==7} )? 'selcted' ">检修中</option>	
+																<option value="8" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==8} )? 'selcted' ">报废</option>
+																<option value="9" th:attr="selected=( ${currItem!=null && currItem.cycleStatus==9} )? 'selcted' ">退库</option>	
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 用水性质 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">水价分类</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meter-water-use" name="waterUse" th:value="${currItem==null ? '' : currItem.waterUse}" >
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${priceTypeMapList}" th:remove="tag">
+																	<option th:value="${item.PRICE_TYPE_CODE}"  th:attr="selected=${currItem!=null && item.PRICE_TYPE_CODE==currItem.waterUse ? 'true':'false'}, data-price-type-code=${item.PRICE_TYPE_CODE}"
+																			th:text="${item.PRICE_TYPE_NAME}">数据字典的值</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 水价 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">水价</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meter-price-code" name="priceCode" th:value="${currItem==null ? '' : currItem.priceCode}" >
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${waterPriceList}" th:remove="tag">
+																	<option th:value="${item.priceCode}"  th:attr="selected=${currItem!=null && item.priceCode==currItem.priceCode ? 'true':'false'}"
+																			th:text="${item.ladderName}">数据字典的值</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+	<!-- 选择地理位置页面 -->
+	<div th:include="meters/location_select" th:remove="tag"></div>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		
+		/**
+		 * 	用户点击树节点的回调函数
+		 */
+		function clickZTreeSelectNodeCallback(locationId, traceIds, fullname){
+			$("#select-location-id").val(locationId);//设置地理位置ID
+			$("#location-traceids").val(traceIds);//设置地理位置traceIds
+			$("#select-location-name").val(fullname);//设置地理位置全名称
+			showHideLocationTree.hide();//隐藏地理位置选择框
+		}
+
+		//------------------业务操作----------------------
+		
+		/**
+		 * 设置父节点ID（pid）的disabled属性，如果是增加操作可编辑，如果是编辑操作不可编辑
+		 */
+		function setMeterPidDisabled(flag){
+			$("#meters-pid").attr("disabled", flag);
+		}
+		
+		/**
+		 * 	保存条目
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function save(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/meter-change/insert";
+			
+			var metersId= $("#meters-id").val();
+			if(metersId!=null && metersId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/meter-change/update";
+			}
+			var form=new FormData($("#dialog-edit-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), */
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							
+							closeEditDialog();//关闭对话框
+							loadPageClickPageNum();//加载当前页
+							util.message(res.result_msg,null,"warning");
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+		/*
+			设置input背景色
+		*/
+		function setBackGround() {
+			$("#meters-check_date").css("background-color", "white");
+		}
+		function setBackGround() {
+			$("#customers-effective_date").css("background-color", "white");
+		}
+		
+		$.validator.setDefaults({//验证成功后，保存数据
+		    submitHandler: function() {
+		    	save(true);
+		     	//alert("提交事件!");
+		    }
+		});
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			var G_JMSHYS = "JMSHYS";//用水性质是居民生活用水时,属于阶梯水价
+			var waterUse = $("#meter-water-use").find("option:selected").val();
+			if(waterUse == G_JMSHYS){
+				$("#meter-price-code").attr("disable", true);
+			}
+			
+			$("#meter-water-use").on('change',function() {//用水性质下拉框改变事件
+				var url = BASE_CONTEXT_PATH + "/water-price/get-water-price";
+				var waterPriceList = null;
+				var waterUse = $("#meter-water-use").find("option:selected").val();
+				
+				if(waterUse ==null || waterUse==""){
+					$("#meter-price-code").empty();
+					var html = "<option value='' data-price-type-code=''>-请选择-</option>";
+					$("#meter-price-code").append(html);
+					$("#meter-price-code").attr("disabled", true);
+				} else if(waterUse == G_JMSHYS){
+					$("#meter-price-code").attr("disabled", true);
+				} else {
+					$("#meter-price-code").attr("disabled", false);
+				}
+				
+				var parms = new Object();
+				parms.waterUse = waterUse;
+				$.post(url, parms, function(res){
+				 	if(res != null && res != "") {
+				 		waterPriceList = res;
+				 		$("#meter-price-code").empty();
+				 		var html = "";
+				 		if(waterUse == G_JMSHYS){
+				 			html += "<option value='' data-price-type-code=''>-阶梯水价-</option>";
+				 		}
+				 		$.each(waterPriceList, function(){
+				 			html += "<option value='"+this.priceCode+"'>"+this.ladderName+"</option>";
+				 		});
+				 		$("#meter-price-code").append(html);
+					} 
+				});
+			});
+			
+			 $("#dialog-edit-form").validate({//设置正则验证
+			    rules: {
+			        propEmail: {
+			          required: true,
+			          email: true
+			        },
+			      },
+			      messages: {
+			        propEmail: "请输入一个正确的邮箱",
+			       }
+			      }); 
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				$("#dialog-edit-form").submit();
+					
+			});
+
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

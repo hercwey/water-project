@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.LocationMeterMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.LocationMeter">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="LOCATION_ID" jdbcType="DECIMAL" property="locationId" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="BIND_TIME" jdbcType="TIMESTAMP" property="bindTime" />
+    <result column="UNBIND_TIME" jdbcType="TIMESTAMP" property="unbindTime" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="METER_STATUS" jdbcType="DECIMAL" property="meterStatus" />
+    <result column="TRACE_IDS" jdbcType="VARCHAR" property="traceIds" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, LOCATION_ID, METER_ID, REMARK, BIND_TIME, UNBIND_TIME, DELETED, METER_STATUS, TRACE_IDS 
+  </sql>
+  
+  <!-- 根据表计ID集合查询地理位置-表计 -->
+  <select id="getListByMeterIdList" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		LOCATION_METER 
+	WHERE
+		<!-- 删除状态，1=已删除，0=未删除（默认） -->
+		DELETED=0
+		AND METER_ID IN 
+		<foreach close=")" collection="meterIdList" index="index" item="item" open="(" separator=",">  
+            #{item}  
+		</foreach>
+  </select>
+  
+   <select id="getLocationByMeterId" resultMap="BaseResultMap">
+  	select *
+  		from location_meter 
+  	<where>
+  		1=1
+  		AND DELETED=0
+  		<if test="meterId!=null and meterId!=''">
+		AND	METER_ID =#{meterId}
+		</if>
+		
+  	</where> 
+  </select>
+  
+  <!-- 同步地理位置traceIds，更新地理位置-表计关系表中traceIds与地理位置表中traceIds不同的数据，让地理位置-表计表中的traceIds=地理位置表中traceIds -->
+  <update id="updateTraceIds">
+  	UPDATE (
+		SELECT
+			LM.TRACE_IDS AS LM_TRACE_IDS,
+			L.TRACE_IDS AS L_TRACE_IDS 
+		FROM
+			LOCATION_METER LM
+			LEFT JOIN LOCATION L ON LM.LOCATION_ID = L.ID 
+		WHERE
+			<!-- 删除状态，0=未删除（默认）；1=已删除； -->
+			LM.DELETED = 0 
+			AND L.DELETED = 0 
+		) T 
+		SET T.LM_TRACE_IDS = T.L_TRACE_IDS 
+	WHERE
+		T.LM_TRACE_IDS != T.L_TRACE_IDS
+  </update>
+  
+</mapper>

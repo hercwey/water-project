@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.TaxInvoiceDetailMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.TaxInvoiceDetail">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="INVOICE_ID" jdbcType="DECIMAL" property="invoiceId" />
+    <result column="SPMC" jdbcType="VARCHAR" property="spmc" />
+    <result column="HSBZ" jdbcType="VARCHAR" property="hsbz" />
+    <result column="SLV" jdbcType="DECIMAL" property="slv" />
+    <result column="JE" jdbcType="DECIMAL" property="je" />
+    <result column="DJ" jdbcType="DECIMAL" property="dj" />
+    <result column="JLDW" jdbcType="VARCHAR" property="jldw" />
+    <result column="GGXH" jdbcType="VARCHAR" property="ggxh" />
+    <result column="SE" jdbcType="DECIMAL" property="se" />
+    <result column="SL" jdbcType="DECIMAL" property="sl" />
+    <result column="BMBBH" jdbcType="VARCHAR" property="bmbbh" />
+    <result column="SSFLBM" jdbcType="VARCHAR" property="ssflbm" />
+    <result column="YHZC" jdbcType="VARCHAR" property="yhzc" />
+    <result column="YHZCNR" jdbcType="VARCHAR" property="yhzcnr" />
+    <result column="LSLBS" jdbcType="VARCHAR" property="lslbs" />
+    <result column="QYZBM" jdbcType="VARCHAR" property="qyzbm" />
+    <result column="KCE" jdbcType="DECIMAL" property="kce" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, INVOICE_ID, SPMC, HSBZ, SLV, JE, DJ, JLDW, GGXH, SE, SL, BMBBH, SSFLBM, YHZC, 
+    YHZCNR, LSLBS, QYZBM, KCE, DELETED
+  </sql>
+</mapper>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 输入布局 */
+.table-layout td {
+	border: 0px;
+	padding: 0px;
+}
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-overdue-dialog"
+					role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+					<div class="modal-dialog modal-lg">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header"
+								style="background-color: #a5f1b6; height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>违约金减免</span> <i class="fa fa-tags fa-1x"
+										aria-hidden="true" style="color: blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close"
+									data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+								
+									<!-- 采用表格进行布局 -->
+									<table class="table table-sm">
+										<thead>
+											<tr>
+												<th>
+													<!-- <input type="checkbox" class="select-all-toggle"> -->
+
+													<div class="custom-control custom-checkbox">
+														<input type="checkbox" class="custom-control-input"
+															id="select-all-toggle" name="example1"> <label
+															class="custom-control-label" for="select-all-toggle"></label>
+													</div>
+												</th>
+												<th>名称</th>
+												<th>期间</th>
+												<th>违约金金额</th>
+												<!-- <th>已减免金额</th> -->
+												<th>减免金额</th>
+											</tr>
+										</thead>
+										<tbody id="overdue-fine-body">
+											<tr th:each="item,iterStat: ${overdueFineList}">
+
+												<!-- 条目选择器 -->
+												<td>
+
+													<div class="custom-control custom-checkbox"
+														style="margin-bottom: -1px !important;">
+														<input type="checkbox"
+															class="custom-control-input item-selector"
+															name="example1"
+															th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id},data-overdue-account-id=${item.overdueAccountId}, data-overdue-fine=${item.overdueFine}, data-customer-id=${item.customerId}">
+														<label class="custom-control-label"
+															th:attr="for='item-selector'+'-'+${item.id}"></label>
+													</div>
+												</td>
+												<!-- 客户名称 -->
+												<td class="customer-name" th:text="${item.customerName}">客户名称</td>
+												<!-- 期间-->
+												<td class="period" th:text="${item.period}">期间</td>
+												<!-- 违约金金额 -->
+												<td th:text="${item.overdueFine}">违约金金额</td>
+												<!-- 已减免金额 -->
+												<!-- <td th:text="${item.discountAmountSum}">已减免金额</td> -->
+												<td class="input-group-sm">
+														<input type="text" class="form-control input-sm discount-amount" disabled="disabled"
+															th:value="${item.overdueFine}"
+															th:attr=" data-overdue-fine-id=${item.id}, data-overdue-account-id=${item.overdueAccountId}"
+															id="overdue-discount-amount" name="discountAmount"
+															maxlength=30 title="请输入1-30个字符" />
+												</td>
+
+											</tr>
+										</tbody>
+									</table>
+
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"
+									id="btn-modify-and-back">保存</button>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+		<script>
+		//------------------业务操作----------------------
+		
+		function getOverdueFineParms(){
+			
+			var isContinue = true;
+			
+			var overdueFineArr = new Array();
+			$("#overdue-fine-body tr").each(function(){
+				
+				var discountAmount = $(this).find(".discount-amount").val();//减免金额
+				
+				var overdueFineId = $(this).find(".discount-amount").attr("data-overdue-fine-id");//违约金ID
+				var overdueAccountId = $(this).find(".discount-amount").attr("data-overdue-account-id");//违约金账单ID
+				var obj = new Object();
+				obj.discountAmount = discountAmount;
+				obj.overdueFineId = overdueFineId;
+				obj.overdueAccountId = overdueAccountId;
+				overdueFineArr.push(obj);
+			});
+			
+			if(!isContinue){
+				return false;
+			}
+			var overdueFineJSON = JSON.stringify(overdueFineArr);
+			
+			var customerId = $("#overdue-customer-id").val();
+			var accountItemId = $("#overdue-account-item-id").val();
+			
+			var parms = new Object();
+			parms.customerId = customerId;
+			parms.accountItemId = accountItemId;
+			parms.overdueFineJSON = overdueFineJSON;
+			return parms;
+			
+		}
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(parms) {
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH + "/account-item/save-overdue-fine";
+			//var parms = getOverdueFineParms();
+			
+			if(!parms){
+				return false;
+			}
+			
+			$.post(url, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						closeOverdueReduceDialog();
+						loadPageClickPageNum(); 
+						util.message(res.result_msg,null,"warning");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+			修改对话框-保存按钮-CLICK
+			保存所修改的条目
+		*/
+		/* $('#btn-modify-and-back').on('click',function() {
+			modiItem(true);				
+		}); */
+		
+		/*
+			btn-del
+			批量保存按钮
+		*/
+		$('#btn-modify-and-back').on('click', function() {	
+			var parms=getSelectedIdAndOverdue();  //此函数定义于_table.html中
+			modiItem(parms);
+			//saveConfirm();  //显示保存确认对话框
+		});
+	
+		/*
+			批量保存确认
+		*/
+		function saveConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("保存所选择的记录? ", "xxx", "ok_callback_name", "cancel_callback_name")			
+		}
+		
+		/*
+			批量保存确认:确认(回调)
+		*/
+		function ok_callback_name(id){
+			var parms=getSelectedIdAndOverdue();  //此函数定义于_table.html中
+			modiItem(parms);
+		}
+		
+		/*
+			批量保存确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedIdAndOverdue(){
+			var parmArr = new Array();
+			var parms = new Object();
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					var overdueAccountId = $(this).attr("data-overdue-account-id"); //
+					var overdueFine = $(this).attr("data-overdue-fine"); //
+					var customerId = $(this).attr("data-customer-id"); //
+					var obj = new Object();
+					obj.id = id;
+					obj.overdueAccountId = overdueAccountId;
+					obj.overdueFine = overdueFine;
+					obj.customerId = customerId;
+					parmArr.push(obj);
+					var overdueFineJSON = JSON.stringify(parmArr);
+					
+					parms.overdueFineJSON = overdueFineJSON;
+				}
+			}); // end of item-selector
+			return parms;
+		}
+		
+		/*
+			选择/取消选择  当前页记录
+			select all  or  deselect all			 	
+		*/
+		$("#select-all-toggle").on('click', function(e) {
+			var prefix = "item-selector-";
+	
+			if (this.checked) {					
+				//查询列表中的项目
+				$(".item-selector").each(function(index, elem) {
+					this.checked = true;
+					var surfix = $(this).attr("data-bind");  //item'id
+					var rowId = prefix + surfix; 
+					$('#' + rowId).addClass("selected");
+				});
+			} 
+			else{
+				$(".item-selector").each(function(index, elem) {
+					this.checked = false;
+					var surfix = $(this).attr("data-bind");
+					var rowId = prefix + surfix;
+					$('#' + rowId).removeClass("selected");
+				});
+			} // end of else
+		});
+
+		
+		//======================分页（页码导航）========================
+
+		/*
+		 	【分页】导航： 当点击页号时读取需要导航到的页码及每页记录数（pageNum,pageSize）
+		 	 data-bind:pageNum-pageSize形式 
+		 	 如果data-bind为空字符串，不做动作 
+		 	 当用户点击某页时，	 则发送请求
+		*/
+		$(".pagination li a").on('click', function(e) {
+			var dataBind = $(this).attr("data-bind");
+			//当dataBind有数据时处理
+			if (dataBind != "") {
+				var pageArr = new Array();
+				pageArr = dataBind.split("-");
+				// 置分页数据
+				curr_pageNum = pageArr[0];
+				curr_pageSize = pageArr[1];
+				//加载页
+				loadPage(); 
+			}
+
+		});
+	});
+	</script>
+
+
+
+	</th:block>
+
+</body>
+</html>

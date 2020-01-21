@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 输入布局 */
+.table-layout-user td{
+	border:0px;
+	padding:0px;
+}
+
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-user-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>编辑:用户</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="user-dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="user-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table" frame=void>
+										<tbody>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="user-account" class="col-sm-4 control-label">用户名</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" 
+																	class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.username}" 
+																	id="user-account"	name="username" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="用户名" />
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 昵称 -->
+													<div class="form-group form-inline">
+														<label for="user-name" class="col-sm-4 control-label">昵称</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																	th:value="${currItem==null ? '' : currItem.nickname}" 
+																	class="form-control  " 
+																	id="user-name" name="nickname" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="昵称" />
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="user-realname" class="col-sm-4 control-label">真实姓名</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" 
+																	class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.realname}" 
+																	id="user-realname"	name="realname" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="真实姓名" />
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 员工编码 -->
+													<div class="form-group form-inline">
+														<label for="user-name" class="col-sm-4 control-label">员工编码</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																	th:value="${currItem==null ? '' : currItem.code}" 
+																	class="form-control  " 
+																	id="user-code" name="code" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="员工编码" />
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="user-sex" class="col-sm-4 control-label">性别</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control  " id="user-sex" name="sex" th:value="${currItem==null ? 0 : currItem.sex}">
+																<!-- 默认选择第一个 -->
+																<option value="0" th:attr="selected=( ${currItem!=null && currItem.sex==0} )? 'selcted' " >-请选择-</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.sex==1} )? 'selcted' ">男</option>
+																<option value="2" th:attr="selected=( ${currItem!=null && currItem.sex==2} )? 'selcted' ">女</option>												
+															</select>
+														</span>
+													</div>
+												</td>
+												<td>
+													<div class="form-group form-inline">
+														<!-- 婚否;1：是；2：否 -->
+														<label for="user-married" class="col-sm-4 control-label">婚否</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control  " id="user-married" name="married" th:value="${currItem==null ? 0 : currItem.married}">
+																<!-- 默认选择第一个 -->
+																<option value="0" th:attr="selected=( ${currItem!=null && currItem.married==0} )? 'selcted' " >-请选择-</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.married==1} )? 'selcted' ">是</option>
+																<option value="2" th:attr="selected=( ${currItem!=null && currItem.married==2} )? 'selcted' ">否</option>												
+															</select>
+														</span>
+													</div>
+												</td>												
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 电话 -->
+													<div class="form-group form-inline">
+														<label for="user-telephone" class="col-sm-4 control-label">电话</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.tel}" 
+																	id="user-telephone" name="tel" 
+																	maxlength=20 title="请输入8-15位字符" placeholder="电话" />
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 手机 -->
+													<div class="form-group form-inline">
+														<label for="user-mobile" class="col-sm-4 control-label">手机号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.mobile}" 
+																	id="user-mobile" name="mobile" 
+																	maxlength=15 title="请输入11位字符" placeholder="手机号" />
+														</span>
+													</div>
+												</td>
+											</tr>	
+											<tr>
+												<td>
+													<!-- 电子邮箱 -->
+													<div class="form-group form-inline">
+														<label for="user-email" class="col-sm-4 control-label">电子邮箱</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.email}" 
+																	id="user-email" name="email" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="电子邮箱" />
+														</span>													
+													</div>
+												</td>	
+												<td>
+													<!-- 启用-状态;1:是;0:否(默认) -->
+													<div class="form-group form-inline">
+														<label for="user-enabled" class="col-sm-4 control-label">启用状态</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control  " id="user-enabled" name="enabled" th:value="${currItem==null ? -1 : currItem.enabled}">
+																<!-- 默认选择第一个 -->
+																<option value="-1" th:attr="selected=( ${currItem!=null && currItem.married==-1} )? 'selcted' " >-请选择-</option>
+																<option value="0" th:attr="selected=( ${currItem!=null && currItem.married==0} )? 'selcted' ">否</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.married==1} )? 'selcted' ">是</option>
+															</select>
+														</span>										
+													</div>
+												</td>											
+											</tr>	
+											<tr>
+												<td>
+													<!-- 备注 -->
+													<div class="form-group form-inline">
+														<label for="user-remark" class="col-sm-4 control-label">备注</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  "
+																	th:value="${currItem==null ? '' : currItem.remark}" 
+																	id="user-remark" name="remark" 
+																	maxlength=100 title="请输入1-50位字符" placeholder="备注" />
+														</span>													
+													</div>
+												</td>	
+											</tr>		
+											
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiUserItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/user/insert";
+			
+			var userId = $("#user-id").val();
+			if(userId!=null && userId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/user/update";
+			}
+			var form=new FormData($("#user-dialog-modi-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), */
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeModiUserDialog();
+							}
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				modiUserItem(true);				
+			});
+
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

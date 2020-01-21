@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomerBillInfoMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CustomerBillInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="CUSTOMER_NAME" jdbcType="VARCHAR" property="customerName" />
+    <result column="REG_ADDRESS" jdbcType="VARCHAR" property="regAddress" />
+    <result column="TELEPHONE" jdbcType="VARCHAR" property="telephone" />
+    <result column="ACCOUNT_BANK" jdbcType="VARCHAR" property="accountBank" />
+    <result column="ACCOUNT_NO" jdbcType="VARCHAR" property="accountNo" />
+    <result column="TAX_NO" jdbcType="VARCHAR" property="taxNo" />
+    <result column="POST_ADDRESS" jdbcType="VARCHAR" property="postAddress" />
+    <result column="CONTACT" jdbcType="VARCHAR" property="contact" />
+    <result column="ENABLED" jdbcType="DECIMAL" property="enabled" />
+    <result column="BILL_TYPE" jdbcType="DECIMAL" property="billType" />
+     <result column="BILL_NO" jdbcType="VARCHAR" property="billNo" />
+     <result column="SHORT_CODE" jdbcType="VARCHAR" property="shortCode" />
+      <result column="IS_DEFAULT" jdbcType="DECIMAL" property="isDefault" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, CUSTOMER_NAME, REG_ADDRESS, TELEPHONE, ACCOUNT_BANK, ACCOUNT_NO, 
+    TAX_NO, POST_ADDRESS, CONTACT, ENABLED, BILL_TYPE, BILL_NO, SHORT_CODE, IS_DEFAULT
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchCustomerBillInfo" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM CUSTOMER_BILL_INFO b
+		<where>
+			b.customer_id=#{customerId}
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					b.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+  					OR b.ACCOUNT_BANK LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY b.id DESC
+  </select>
+  <!-- 查询客户开票信息，只查询有效状态是有效的开票信息 -->
+  <select id="getCustomerInvoiceList" resultType="map">
+  	SELECT
+		I.ID,
+		I.CUSTOMER_ID,
+		C.CUSTOMER_NAME,
+		I.CUSTOMER_NAME AS INVOICE_NAME,
+		I.TAX_NO,
+		I.BILL_NO,
+		NVL(I.ACCOUNT_BANK, '') AS ACCOUNT_BANK,
+		NVL(I.ACCOUNT_NO, '') AS ACCOUNT_NO,
+		NVL(I.REG_ADDRESS, '') AS REG_ADDRESS,
+		NVL(I.TELEPHONE, '') AS TELEPHONE,
+		I.BILL_TYPE 
+	FROM
+		CUSTOMER_BILL_INFO I LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID 
+	<where>
+		<!-- 是否有效：0=有效（默认）；1=无效 -->
+		I.ENABLED = 0 
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				<!-- OR I.TAX_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.ACCOUNT_BANK LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.ACCOUNT_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.REG_ADDRESS LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) -->
+				OR I.TELEPHONE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.SHORT_CODE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.BILL_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+			)
+		</if>
+	</where>
+	ORDER BY
+		I.CUSTOMER_ID
+	
+  </select>
+  <!-- 查询客户开票信息，只查询有效状态是有效的开票信息 -->
+  <select id="searchCustomerInvoiceList" resultType="map">
+  	SELECT
+		I.ID,
+		I.CUSTOMER_ID,
+		C.CUSTOMER_NAME,
+		I.CUSTOMER_NAME AS INVOICE_NAME,
+		I.TAX_NO,
+		I.BILL_NO,
+		NVL(I.ACCOUNT_BANK, '') AS ACCOUNT_BANK,
+		NVL(I.ACCOUNT_NO, '') AS ACCOUNT_NO,
+		NVL(I.REG_ADDRESS, '') AS REG_ADDRESS,
+		NVL(I.TELEPHONE, '') AS TELEPHONE,
+		I.BILL_TYPE 
+	FROM
+		CUSTOMER_BILL_INFO I LEFT JOIN CUSTOMERS C ON I.CUSTOMER_ID = C.ID 
+	<where>
+		<!-- 是否有效：0=有效（默认）；1=无效 -->
+		I.ENABLED = 0 
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+				C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				<!-- OR I.TAX_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.ACCOUNT_BANK LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.ACCOUNT_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.REG_ADDRESS LIKE CONCAT('%', CONCAT(#{searchCond}, '%')) -->
+				OR I.TELEPHONE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.SHORT_CODE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+				OR I.BILL_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+			)
+		</if>
+		<if test="billType!=null">
+			AND I.BILL_TYPE = #{billType}
+		</if>
+	</where>
+	ORDER BY
+		I.CUSTOMER_ID
+	
+  </select>
+</mapper>

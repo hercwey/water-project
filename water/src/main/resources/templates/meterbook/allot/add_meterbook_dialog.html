@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 批次输入布局 */
+.table-layout-batch td{
+	border:0px;
+	padding:0px;
+}
+
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+		<!-- 当前所编辑的条目ID -->
+		<input type="hidden" id="add-meterbook-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-user-meterbook-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>分配表册</span>
+									<span th:text="'【'+${currItem==null ? '' : currItem.realname}+'】'">【抄表员】</span>
+									<!-- <i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i> -->
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-edit-form">
+									
+									<!-- 采用表格进行布局 -->
+									<table class="table table-layout-batch" frame=void>
+										<tbody>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="location-block" class="col-sm-5 control-label">地理位置-小区</label>
+														<select class="form-control col-sm-5" id="location-block" name="locationBlockId" data-location-curr-node-type="BLOCK" data-location-next-node-type="BUILDING">
+															<option value="">——请选择小区——</option>
+															<span th:each="item,iterStat: ${locationList}" th:remove="tag">
+																<option th:value="${item.id}" th:attr="data-location-code=${item.code},data-location-name=${item.name}"
+																		th:text="${item.name}">小区名称</option>
+															</span>
+														</select>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="location-building" class="col-sm-5 control-label">地理位置-楼号</label>
+														<select class="form-control col-sm-5" id="location-building" name="locationBuildingId" data-location-curr-node-type="BUILDING" data-location-next-node-type="UNIT" disabled="disabled">
+															<option value="">——请选择楼号——</option>
+														</select>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="location-unit" class="col-sm-5 control-label">地理位置-单元</label>
+														<select class="form-control col-sm-5" id="location-unit" name="locationUnitId" data-location-curr-node-type="UNIT" data-location-next-node-type="ROOM" disabled="disabled">
+															<option value="">——请选择单元——</option>
+														</select>
+													</div>
+												</td>
+											</tr>
+											
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		
+		
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function saveItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/meter-book-allot/insert";
+			var readerId= $("#add-meterbook-id").val();
+			console.log(readerId);
+			
+			var locationBlockCode = $('#location-block').find("option:selected").attr("data-location-code");
+			var locationBuildingCode = $('#location-building').find("option:selected").attr("data-location-code");
+			var locationUnitCode = $('#location-unit').find("option:selected").attr("data-location-code");
+			
+			if(typeof(locationBuildingCode)=="undefined"){
+				locationBuildingCode = null;
+			}
+			if(typeof(locationUnitCode)=="undefined"){
+				locationUnitCode = null;
+			}
+			
+			var parms = new Object();
+			parms.readerId = readerId;
+			parms.locationBlockCode = locationBlockCode;
+			parms.locationBuildingCode = locationBuildingCode;
+			parms.locationUnitCode = locationUnitCode;
+			console.log("parms:"+JSON.stringify(parms));
+			
+			$.post(urlStr, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						closeUserMeterBookDialog();
+						util.message(res.result_msg,null,"warning");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+			/* 
+				close dialog:关闭分水量对话框
+			*/
+			function closeUserMeterBookDialog() {
+				$("#modal-container-user-meterbook-dialog").modal("hide");
+			}
+	
+		/**
+		 * 	查询地理位置-小区/楼号/单元
+		 */
+		function getLocationFn(locationId, nodeType){
+			var url = BASE_CONTEXT_PATH + "/location/get-block-building-unit";
+			var params = new Object();
+			params.locationId = locationId;
+			params.nodeType = nodeType;
+			$.post(url, params, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						var locationList = res.locationList;
+						if(nodeType=="BUILDING"){
+							setLocationBuildingHtml(locationList);
+						}else{
+							setLocationUnitHtml(locationList);
+						}
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		/**
+		 * 	设置地理位置-楼号的下拉列表
+		 */
+		function setLocationBuildingHtml(locationList){
+			
+			$("#location-building").attr("disabled", false);//设置地理位置-楼号可编辑
+			
+			var html = "<option value=''>——请选择楼号——</option>";
+			$.each(locationList, function(){
+				html = html + "<option value='"+this.id+"' data-location-code='"+this.code+"' data-location-name='"+this.name+"'>"+this.name+"</option>";
+			});
+			$('#location-building').html(html);
+		}
+		/**
+		 * 	设置地理位置-单元的下拉列表
+		 */
+		function setLocationUnitHtml(locationList){
+			
+			$("#location-unit").attr("disabled", false);//设置地理位置-单元可编辑
+			
+			var html = "<option value=''>——请选择单元——</option>";
+			$.each(locationList, function(){
+				html = html + "<option value='"+this.id+"' data-location-code='"+this.code+"' data-location-name='"+this.name+"'>"+this.name+"</option>";
+			});
+			$('#location-unit').html(html);
+		}
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				
+				var locationBlockId = $("#location-block").val();
+				if(locationBlockId==null || locationBlockId ==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择地理位置-小区！",null,"warning");
+					return;
+				}
+				
+				saveItem(true);				
+			});
+			
+			/**
+			 * 	绑定地理位置-小区的change事件
+			 */
+			$('#location-block').on('change',function() {
+				
+				$("#location-building").val("");//设置地理位置-楼号值为空
+				$("#location-unit").val("");//设置地理位置-单元值为空
+				$("#location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$("#location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+				
+				var locationId = $(this).val();
+				var nextNodeType = $(this).attr("data-location-next-node-type");
+				getLocationFn(locationId, nextNodeType);			
+			});
+			
+			/**
+			 * 	绑定地理位置-楼号的change事件
+			 */
+			$('#location-building').on('change',function() {
+				
+				$("#location-unit").val("");//设置地理位置-单元值为空
+				$("#location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+				
+				var locationId = $(this).val();
+				var nextNodeType = $(this).attr("data-location-next-node-type");
+				getLocationFn(locationId, nextNodeType);				
+			});
+			
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

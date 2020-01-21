@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!-- wechat-消息通知方式:正在使用中 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')"  th:remove="tag"></div> -->
+<title>石家庄高新区供水排水公司</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta name="context-path" content="/" />
+    
+
+<link rel="stylesheet" type="text/css" href="/weui/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="/weui/css/weuix.css" />
+
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body ontouchstart>
+
+	<div id="confirm-dialog-container"></div>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h5 style="text-align: center; margin-top: 10px;">用户编号</h5>
+				<hr class="style-two" /> -->
+				<div th:include="wechat/public_page/header::header('通知方式')"	th:remove="tag"></div>
+
+				<!-- <div class="form-horizontal " role="form" id="bind-customer-form"> -->
+				<!-- 用户编号-->
+				<!-- 页面中通知方式默认为关闭状态 -->
+				<div class="" style="text-align: center;">
+					<ul class="customer-no-list " style="list-sytle-type: none;">
+						<li>
+							<div class="weui-cells weui-cells_form">
+								<div class="weui-cell weui-cell_switch">
+									<div class="weui-cell__bd">微信方式</div>
+									<div class="weui-cell__ft">
+										<input id="chk-notify-mode-wechat" class="weui-switch" type="checkbox">
+									</div>
+								</div>
+								<div class="weui-cell weui-cell_switch">
+									<div class="weui-cell__bd">短信方式</div>
+									<div class="weui-cell__ft">
+										<input	id="chk-notify-mode-sms" class="weui-switch"  type="checkbox">
+									</div>
+								</div>
+							</div>
+						</li>
+
+						<li>
+							<!-- <button type="button" id="btnSetNotify" name="btnSetNotify"  	class="btn btn-primary btn-block">提交设置</button> -->
+							<a class="weui-btn  bg-blue" href="javascript:" id="btnSetNotify" name="btnSetNotify" >提交设置</a>							
+							
+						</li>
+
+					</ul>
+
+				</div>
+				<!--提交按钮-->
+				<!-- <div class="form-group form-inline">
+						<button type="button" id="btnReturn" name="btnReturn"
+							class="btn btn-primary btn-lg btn-block">返回</button>
+					</div> -->
+				<!-- </div> -->
+			</div>
+		</div>
+		<!-- <div class="row">
+			<div
+				th:include="wechat/public_page/footer::footer('温馨提示:用户可以通过致电供水热线xxxxxx查询用户编号,已经定制短信通知服务的用户可查阅短信通知上的10位用户编号.')"
+				th:remove="tag"></div>
+		</div> -->
+		
+		<div class="weui-footer ">
+				<p class="weui-footer__links" style="margin-bottom:5px;">
+					<a href="#" class="weui-footer__link">石家庄高新区供水排水公司</a>
+				</p>
+				<p class="weui-footer__links" style="margin-bottom:5px;">
+					<a href="#" class="weui-footer__link">供水热线:69099838</a>
+				</p>
+				<!-- <p class="weui-footer__text">Copyright &copy; 石家庄高新区供排水公司</p> -->
+			</div>
+		
+		
+		
+	</div>
+	
+	<script type="text/javascript" src="/weui/js/zepto.min.js"></script>
+
+	<script src="/weui/js/zepto.weui.js"></script>
+	
+	<script type="text/javascript">
+			var BASE_CONTEXT_PATH = $('meta[name=context-path]')
+					.attr("content");
+			console.log("BASE_CONTEXT_PATH0:"+BASE_CONTEXT_PATH) ;
+			BASE_CONTEXT_PATH = BASE_CONTEXT_PATH.substr(0,BASE_CONTEXT_PATH.length - 1);
+			console.log("BASE_CONTEXT_PATH1:"+BASE_CONTEXT_PATH) ;
+	</script>
+	
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var notifyMode=[[${notifyMode}]];		
+		/*]]>*/
+	</script>
+
+	<script type="text/javascript">
+		
+	/*
+		通知模式对象
+	*/
+	function NotifyMode(){
+		
+		//设置通知方式URL
+		var url=BASE_CONTEXT_PATH+'/wechat/setnotifymode';
+		
+		/*
+			功能:
+				设置通知方式回调函数				
+		*/
+		this.setNofityModeCallBack=function(response,status,xhr){
+			//请求结果常量 
+			const REQUEST_SUCCESS="success";
+			const REQUEST_FAIL="fail";
+			
+			var resultCode=response.result_code;   //success, fail
+			var resultMsg=response.result_msg;
+			
+			console.log("response:"+response);
+			
+			$.toast(resultMsg, 2000);
+			if(resultCode==REQUEST_SUCCESS){
+				//add code here		
+			}
+			
+		}
+		
+		/*
+			功能:
+				设置通知方式
+		*/
+		this.setNotifyMode=function(){
+			var parms=this.getRequestParms();
+			$.post(url,parms,this.setNofityModeCallBack);
+		}
+		
+		/*
+			功能:
+				获取请求参数
+			返回:
+				请求参数对象  weChatMode  smsMode
+		*/
+		this.getRequestParms=function(){
+			//常量定义
+			const NOTIFY_MODE_OPEN=1;
+			const NOTIFY_MODE_CLOSE=0;
+			
+			var parms=new Object();
+			
+			//微信通知方式
+			var weChatMode=	$("#chk-notify-mode-wechat").is(":checked");  //true false			
+			console.log("notify mode wechat is:"+weChatMode);			
+			if(weChatMode==true){
+				parms.weChatMode=NOTIFY_MODE_OPEN;
+			}
+			else{
+				parms.weChatMode=NOTIFY_MODE_CLOSE;
+			}
+			
+			//短信通知方式
+			var smsMode=$("#chk-notify-mode-sms").is(":checked");	//true false		
+			console.log("notify-mode-sms is:"+smsMode);			
+			if(smsMode==true){
+				parms.smsMode=NOTIFY_MODE_OPEN;
+			}
+			else{
+				parms.smsMode=NOTIFY_MODE_CLOSE;
+			}
+			return parms;
+		}
+		
+		/*
+			根据后台传送过来的notifyMode初始化组件的状态
+		*/
+		this.initNotifyModeState=function(notifyMode){
+			
+			const wechatId='#chk-notify-mode-wechat';
+			const smsId='#chk-notify-mode-sms';
+			
+			/* NOTIFY_NO(0, "全部关闭"),
+			NOTIFY_WECHAT(1, "微信"),
+			NOTIFY_SMS(2, "短信"),
+			NOTIFY_ALL(3, "全部打开"); */
+			const NOTIFY_NO=0;
+			const NOTIFY_WECHAT=1;
+			const NOTIFY_SMS=2;
+			const NOTIFY_ALL=3;
+			
+			switch(notifyMode){
+				case NOTIFY_NO:
+					//do nothing
+					break;
+				case NOTIFY_WECHAT:
+					$(wechatId).attr("checked",true);
+					break;
+				case NOTIFY_SMS:
+					$(smsId).attr("checked",true);
+					break;
+				case NOTIFY_ALL:
+					console.log("set component's status!");
+					$(wechatId).attr("checked",true);
+					$(smsId).attr("checked",true);
+					break;
+				default:
+					//do nothing
+					break;
+			}
+			
+		}
+	
+	}
+	
+
+	//page loaded ready
+	$(function() {
+		
+		//生成前台[修改通知方式]操作对象
+		var notifyModeObj=new NotifyMode();
+		
+		//初始化组件的状态
+		//notifyMode来自于后台传送过来的参数.
+		console.log("notifyMode from server is:"+notifyMode);
+		notifyModeObj.initNotifyModeState(notifyMode);
+		
+		//设置通知方式按钮 click handler			
+		$('#btnSetNotify').on('click',function(){
+			notifyModeObj.setNotifyMode();
+		});
+		
+	});
+	</script>
+
+
+</body>
+</html>

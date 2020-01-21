@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 输入布局 */
+.table-layout td{
+	border:0px;
+	padding:0px;
+}
+
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-confirm-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>确认抄表记录</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!--抄表期间 -->
+													<div class="form-group form-inline">
+														<label for="record.period" class="col-sm-4 control-label">抄表期间</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control Wdate"
+																	id="app-meter-record-period" name="period"
+																	th:value="${defaultConfirmPeriod==null ? '':defaultConfirmPeriod}" th:attr="data-max-period=${maxPeriod},data-comfirm-period=${defaultConfirmPeriod==null ? '':defaultConfirmPeriod}"
+																	onClick="WdatePicker({dateFmt:'yyyy-MM',isShowClear:false,onpicked: setBackGround});"
+																	placeholder="抄表期间" style="background-color: white;" th:title="'注：所选记录最大期间为'+${maxPeriod}">
+														</span>
+													</div>
+												</td>
+											</tr>
+											<!-- <tr>
+												<td>
+													注意信息
+													<div class="form-group form-inline">
+														<label  class="col-sm-4 control-label"></label>
+														<span class="input-group-sm col-sm-8" th:text="'注：所选记录最大期间为'+${maxPeriod}" th:value="${maxPeriod}" id="max-period" style="color: red">
+														</span>
+													</div>
+												</td>
+											</tr> -->
+											<tr id="alert-info-tip" style="display:none;">
+												<td>
+													<!--提示信息 -->
+													<div class="form-group form-inline">
+														<label  class="col-sm-4 control-label"></label>
+														<span class="input-group-sm col-sm-8" style="color: red">
+															抄表记录期间不能间隔超过一个月！
+														</span>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary" id="btn-confirm-meter-record">确认</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+			var maxPeriod=[[${maxPeriod}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+	
+		/*
+		 *	设置日期插件input背景色
+		 */
+		function setBackGround() {
+			$("#app-meter-record-period").css("background-color", "white");
+				var period = $("#app-meter-record-period").val();
+				var confirmPeriod = $("#app-meter-record-period").attr("data-comfirm-period");
+				var maxPeriod = $("#app-meter-record-period").attr("data-max-period");
+				if(period>confirmPeriod){
+					var tip = "抄表记录期间不能间隔超过一个月！";
+					$("#alert-info-tip").find("span").text(tip);
+					$("#alert-info-tip").show();
+					return;
+				} else if(period<maxPeriod){
+					var tip = "确认的抄表期间不能重复！";
+					$("#alert-info-tip").find("span").text(tip);
+					$("#alert-info-tip").show();
+					return;
+				}else{
+					$("#alert-info-tip").hide();
+				}
+				
+				
+		}
+		
+		/**
+		 * 	获取确认抄表记录的查询参数
+		 */
+		function getConfirmRecordParms(){
+			var idArr = getSelectedIds();
+			var searchParms = getSearchAppParams();
+			var parms = new Object();
+			var appRecordJSON = "";
+			if(idArr.length!=0){
+				appRecordJSON = JSON.stringify(idArr);
+			} 
+			var searchCond=searchParms.searchCond;
+			var readType=searchParms.readType;
+			var traceIds=searchParms.traceIds;
+			var period= $("#app-meter-record-period").val();
+			
+			parms.searchCond=searchCond;
+			parms.readType=readType;
+			parms.traceIds=traceIds;
+			parms.appRecordJSON = appRecordJSON;
+			parms.period = period;
+			return parms;
+			
+			
+		}
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function confirmMeterRecordCallback(closeDialogFlag) {
+			 
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/app-meter-record/confirm-record";
+			//var idArr = getSelectedIds();
+			var period= $("#app-meter-record-period").val();
+			var parm = getConfirmRecordParms();
+			//parm.period = period;
+			console.log(JSON.stringify(parm))
+			$.post(urlStr, parm, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						closeConfirmRecordDialog();
+						loadPageClickPageNum();
+						util.message(res.result_msg,null,"warning");
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		 }
+	
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadAppMeterRecordPage() {
+			var pageNum = curr_pageNum;
+			var pageSize = curr_pageSize;
+			var searchCond=curr_searchCond;
+	
+			searchAppMeterRecord(searchCond, pageNum, pageSize);
+		}
+		/* 
+			关闭(CLOSE) 增加核对类型对话框
+		 */
+		function closeConfirmRecordDialog() {
+			$("#modal-container-confirm-dialog").modal("hide");
+		}
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------	init	---------------
+			//---------------click event process binding---------------
+			
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-confirm-meter-record').on('click',function() {
+				
+				var period = $("#app-meter-record-period").val();
+				var confirmPeriod = $("#app-meter-record-period").attr("data-comfirm-period");
+				var maxPeriod = $("#app-meter-record-period").attr("data-max-period");
+				
+				if(period==null || period==""){
+					var tip = "请选择抄表期间！";
+					$("#alert-info-tip").find("span").text(tip);
+					$("#alert-info-tip").show();
+					return;
+				}
+				if(period>confirmPeriod){
+					var tip = "抄表记录期间不能间隔超过一个月！";
+					$("#alert-info-tip").find("span").text(tip);
+					$("#alert-info-tip").show();
+					return;
+				}
+				if(period<maxPeriod){
+					var tip = "确认的抄表期间不能重复！";
+					$("#alert-info-tip").find("span").text(tip);
+					$("#alert-info-tip").show();
+					return;
+				}
+				$("#alert-info-tip").hide();
+				//注: 回调函数需要采用引号引起来
+				util.confirm("确认后APP抄表记录会转存到正常抄表记录，是否继续? ", "xxx", "confirmMeterRecordCallback", "cancel_callback_name")
+				
+			});
+			
+			/**
+			 * 	确认对话框中确认按钮回调
+			 */
+			function confirmMeterRecordCallback(){
+				confirmMeterRecordCallback(true);
+			}
+			/**
+			 * 	确认对话框中取消按钮回调
+			 */
+			function cancel_callback_name(){
+				console.log("取消");
+			}
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

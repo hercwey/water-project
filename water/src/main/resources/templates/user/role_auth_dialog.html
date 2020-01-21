@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 批次输入布局 */
+.table-layout-batch td{
+	border:0px;
+	padding:0px;
+}
+
+</style>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<!-- <script src="/calendar/WdatePicker.js" type="text/javascript"></script> -->
+
+
+</head>
+<!-- 角色授权对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-role-auth-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>角色授权</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="role-auth-form">
+									<input type="hidden" title="用于角色授权的用户ID" id="role-auth-user-id" value="" /> 
+									<input type="hidden" title="用于角色授权的用户类型：1=系统用户；2=业务用户；默认值=1" id="role-auth-user-type" value="" /> 
+									<div th:each="item,iterStat: ${roleList}" class="form-group form-inline">
+										<div class="col-sm-3">&nbsp;</div>
+										<div class="col-sm-6">
+											<div class="custom-control custom-checkbox"
+												style="margin-bottom: -1px !important;">
+												<input type="checkbox" class="custom-control-input role-auth-selector" name="example1" th:attr="id='role-auth-selector'+'-'+${item.id},data-bind=${item.id}" />
+												<label class="custom-control-label" style="text-align: left;" th:attr="for='role-auth-selector'+'-'+${item.id}" th:text="${item.roleName}">角色名称</label>
+											</div>
+										</div>
+										<div class="col-sm-3">&nbsp;</div>
+									</div>
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-save-auth-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function insertRoleAuth() {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/user/insert-role-auth";
+			
+			var userId = $("#role-auth-user-id").val();
+
+			var roleIdArr = new Array();
+			// 扫描用户所选择条目ID
+			$(".role-auth-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					roleIdArr.push(id);
+				}
+			}); // end of role-auth-selector
+			
+			var params = {"userId": userId, "roleIds": roleIdArr.toString()};
+			//console.log(params);
+			//return false;
+			
+			$.post(urlStr, params, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						//console.log(res.result_msg);
+						//loadPage();//重新刷新当前页面
+						closeRoleAuthDialog();//关闭对话框
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+			/* $.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				data : params,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			}); */
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				角色授权对话框-保存按钮-CLICK
+				保存授权信息
+			*/
+			$('#btn-save-auth-and-back').on('click',function() {
+				insertRoleAuth();				
+			});
+
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.SysRightsMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.SysRights">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="RIGHT_CODE" jdbcType="VARCHAR" property="rightCode" />
+    <result column="RIGHT_NAME" jdbcType="VARCHAR" property="rightName" />
+    <result column="RIGHT_LINK" jdbcType="VARCHAR" property="rightLink" />
+    <result column="SORT" jdbcType="DECIMAL" property="sort" />
+    <result column="PID" jdbcType="DECIMAL" property="pid" />
+    <result column="RIGHT_LEVEL" jdbcType="DECIMAL" property="rightLevel" />
+    <result column="RIGHT_ICON" jdbcType="VARCHAR" property="rightIcon" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, RIGHT_CODE, RIGHT_NAME, RIGHT_LINK, SORT, PID, RIGHT_LEVEL, RIGHT_ICON, REMARK, 
+    CREATE_TIME
+  </sql>
+  
+  <!-- 根据角色ID查询菜单权限 -->
+  <select id="getByRoleIds" resultMap="BaseResultMap">
+		
+		SELECT
+			* 
+		FROM
+			SYS_RIGHTS 
+		WHERE
+			ID IN (
+				SELECT
+					p.id 
+				FROM
+					sys_rights p
+					LEFT JOIN sys_roles_rights rp ON p.id = rp.right_id 
+				<where>
+					1=1
+					<if test="roleIds!=null and roleIds.size&gt;0">
+						AND rp.role_id in
+						<foreach close=")" collection="roleIds" index="index" item="item" open="(" separator=",">
+							#{item}
+						</foreach>
+					</if>
+				</where> 
+				GROUP BY
+					p.id 
+			) 
+		ORDER BY
+			RIGHT_LEVEL ASC,
+			SORT ASC,
+			PID ASC,
+			ID ASC
+		
+		<!-- SELECT
+			p.*
+		FROM
+			sys_rights p
+		LEFT JOIN sys_roles_rights rp ON p.id = rp.right_id
+		<where>
+			1=1
+			<if test="roleIds!=null and roleIds.size&gt;0">
+				AND rp.role_id in
+				<foreach close=")" collection="roleIds" index="index" item="item" open="(" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY p.right_level ASC,p.sort ASC,p.pid ASC,p.id ASC -->
+  </select>
+  
+</mapper>

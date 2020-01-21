@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+<!-- 正则表达式验证 -->
+<script src="/jquery/jquery-validation/jquery.validate.min.js"></script>
+<script src="/jquery/jquery-validation/messages_zh.js"></script>
+<!-- 数字计算工具类 -->
+<script type="text/javascript"	th:src="@{/commons/calculateutil.js}"></script>
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<!-- 增加账单选择用户对话框 -->
+		<div id="insert-bill-dialog" th:include="bill/balance_bill/insert_bill/customer_item_dialog"></div>
+		<!-- <div id="insert-bill-dialog"></div> -->
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+					<div class="modal-content">
+
+						<!-- 主体(用于展示表单) -->
+						<div class="modal-body">
+							<form class="form-horizontal " role="form" id="dialog-insert-bill-form">
+								<!-- 当前所编辑的条目ID -->
+								<input type="hidden" id="record-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+																	
+								<!-- 采用表格进行布局 -->
+								<!-- 配置费规则部分 -->
+								<table class="table-layout table">
+									<tbody>
+										<!-- 第二次优化时打开 -->
+										<tr>
+											<td>
+												<!-- 客户 -->
+												<div class="form-group form-inline">
+													<label for="record-description" class="col-sm-4 control-label">客户&nbsp<i style="color: red">*</i> </label>
+													<span class="input-group-sm col-sm-8">
+														<input type="hidden" id="bill-customer-id" name="customerId" th:value="${customerId}" />
+														<input type="text" class="form-control" id="bill-customer-name" name="customerName" th:value="${customerName}" readonly="readonly" />
+														<!-- <input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.customerName}"
+																id="bill-customer-name" name="customerName" readonly="readonly" onclick="getCustomerList()"
+																maxlength=20 title="请选择客户" placeholder="请选择客户" required/> -->
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 地理位置 -->
+												<div class="form-group form-inline">
+													<label for="record-name" class="col-sm-4 control-label">地理位置</label>
+													 <span class="input-group-sm col-sm-8">
+														 <input type="text" class="form-control" id="bill-customer-place" name="place" th:value="${place}"  readonly="readonly"/>
+														<!-- <input type="text" id="bill-customer-place" class="form-control" name="customerPlace" readonly="readonly"  onclick="getLocationList()"
+															th:value="${currItem==null ? '地理位置' : currItem.place}" placeholder="地理位置" title="请选择地理位置" /> -->
+													</span>
+												</div>
+											</td>											
+										</tr> 		
+										
+										<tr>
+											<td>
+												<!-- 抄表期间 -->
+												<div class="form-group form-inline">
+													<label for="record-name" class="col-sm-4 control-label">期间&nbsp<i style="color: red">*</i> </label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control input-sm Wdate"
+																id="balance-bill-period" name="period" 
+																th:value="${currItem==null ? '' : currItem.period}" 	
+																onClick="WdatePicker({dateFmt:'yyyy-MM'});"
+																placeholder="抄表期间" style="background-color: white;" title="请选择期间" required>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 用水性质-->
+												<div class="form-group form-inline">
+													<label for="" class="col-sm-4 control-label">用水性质&nbsp<i style="color: red">*</i> </label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control" id="meter-price-code" name="priceCode" th:value="${currItem==null ? '' : currItem.priceCode}" required>
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${waterPriceList}" th:remove="tag">
+																<option th:value="${item.ladderName}"  th:attr="selected=${currItem!=null && item.ladderName==currItem.priceCode ? 'true':'false'}, data-water-price-id=${item.id},data-water-price=${item.totalPrice}"
+																		th:text="${item.ladderName}">数据字典的值</option>
+															</span>
+														</select>
+													</span>
+												</div>
+											</td>	
+																						
+										</tr>
+										<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="customer-propname" class="col-sm-4 control-label">类型&nbsp<i style="color: red">*</i> </label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="subject-action" name="subjectAction" th:attr="data-total-amount=${totalOweAmount},data-base-amount=${basePriceOweAmount},data-treatment-amount=${treatmentFeeOweAmount}" required>
+																<span th:each="item,iterStat: ${subjectActionList}" th:remove="tag">
+																	<option th:value="${item.key}" th:text="${item.value}">类型</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+												<td>
+													<div class="form-group form-inline">
+														<label for="customer-propname" class="col-sm-4 control-label">支付方式&nbsp<i style="color: red">*</i> </label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="subject-payment" name="subjectPayment" required>
+																<span th:each="item,iterStat: ${subjectPaymentList}" th:remove="tag">
+																	<option th:value="${item.key}" th:text="${item.value}">支付方式</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+										<tr>
+											<!-- <td>
+												账单类型
+												<div class="form-group form-inline">
+													<label for="" class="control-label col-sm-4" >账单类型&nbsp<i style="color: red">*</i> </label> 
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control " id="bill-debit-credit" name="debtCredit" th:value="${currItem==null ? 2 : currItem.debtCredit}" required>
+															默认选择第一个
+															<option value="2" th:attr="selected=( ${currItem!=null && currItem.debtCredit==2} )? 'selcted' ">欠费账单</option>
+															<option value="1" th:attr="selected=( ${currItem!=null && currItem.debtCredit==1} )? 'selcted' ">充值账单</option>
+															
+														</select>
+													</span>
+												</div>
+											</td> -->
+											<td>
+												<!-- 水量-->
+												<div class="form-group form-inline">
+													<label for="engineering-organization" class="col-sm-4 control-label">水量&nbsp<i style="color: red">*</i></label>
+													<span class="input-group-sm col-sm-8">
+														<input type="number" class="form-control bill-water-amount"
+																th:value="${currItem==null ? '' : currItem.waterAmount}" 
+																id="bill-water-amount" name="waterAmount" required
+																maxlength=30 title="请输入整数" placeholder="水量"/>
+													</span>
+												</div>
+											
+											</td>
+											<td>
+												<!-- 金额-->
+												<div class="form-group form-inline">
+													<label for="engineering-organization" class="col-sm-4 control-label">金额&nbsp<i style="color: red">*</i></label>
+													<span class="input-group-sm col-sm-8">
+														<input type="number" class="form-control bill-amount"
+																th:value="${currItem==null ? '' : currItem.amount}"
+																id="bill-amount" name="amount" required
+																maxlength=30 title="请输入正确的金额" placeholder="金额"/>
+													</span>
+												</div>
+											
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- 摘要  -->
+												<div class="form-group form-inline">
+													<label for="engineering-organization" class="col-sm-4 control-label">摘要</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.digest}" 
+																id="bill-digest" name="digest" 
+																maxlength=30 title="请输入1-30个字符" placeholder="摘要"/>
+													</span>
+												</div>
+											</td>
+											<td></td>
+											
+										</tr>
+									</tbody>
+									
+								</table>
+																										
+							</form>
+						</div>
+
+						<!-- 尾部 -->
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary btn-sm"	id="btn-insert-bill-and-back">保存&返回</button>
+						</div>
+						
+					</div>
+
+
+
+			</div>
+		</div>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var g_curr_item=[[${currItem}]];
+			var place=[[${place}]];
+			var customerId=[[${customerId}]];
+			var customerName=[[${customerName}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+	
+		//-------------------加载所有水表列表
+		
+		/*
+			点击客户输入框click事件
+		*/
+		/* function getCustomerList(){
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH+'/customer-balance-bill/customer-item-main';
+			var parms = null;
+			
+			$("#modal-container-customer-select-item #customer-select-item-dialog-body").load(url, parms,function(){
+				console.log(123)
+				//加载完毕后显示
+				openDialogFn("modal-container-customer-select-item");//打开对话框
+			}); 
+		} */
+		
+		/*
+			点击地理位置输入框click事件
+		*/
+		/* function getLocationList(){
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH+'/customer-balance-bill/customer-item-main';
+			var parms = null;
+			$("#modal-container-customer-select-item #customer-select-item-dialog-body").load(url, parms,function(){
+				//加载完毕后显示
+				openDialogFn("modal-container-customer-select-item");//打开对话框
+			}); 
+		} */
+		
+		
+		
+		//-------------------	通用打开/关闭对话框功能	--------------------
+		/*
+		 * 	打开(Open)对话框
+		 */
+		function openDialogFn(dialogId) {
+			//可拖拽
+			$("#"+dialogId).draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$("#"+dialogId).modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+		 *	关闭(CLOSE)对话框
+		 */
+		function closeDialogFn(dialogId) {
+			$("#"+dialogId).modal("hide");
+		}
+	
+		//------------------通用方法----------------------
+		/*
+			设置日期选择input背景色
+		*/
+		function setBackGround() {
+			$("#customers-settle_time").css("background-color", "white");
+		}
+		
+		/**
+		 * 	获取当前系统月份（表示为抄表记录中的期间）
+		 */
+		function getCurrSysMonth(){
+			var date = new Date();
+			var year = date.getFullYear();    //获取完整的年份(4位,1970-????)
+			var month = date.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+			if(month<10){
+				month = "0"+month
+			}
+			return year+"-"+month;
+		}
+		/**
+		 * 	获取当前系统日期（表示为抄表记录中的本期抄表日期）
+		 */
+		function getCurrSysDay(){
+			var date = new Date();
+			var year = date.getFullYear();//获取完整的年份(4位,1970-????)
+			var month = date.getMonth()+1;//获取当前月份(0-11,0代表1月)
+			var day = date.getDate();//获取当前日(1-31)
+			var h = date.getHours();//获取当前小时数(0-23)
+			var m = date.getMinutes();//获取当前分钟数(0-59)
+			var s = date.getSeconds();//获取当前秒数(0-59)
+			if(month<10){
+				month = "0"+month;
+			}
+			if(day<10){
+				day = "0"+day;
+			}
+			return year+"-"+month+"-"+day+" "+h+":"+m+":"+s;
+		}
+		
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiRecordItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/customer-balance-bill/insert";
+			var params = new Object();
+			var customerId = $("#bill-customer-id").val();
+			var period = $("#balance-bill-period").val();
+			var debitCredit = "1";
+			var digest = $("#bill-digest").val();
+			var amount = $("#bill-amount").val();
+			var waterPriceId = $("#meter-price-code").find("option:selected").attr("data-water-price-id");
+			var waterPrice = $("#meter-price-code").find("option:selected").attr("data-water-price");//水价
+			var subjectAction = $("#subject-action").val();//缴费类型
+			var subjectPayment = $("#subject-payment").val();//支付类型
+			
+			/* var waterAmount = $("#bill-water-amount").val();//水量
+			if(amount != Calc.Mul(waterPrice, waterAmount)){
+				util.message("水费计算异常，请检查并重新输入");
+			} */
+			
+			params.customerId = customerId;
+			params.period = period;
+			params.debitCredit = debitCredit;
+			params.digest = digest;
+			params.amount = amount;
+			params.waterPriceId = waterPriceId;
+			params.subjectAction = subjectAction;
+			params.subjectPayment = subjectPayment;
+			console.log(JSON.stringify(params));
+			$.post(urlStr, params, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						//var redirectUrl = BASE_CONTEXT_PATH+"/arrears-account-item/starter";
+						//util.message(res.result_msg,redirectUrl,"success");
+						hideAccountItemInsertTab();//隐藏增加账单选项卡
+						loadPageClickPageNum();//重新刷新当前页面
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				} 
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		
+		/**
+		 * 	设置抄表记录的抄表日期为当前系统日期
+		 */
+		function setRecordDefaultValue(){
+			if(g_curr_item==null){
+				$("#balance-bill-period").val(getCurrSysMonth());
+				$("#record-curr-date").val(getCurrSysDay());
+			}
+		}
+		
+		$.validator.setDefaults({//验证成功后，保存数据
+		    submitHandler: function() {
+		    	modiRecordItem(true);	
+		     	//alert("提交事件!");
+		    }
+		});
+		
+		$(function() {
+			
+			/**
+			 * 绑定水量输入框的input事件，用户输入时自动计算水费
+			 */
+			$(".bill-water-amount").on("input", function(){
+				var waterAmount = $(this).val();//水量
+				var waterPrice = $("#meter-price-code").find("option:selected").attr("data-water-price");//水价
+				var waterFee = Calc.Mul(waterPrice, waterAmount, 2);//水费
+				console.log("水量："+waterAmount+"*水价："+waterPrice+"=水费："+waterFee);
+				$(".bill-amount").val(waterFee);
+			});
+			
+			
+			/**
+			 * 绑定水费输入框的input事件，用户输入时自动计算水费
+			 */
+			$(".bill-amount").on("input", function(){
+				var waterFee = $(this).val();//水量
+				var waterPrice = $("#meter-price-code").find("option:selected").attr("data-water-price");//水价
+				var waterAmount = Calc.Div(waterFee, waterPrice,3);//水费
+				
+				console.log("水量："+waterAmount+"*水价："+waterPrice+"=水费："+waterFee);
+				$(".bill-water-amount").val(waterAmount);
+			});
+			
+			
+			//---------------	init	---------------
+			setRecordDefaultValue();//设置抄表记录的抄表日期为当前系统日期
+			$("#dialog-insert-bill-form").validate({//设置正则验证
+			    rules: {
+			    	waterAmount: {
+			    		digits: false,
+			        },
+			      },
+			      messages: {
+			    	  meterPlace: "请选择一个客户",
+			       }
+			      });
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-insert-bill-and-back').on('click',function() {
+				$("#dialog-insert-bill-form").submit();
+				
+							
+			});
+			
+			
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

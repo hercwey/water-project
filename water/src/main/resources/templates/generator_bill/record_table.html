@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+
+<style type="text/css">
+.font-color-yellow{
+	color: yellow;
+}
+.font-color-red{
+	color: red;
+}
+.table tbody td{
+	/* text-align:center; *//* 设置水平居中 */
+	vertical-align:middle;/* 设置垂直居中 */
+}
+</style>
+
+<!-- 图片查看器 CSS,JS -->
+<link rel="stylesheet" th:href="@{/viewer/css/viewer.min.css}" />
+<script type="text/javascript" th:src="@{/viewer/js/viewer-jquery.min.js}"></script>
+
+</head>
+<body>
+
+	<!-- 当前所操作的客户ID -->
+	<input type="hidden" id="record-customer-id" name="" value="" />
+	<!-- 当前所操作的抄表记录ID -->
+	<input type="hidden" id="record-ids" name="" value="" />
+	<!-- 当前所操作的表计ID -->
+	<input type="hidden" id="record-meter-ids" name="" value="" />
+	<!-- 当前所操作的期间 -->
+	<input type="hidden" id="record-period" name="" value="" />
+	<!-- 列表 -->
+	<table class="table table-sm table-hover" id="meter-record-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>地理位置</th> 
+				<th>客户姓名</th> 
+				<th>抄表期间</th>
+				<th>用水性质</th>
+				<th>基本水价</th>
+				<th>污水处理费</th>
+				<th>总水价</th>
+				<th>水量</th>
+				<th>水费</th>
+				<th>开账状态</th>
+				<th>追加减免水量</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<span th:each="item,iterStat: ${partitionWaterMapList}">
+			
+				<tr>
+				
+					<!-- 条目选择器 -->
+					<td class="">
+						
+						<div class="custom-control custom-checkbox"
+							style="margin-bottom: -1px !important;">
+							<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="data-bind-id=${item.ID},id='item-selector'+'-'+${item.ID},data-customer-id=${item.CUSTOMER_ID},data-period=${item.PERIOD}">
+							<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.ID}"></label>
+						</div> 
+					</td>
+					<!-- 位置 -->
+					<td class="" th:text="${item.place}">位置</td> 
+					<!-- 业主姓名 -->
+					<td class="" th:text="${item.CUSTOMER_NAME}">业主姓名</td> 
+					<!-- 抄表期间-->
+					<td class="" th:text="${item.PERIOD}">抄表期间</td>
+					
+					<!-- 用水性质 -->
+					<td th:text="${item.waterUseValue}">用水性质</td>
+					<!-- 基本水价-->
+					<td th:text="${item.BASE_PRICE}">基本水价</td>
+					<!-- 污水处理费 -->
+					<td th:text="${item.TREATMENT_FEE}">污水处理费</td>
+					<!-- 总水价-->
+					<td th:text="${item.WATER_PRICE}">总水价</td>
+					<!-- 水量-->
+					<td th:text="${item.REAL_WATER_AMOUNT}">水量</td>
+					<!-- 水费-->
+					<td th:text="${item.WATER_FEE}">水费</td>
+					<!-- 开账状态,是否已开账：0=未开账（默认值）；1=已开账-->
+					<td>
+						<span th:if="${item.IS_MAKE_BILL==0}">
+							<span class="badge badge-warning">未开账</span>
+						</span>
+						<span th:if="${item.IS_MAKE_BILL==1}">
+							<span class="badge badge-success">已开账</span>
+						</span>
+					</td>
+					<td>
+						<span th:if=${item.isAddSubWater}>
+							<span class="badge badge-success" title="已追加减免水量">是</span>
+						</span>
+					</td>
+					
+					<!-- 操作列 -->
+					<td class="">
+						<div class="dropdown">
+						    <button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+						      	操作
+						    </button>
+						    <div class="dropdown-menu">
+						    
+						    	<!-- 是否已开账：0=未开账（默认值）；1=已开账 -->
+						      	<!-- 生成账单 -->
+								<a class="dropdown-item btn-sm btn-generate-bill"
+									th:attr="bind-id=${item.ID},data-customer-id=${item.CUSTOMER_ID},data-period=${item.PERIOD}, data-is-make-bill=${item.IS_MAKE_BILL}">
+									<i class="fa fa-bookmark" aria-hidden="true">
+										<span>开账</span>
+									</i>
+								</a>
+						    </div>
+						</div>
+					</td>
+				
+				</tr>
+				
+			</span>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td style="font-weight: bold;">统计：</td>
+				<td style="font-weight: bold;" th:text="${totalWaterAmount}">总水量</td>
+				<td style="font-weight: bold;" th:text="${totalWaterFee}">总水费</td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		var curr_readType=[[${readType}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	//---------------------------------------------------------------------------------------------------
+	/*
+		功能说明:
+			删除所选条目(通用删除函数)
+		参数说明:
+			ids:所要删除的条目ID数组,(可使函数更具通用性.)
+	*/
+	function delBatchItem(delConds) {
+		
+		console.log(delConds);
+				
+		var url = BASE_CONTEXT_PATH+"/meter-record/delete"; // 需要提交的url
+		var params = new Object();
+		params.delConds = JSON.stringify(delConds);
+		
+		$.post(url, params, function(res){
+			//console.log(res);
+			if (res != null && res != "") {
+				if (res.result_code == "success") {
+					loadMeterRecordPage();//重新加载抄表记录列表
+				} else {
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"warning");
+				}
+			}
+		});
+	}
+	//------------------单个删除------------------
+	
+	/* 
+		单个删除 
+	*/
+	$('.del-record-single').on('click', function() {
+		var customerId = $(this).attr("data-customer-id"); //客户ID
+		var period = $(this).attr("data-period"); //期间
+		
+		setCustomerIdFn(customerId);//设置当前操作的客户ID
+		setPeriodFn(period);//设置当前操作的期间
+		
+		util.delConfirm("确认删除此条目?", "xxx", "deleteSingle");
+	})
+	
+	//单个删除-确认回调函数
+	function deleteSingle(id){
+		
+		var delCondArr=new Array();
+		
+		var customerId = getCustomerIdFn();//设置当前操作的客户ID
+		var period = getPeriodFn();//设置当前操作的期间
+		
+		var obj = new Object();
+		obj.customerId = customerId;
+		obj.period = period;
+		delCondArr.push(obj);
+		
+		delBatchItem(delCondArr);
+	}
+	//--------------批量删除-----------------
+	
+	/*
+		批量删除确认
+	*/
+	function deleteConfirm(){			
+		//注: 回调函数需要采用引号引起来
+		util.confirm("删除所选择的记录? ", "xxx", "ok_callback_name", "cancel_callback_name")			
+	}
+	
+	/*
+		批量删除确认:确认(回调)
+	*/
+	function ok_callback_name(id){
+		var delConds=getSelectedDelConds();  //此函数定义于_table.html中
+		delBatchItem(delConds);
+	}
+	
+	/*
+		批量删除确认:取消(回调)  桩函数
+	*/
+	function cancel_callback_name(){
+		console.log('cancel!');
+	}
+	
+	/**
+	 * 	获取选中的复选框的删除条件
+	 * 		一个Array，内容包括客户ID和期间；如：[{"customerId":1, "period":"2019-06"},...]
+	 */
+	function getSelectedDelConds(){
+		var delCondArr = new Array();//包括客户ID和期间
+
+		// 扫描用户所选择条目ID
+		$(".item-selector").each(function(index, elem) {
+			if (this.checked) { // 对于己选条目
+				
+				var customerId = $(this).attr("data-customer-id"); //客户ID
+				var period = $(this).attr("data-period"); //期间
+				
+				var obj = new Object();
+				obj.customerId = customerId;
+				obj.period = period;
+				delCondArr.push(obj);
+			}
+		}); // end of item-selector
+		return delCondArr;
+	}
+	
+	//------------------生成账单------------------
+	$(".btn-generate-bill").on("click", function(){
+		
+		//是否已开账：0=未开账（默认值）；1=已开账
+		var isMakeBill = $(this).attr("data-is-make-bill");
+		if(isMakeBill==G_MAKE_BILL_YES){
+			//dialog type: success warning info error,默认为info
+			util.message("此记录已开账，不需要重复开账！",null,"warning");
+			return false;
+		}
+		
+		var partitionWaterId = $(this).attr("bind-id"); //分水量ID
+		//var customerId = $(this).attr("data-customer-id"); //客户ID
+		//var period = $(this).attr("data-period"); //期间
+		
+		util.delConfirm("确认开账?", partitionWaterId, "generateBillFn");
+	});
+	/**
+	 * 	生成账单
+	 */
+	function generateBillFn(partitionWaterId){
+
+		//console.log("分水量ID："+partitionWaterId);
+		
+		var url = BASE_CONTEXT_PATH+'/generator-bill/generate-bill';
+		
+		var parms = new Object(); //参数
+		parms.partitionWaterId = partitionWaterId;
+		
+		$.post(url, parms, function(res){
+			//console.log(res);
+			if (res != null && res != "") {
+				if (res.result_code == "success") {
+					loadPageClickPageNum();//重新加载抄表记录列表
+				} else {
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"warning");
+				}
+			}
+		});
+	}
+	
+	/**
+	 * 	初始化用户选中的列表复选框，主要针对分页
+	 */
+	function initSelectedItemId(){
+		$("#meter-record-table tbody .item-selector").each(function(e) {
+			var id = $(this).attr("data-bind-id");  //item'id
+	
+			var len = G_SELECTED_PW_ID_ARR.length;
+			for(var i=0; i<len; i++){
+				if(id==G_SELECTED_PW_ID_ARR[i]){
+					$(this).prop("checked", true);
+					break;
+				}
+			}
+		});
+	}
+	
+	//-----------------page loaded ready------------------
+	$(function() {
+		
+		//----------	init	----------
+		initSelectedItemId();//初始化用户选中的列表复选框，主要针对分页
+		
+		/**
+		 * 	绑定列表中复选框的click事件，验证用户是否选择记录
+		 */
+		$("#meter-record-table tbody .item-selector").on('click', function(e) {
+			var id = $(this).attr("data-bind-id");  //item'id
+	
+			//如果用户已选择记录，则把记录ID增加到分水量ID数组，批量确认时用到此处的ID
+			if(this.checked) {					
+				G_SELECTED_PW_ID_ARR.push(id);
+			}else{//如果用户取消选择记录，则把记录ID从分水量ID数组中删除
+				var len = G_SELECTED_PW_ID_ARR.length;
+				for(var i=0; i<len; i++){
+					if(id==G_SELECTED_PW_ID_ARR[i]){
+						G_SELECTED_PW_ID_ARR.splice(i,1);
+						break;
+					}
+				}
+			}
+			//console.log("需要开账的分水量ID："+G_SELECTED_PW_ID_ARR);
+		});
+		
+		/*
+			选择/取消选择  当前页记录
+			select all  or  deselect all			 	
+		*/
+		$("#select-all-toggle").on('click', function(e) {
+			var prefix = "item-selector-";
+	
+			if (this.checked) {					
+				//查询列表中的项目
+				$(".item-selector").each(function(index, elem) {
+					this.checked = true;
+					var surfix = $(this).attr("data-bind");  //item'id
+					var rowId = prefix + surfix; 
+					$('#' + rowId).addClass("selected");
+				});
+			} 
+			else{
+				$(".item-selector").each(function(index, elem) {
+					this.checked = false;
+					var surfix = $(this).attr("data-bind");
+					var rowId = prefix + surfix;
+					$('#' + rowId).removeClass("selected");
+				});
+			} // end of else
+		});
+
+
+	});
+	//创建分页组件实例
+	var pager=new Pager("pager1");
+	$(function(){			
+		pager.init(loadPageClickPageNum,curr_searchCond);			
+	});
+</script>
+</body>
+</html>

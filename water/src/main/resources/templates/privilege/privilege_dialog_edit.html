@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 编辑菜单权限:对话框 -->
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-privilege-edit" role="dialog"	aria-labelledby="myModalLabelPrivilegeEdit" aria-hidden="true">
+					<div class="modal-dialog modal-lg">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabelPrivilegeEdit">
+									<span id="modal-title-span">编辑:菜单权限</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<div class="row clearfix">
+									<div class="col-md-12 column">
+										<form class="form-inline" role="form" id="privilege-form">
+											<!-- 表单内容 -->
+											<!-- form-inline -->
+											<input type="hidden" id="privilege-id" name="id" value="" placeholder="菜单权限ID" />
+											<input type="hidden" id="privilege-type" name="rightLevel" value="0" placeholder="菜单权限类型：0:菜单目录 1:菜单 2:功能" />
+											<table class="table table-configfeerule" frame=void>
+												<tbody>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2">编码</label>
+																<input type="text" class="form-control col-sm-10" id="right-code" name="rightCode" value="" placeholder="编码" />
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2">名称</label>
+																<input type="text" class="form-control col-sm-10" id="privilege-name" name="rightName" value="" placeholder="名称" />
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2">描述</label>
+																<input type="text" class="form-control col-sm-10" id="privilege-description" name="remark" value="" placeholder="描述" />
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2">上级菜单</label>
+																<select class="form-control col-sm-10" id="parent-id" name="pid">
+																	<option value="0" data-privilege-type="0" selected="selected">请选择上级菜单（默认为根节点）</option>
+																	<span th:each="privilege,iterStat: ${privilegeList}" th:remove="tag">
+																		<span th:if="${privilege.rightLevel==0}" th:remove="tag">
+																			<option th:value="${privilege.id}" th:attr="data-privilege-type=${privilege.rightLevel+1}" th:text="''+${privilege.rightName}">菜单权限名称</option>
+																		</span>
+																		<span th:if="${privilege.rightLevel==1}" th:remove="tag">
+																			<option th:value="${privilege.id}" th:attr="data-privilege-type=${privilege.rightLevel+1}" th:text="'&nbsp;&nbsp;'+${privilege.rightName}">菜单权限名称</option>
+																		</span>
+																		<span th:if="${privilege.rightLevel==2}" th:remove="tag">
+																			<option th:value="${privilege.id}" th:attr="data-privilege-type=${privilege.rightLevel+1}" th:text="'&nbsp;&nbsp;&nbsp;&nbsp;'+${privilege.rightName}">菜单权限名称</option>
+																		</span>
+																	</span>
+																</select>
+															</div>
+														</td>
+													</tr>
+													<tr id="privilege-href-tr">
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2 control-label">链接</label>
+																<input type="text" class="form-control col-sm-10" id="privilege-href" name="rightLink" value="" placeholder="菜单链接" />
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2 control-label">排序</label>
+																<input type="text" class="form-control col-sm-10" id="privilege-seq" name="sort" value="" placeholder="排序" />
+															</div>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</form>  
+									</div>
+								</div>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="saveandback-btn">保存&返回</button>
+								<button type="button" class="btn btn-success"	id="saveandcont-btn">保存&继续</button>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+	/**
+	 * 	绑定上级菜单的change事件
+	 */
+	$("#modal-container-privilege-edit #parent-id").on("change", function(){
+		//console.log("change");
+		var type = $(this).find("option:selected").attr("data-privilege-type");
+		$("#privilege-type").val(type);
+	});
+	
+	/**
+	 * 	绑定保存&返回按钮的click事件
+	 */
+	$("#modal-container-privilege-edit #saveandback-btn").on("click", function(){
+		save(false);//保存菜单权限
+	});
+	/**
+	 * 	绑定保存&继续按钮的click事件
+	 */
+	$("#modal-container-privilege-edit #saveandcont-btn").on("click", function(){
+		save(true);//保存菜单权限
+	});
+	
+	/**
+	 * 	保存菜单权限
+	 */
+	function save(isContinue){
+		var privilegeId = $("#modal-container-privilege-edit #privilege-id").val();
+		var url = BASE_CONTEXT_PATH + "/privilege/insert";
+		if(privilegeId!=null && privilegeId!=""){
+			url = BASE_CONTEXT_PATH + "/privilege/update";
+		}
+		$("#modal-container-privilege-edit #privilege-form").ajaxSubmit({
+			type:"post",
+			url:url,
+			success : function(res) {
+				//console.log(res);
+				if(res!=null){
+					var obj = res;//$.parseJSON(res);
+					if(obj.result_code=="success"){
+						//$("#update-menu-modal-div").modal("hide");//隐藏修改菜单对话框
+						//util.message(obj.result_msg);
+						//window.location.href="loginSubmit";
+						//操作成功后重新加载当前菜单内容
+						//reloadInfoFun();
+						if(isContinue){//提交&继续
+							resetFun();
+						}else{//提交&返回
+							reloadInfoFun();
+						}
+					}else{
+						util.message(obj.result_msg);
+					}
+				}
+			},
+		});
+	}
+	
+	/*
+	 * 	重新加载当前菜单内容
+	 */
+	function reloadInfoFun(){
+		//操作成功后重新加载
+		var href = "/privilege/starter";
+		//parent.window.iframeShowPage(href);//调用主页面中的在iframe中加载内容的方法
+		location.href = href;//重新加载页面
+	}
+	
+	</script>
+	
+	</th:block>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.NotifyGroupMeterMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.NotifyGroupMeter">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="GROUP_ID" jdbcType="DECIMAL" property="groupId" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, GROUP_ID, METER_ID
+  </sql>
+  
+  <!-- 获取某分组下的表计列表 -->
+  <select id="getSelectedMeterList" resultType="com.learnbind.ai.model.Meters">
+  	SELECT
+		M.* 
+	FROM
+		NOTIFY_GROUP_METER GM
+		LEFT JOIN METERS M ON GM.METER_ID = M.ID 
+	<where>
+		1=1
+		<if test="groupId!=null">
+			AND GM.GROUP_ID = #{groupId}
+		</if>
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.DESCRIPTION LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.METER_ADDRESS LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+		</if>
+	</where>
+  </select>
+  <!-- 获取未选择的表计 -->
+  <select id="getUnelectedMeterList" resultType="com.learnbind.ai.model.Meters">
+  	SELECT
+		* 
+	FROM
+		METERS M
+		LEFT JOIN CUSTOMER_METER CM ON CM.METER_ID = M.ID 
+	WHERE
+		M.DELETED = 0 
+		AND NOT EXISTS (
+			SELECT
+				* 
+			FROM
+				NOTIFY_GROUP G
+				LEFT JOIN NOTIFY_GROUP_METER GM ON G.ID = GM.GROUP_ID 
+			WHERE
+				M.ID = GM.METER_ID 
+				AND G.INCLUDE_FLAG = #{includeFlag} 
+		) 
+		AND CM.CUSTOMER_ID = #{customerId}
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+  					M.METER_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.STEEL_SEAL_NO LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.PLACE LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.DESCRIPTION LIKE concat(concat('%',#{searchCond}),'%')
+  					OR M.METER_ADDRESS LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+		</if>
+  </select>
+</mapper>

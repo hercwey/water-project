@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/customerbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="pledge-dialog-edit"></div>
+	<br>
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label pledge-main">
+		<div class="col-md-12 column">
+			
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block" id="search-pledge-div">
+				<ul class="extra-l" style="list-style: none;">
+					<span th:class="${FUNCTION_MODULE=='MODULE_MANAGE' ? '' : 'd-none'}">
+						<!-- 面板:增加/删除 -->
+						<li>
+							<button type="button" class="btn btn-primary btn-sm"
+								id="btn-add">
+								<i class="fa fa-plus" aria-hidden="true"> 
+									<!-- <span style="color:black">增加</span> -->
+									<span>增加</span>
+								</i>
+							</button>
+						</li>
+						<li>
+							<button type="button" class="btn btn-danger btn-sm"
+								id="btn-del">
+								<i class="fa fa-remove" aria-hidden="true"> <span>删除</span>
+								</i>
+							</button>
+						</li>
+					</span>
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入客户名称" />
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+				</ul>
+			</div>
+
+			<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+
+			<!-- 容器:字典列表 -->
+			<div class="pledge-table table-container" id = "customer-body"></div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchPledge(parms) {
+			
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/customer-pledge/table"
+			$(".pledge-table").load(url, parms, customerResizeFuncx);
+		}
+		
+		function customerResizeFuncx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchPledgeParams(){
+			//初始化请求参数
+			var parms = new Object();
+			var searchCond = $("#search-pledge-div .search-cond").val();
+			parms.searchCond=searchCond;
+			parms.customerId = getCustomerIdFn();//获取客户ID
+			return parms;
+		}
+
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchPledge() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchPledgeParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchPledge(parms);
+
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchPledgeClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchPledgeParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchPledge(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPledgePage(searchCond, pageNum, pageSize) {
+			var parms = getSearchPledgeParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchPledge(parms);
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		/*		
+			加载(Load): 增加/编辑对话框
+			将对话框内容加载到指定的容器中
+		 */
+		function loadPledgeDialog() {
+			var url = BASE_CONTEXT_PATH + '/customer-pledge/loadaddpledgedialog';
+			$("#pledge-dialog-edit").load(url, null, function(){
+				//加载完毕后显示
+				var customerId = getCustomerIdFn();//获取客户ID
+				console.log(customerId);
+				$("#pledge-customer-id").val(customerId);
+				openPledgeDialog();
+			});
+		}
+			
+		/*
+		 * 	打开(Open) 增加核对类型对话框
+		 */
+		function openPledgeDialog() {
+			//可拖拽
+			$("#modal-container-pledge-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$('#modal-container-pledge-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			关闭(CLOSE) 增加核对类型对话框
+		 */
+		function closePledgeDialog() {
+			$("#modal-container-pledge-dialog").modal("hide");
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchPledge();
+
+			//---------事件绑定--------------
+			
+			/*
+				增加核对类型按钮CLICK
+			*/
+			$('#search-pledge-div #btn-add').on('click', function() {
+				loadPledgeDialog();  //先加载后显示对话框
+				//openAddRoleDialog();
+			}); 
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#search-pledge-div #btn-search').on('click', function() {
+				btnSearchPledgeClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#search-pledge-div #btn-search-reset').on('click', function() {
+				$("#search-pledge-div #search-cond").val("");
+				$("#search-pledge-div #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#search-pledge-div #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/*
+				btn-del-role
+				批量删除按钮
+			*/
+			$('#search-pledge-div #btn-del').on('click', function() {				
+				deletePledgeConfirm();  //显示删除确认对话框
+			});
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

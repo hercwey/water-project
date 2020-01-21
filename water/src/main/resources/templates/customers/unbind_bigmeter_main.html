@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户列表主界面</title>
+
+<link rel="stylesheet"	href="/css/customerbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+
+	<div id="bind-meter-meter-dialog"  th:include="customers/bind_meter_dialog"></div>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+		
+		<div class="form-group form-inline">
+			<!-- <h6 >客户名称：</h6>
+			<h6 th:text="${customerName}">客户名称</h6> -->
+		</div>
+			
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block" id="unbind-bigmeter-search">
+				<ul class="extra-l" style="list-style: none;">
+					<!-- 地理位置查询 -->
+					<li class="input-group-sm">
+						<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher-unbind')" th:remove="tag"></div>
+					</li>
+					<li class="input-group-sm">
+						<select class="form-control btn-sm" id="meter-use" name="meterUse" >
+							<option value="" >-水表用途-</option>
+							<span th:each="item,iterStat: ${meteUseList}" th:remove="tag">
+								<option th:value="${item.key}"  
+										th:text="${item.value}">数据字典的值</option>
+							</span>
+						</select>
+					</li>
+					<!-- 面板:查询 -->
+					<li class="input-group-sm">
+						<input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入水表编号、钢印号、厂家、水表位置" title="请输入水表编号、钢印号、厂家、水表位置查询">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-primary btn-sm"	id="btn-unbind-bigmeter">
+							<i class="fa fa-unlock" aria-hidden="true"> <span>解绑</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-primary btn-sm btn-bind-meter"	id="btn-bind-meter00000">
+							<i class="fa fa-lock" aria-hidden="true"> <span>绑定</span>	</i>
+						</button>
+					</li>
+					
+				</ul>
+			</div>
+			<!-- 容器:字典列表 -->
+			<div class="unbind-bigmeter-table-container" id = "customer-body"></div>
+			
+
+		</div>
+	</div>
+	<!-- 地理位置下拉框查询JS -->
+	<script type="text/javascript"	th:src="@{/js/component/districtsearcher/DistrictSearcher.js}"></script>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------针对客户ID的操作------------------------------------------------
+		/**
+		 * 	获取客户ID
+		 */
+		function getCustomerIdFn(){
+			return $(G_CUSTOMER_ID).val();
+		}
+		/**
+		 * 	设置客户ID
+		 */
+		function setCustomerIdFn(customerId){
+			$(G_CUSTOMER_ID).val(customerId);//设置全局客户ID
+		}
+		
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchUnBindMeterItem(parms) {
+
+			
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/customers/unbind-bigmeter-table"
+			$(".unbind-bigmeter-table-container").load(url, parms, resizeFuncx);
+		}
+		function resizeFuncx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchUnbindParams(){
+			var traceIds = null;//地理位置痕迹ID（ID-ID-ID-ID）
+			var locaBlockTraceIds = locationSearcherUnbind.getBlockId();//地理位置-小区traceIds
+			var locaBuildingTraceIds = locationSearcherUnbind.getBuildingId();//地理位置-楼号traceIds
+			var locaUnitTraceIds = locationSearcherUnbind.getUnitId();//地理位置-单元traceIds
+			if(locaUnitTraceIds!=null && locaUnitTraceIds!=""){
+				traceIds = locaUnitTraceIds;
+			}else if(locaBuildingTraceIds!=null && locaBuildingTraceIds!=""){
+				traceIds = locaBuildingTraceIds;
+			}else if(locaBlockTraceIds!=null && locaBlockTraceIds!=""){
+				traceIds = locaBlockTraceIds;
+			}
+			
+			//客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户；
+			//当用户选择已立户时，查询已立户和过户的客户
+			var meterUse = $("#unbind-bigmeter-search #meter-use").val();
+			var searchCond = $("#unbind-bigmeter-search .search-cond").val();
+			var customerId = getCustomerIdFn();
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.traceIds=traceIds;
+			parms.meterUse=meterUse;//客户状态
+			parms.customerId=customerId;//客户状态
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchUnBindMeterItem() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchUnbindParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchUnBindMeterItem(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchUnBindMeterItemClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchUnbindParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchUnBindMeterItem(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadUnBindMeterItemClickPageNum(searchCond,pageNum,pageSize) {
+			var parms = getSearchUnbindParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchUnBindMeterItem(parms);
+		}
+		//地理位置下拉框件实例
+		var locationSearcherUnbind = new DistrictSearcher("location-searcher-unbind", locationSelectSearchUnbindCallback); //此处searcher的ID和回调函数
+		
+		/**
+		 * 	地理位置下拉查询组件回调函数
+		 */
+		function locationSelectSearchUnbindCallback(){
+			defaultSearchUnBindMeterItem();//查询客户
+		}
+		/*
+			btn-del
+			解绑按钮
+		*/
+		$('#btn-unbind-bigmeter').on('click', function() {				
+			unbindConfirm(); 
+			//
+		});
+		
+		//----------绑定水表------------------------
+		/* 
+			绑定表计对话框 
+		*/
+		$('#btn-bind-meter00000').on('click',function() {
+			
+			 var url = BASE_CONTEXT_PATH + '/customers/load-bind-meter-dialog';
+			var parms = new Object(); //参数
+			parms.customerId = getCustomerIdFn();;
+			
+			$("#bind-meter-meter-dialog").load(url, null, loadBindmeter); //加载完毕后显示 
+			//loadBindmeter();
+			
+		});
+		
+		/**
+		 * 	绑定大表时跳转选项卡
+		 */
+		function loadBindmeter(){
+			
+			var url = BASE_CONTEXT_PATH+'/customers/customer-bindmeter-main';
+			var customerId = getCustomerIdFn();
+			var parms = new Object(); //参数
+			parms.customerId = customerId;
+			$("#modal-container-bind-meter-meter-dialog #tab-bind-meter-body").load(url, parms,function(){
+				console.log(23)
+				//加载完毕后显示
+				openDialogFn("modal-container-bind-meter-meter-dialog");//打开对话框
+			}); 
+			
+			
+		}
+		
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//地理位置下拉组件初始化
+			locationSearcherUnbind.init();
+			//主页:默认查询(加载默认列表)
+			defaultSearchUnBindMeterItem();
+
+			//---------事件绑定--------------
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#unbind-bigmeter-search #btn-search').on('click', function() {
+				btnSearchUnBindMeterItemClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#unbind-bigmeter-search #btn-search-reset').on('click', function() {
+				$("#unbind-bigmeter-search #search-cond").val("");
+				$("#unbind-bigmeter-search #search-cond").focus();//获得焦点
+				//设置小区-楼号-单元下拉框为未选择
+				$("#unbind-bigmeter-search .location-block").val("");//设置地理位置-小区值为空
+				$("#unbind-bigmeter-search .location-building").val("");//设置地理位置-楼号值为空
+				$("#unbind-bigmeter-search .location-building").attr("disabled", true);//设置地理位置-楼号不可编辑
+				$("#unbind-bigmeter-search .location-unit").val("");//设置地理位置-单元值为空
+				$("#unbind-bigmeter-search .location-unit").attr("disabled", true);//设置地理位置-单元不可编辑
+				
+				//设置客户状态为空
+				$("#unbind-bigmeter-search #customer-status").val("");//客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户；
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#unbind-bigmeter-search #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#unbind-bigmeter-search #btn-search').trigger("click");	                
+	            }	
+			});
+			
+		});
+	</script>
+
+</body>
+</html>

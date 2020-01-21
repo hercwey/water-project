@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<!-- 表计列表 -->
+	<table class="table table-hover table-sm" id="meter-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>水表编号</th>
+				<th>口径</th>
+				<th>水表类型</th>
+				<th>状态</th>
+				<th>生产厂家</th>
+				<th>水表位置</th>
+				<th style="width:100px;">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${meterList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 编号 -->
+				<td th:text="${item.meterNo}">编号</td>
+				<!-- 口径 -->
+				<td th:text="${item.caliber}">口径</td>
+				<!-- 水表类型-->
+				<td th:text="${item.meterTypeValue}">水表类型 </td>
+				<!-- 生命周期 -->
+				<td th:text="${item.cycleStatusStr}">生命周期</td>
+				<!-- 生产厂家 -->
+				<td th:text="${item.factoryValue}">生产厂家</td>
+				<td th:text="${item.place}">水表位置</td>
+				<!-- 操作列 -->
+				<td>
+					<button type="button" class="btn-meter-doc btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i>
+						<span>查看单据</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			//------------------------------	表计单据详情功能	------------------------------
+			/**
+			 * 绑定详情按钮的click事件，查看表计档案
+			 */
+			$(".btn-meter-doc").on("click", function(){
+				
+				var meterId = $(this).attr("bind-id");//表计ID
+				setMeterIdFn(meterId);//设置用户当前编辑的表计ID
+				
+				var params = {"meterId":meterId};
+					
+				loadMeterBaseList(params, loadMeterBaseListCallback);//加载表计基本信息
+				
+				
+			});
+			/**
+			 * 加载表计基本信息回调
+			 */
+			function loadMeterBaseListCallback(){
+				showMeterDetailTab();//显示表计档案选项卡
+				transferTabs(G_TABS_METER_ITEM_NAV, G_METERS_DETAIL_TAB, "show");//显示表计档案选项卡
+				transferTabs(G_TABS_METER_DETAIL_NAV, G_METER_BASE_DETAIL_TAB, "show");//显示表计档案选项卡中的表计基本信息选项卡
+			}
+			
+			
+			
+
+		});
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

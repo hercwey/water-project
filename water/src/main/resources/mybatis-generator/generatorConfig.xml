@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<!-- 设置mysql驱动路径  
+	注意，classPathEntry只在下面这两种情况下才有效：
+		当加载 JDBC 驱动内省数据库时
+		当加载根类中的 JavaModelGenerator 检查重写的方法时
+		因此，如果你需要加载其他用途的jar包，classPathEntry起不到作用，不能这么写，解决的办法就是将你用的jar包添加到类路径中，在Eclipse等IDE中运行的时候，添加jar包比较容易。当从命令行执行的时候，需要用java -cp xx.jar,xx2.jar xxxMainClass这种方式在-cp后面指定来使用(注意-jar会导致-cp无效)。
+	 -->
+	 
+	<!-- 指定数据连接驱动jar地址 -->
+	<!-- HZ 本地 D:\maven-repository\mysql\mysql-connector-java\5.1.38 -->
+	<!-- <classPathEntry	location="D:\maven-repository\mysql\mysql-connector-java\5.1.38\mysql-connector-java-5.1.38.jar"/> -->
+	<!-- ZYC 计算机上的maven库 -->
+	<!-- <classPathEntry	location="D:\software\Java_maven\mvn_repo\com\oracle\ojdbc6\11.1.0.7.0\ojdbc6-11.1.0.7.0.jar"/> -->
+	<!-- SRD 计算机上的maven库 -->
+	<classPathEntry	location="D:\Program Files\Repositories\Maven\com\oracle\ojdbc6\12.1.0.1-atlassian-hosted\ojdbc6-12.1.0.1-atlassian-hosted.jar"/>
+		
+	<!-- 此处指定生成针对MyBatis3的DAO -->
+	<!-- 一个数据库一个context -->
+	<context id="DB2Tables"	targetRuntime="MyBatis3">
+		<!-- 生成的Java文件的编码 -->
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <!-- 格式化java代码 -->
+        <property name="javaFormatter" value="org.mybatis.generator.api.dom.DefaultJavaFormatter"/>
+        <!-- 格式化XML代码 -->
+        <property name="xmlFormatter" value="org.mybatis.generator.api.dom.DefaultXmlFormatter"/>
+		
+		<property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+		
+		<!-- 增加Models ToStirng方法 -->
+        <plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
+		
+		<!-- 通用Mapper -->
+        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
+          <property name="mappers" value="tk.mybatis.mapper.common.Mapper"/>
+        </plugin>
+		
+		<!-- 注释 -->
+		<commentGenerator>
+			<!-- 是否生成注释代时间戳 -->
+			<property name="suppressDate" value="true"/>
+			<!-- 是否去除自动生成的注释 true：是 ： false:否 --><!-- 是否取消注释 -->
+			<property name="suppressAllComments" value="false"/>
+		</commentGenerator>
+		<!--数据库链接URL，用户名、密码 -->
+		<!-- <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://127.0.0.1:3306/5aibc_db" userId="root" password="root">
+		</jdbcConnection> -->
+		<!-- <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver" connectionURL="jdbc:oracle:thin:@192.168.3.111:1521:wsd" userId="wsd" password="wsd">
+		</jdbcConnection> -->
+		<!-- 阿里云 -->
+		<jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver" connectionURL="jdbc:oracle:thin:@39.107.230.168:1521:orcl" userId="wsd" password="wsd">
+		</jdbcConnection>
+		<!-- 本地 -->
+		<!-- <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver" connectionURL="jdbc:oracle:thin:@192.168.3.111:1521:wsd" userId="wsd" password="wsd">
+		</jdbcConnection> -->
+		<javaTypeResolver>
+			<!-- 是否使用bigDecimal， false可自动转化以下类型（Long, Integer, Short, etc.） -->
+			<property name="forceBigDecimals" value="false"/>
+		</javaTypeResolver>
+		<!-- 生成模型的包名和位置-->
+		<javaModelGenerator targetPackage="com.learnbind.ai.model" targetProject="src/main/java">
+			<property name="enableSubPackages" value="true"/>
+			<property name="trimStrings" value="true"/>
+		</javaModelGenerator>
+		<!-- 生成映射文件的包名和位置-->
+		<sqlMapGenerator targetPackage="com.learnbind.ai.mapper" targetProject="src/main/java">
+			<property name="enableSubPackages" value="true"/>
+		</sqlMapGenerator>
+		<!-- 生成DAO的包名和位置-->
+		<javaClientGenerator type="XMLMAPPER" targetPackage="com.learnbind.ai.dao" targetProject="src/main/java">
+			<property name="enableSubPackages" value="true"/>
+		</javaClientGenerator>
+		
+		<!-- 要生成哪些表 -->
+					
+		<!-- 用户 -->
+		<!-- <table tableName="sys_users" domainObjectName="SysUsers" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 角色 -->
+		<!-- <table tableName="sys_roles" domainObjectName="SysRoles" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 菜单权限 -->
+		<!-- <table tableName="sys_rights" domainObjectName="SysRights" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 用户角色 -->
+		<!-- <table tableName="sys_users_roles" domainObjectName="SysUsersRoles" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 角色权限 -->
+		<!-- <table tableName="sys_roles_rights" domainObjectName="SysRolesRights" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 水价配置表 -->
+		<!-- <table tableName="SYS_WATER_PRICE" domainObjectName="SysWaterPrice" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>  -->
+	
+		<!-- 抄表记录表 -->
+		<!-- <table tableName="METER_RECORD" domainObjectName="MeterRecord" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 抄表记录临时表 -->
+		<!-- <table tableName="METER_RECORD_TEMP" domainObjectName="MeterRecordTemp" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 客户账户-账目 -->
+		<!-- <table tableName="CUSTOMER_ACCOUNT_ITEM" domainObjectName="CustomerAccountItem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> --> 
+		
+		<!-- 客户的政策减免额度 -->
+		<!-- <table tableName="CUSTOMER_POLICY_DISCOUNT" domainObjectName="CustomerPolicyDiscount" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>  -->
+		<!-- 追加减免水量 -->
+		<!-- <table tableName="ADD_SUB_WATER" domainObjectName="AddSubWater" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>  -->
+		<!-- 分水量记录 -->
+		<!-- <table tableName="PARTITION_WATER" domainObjectName="PartitionWater" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>  -->
+		
+		<!-- 客户违约金 -->
+		<!-- <table tableName="CUSTOMER_OVERDUE_FINE" domainObjectName="CustomerOverdueFine" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 客户违约金减免日至 -->
+		<!-- <table tableName="DISCOUNT_FINE_TRACE" domainObjectName="DiscountFineTrace" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>  --> 
+		
+		<!-- 表册 -->
+		<!-- <table tableName="METER_BOOK" domainObjectName="MeterBook" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 表册-表计关系表 -->
+		<!-- <table tableName="METER_BOOK_METER" domainObjectName="MeterBookMeter" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 用户-表册关系表 -->
+		<!-- <table tableName="USER_METER_BOOK" domainObjectName="UserMeterBook" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 记录异常水费规则 -->
+		<!-- <table tableName="ABNORMAL_FEE" domainObjectName="AbnormalFee" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 记录异常水量规则 -->
+		<!-- <table tableName="ABNORMAL_QUANTITY" domainObjectName="AbnormalQuantity" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 客户-账户 -->
+		<!-- <table tableName="CUSTOMER_ACCOUNT" domainObjectName="CustomerAccount" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		
+		<!-- 客户协议表 -->
+		<!-- <table tableName="CUSTOMER_AGREEMENT" domainObjectName="CustomerAgreement" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 客户银行信息表 -->
+		<!-- <table tableName="CUSTOMER_BANKS" domainObjectName="CustomerBanks" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 客户开票信息表 -->
+		<!-- <table tableName="CUSTOMER_BILL_INFO" domainObjectName="CustomerBillInfo" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 客户-表记关系表 -->
+		<!-- <table tableName="CUSTOMER_METER" domainObjectName="CustomerMeter" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 客户多人口调整记录 -->
+		<!-- <table tableName="CUSTOMER_PEOPLE_ADJUST" domainObjectName="CustomerPeopleAdjust" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 客户押金信息表 -->
+		<!-- <table tableName="CUSTOMER_PLEDGE" domainObjectName="CustomerPledge" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 客户档案表 -->
+		<!-- <table tableName="CUSTOMERS" domainObjectName="Customers" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 数据字典 -->
+		<!-- <table tableName="DATA_DICT" domainObjectName="DataDict" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		
+		<!-- 地理位置 -->
+		<!-- <table tableName="LOCATION" domainObjectName="Location" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 地理位置-客户 -->
+		<!-- <table tableName="LOCATION_CUSTOMER" domainObjectName="LocationCustomer" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 地理位置-表记 -->
+		<!-- <table tableName="LOCATION_METER" domainObjectName="LocationMeter" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		
+		<!-- 表记档案 -->
+		<!-- <table tableName="METERS" domainObjectName="Meters" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 打印机配置 -->
+		<!-- <table tableName="PRINTER_CONFIG" domainObjectName="PrinterConfig" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 表记检测规则 -->
+		<!-- <table tableName="SYS_CHECK_METER" domainObjectName="SysCheckMeter" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 政策减免额度 -->
+		<!-- <table tableName="SYS_DISCOUNT" domainObjectName="SysDiscount" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 违约金配置表 -->
+		<!-- <table tableName="SYS_OVERDUE_FINE" domainObjectName="SysOverdueFine" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 多人口调整记录 -->
+		<!-- <table tableName="SYS_PEOPLE_ADJUST" domainObjectName="SysPeopleAdjust" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 接口配置 -->
+		<!-- <table tableName="SYS_INTERFACE_CONFIG" domainObjectName="SysInterfaceConfig" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 客户信息汇总 -->
+		<!-- <table tableName="CUSTOMER_INFO_COLLECT" domainObjectName="CustomerInfoCollect" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 水表检测结果 -->
+		<!-- <table tableName="SYS_CHECK_METER_RESULT" domainObjectName="SysCheckMeterResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 中国建设银行批量代扣记录表 -->
+		<!-- <table tableName="CCB_BATCH_WITHHOLD_RECORD" domainObjectName="CcbBatchWithholdRecord" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 抄表记录照片表 -->
+		<!-- <table tableName="METER_RECORD_PHOTO" domainObjectName="MeterRecordPhoto" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 抄表记录临时照片表 -->
+		<!-- <table tableName="METER_RECORD_TEMP_PHOTO" domainObjectName="MeterRecordTempPhoto" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 安装工程表 -->
+		<!-- <table tableName="INSTALL_ENGINEERING" domainObjectName="InstallEngineering" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 工程单据 -->
+		<!-- <table tableName="ENGINEERING_DOC" domainObjectName="EngineeringDoc" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 工程-地理位置关系表 -->
+		<!-- <table tableName="LOCATION_ENGINEERING" domainObjectName="LocationEngineering" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 微信用户 -->
+		<!-- <table tableName="WECHAT_USER" domainObjectName="WechatUser" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 微信用户与客户的关系 -->
+		<!-- <table tableName="WECHAT_CUSTOMER" domainObjectName="WechatCustomer" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 表计-电子档案关系表 -->
+		<!-- <table tableName="METER_ERECORD" domainObjectName="MeterERecord" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 微信订单 -->
+		<!-- <table tableName="WECHAT_ORDER" domainObjectName="WechatOrder" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 中国建设银行批量代扣记录-客户账单关联表 -->
+		<!-- <table tableName="CCB_BATCH_CUSTOMER_ACCOUNT" domainObjectName="CcbBatchCustomerAccount" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 中国民生银行批量代扣记录表 -->
+		<!-- <table tableName="CMBC_BATCH_WITHHOLD_RECORD" domainObjectName="CmbcBatchWithholdRecord" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 中国民生银行批量代扣记录-客户账单关联表 -->
+		<!-- <table tableName="CMBC_BATCH_CUSTOMER_ACCOUNT" domainObjectName="CmbcBatchCustomerAccount" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>  -->
+		
+		<!-- 表计父子关系表 -->
+		<!-- <table tableName="METER_TREE" domainObjectName="MeterTree" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 表计分水量规则表 -->
+		<!-- <table tableName="METER_PART_WATER_RULE" domainObjectName="MeterPartWaterRule" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>  --> 
+		
+		<!-- 账目日志表 -->
+		<!-- <table tableName="ACCOUNT_ITEM_TRACE" domainObjectName="AccountItemTrace" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 表计父子关系 -->
+		<!-- <table tableName="METER_TREE" domainObjectName="MeterTree" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 公司账目表 -->
+		<!-- <table tableName="COMPANY_ACCOUNT_ITEM" domainObjectName="CompanyAccountItem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 开票信息 -->
+		<!-- <table tableName="TAX_INVOICE" domainObjectName="TaxInvoice" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 开票明细信息 -->
+		<!-- <table tableName="TAX_INVOICE_DETAIL" domainObjectName="TaxInvoiceDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> --> 
+		<!-- 红字信息表 -->
+		<!-- <table tableName="TAX_RED_INFO" domainObjectName="TaxRedInfo" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> --> 
+		<!-- 发票与账单关系表 -->
+		<!-- <table tableName="TAX_INVOICE_ACCOUNT_ITEM" domainObjectName="TaxInvoiceAccountItem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> --> 
+		<!-- 发送短信日志表 -->
+		<!-- <table tableName="SEND_SMS_LOG" domainObjectName="SendSmsLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 发送微信日志表 -->
+		<!-- <table tableName="SEND_WECHAT_LOG" domainObjectName="SendWechatLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		
+		<!-- 统计报表部分 -->
+		<!-- 月抄表率 -->
+		<table tableName="STAT_MONTH_READ_METER_RATE" domainObjectName="StatMonthReadMeterRate" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>
+		<!-- 月用水量 -->
+		<!-- <table tableName="STAT_MONTH_USE_WATER" domainObjectName="StatMonthUseWater" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 小区水费汇总表 -->
+		<!-- <table tableName="STAT_BLOCK_WATER_FEE" domainObjectName="StatBlockWaterFee" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 水费收缴情况表 -->
+		<!-- <table tableName="STAT_WATER_FEE_INCOME" domainObjectName="StatWaterFeeIncome" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 开票明细表 -->
+		<!-- <table tableName="STAT_TAX_DETAIL" domainObjectName="StatTaxDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 欠费单位总表 -->
+		<!-- <table tableName="STAT_OWE_COMPANY_METER" domainObjectName="StatOweCompanyMeter" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 欠费单位明细表 -->
+		<!-- <table tableName="STAT_OWE_COMPANY_DETAIL" domainObjectName="StatOweCompanyDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+		<!-- 水费无票明细表 -->
+		<!-- <table tableName="STAT_WATER_FEE_NO_TAX_DETAIL" domainObjectName="StatWaterFeeNoTaxDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table> -->
+	</context>
+</generatorConfiguration>

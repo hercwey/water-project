@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户通知单页面</title>
+<style type="text/css">
+	#search-customer-bill-div ul li label{
+		margin-bottom: 0px;
+	}
+	#search-customer-bill-div .input-group-text{
+		font-size: .875rem;
+		background-color: #f8f9fa;
+	}
+	#search-customer-bill-div .input-group-prepend, .input-group-text {
+		height: 32px;
+	}
+</style>
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label bank-main" th:id="${containerId}">
+		<div class="col-md-12 column">
+			<div class="tabbable" id="tabs-selected-customer-bill">
+				<ul class="nav nav-tabs" id="water-fee-notify-nav">
+					<li class="nav-item" id="water-fee-notify-item-li">
+						<a class="nav-link active" href="#water-fee-notify-item" data-toggle="tab">水费通知单列表</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="water-fee-notify-item">
+						<!-- 操作面板 -->
+						<div class="" style="display: inline-block; width:100%;padding-right:40px;" id="search-customer-bill-div">
+							<ul class="extra-l" style="list-style: none;">
+							
+								<!-- 面板:查询 -->
+								<!-- <li class="input-group-sm">
+									<input type="text" class="form-control" id="search-cond" placeholder="请输入客户名称、开票名称、税号、开户行及账号、地址及电话" title="请输入客户名称、开票名称、税号、开户行及账号、地址及电话" />
+								</li> -->
+								<!-- <li style="float:right;">
+									<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+								</li> -->
+								<li style="float:right;">
+									<button type="button" class="btn btn-primary btn-sm btn-bank-modify-and-back" id="btn-bank-modify-and-back" data-dismiss="modal">确认</button>
+								</li>
+								<li style="float:right;">
+									<div class="input-group-prepend" id="invoice-fee-type">
+										<div class="input-group-text">
+											<label><input type="radio" name="waterFee" value="1" checked="checked">基础水费</label>
+											&nbsp;&nbsp;
+											<label><input type="radio" name="waterFee" value="2">污水处理水费</label>
+											&nbsp;&nbsp;
+											<label><input type="radio" name="waterFee" value="3">总水费</label>
+										</div>
+									</div>
+								</li>
+								<li style="float:right;">
+									<div class="input-group-prepend btn-default">
+										<div class="input-group-text">
+											<label><input type="checkbox" class="is-merge-notify" id="is-merge-notify">合并通知单</label>
+											&nbsp;&nbsp;
+											<label><input type="checkbox" class="is-merge-bill" id="is-merge-bill">合并账单</label>
+										</div>
+									</div>
+								</li>
+								<!-- <li style="float:right;">
+									<button type="button" class="btn btn-warning btn-sm" id="btn-search-reset">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+								</li> -->
+								<!-- 查询按钮 -->
+								<li style="float:right;">
+									<button type="button" class="btn btn-success btn-sm" id="btn-search">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+								</li>
+								<!-- 期间 -->
+								<li style="float:right;" class="input-group-sm">
+									<input type="text" class="form-control Wdate period" readonly="readonly" style="width: 100px;"
+											id="period" name="period"
+											onClick="WdatePicker({dateFmt:'yyyy-MM'});"
+											placeholder="期间" title="期间" />
+								</li>
+								
+							</ul>
+						</div>
+			
+						<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+			
+						<!-- 容器:字典列表 -->
+						<div class="customer-bill-body table-container" id="customer-bill-body"></div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<!-- 选择客户通知单JS -->
+	<script type="text/javascript" src="/js/component/selectinvoice/SelectCustomerNotify.js"></script>
+
+	<script>
+	
+		
+	</script>
+
+</body>
+</html>

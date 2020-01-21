@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户档案详细信息</title>
+<style type="text/css">
+	#account-detail-table tr td{
+		width:25%;
+	}
+	#meter-record-table tr td{
+		width:25%;
+	}
+</style>
+</head>
+
+<body>
+	
+	<th:block th:fragment="dialog">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<h5 class="card-header">
+						账单信息
+					</h5>
+					<div class="card-body">
+						<table class="table" id="account-detail-table">
+							<tr>
+								<td>客户名称：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.customerName}"></td>
+								<td>期间：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.period}"></td>
+							</tr>
+							<tr>
+								<td>账单开始时间：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.startTimeStr}"></td>
+								<td>账单结束时间：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.endTimeStr}"></td>
+							</tr>
+							
+							<tr>
+								<td>账单类型：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.creditSubject}"></td>
+								<td>记账日期：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.accountDateStr}"></td>
+								
+							</tr>
+							<tr>
+								<td>基础水费：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.baseWaterFee}"></td>
+								<td>污水水费：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.sewageWaterFee}"></td>
+							</tr>
+							<tr>
+								<td>账单金额：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.creditAmount}"></td>
+								<td>已充值金额：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.debitAmount}"></td>
+								
+							</tr>
+							<tr>
+								<td>违约金金额：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.overdueValue}"></td>
+								<td>已充值违约金金额：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.rechargeOverdueValue}"></td>
+							</tr>
+							<tr>	
+							
+								<td>账单描述：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.creditDigest}"></td>
+								<td>记账人：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.operatorName}"></td>
+							</tr>
+							<tr>
+								<td>账单备注：</td>
+								<td th:text="${accountItem==null ? '' : accountItem.remark}"></td>
+								<td></td>
+								<td></td>
+							</tr>
+							
+						</table>
+					</div>
+					<!-- 尾部 -->
+					<!-- <div class="card-footer">
+							<b>欠费金额：<span th:text="${accountItem==null ? '0' : accountItem.arrearsValue}"></span></b>
+							<input type="hidden" id="detail-total-owe-amount" th:value="${accountItem==null ? '0' : accountItem.arrearsValue}" placeholder="保存总欠费金额,结算对话框中显示" />
+							<button type="button" class="btn btn-info btn-sm" id="settle-account">缴费</button>
+					</div> -->
+				</div>
+			</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<h5 class="card-header">
+							抄表信息
+						</h5>
+						<div class="card-body">
+							<table class="table" id="meter-record-table">
+								<tr>
+									<td>上期抄表日期：</td>
+									<td th:text="${accountItem==null ? '' : accountItem.preDate}"></td>
+									<td>上期表底：</td>
+									<td th:text="${accountItem==null ? '' : accountItem.preRead}"></td>
+								</tr>
+								<tr>
+									<td>本期抄表日期：</td>
+									<td th:text="${accountItem==null ? '' : accountItem.currDate}"></td>
+									<td>本期表底：</td>
+									<td th:text="${accountItem==null ? '' : accountItem.currRead}"></td>
+								</tr>
+								<tr>
+									<td>基础水价：</td>
+									<td th:text="${accountItem==null ? '' : accountItem.basePrice}"></td>
+									<td>污水处理费单价：</td>
+									<td th:text="${accountItem==null ? '' : accountItem.treatment}"></td>
+								</tr>
+								<tr>
+									<td>合计水价：</td>
+									<td th:text="${accountItem==null ? '' : accountItem.waterPrice}"></td>
+									<td>水量：</td>
+									<td th:text="${accountItem==null ? '' : accountItem.waterAmount}"></td>
+								</tr>
+								
+							</table>
+						</div>
+					</div>
+				</div>
+		</div>
+		
+	</th:block>
+	
+	
+	<script type="text/javascript">
+		
+		/* 
+			结算按钮对话框 
+		*/
+		$('#settle-account').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/account-item/loadsettleaccountdialog';
+			var accountItemId = getCurrEditAccountItemId();//获取当前编辑账单的ID
+			var parms = new Object(); //参数
+			parms.accountItemId = accountItemId;
+			$("#settle-account-dialog").load(url, parms,function(){
+				//加载完毕后显示 
+				openSettleAccountDialog();//打开结算对话框
+			});
+		});
+	
+	</script>
+</body>
+</html>

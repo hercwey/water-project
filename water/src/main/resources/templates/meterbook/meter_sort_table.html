@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+		<table class="table table-hover table-sm " id="meter-select-item-table">
+			<thead>
+				<tr>
+					<th>
+						
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input select-all-toggle"
+								id="meter-select-all-toggle" name="example1"> <label
+								class="custom-control-label" for="meter-select-all-toggle"></label>
+						</div>
+					</th>
+					<th>客户名称</th>
+					<th>水表钢印号</th>
+					<th>水表位置</th>
+				</tr>
+			</thead>
+			<tbody  class="sortable">
+				<tr th:each="item,iterStat: ${mbList}"	th:attr="data-bind=${item.meterId},data-sort-value=${item.sortValue},data-index=${iterStat.index}, data-last=${iterStat.last}, data-first=${iterStat.first}" class="meter-item-selector-tr">
+					<td>
+						<div class="custom-control custom-checkbox"
+							style="margin-bottom: -1px !important;">
+							<input type="checkbox" class="custom-control-input meter-item-selector" name="example1" th:attr="id='meter-item-selector'+'-'+${item.meterId},data-bind=${item.meterId}">
+							<label class="custom-control-label"	th:attr="for='meter-item-selector'+'-'+${item.meterId}"></label>
+						</div> 
+					</td>
+					<td th:text="${item.customerName}">客户名称</td>
+					<td th:text="${item.steelSealNo}">水表钢印号</td>
+					<td th:text="${item.place}">水表位置</td>
+				</tr>
+			</tbody>
+		</table>
+
+	<!-- 尾部 -->
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+		<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+			var mbList=[[${mbList}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		var G_NEW_METER_ID = 0;//保存用户调整顺序的表计ID
+		
+	
+		/**
+		 *	返回所选条目的 id(每行对应一个唯一的ID)
+		 *	@return   
+		 */
+		function getNewMeterId(){
+			return G_NEW_METER_ID;
+		}
+		
+		/**
+		 *	设置所选条目的 id(每行对应一个唯一的ID)
+		 */
+		function setNewMeterId(meterId){
+			G_NEW_METER_ID = meterId;
+		}	
+		
+		//------------------业务操作----------------------
+		
+	
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			/**
+			 * 绑定客户列表行的click事件，用户点击行来设置该行是否选中（checkbox是否选中）
+			 */
+			$("#meter-select-item-table .meter-item-selector-tr").on('click', function(e) {
+				var itemId = $(this).attr("data-bind");  //item'id
+				setNewMeterId(itemId);//把用户所选行的客户ID设置为新客户ID
+				var prefix = "meter-item-selector-";
+				
+				//设置非当前选中行的checkbox为未选中状态，并设置当前选中行的checkbox为选中状态
+				$("#meter-select-item-table tbody .meter-item-selector").each(function(index, elem) {
+					this.checked = true;
+					var surfix = $(this).attr("data-bind");  //item'id
+					var rowId = prefix + surfix; 
+					if(surfix==itemId){
+						//console.log("checkbox true:"+surfix);
+						$('#meter-select-item-table tbody #' + rowId).prop("checked", true);
+					}else{
+						//console.log("checkbox false:"+surfix);
+						$('#meter-select-item-table tbody #' + rowId).prop("checked", false);
+					}
+				});
+				
+			});
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#meter-select-item-table .select-all-toggle").on('click', function(e) {
+				var prefix = "meter-item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$("#meter-select-item-table .meter-item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#meter-select-item-table #' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$("#meter-select-item-table .meter-item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#meter-select-item-table #' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+			
+			
+			
+			 $(".sortable").sortable({ 
+			        cursor: "move", 
+			        items: "tr", //只是tr可以拖动 
+			        opacity: 0.8, //拖动时，透明度为0.6 
+			        revert: false, //释放时，增加动画 
+			        update: function(event, ui) { //更新排序之后 
+			            //var categoryids = $(this).sortable( 'refreshPositions' ) 
+			        } 
+	
+			    }); 
+	
+			/*
+				保存表计排列顺序
+			*/
+			$('#btn-modify-and-back').on('click',function() {//上移按钮click事件
+				var sortMeterArr = new Array();
+				
+				$("#meter-select-item-table .meter-item-selector-tr").each(function(index){
+					var id = $(this).attr("data-bind");
+					var sortValue = $(this).attr("data-sort-value");
+					var sortValue1 = index;
+					var obj = new Object();
+					if(sortValue != sortValue1){
+						
+						obj.id = id;
+						obj.sortValue = sortValue1;
+						sortMeterArr.push(obj);
+					}
+					//console.log("----------:"+JSON.stringify(obj));
+				});
+				console.log(sortMeterArr);
+				var url = BASE_CONTEXT_PATH + "/meter-book/edit-meter-sort";
+				var parms = new Object();
+				parms.sortMeterArr = JSON.stringify(sortMeterArr);
+				$.post(url, parms, function(res){
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							defaultSearchSortMeter();
+							loadMyMeterBookPage(); 
+							util.message(res.result_msg,null,"success");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				});
+			});
+			
+			
+		});
+		
+	</script>
+</body>
+</html>

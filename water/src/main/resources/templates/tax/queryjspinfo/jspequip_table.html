@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>金税盘设备信息-table</title>
+</head>
+<body>
+<!--
+列表样式如下:
+---field------value------field--------value---------- 
+纳税登记号			驱动程序版本号	
+本开票机类型			底层程序版本号	
+分开票机数目			金税盘编号	
+对应开票机号			报税盘编号
+金税设备当前日期		报税盘底层版本号	
+发票是否用完			发行授权信息
+上传截止日期			报税盘容量	
+离线时限			
+企业性质			
+可开具调整前税率失效时间
+ -->			
+ <table class="table table-bordered table-condensed" contenteditable="false">
+	<!-- <thead>
+		<tr></tr>
+	</thead> -->
+	<tbody>
+	
+	<!-- 
+	Nsrsbh	纳税人识别号	字符	20		
+	Bkpjlx	本开票机类型	字符	1		固定值
+									0：主开票机
+									1：开票机
+	Fkpjsm	分开票机数目	字符	100		
+	Kpdh	开票点号		字符	100		单机版时，是开票机号
+									服务器版时，是服务器号
+	Jssbdqrq	金税设备当前日期	日期	8		格式为yyyy-MM-dd
+	Fpsfyw		发票是否用完		字符	1		固定值
+										0：无可用发票
+										1：有可用发票
+	Scjzrq	上传截止日期			字符	100		1至31
+								例如：
+								20，指每月20日
+	Lxsx	离线时限			字符	100		单位：小时
+	Qdcxbbh	驱动程序版本号	字符	100		
+	Dccxbbh	底层程序版本号	字符	100		
+	Jspbh	金税盘编号		字符	20		
+	Bspbh	报税盘编号		字符	20		
+	Bspdcbbh	报税盘底层版本号	字符	100		
+	Hzfwsq		汉字防伪授权		字符	1		固定值
+										0：非汉字防伪
+										1：汉字防伪
+	Fxsqxx		发行授权信息		字符	1		固定值
+										0：无
+										1：有
+	Bsprl		报税盘容量		字符	100	 -->
+	
+	
+		<tr>						
+			<td>纳税登记号</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Nsrsbh}"></td>
+			<td>驱动程序版本号</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Qdcxbbh}"></td>		
+		</tr>		
+		<tr>						
+			<td >本开票机类型</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Bkpjlx}"></td>
+			<td >底层程序版本号</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Dccxbbh}"></td>		
+		</tr>	
+		<tr>						
+			<td >分开票机数目</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Fkpjsm}"></td>
+			<td >金税盘编号</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Jspbh}"></td>		
+		</tr>
+		<tr>						
+			<td >对应开票机号</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Kpdh}"></td>
+			<td>报税盘编号</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Bspbh}"></td>		
+		</tr>
+		<tr>						
+			<td>金税设备当前日期</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Jssbdqrq}"></td>
+			<td>报税盘底层版本号</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Bspdcbbh}"></td>		
+		</tr>
+		<tr>						
+			<td>发票是否用完</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Fpsfyw}"></td>
+			<td>发行授权信息</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Fxsqxx}"></td>		
+		</tr>
+		<tr>						
+			<td>上传截止日期</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Scjzrq}"></td>
+			<td>报税盘容量</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Bsprl}"></td>		
+		</tr>
+		<tr>						
+			<td>离线时限</td>
+			<td th:text="(${resultObj}==null) ? '': ${resultObj.taxEquipInfo.Lxsx}"></td>
+			<td></td>
+			<td></td>		
+		</tr>
+		<tr>						
+			<td>企业性质</td>
+			<td th:text="'固定值:一般纳税人,在何处有此信息'"></td>
+			<td></td>
+			<td></td>		
+		</tr>
+		<tr>						
+			<td>可开具调整前税率失效时间</td>
+			<td th:text="'-'"></td>
+			<td></td>
+			<td></td>		
+		</tr>
+	</tbody>
+</table>
+ 
+</body>
+</html>

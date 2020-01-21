@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<style type="text/css">
+.table td{
+	border-top: 0px;
+}
+</style>
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-dict-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>编辑:数据字典</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dict-dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="data-dict-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 采用表格进行布局 -->
+									<!-- 输入部分 -->
+									<table class="table-layout table" frame=void>
+										<tbody>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+													
+														<input type="hidden" id="data-dict-type-code" name="typeCode" th:value="${currItem==null ? '' : currItem.typeCode}" placeholder="字典类型编码" /><!-- 字典类型编码 -->
+														<input type="hidden" id="data-dict-type-name" name="typeName" th:value="${currItem==null ? '' : currItem.typeName}" placeholder="字典类型名称" /><!-- 字典类型名称 -->
+													
+														<label for="data-dict-type" class="col-sm-4 control-label">类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control " id="data-dict-type" name="" th:value="${currItem==null ? 0 : currItem.typeCode}">
+																<!-- 默认选择第一个 -->
+																<option value="">——请选择——</option>
+																<span th:each="item,iterStat: ${dictTypeList}" th:remove="tag">
+																	<option th:attr="data-dict-type-code=${item.TYPE_CODE},data-dict-type-name=${item.TYPE_NAME}" th:value="${item.TYPE_CODE}" th:text="${item.TYPE_NAME}">类型名称</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="data-dict-key" class="col-sm-4 control-label">键名称</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																	th:value="${currItem==null ? '' : currItem.key}" 
+																	class="form-control  " 
+																	id="data-dict-key" name="key" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="键名称" />
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="data-dict-value" class="col-sm-4 control-label">键值</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																	th:value="${currItem==null ? '' : currItem.value}" 
+																	class="form-control  " 
+																	id="data-dict-value" name="value" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="键值" />
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<div class="form-group form-inline">
+														<label for="data-dict-remark" class="col-sm-4 control-label">备注</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																	th:value="${currItem==null ? '' : currItem.remark}" 
+																	class="form-control  " 
+																	id="data-dict-remark" name="remark" 
+																	maxlength=32 title="请输入1-32位字符" placeholder="备注" />
+														</span>
+													</div>
+												</td>												
+											</tr>
+											
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			 
+			var dictTypeCode = $("#data-dict-type").val();//类型编码
+			if(dictTypeCode==null || dictTypeCode==""){
+				//dialog type: success warning info error,默认为info
+				util.message("请选择类型！",null,"error");
+				return;
+			}
+			
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/data-dict/insert";
+			
+			var id = $("#data-dict-id").val();
+			if(id!=null && id!=""){
+				urlStr = BASE_CONTEXT_PATH + "/data-dict/update";
+			}
+			var form=new FormData($("#dict-dialog-modi-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), */
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeModiDialogFn();
+							}
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+	
+		/**
+		 * 设置数据字典类型的编码和名称到input，用于保存
+		 */
+		function setDictTypeVal(dictTypeCode, dictTypeName){
+			$("#data-dict-type-code").val(dictTypeCode);//设置类型编码，用于保存
+			$("#data-dict-type-name").val(dictTypeName);//设置类型名称，用于保存
+		}
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/**
+			 * 绑定字典类型的change事件，用户选择字典类型后把类型设置到隐藏的input输入框中
+			 */
+			$("#data-dict-type").on("change", function(){
+				
+				var dictTypeCode = $("#data-dict-type").val();//类型编码
+				if(dictTypeCode==null || dictTypeCode==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择类型！",null,"error");
+					return;
+				}
+				var dictTypeName = $("#data-dict-type").find("option:selected").text();//类型名称
+				
+				$("#data-dict-type-code").val(dictTypeCode);//设置类型编码，用于保存
+				$("#data-dict-type-name").val(dictTypeName);//设置类型名称，用于保存
+				 
+			});
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				modiItem(true);				
+			});
+
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

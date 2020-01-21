@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.DrainWaterRecordMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.DrainWaterRecord">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="DRAIN_NAME" jdbcType="VARCHAR" property="drainName" />
+    <result column="CALIBER" jdbcType="VARCHAR" property="caliber" />
+    <result column="DRAIN_CALIBER" jdbcType="VARCHAR" property="drainCaliber" />
+    <result column="WATER_AMOUNT" jdbcType="DECIMAL" property="waterAmount" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, DRAIN_NAME, CALIBER, DRAIN_CALIBER, WATER_AMOUNT, OPERATION_TIME, REMARK, PERIOD
+  </sql>
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchCond" resultMap="BaseResultMap">
+	SELECT
+		*
+	FROM
+		DRAIN_WATER_RECORD
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					DRAIN_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR DRAIN_CALIBER LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR REMARK LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="period!=null and period!='' ">
+  				AND PERIOD=#{period}
+  			</if>
+		</where>
+		ORDER BY id DESC
+  </select>
+</mapper>

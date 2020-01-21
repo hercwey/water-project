@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-12 column">
+			<!-- 容器:列表 -->
+			<div class="table-container">
+				<!-- 库存水表统计信息 -->
+				<div class="card-body meters-table" id="meters-body" style="padding-left:10px;padding-right:10px;">
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+		function defaultSearch() {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meter-stock-statistic/table"
+			$(".meters-table").load(url, null, null);
+		}
+		//--------------------公共查询函数--------------------------
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			defaultSearch();
+			//------------init-------------
+
+			//---------事件绑定--------------
+			
+		});
+	</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>通知单模板</title>
+<!-- .pdf文件下载  download -->
+ <script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+ <script src="https://cdn.bootcss.com/jspdf/1.3.4/jspdf.debug.js"></script>
+<!-- jQuery 2.2.3 -->
+<script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!-- <link href="src/main/resources/static/font-awesome/4.7.0/css/font-awesome.css"  rel="stylesheet" /> -->
+
+<style>
+	/* 横线的样式  */
+	
+	/* 页大小 */	
+	@page{
+		size:70mm 90mm portrait;
+	}
+	
+	/* 横线样式 */
+	hr{
+		background-color:red;height: 1px;width:100%;border: none;
+	}
+	
+	/* 
+	@font-face {
+    font-family: glyphicons;
+    font-size: small;    
+    src: url('src/main/resources/static/font-awesome/4.7.0/fonts/fontawesome-webfont.woff') format('woff');
+	} 
+	*/
+	
+</style>
+
+<!-- <link href="src/main/resources/static/font-awesome/4.7.0/css/font-awesome.css"  rel="stylesheet" /> -->
+
+</head>
+<body style = "font-family: SimSun;" >
+	<div class="container-fluid">
+
+		<!-- 标题信息 -->
+		<div class="row">
+			<div class="col-md-12">
+				<p></p>
+				<div class="row">
+					<div class="col-md-12" style="text-align:center;font-size:18px;font-weight:bold;">
+						<span>高新区自来水公司</span>
+						<span>水费通知单</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 分隔线1 -->
+		<hr/>
+
+		<!-- 患者信息 -->
+		<div class="row">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-12">
+						<span class="" style="font-size:20px;font-weight:bold;">长久花园小区各位业主</span> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span>1.	以下为2019年4月12日-13日将从建行卡上扣除的水费，请业主向卡内存入足够金额，避免余额不足形成欠费，欠费超过2个月的用户，根据供水协议，我们将做停水处理。</span> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span>2.	每月扣费两次：12-13日（节假日提前）进行第一次扣费；23-25日进行第二次扣费。（4次失败为欠费2个月）</span> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span>3.	请未能收到短信催费提醒的业主，致电营业处更换电话号码。69099838</span> 
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- 分隔线2 -->
+		<hr/>
+
+		<!-- 用药信息 -->
+		<div class="row">
+			<div class="col-md-12">
+				<table class="table table-sm">
+					<thead>
+						<tr>
+							<th>地理位置</th> 
+							<th>业主姓名</th> 
+							<th>抄表期间</th>
+							<th>本期抄表底数</th>
+							<th>上期抄表底数</th>
+							<th>本期水量</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item,iterStat: ${testData}">
+							<!-- 水价ID -->
+							<td th:text="${item.longCode}"></td>
+							<!-- 口径 -->
+							<td th:text="${item.customerId}"></td>
+							<!-- 检测周期 -->
+							<td th:text="${item.period}"></td>
+							<!-- 备注 -->
+							<td th:text="${item.currRead}"></td>
+							
+							<td th:text="${item.preRead}"></td>
+							
+							<td th:text="${item.currAmount}"></td>
+							<!-- 操作列 -->
+						</tr>
+						
+					</tbody>
+				</table>
+				<div style="page-break-before:always;"></div> 
+			</div>
+		</div>
+
+	</div>
+</body>
+
+</html>

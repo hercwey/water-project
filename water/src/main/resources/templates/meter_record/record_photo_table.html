@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>抄表记录-照片</title>
+
+<link rel="stylesheet" th:href="@{/viewer/css/viewer.min.css}" />
+<script type="text/javascript" th:src="@{/viewer/js/viewer-jquery.min.js}"></script>
+<!-- 文件上传验证JS -->
+<script src="/commons/file-upload-validate.js" type="text/javascript"></script>
+<!-- ajax file upload js -->
+<script src="/jquery/ajaxFileUpload.js" type="text/javascript"></script>
+
+</head>
+<body>
+
+<body>
+	<br>
+	<!-- 主界面(操作页板+列表容器) -->
+	
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="card">
+				<h5 class="card-header">
+					<button type="button" class="btn btn-primary" id="btn-show-photo-upload">上传</button>
+				</h5>
+				<div class="card-body" id="photo-item">
+					<div class="row">
+						<div class="col-md-3 column" th:each="item,iterStat: ${recordPhotoList}">
+							<div class="card">
+								<div class="card-body">
+									<p style="text-align: center;">
+										<img class="card-img-top record-img" th:attr="data-original=${item.imagePath}," th:src="${item.imagePath}" style="height:100px;width:auto;" />
+									</p>
+									<p>
+										<button type="button" class="btn btn-warning btn-delete-photo" th:attr="data-id=${item.id},data-path=${item.imagePath}">删除</button>
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 加入协议上传对话框 -->
+	<div id="photo-dialog-edit"></div>
+
+	
+	
+	<script type="text/javascript">
+	
+		/**
+		 * 	ajax请求删除客户协议
+		 */
+		function ajaxReqDeletePhoto(id){
+			var url = BASE_CONTEXT_PATH + "/meter-record/delete-photo"
+			var params = new Object();
+			params.id = id;
+			//params.path = path;
+			$.post(url, params, function(res){
+				//console.log("success:"+res);
+		    	if(res!=null){
+					if(res.result_code=="success"){
+						
+						reloadMeterRecordPhoto();//重新加载抄表记录照片
+						
+						//searchMeterRecordPhoto(id);
+						//closePhotoUploadDialog();//关闭协议上传对话框
+						//重新加载协议列表
+					}else{
+						util.message(res.result_msg);
+					}
+				}
+			});
+		}
+		/**
+		 * 	重新加载抄表记录照片
+		 */
+		function reloadMeterRecordPhoto(){
+			var customerId = getCustomerIdFn();//获取当前操作的客户ID
+			var period = getPeriodFn();//获取当前操作的期间
+			var recordIds = getRecordIdsFn();//获取当前操作的抄表记录ID
+			var meterIds = getMeterIdsFn();//获取当前操作的表计ID
+			
+			var parms = new Object(); //参数
+			parms.customerId = customerId;
+			parms.period = period;
+			parms.recordIds = recordIds;
+			parms.meterIds = meterIds;
+			searchMeterRecordPhoto(parms);
+		}
+		
+		$(function(){
+			/**
+			 * 	绑定协议的删除按钮的click事件
+			 */
+			$(".btn-delete-photo").on("click", function(){
+				var id = $(this).attr("data-id");
+				var path = $(this).attr("data-path");
+				
+				var ok_callback_bank = "ajaxReqDeletePhoto";
+				//注: 回调函数需要采用引号引起来
+				util.confirm("删除所选择的记录? ", id, ok_callback_bank, "cancel_callback_name")
+				
+			});
+			
+			//---------事件绑定--------------
+			
+			/**
+			 * 	加载协议上传对话框，并打开
+			 */
+			$("#btn-show-photo-upload").on("click", function() {
+				
+				//加载字典列表页面
+				var url = BASE_CONTEXT_PATH + "/meter-record/loadphotodialog"
+				$("#photo-dialog-edit").load(url, null, function(){
+					openPhotoUploadDialog();//打开图片上传对话框
+				});
+			});
+			
+			/**
+			 * 	初始化协议图片查看器插件
+			 */
+			$("#photo-item").viewer({
+				url: 'data-original',
+			});
+			
+			
+		});
+		
+		</script>
+		
+</body>
+</html>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.InvoiceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.Invoice">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="INVOICE_NO" jdbcType="VARCHAR" property="invoiceNo" />
+    <result column="COMPANY_NAME" jdbcType="VARCHAR" property="companyName" />
+    <result column="TAX_NO" jdbcType="VARCHAR" property="taxNo" />
+    <result column="BANK_NAME" jdbcType="VARCHAR" property="bankName" />
+    <result column="BANK_NO" jdbcType="VARCHAR" property="bankNo" />
+    <result column="INVOICE_DATE" jdbcType="TIMESTAMP" property="invoiceDate" />
+    <result column="INVOICE_PEOPLE" jdbcType="VARCHAR" property="invoicePeople" />
+    <result column="INVOICE_TYPE" jdbcType="DECIMAL" property="invoiceType" />
+    <result column="TOTAL_AMOUNT" jdbcType="DECIMAL" property="totalAmount" />
+    <result column="FEE_AMOUNT" jdbcType="DECIMAL" property="feeAmount" />
+    <result column="TAX_RATE" jdbcType="DECIMAL" property="taxRate" />
+    <result column="TAX_AMOUNT" jdbcType="DECIMAL" property="taxAmount" />
+    <result column="E_RECORD_ID" jdbcType="DECIMAL" property="eRecordId" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+    <result column="INVOICE_USE" jdbcType="VARCHAR" property="invoiceUse" />
+    <result column="ACCOUNT_ITEM_ID" jdbcType="DECIMAL" property="accountItemId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, INVOICE_NO, COMPANY_NAME, TAX_NO, BANK_NAME, BANK_NO, INVOICE_DATE, INVOICE_PEOPLE, 
+    INVOICE_TYPE, TOTAL_AMOUNT, FEE_AMOUNT, TAX_RATE, TAX_AMOUNT, E_RECORD_ID, PERIOD, 
+    INVOICE_USE, ACCOUNT_ITEM_ID
+  </sql>
+  
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchInvoice" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM invoice r
+		<where>
+			1=1
+			<!-- 输入发票号码、单位名称、税号、开户账号、开票人查询 -->
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					r.INVOICE_NO LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR r.COMPANY_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR r.TAX_NO LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR r.INVOICE_PEOPLE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR r.BANK_NO LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+  			<if test="invoiceType!=null and invoiceType!='' ">
+  				AND r.INVOICE_TYPE = #{invoiceType}
+  			</if>
+  			<if test="period!=null and period!='' ">
+  				AND r.PERIOD = #{period}
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+</mapper>

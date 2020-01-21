@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+
+<link rel="stylesheet"	href="/css/meterbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label">
+		<div class="col-md-12 column">
+			
+			
+			<div class="tabbable" id="tabs-account-item">
+				<ul class="nav nav-tabs" id="account-item-nav-tabs">
+					<li class="nav-item" id="account-item-tab">
+						<a class="nav-link active" href="#tab-customer-item" data-toggle="tab">客户档案日志</a>
+					</li>
+					<li class="nav-item" id="tab-customer-trace-detail-li" style="display: none;">
+						<a class="nav-link" href="#tab-customer-trace-detail" data-toggle="tab">日志详情</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab-customer-item">
+						<!-- 操作面板 -->
+						<div class="" style="display: inline-block">
+							<ul class="extra-l" style="list-style: none;">
+								<!-- 面板:查询 -->
+								<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入客户名称" />
+								</li>
+								<!-- 查询按钮 -->
+								<li>
+									<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+										<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+									</button>
+								</li>
+								<li>
+									<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+										<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+									</button>
+								</li>
+							</ul>
+						</div>
+						<div class="card">
+							<!-- 容器:字典列表 -->
+							<div class="customers-trace-table table-container" id="meters-body"></div>
+						</div>
+						
+					</div>
+					
+					<div class="tab-pane" id="tab-customer-trace-detail">
+						<!-- 客户立户单详细信息 -->
+					</div>
+					
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		/**
+		 * 	隐藏客户档案日志详情选项卡
+		 */
+	 	function hideDetailTab(){
+			$("#tab-customer-trace-detail-li").hide();
+		} 
+		/**
+		 * 	显示客户档案日志详情选项卡
+		 */
+		function showDetailTab(){
+			$("#tab-customer-trace-detail-li").show();
+			$("#account-item-nav-tabs a[href='#tab-customer-trace-detail']").tab("show");//跳转到详细信息选项卡
+		}
+		
+		/* 
+			加载客户档案日志
+		*/
+		function loadCustomerTraceList(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/customers-trace/table";
+			var callbackFunc = callback;
+			var containerId = "#tab-account-item";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		/* 
+			加载客户档案日志详情详情信息
+		*/
+		function loadDetailList(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/customers-trace/detail";
+			var callbackFunc = callback;
+			var containerId = "#tab-customer-trace-detail";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function search(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/customers-trace/table"
+			$(".customers-trace-table").load(url, parms, customerResizeFuncx);
+		}
+		
+		function customerResizeFuncx(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchParams(){
+			//初始化请求参数
+			var parms = new Object();
+			var searchCond = $("#search-cond").val();
+			parms.searchCond=searchCond;
+			
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearch() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadTracePage(searchCond, pageNum, pageSize) {
+			var parms = getSearchParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			search(parms);
+		}
+
+		
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearch();
+			/**
+			 * 	绑定客户信息选项卡的click事件
+			 */
+			$("#account-item-tab").on("click", function(){
+				loadCustomerTraceList(null,null);
+				hideDetailTab();//隐藏客户档案日志详情信息
+			});
+
+			//---------事件绑定--------------
+			
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#btn-search').on('click', function() {
+				btnSearchClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#btn-search-reset').on('click', function() {
+				$("#search-cond").val("");
+				$("#search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#btn-search').trigger("click");	                
+	            }	
+			});
+			
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

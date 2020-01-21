@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<!-- 表计父子关系业务主页 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- ZTree样式 -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<!-- <link rel="stylesheet"	href="/css/customerbody.css" /> -->
+<!-- ZTree自定义样式, -->
+<!-- <link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}"> -->
+
+<style>
+
+/* location tree style */
+#location-tree-location-tree {
+	margin-top: 10px;
+	border: 1px solid #617775;
+	background: white;
+	width: 100%;
+	height: 300px;
+	overflow-y: scroll;
+	overflow-x: auto;
+}
+/* meter-tree style */
+#location-tree-psmeter-tree{
+	margin-top: 10px;
+	border: 1px solid #617775;
+	background: white;
+	width: 100%;
+	height: 300px;
+	overflow-y: scroll;
+	overflow-x: auto;
+}
+
+/* ztree 选择后的css */
+#location-tree-location-tree a.curSelectedNode {
+	background-color: yellow;
+	color: blue;
+	font-weight:bold;
+}
+
+#location-tree-psmeter-tree a.curSelectedNode {
+	background-color: lightgreen;
+	color: blue;
+	font-weight:bold;
+}
+
+table tbody tr:hover{
+	background-color:#8FBC8F;
+}
+
+/* 操作面板中的按钮向右浮动 */
+.extra-r li {
+	float: right;	
+	cursor: pointer;
+}
+
+</style>
+
+</head>
+<body>	
+	
+		<div class="row clearfix">			
+			<div class="col-md-6 column">
+				<div class="col-md-12 column">
+					<h5>分组表计</h5>
+				</div>		
+				<div class="card">
+					<div class="card-body" id="location-body" style="padding-top:10px;padding-bottom:10px">
+						<!-- 地理位置列表 -->
+						<div th:include="component/locationtree/location_tree::tree('location-tree')" th:remove="tag" ></div>
+					</div>					
+				</div>
+				<!-- Location Tree node's meter table -->
+				<!-- 列表容器 -->
+				<div class="column" id="meter-table-container">					
+				</div>	
+			</div>
+			<div class="col-md-6 column">
+				<div class="col-md-12 column">
+					<h5>表计关系</h5>
+				</div>		
+				<div class="card">
+					<div class="card-body" id="location-body" style="padding-top:10px;padding-bottom:10px">
+						<!-- 地理位置列表 -->
+						<div th:include="component/metertree/meter_tree::tree('psmeter-tree')" th:remove="tag" ></div>						
+					</div>
+				</div>
+				<div class="" style="display: inline-block;width:100%;" id="general-operate-panel">
+							<ul class="extra-r" style="list-style: none; padding-inline-start: 20px;">							
+							 	<li>
+									<button type="button" class="btn btn-danger btn-sm"
+										id="btn-up">
+										<i class="fa fa-arrow-up" aria-hidden="true"> <!-- <span>删除</span> --></i>
+									</button>
+								</li>				
+								<li >
+									<button type="button" class="btn btn-primary btn-sm btn-add" id="btn-down">
+										<i class="fa fa-arrow-down" aria-hidden="true"><!-- <span>增加</span> --></i>
+									</button>
+								</li>
+							</ul>
+				</div>
+				<!-- node's meter info -->
+				<!-- 表计信息容器 -->
+				<div class="column" id="meter-info-container">	
+															
+				</div>				
+			</div>
+		</div>
+	
+
+	<!-- 地理位置树自适应JS -->
+	<!-- <script type="text/javascript"	th:src="@{/js/location_tree_adaptive/location_tree_adaptive.js}"></script> -->
+	
+	<!-- ZTree JS Scripts-->
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+	<!-- jquery.ztree.exedit.js zTree拖放 -->
+	<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.exedit.js}"></script>
+	<!-- jquery ui 此处用于拖放表格中的行 -->
+	<!-- <script type="text/javascript"	th:src="@{/jquery-ui/jquery-ui.js}"></script> -->
+	
+	<!-- 地理位置treeJS -->
+	<script type="text/javascript"	th:src="@{/js/component/locationtree/LocationTreex.js}"></script>
+	<script type="text/javascript"	th:src="@{/js/component/locationtree/LocationTree2.js}"></script>
+	
+	<script type="text/javascript" th:src="@{/pivas/js/common/UseLoading.js}"></script>
+	
+
+	<script th:inline="javascript">
+	</script>
+
+	<script>
+	
+		//tree实例
+		var locationTree = new LocationTree('location-tree');  		//表计分组导航 Location Tree
+		var psMeterTree = new LocationTree2('psmeter-tree');    	//表计父子关系Meter Tree
+		
+		/*
+			location ztree click某节点后的回调函数
+			action:
+				(1)重新加载结点下的表计列表
+		*/
+		function locationTreeNodeCallback(treeNode) {
+			
+			console.log("call outer function---locationTreeNodeCallback  in psmeter_main");
+			//console.log("click node is:"+JSON.stringify(treeNode));		
+		
+			if(treeNode==null){
+				console.log("tree clicked----------- not on tree node");
+				return false;
+			}
+			
+			//获取节点信息
+			debugInfo1(treeNode);
+			
+			defaultSearchLocationMeter();			
+		}
+		
+		/*
+			debug tree node's info
+		*/		
+		function debugInfo1(treeNode){
+			var traceIds = treeNode.traceIds;//节点的traceIds
+			var pyCode = treeNode.pycode;//节点的pycode
+			var nodeId=treeNode.id;     //节点ID
+			console.log("traceIds is:"+traceIds);
+			console.log("pyCode is:"+pyCode);
+			console.log("nodeId is:"+nodeId);
+		}
+		
+		//------------------meter tree--------------------
+		/*
+			meter tree, click node callback function
+			action:
+				display node's meter info
+		*/
+		function psmeterTreeNodeCallback(treeNode) {			
+			console.log("click node is:"+JSON.stringify(treeNode));
+			
+			if(treeNode==null){
+				return false;
+			}
+			
+			debugInfo2(treeNode);  //显示tree节点信息
+			var meterId=treeNode.meterId;  //表计id 
+			
+			displayMeterInfo(meterId);  //显示表计信息
+			
+		}
+		
+		/*
+		*	功能:
+				修改结点名称
+			参数:
+				nodeId:结点id(in meter tree)
+				newName:结点的新名称
+		*/
+		function renameTreeNode(nodeId,newName){			
+			console.log("-----------------rename business function------------------");
+			console.log("nodeId"+nodeId);
+			console.log("newName"+newName);
+			
+			//请求的url
+			var url=BASE_CONTEXT_PATH+"/psmeter/treeNodeRename";
+			//请求参数
+			var params=new Object();
+			params.nodeId=nodeId;
+			params.newName=newName;
+			
+			$.post(url,params,null);	
+		}
+		
+		/*
+			功能:
+				移除树结点
+			参数:
+				nodeId: meter tree node's id
+				traceIds:父结点id列表,以"-"分隔
+		*/
+		function removeTreeNode(nodeId){			
+			console.log("-----------------remove business function------------------");
+			console.log("nodeId"+nodeId);
+			//console.log("traceIds"+traceIds);
+			
+			//请求的url
+			var url=BASE_CONTEXT_PATH+"/psmeter/treeNodeRemove";
+			//请求参数
+			var params=new Object();
+			params.nodeId=nodeId;
+			//params.traceIds=traceIds;
+			//发送请求
+			$.post(url,params,null);	
+		}
+		
+		/*
+			功能:
+				加载并显示表计信息(单个表计)
+			参数:
+				meterId 表计id
+		*/
+		function displayMeterInfo(meterId){
+			const CONTAINER="#meter-info-container";
+			//请求url
+			var url=BASE_CONTEXT_PATH+"/psmeter/meterInfo";
+			//请求参数
+			var params=new Object();
+			params.meterId=meterId;
+			
+			$(CONTAINER).load(url,params,null);
+		}
+		
+		/*
+			调试用函数.
+		*/
+		function debugInfo2(treeNode){
+			var traceIds = treeNode.traceIds;//节点traceIds(traceId用于将Tree结构转换成线性结构)
+			var pyCode = treeNode.pycode;//拼音编码:pycode
+			var nodeId=treeNode.id;     //节点ID
+			var meterId=treeNode.meterId;  //显示表计ID信息
+			console.log("traceIds is:"+traceIds);
+			console.log("pyCode is:"+pyCode);
+			console.log("nodeId is:"+nodeId);
+			console.log("meterId is:"+meterId);  //结点下的表计ID
+		}
+		
+		//---------------------------------------
+		
+		/*
+			加载meter table main page
+		*/		
+		function loadMeterMain(){
+			const METER_MAIN_CONTAINER="#meter-table-container";  //表计tablep容器
+			
+			var url=BASE_CONTEXT_PATH+"/psmeter/meterTableMain";
+			$(METER_MAIN_CONTAINER).load(url,null,null);
+		}
+		
+		/*
+			meter tree 外部drop事件处理
+		*/		
+		function drop(ev) {
+		    //ev.preventDefault();
+		    //接收传递过来的数据
+		    console.log("meter tree-------drop row");		    
+		    var  data = ev.dataTransfer.getData('transferData'); // 取得设置的数据
+		    console.log("data is:"+data);
+		    if((data==null) || ("undefined" == typeof data) ||(data=="")){
+		    	console.log("来自于location tree的drag and drop");
+		    	//取得location tree当前树结点
+		    	var treeNode=locationTree.getSelectedTreeNode();
+		    	console.log("被拖入的节点为:"+JSON.stringify(treeNode));
+		    	//TODO在此处处理相应的拖入业务逻辑(自location tree中)
+		    	//分成两个步骤(1)先将结点拖入到树中做为根结点来处理(2)而后再手工进行调整
+		    	if(treeNode!=null){
+		    		UseLoading.show();
+		    		addLocationTreeNode2MeterTree(treeNode);	
+		    	}
+		    	
+		    }
+		    else{		    	
+		    	console.log("来自于meter table row的drag and drop");
+		    	/* 
+		    		data结构如下:
+		    		{
+		  				meterId:"",
+		  				meterPlace:""
+		  			} 
+		    	*/
+		    	var transferData=JSON.parse(data);
+		    	console.log("received data meter id is :"+transferData.meterId);
+		    	console.log("received data meter id is :"+transferData.meterPlace);
+		    	//TODO 在此处处理相应的拖入业务逻辑(自表计table中)
+		    	//分成两个步骤(1)先将结点拖入到树中做为根结点来处理(2)而后再手工进行调整
+		    	addMeter2MeterTree(transferData);
+		    }
+		    //ev.target.appendChild(document.getElementById(data)); // 把拿到的数据放到指定的容器中
+		    return false;
+		}
+		
+		/*
+			meter tree允许放置
+		*/		
+	  	function allowDrop(ev) {			  
+	    	ev.preventDefault();
+	  	}
+		
+		/*
+			功能:
+				向meter tree中增加节点
+				节点来自于meter table
+			参数:transferData	
+			格式如下:
+			{
+	  			meterId:"",
+	  			meterPlace:""
+	  		}
+		*/
+		function addMeter2MeterTree(transferData){
+			//请求的url
+			var url=BASE_CONTEXT_PATH+"/psmeter/dropMeter"
+			//请求参数
+			//var parms=new Object();
+			//parms.meterId=transferData.meterId;
+			//parms.meterPlace=transferData.meterPlace;
+			
+			//发送请求
+			$.post(url,transferData,addTreeNodeSuccess);
+		}
+		
+		/*
+			功能:
+				自Location tree中拖放结点到meter tree时,
+				在meter tree中增加结点
+			参数:
+				treeNode-自location tree拖放的结点.
+		*/
+		function addLocationTreeNode2MeterTree(treeNode){
+			//请求的url
+			var url=BASE_CONTEXT_PATH+"/psmeter/dropTreeNode"
+			//请求参数
+			var parms=new Object();
+			parms.id=treeNode.id;
+			parms.traceIds=treeNode.traceIds;
+			//发送请求
+			$.post(url,parms,addTreeNodeSuccess);
+		}
+		
+		/*
+		
+			直接在回调函数中初始化树
+			相当于重新刷新了数据.
+		*/
+		function addTreeNodeSuccess(){
+			UseLoading.hide();
+			//initMeterTree();	
+			psMeterTree.refreshTree();  //刷新树.
+		}
+		
+		/*
+			初始化 meter tree
+		*/
+		function initMeterTree(){
+			psMeterTree.initTree();
+			psMeterTree.setClickOuterFunction(psmeterTreeNodeCallback);  //设置外部业务函数
+			psMeterTree.setRenameOuterFunction(renameTreeNode);   		//设置外部业务函数
+			psMeterTree.setRemoveOuterFunction(removeTreeNode);   		//设置tree node remove外部业务函数
+		}
+		
+		/*
+			初始化 location tree
+		*/
+		function initLocationTree(){
+			locationTree.initTree();  //初始化树.			
+			locationTree.setClickOuterFunction(locationTreeNodeCallback);  //设置外部业务函数
+		}
+				
+	
+		$(function() {
+			
+			//------------------初始化ztree----------------			 
+			initLocationTree();  	//init location Tree			
+			initMeterTree();  		//init meter tree(meter relation tree)	
+			
+			loadMeterMain(); //加载表计列表主页
+			
+			/*
+				向下按钮
+			*/
+			var oldHeight=$("#location-tree-psmeter-tree").height();
+			$("#btn-down").on('click',function(){				
+				$("#location-tree-psmeter-tree").height(600);
+				$("#meter-info-container").hide();
+				
+			});
+			
+			/*
+				向上按钮
+			*/
+			$("#btn-up").on('click',function(){
+				$("#location-tree-psmeter-tree").height(oldHeight);
+				//$("#general-operate-panel").height(300);
+				$("#meter-info-container").show();
+			});
+			
+		})
+	</script>
+</body>
+</html>

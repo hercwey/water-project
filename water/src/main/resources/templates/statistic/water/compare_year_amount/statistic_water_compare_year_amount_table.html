@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<!-- 抄表记录列表 -->
+	<span th:include="statistic/water/compare_year_amount/table::table" th:remove="tag"></span>	
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+	<!-- 加入分页组件 -->
+	<div th:include="common/common_pager_new::pager('pager1')" class="pagerx"	style="float: right; margin-right: 10px;"></div>
+		
+	<!-- 内联 -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/	
+		var curr_searchCond=[[${searchCond}]];  //json格式数据
+		/*]]>*/
+	</script>
+	
+	<!-- 分页 -->
+	<script src="/js/pager/Pager.js"></script>
+	
+	<script type="text/javascript">
+		
+		var pager=new Pager("pager1");
+		
+		$(function(){			
+			pager.init(statisticWaterCompareYearAmount.pageSearch,curr_searchCond);			
+		});
+		
+	
+	</script>
+	
+	
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+<style>
+.role-main a {
+	text-decoration: none;
+	color: black;
+}
+
+.role-main a:visited {
+	text-decoration: none;
+}
+
+.role-main a:hover {
+	text-decoration: none;
+}
+
+.role-main .container a:hover {
+	text-decoration: none;
+	color: blue;
+}
+
+.extra-l  a {
+	color: black;
+}
+
+.role-table tr:hover {
+	background-color: #CCFFCC;
+}
+
+.medic-label i {
+	color: white;
+}
+
+.medic-label .table-container i {
+	color: black;
+}
+
+.medic-label a i {
+	cursor: pointer;
+}
+
+/* 时间查询条件样式 */
+.extra-l li {
+	float: left;
+	margin: auto 10px;
+	cursor: pointer;
+}
+
+/* placeholder color */
+/* chrome浏览器 */
+#search-cond::-webkit-input-placeholder{
+ color: lightblue; 
+}
+#search-cond:-moz-placeholder{
+color: lightblue;
+}
+#search-cond::-moz-placeholder{
+color: lightblue;
+}
+#search-cond:-ms-input-placeholder{
+color: lightblue;
+}
+
+</style>
+
+</head>
+<body>
+
+	<div class="tabbable" id="tabs-bind-meter">
+		<ul class="nav nav-tabs">
+			<li class="nav-item" id="tab-bind-meter-item-li">
+				<a class="nav-link active" href="#tab-bind-meter-item" data-toggle="tab">绑定</a>
+			</li>
+			<li class="nav-item" id="tab-unbind-meter-item-li" >
+				<a class="nav-link" href="#tab-unbind-meter-item" data-toggle="tab" >解绑</a>
+			</li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="tab-bind-meter-item">
+				
+			</div>
+			<div class="tab-pane" id="tab-unbind-meter-item">
+				
+				<div id="add-know-library">
+					<!-- 表计列表 -->
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		/*]]>*/
+	</script>
+
+	<script>
+		/**
+		 * 	获取客户ID
+		 */
+		function getCustomerIdFn(){
+			return $(G_CUSTOMER_ID).val();
+		}
+		/**
+		 * 	设置客户ID
+		 */
+		function setCustomerIdFn(customerId){
+			$(G_CUSTOMER_ID).val(customerId);//设置全局客户ID
+		}
+		
+		
+		/* 
+			加载客户已绑定的水表信息
+		*/
+		function loadUnBindMeterItem(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/customers/customer-unbindmeter-main";
+			var callbackFunc = callback;
+			var containerId = "#tab-unbind-meter-item";
+			
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		/* 
+			加载客户未绑定的水表信息
+		*/
+		function loadBindMeterItem(parms, callback) {
+			var url = BASE_CONTEXT_PATH+"/customers/customer-bindmeter-main";
+			var callbackFunc = callback;
+			var containerId = "#tab-bind-meter-item";
+			loadPage(containerId, url, parms, callbackFunc);
+		}
+		
+		/**
+		 * 	加载客户未绑定的水表信息
+		 */
+		function loadBindMeterItemList(){
+			var customerId = getCustomerIdFn();
+			var parms = new Object(); //参数
+			parms.customerId = customerId;
+			
+			loadBindMeterItem(parms, null);//加载客户未绑定的水表信息
+		}
+		/**
+		 * 	加载客户已绑定的水表信息
+		 */
+		function loadUnBindMeterItemList(){
+			var parms = new Object();
+			var customerId = getCustomerIdFn();
+			parms.customerId = customerId;
+			loadUnBindMeterItem(parms, null);//加载客户已绑定的水表信息
+		}
+		//---------------------绑定/解绑操作----------------------------------------
+		/**
+		 * 	绑定选项卡的click事件
+		 */
+		$("#tab-bind-meter-item-li").on("click", function(){
+			loadBindMeterItemList();//加载客户未绑定的水表信息
+			
+		});
+		/**
+		 * 	点击解绑选项卡的click事件
+		 */
+		$("#tab-unbind-meter-item-li").on("click", function(){
+			loadUnBindMeterItemList();//加载客户已绑定的水表信息
+			
+		});
+		
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------------默认加载客户未绑定的表计列表--------------------------------------
+			loadBindMeterItemList();//加载客户未绑定的水表信息
+		});
+	</script>
+
+</body>
+</html>

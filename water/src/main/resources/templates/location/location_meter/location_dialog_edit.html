@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 编辑菜单权限:对话框 -->
+
+<!-- color picker 颜色选择器 -->
+<!-- <link 	href="/color-picker/dist/css/bootstrap-colorpicker.css"	rel="stylesheet" />
+<script  src="/color-picker/dist/js/bootstrap-colorpicker.js" type="text/javascript"></script> -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-location-edit" role="dialog"	aria-labelledby="myModalLabelPrivilegeEdit" aria-hidden="true">
+					<div class="modal-dialog modal-lg">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabelPrivilegeEdit">
+									<span id="modal-title-span">查看:地理位置</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<div class="row clearfix">
+									<div class="col-md-12 column">
+										<form class="form-inline" role="form" id="location-form">
+											<!-- 表单内容 -->
+											<!-- form-inline -->
+											<input type="hidden" id="location-id" name="id" value="" placeholder="ID" />
+											<input type="hidden" id="location-level" name="locationLevel" value="0" placeholder="级别：0=一级 1=二级 2三级。。。" />
+											<table class="table table-configfeerule" frame=void>
+												<tbody>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2">上级菜单</label>
+																<select class="form-control col-sm-10" id="location-pid" name="pid">
+																	<option value="0" data-location-level="0" selected="selected">请选择上级菜单（默认为根节点）</option>
+																	<span th:each="location,iterStat: ${locationList}" th:remove="tag">
+																		<option th:value="${location.id}" th:attr="data-location-level=${location.locationLevel+1}" th:text="''+${location.name}">名称</option>
+																		<!-- <span th:if="${location.level==0}" th:remove="tag">
+																			<option th:value="${location.id}" th:attr="data-location-level=${location.level+1}" th:text="''+${location.name}">名称</option>
+																		</span>
+																		<span th:if="${location.level==1}" th:remove="tag">
+																			<option th:value="${location.id}" th:attr="data-location-level=${location.level+1}" th:text="'&nbsp;&nbsp;'+${location.name}">名称</option>
+																		</span>
+																		<span th:if="${location.level==2}" th:remove="tag">
+																			<option th:value="${location.id}" th:attr="data-location-level=${location.level+1}" th:text="'&nbsp;&nbsp;&nbsp;&nbsp;'+${location.name}">名称</option>
+																		</span> -->
+																	</span>
+																</select>
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2">编码</label>
+																<input type="text" class="form-control col-sm-10" id="location-code" name="code" value="" placeholder="编码" />
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2">名称</label>
+																<input type="text" class="form-control col-sm-10" id="location-name" name="name" value="" placeholder="名称" />
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2">节点类型</label>
+																<select class="form-control col-sm-10" id="location-node-type" name="localNodeType">
+																	<option value="" selected="selected">请选择节点类型</option>
+																	<span th:each="locaNodeType,iterStat: ${locaNodeTypeList}" th:remove="tag">
+																		<option th:value="${locaNodeType.key}" th:text="''+${locaNodeType.value}">节点类型值</option>
+																	</span>
+																</select>
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2">描述</label>
+																<input type="text" class="form-control col-sm-10" id="location-remark" name="remark" value="" placeholder="描述" />
+															</div>
+														</td>
+													</tr>
+													<tr >
+														<td>
+															<div class="form-group">
+																<label class="col-sm-2 control-label">排序</label>
+																<input type="text" class="form-control col-sm-10" id="location-sortno" name="sortNo" value="" placeholder="排序" />
+															</div>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</form>  
+									</div>
+								</div>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+	
+	</script>
+	
+	</th:block>
+
+</body>
+</html>

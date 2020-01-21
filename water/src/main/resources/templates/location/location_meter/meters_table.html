@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>表计档案</title>
+<style type="text/css">
+	ul.ztree {margin-top: 10px;border: 1px solid #617775;background: #f0f6e4;width:100%;height:360px;overflow-y:scroll;overflow-x:auto;}
+</style>
+</head>
+<body>
+
+	<!-- 编辑地理位置对话框 -->
+	<div class="container" id="meters-edit-dialog"></div>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label">
+		<div>
+			
+		</div>
+		<div class="col-md-12 column">
+			<!-- 查询面板 -->
+			<div class="row" id="search-meter">
+				<div class="col-md-12 column" style="display:inline-block;">
+					<form id="search-meter-form">
+						<input type="text" class="form-control" id="search-cond" placeholder="请输入表计位置"  style="width:60%; display:inline-block;" />
+						<button type="button" class="btn btn-success" id="search-btn" style="display:inline-block;">
+							<i class="fa fa-search" aria-hidden="true"></i>
+						</button>
+					</form>
+				</div>
+			</div>
+			<!-- 容器:列表 -->
+			<div class="batch-table table-container">
+				<ul id="meters-ztree" class="ztree"><li id="ztree-loading">正在加载中，请稍等...</li></ul>
+			</div>
+			
+		</div>
+	</div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			//var zMeterNodes = [[${meterListJson}]];
+		/*]]>*/
+	</script>
+
+	<script type="text/javascript">
+		
+		/**
+		 * 	ztree加载中
+		 */
+		function meterZTreeLoading(){
+			$("#meters-ztree").html("<li id='ztree-loading'>正在加载中，请稍等...</li>");
+		}
+		/**
+		 * 	ztree加载完成
+		 */
+		function meterZTreeLoaded(){
+			$("#meters-ztree #ztree-loading").remove();
+		}
+	
+		var ztreeMeterSetting = {
+			view: {
+				selectedMulti: false//禁止多点同时选中的功能
+			},
+			async: {
+				enable: true,
+				url: "/meters/get-nodes",
+				autoParam: ["id"]
+			},
+			async: {
+				enable: true,
+				url: "/meters/get-nodes",
+				autoParam: ["id"]
+			},
+			check: {
+				enable: true,
+				chkStyle: "checkbox",
+			},
+			data: {
+				key: {
+					name: "place",
+				},
+				simpleData: {
+					enable:true,
+					idKey: "id",
+					pIdKey: "pid",
+					rootPId: 0
+				}
+			},
+			callback: {
+				onClick: zTreeMeterOnClick,//节点被点击的事件回调函数
+				beforeAsync: meterZTreeBeforeAsync,//用于捕获异步加载之前的事件回调函数
+				onAsyncSuccess: meterZTreeOnAsyncSuccess,//用于捕获异步加载正常结束的事件回调函数
+				onAsyncError: meterZTreeOnAsyncError,//用于捕获异步加载出现异常错误的事件回调函数
+			},
+		};
+		
+		/**
+		 * 	异步加载之前的事件回调函数
+		 */
+		function meterZTreeBeforeAsync(treeId, treeNode) {
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				meterZTreeLoading();//ztree加载中
+			}
+			
+			return true;
+		};
+		/**
+		 * 	异步加载正常结束的事件回调函数
+		 */
+		function meterZTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				meterZTreeLoaded();//ztree加载完成
+			}
+			
+		    //alert(msg);
+		};
+		/**
+		 * 	异步加载出现异常错误的事件回调函数
+		 */
+		function meterZTreeOnAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown) {
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				meterZTreeLoaded();//ztree加载完成
+			}
+			
+		    //alert(XMLHttpRequest);
+		};
+		
+		/*
+		 * 节点被点击的事件回调函数
+		 */
+		function zTreeMeterOnClick(event, treeId, treeNode) {
+		    
+			G_SELECTED_METER_NODE = treeNode;//当前选择的表计节点
+			//console.log("G_SELECTED_METER_NODE:"+JSON.stringify(G_SELECTED_METER_NODE));
+			
+		}
+		
+		/**
+		 * 	取消选中的节点
+		 */
+		function cancelMeterCurrSelectedNode(){
+			var treeObj = $.fn.zTree.getZTreeObj("meters-ztree");
+			treeObj.cancelSelectedNode();//取消所有选中的节点
+		}
+		
+		$(function(){
+			//console.log("start init");
+			$.fn.zTree.init($("#meters-ztree"), ztreeMeterSetting);
+		});
+		
+	</script>
+	<script type="text/javascript">
+		/*
+		 * 	点击编辑按钮时执行，打开编辑选项卡
+		 */
+		function searchMeterDetailFn(location){
+			
+			//console.log("---"+JSON.stringify(location));
+			if(location==null || location.id==0){
+				util.message("请选择要修改的表计！");
+				return;
+			}
+			
+			var url = BASE_CONTEXT_PATH + "/location-meter/load-meter-detail-dialog";
+			$("#meter-edit-dialog").load(url, function(){
+				//编辑对话框加载完成
+				SearchMeterDetailCallback(location);
+			});
+			
+		}
+		
+		/**
+		 * 编辑操作回调函数
+		 */
+		function SearchMeterDetailCallback(location){
+			
+			$("#location-form #location-id").val(location.id);//ID
+			$("#location-form #location-level").val(location.locationLevel);//级别
+			$("#location-form #location-pid").val(location.pid);//父类型ID
+			$("#location-form #location-code").val(location.code);//编码
+			$("#location-form #location-name").val(location.name);//名称
+			$("#location-form #location-node-type").val(location.localNodeType);//节点类型
+			$("#location-form #location-remark").val(location.remark);//备注
+			$("#location-form #location-sortno").val(location.sortNo);//排序
+	
+			$("#modal-title-span").text("查看：地理位置");
+			
+			$("#location-form #location-pid").attr("disabled", true);//设置父节点ID（pid）的disabled属性
+			$("#location-form #location-code").attr("disabled", true);//设置编码的disabled属性
+			$("#location-form #location-name").attr("disabled", true);//设置名称的disabled属性
+			$("#location-form #location-node-type").attr("disabled", true);//设置节点类型的disabled属性
+			$("#location-form #location-remark").attr("disabled", true);//设置备注的disabled属性
+			$("#location-form #location-sortno").attr("disabled", true);//设置排序的disabled属性
+			
+			openEditDialog("modal-container-meter-edit");//打开对话框
+		}
+		
+		
+		//------------------------------	表计查询部分	------------------------------
+		/**
+		 * 	绑定查询面板中查询按钮的click事件
+		 */
+		$("#search-meter-form #search-btn").on("click", function(){
+			
+			var searchCond = $("#search-meter-form #search-cond").val();//查询条件
+			console.log(searchCond);
+			if(searchCond==null || searchCond==""){
+				$.fn.zTree.init($("#meters-ztree"), ztreeMeterSetting);
+				return;
+			}
+			
+			searchMeters(searchCond);//根据条件查询表计并展开对应节点
+			
+		});
+		/**
+		 * 	根据条件查询表计并展开对应节点
+		 */
+		function searchMeters(searchCond){
+			meterZTreeLoading();//ztree加载中
+			var url = BASE_CONTEXT_PATH + "/meters/search";// 需要提交的url
+			var params = {"searchCond":searchCond};
+			$.post(url, params, function(res){
+				meterZTreeLoaded();//ztree加载完成
+				//console.log(res);//由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						var meterList = res.meterList;
+						$.fn.zTree.init($("#meters-ztree"), ztreeMeterSetting, meterList);
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+	</script>
+
+</body>
+</html>

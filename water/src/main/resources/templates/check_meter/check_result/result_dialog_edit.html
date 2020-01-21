@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style>
+
+/* 输入布局 */
+.table-layout td{
+	border:0px;
+	padding:0px;
+}
+
+</style>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<h4 th:text="${title}">增加</h4>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="check-meter-result-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+										<input type="hidden" id="check-meter-id" name="meterId" th:value="${currItem==null ? '' : currItem.meterId}" />
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table-sm">
+										<tbody>
+											<tr>
+												<!-- 表计 -->
+												<td>
+													<!-- 水表钢印号 -->
+													<div class="form-group form-inline">
+														<label for="" class="control-label" style="width:100px;">水表钢印号</label> 
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" style="width:250px;"  onchange="getMetersMessage()"
+																th:value="${currItem==null ? '' : currItem.steelSealNo}"
+																id="info-steel-seal-no" name="steelSealNo" maxlength=30
+																title="请输入1-30位字符" placeholder="水表钢印号" />
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 水表编号 -->
+													<div class="form-group form-inline">
+														<label for="" class="control-label" style="width:100px;">水表编号</label> 
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" style="width:250px;"
+																th:value="${currItem==null ? '' : currItem.meterNo}"
+																id="info-meter-no" name="meterNo" maxlength=20
+																title="请输入1-20位字符" placeholder="水表编号" />
+														</span>
+													</div>
+												</td>
+												
+												
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 水表厂家 -->
+													<div class="form-group form-inline">
+														<label for="" class="control-label" style="width:100px;">水表厂家</label> 
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" style="width:250px;"
+																th:value="${currItem==null ? '' : currItem.factory}"
+																id="info-factory" name="factory" maxlength=30
+																title="请输入1-30位字符" placeholder="水表厂家" />
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 水表表底读数 -->
+													<div class="form-group form-inline">
+														<label for="" class="control-label" style="width:100px;">水表读数</label> 
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" style="width:250px;"
+																th:value="${currItem==null ? '' : currItem.meterBottom}"
+																id="info-meter-bottom" name="meterBottom" maxlength=30
+																title="请输入1-30位字符" placeholder="水表表底读数" />
+														</span>
+													</div>
+												</td>
+												
+											</tr>
+											<tr>
+												
+												<td>
+													<!-- 检测厂家 -->
+													<div class="form-group form-inline">
+														<label for="" class="control-label" style="width:100px;">检测厂家</label> 
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" style="width:250px;"
+																th:value="${currItem==null ? '' : currItem.checkFactory}"
+																id="info-check-fatory" name="checkFactory" maxlength=30
+																title="请输入1-30位字符" placeholder="检测厂家" />
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 检测员 -->
+													<div class="form-group form-inline">
+														<label for="" class="control-label" style="width:100px;">检测员</label> 
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" style="width:250px;"
+																th:value="${currItem==null ? '' : currItem.checkPeople}"
+																id="info-check-people" name="checkPeople" maxlength=30
+																title="请输入1-30位字符" placeholder="检测员" />
+														</span>
+													</div>
+												</td>
+												
+											</tr>
+											<tr>
+													
+												
+												<td>
+													<!-- 检测时间-->
+													<div class="form-group form-inline">
+														<label for="" class="control-label" style="width:100px;">检测时间</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control  input-sm Wdate" 
+																id="info-check-time" name="checkTime"		
+																th:value="${currItem==null ? '' : currItem.checkTimeStr}"				
+																onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+																placeholder="回复时间" style="background-color: white; width:250px;" title="检测时间">
+														</span>
+													</div>
+												</td>
+												<td></td>
+											</tr>					
+										
+											<tr>
+												<td colspan="2">
+												<!-- 检测结果 -->
+													<div class="form-group form-inline">
+														<label for="" class="control-label" style="width:100px;">检测结果</label>
+														<span class="input-group-sm  col-sm-8"> 
+															<textarea rows="2" cols="130" class="form-control" 
+																	id="info-check-result" name="checkResult" style="width:640px;"
+																	th:text="${currItem==null ? '' : currItem.checkResult}" 
+																	maxlength=200 title="请输入1-200位字符" placeholder="检测结果"></textarea>
+														</span>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+			var title=[[${title}]];
+			var G_METER_LIST = [[${meterList}]];//后台返回的班次列表
+		/*]]>*/
+	</script>
+
+	<script>
+		/*
+			水表钢印号输入框改变事件
+		*/
+		function getMetersMessage(){
+			//需要提交的url	
+			var url = BASE_CONTEXT_PATH + "/check-result/meter-message";
+			var steelSealNo = $("#info-steel-seal-no").val();
+			var parms = new Object();
+			parms.steelSealNo = steelSealNo;
+			$.post(url, parms, function(res){
+			 	if(res != null && res != "") {
+			 		setMeterNoFn(res.meterNo);
+					setMeterIdFn(res.meterId);
+					setMeterBottomFn(res.changeMeterBottom); 
+				} else {
+					setMeterNoFn("");
+					setMeterIdFn("");
+					setMeterBottomFn(""); 
+					util.message("该水表不存在");
+				}
+			});
+		}
+			
+		/**
+		 * 	获取该钢印号水表的编号
+		 */
+		function getMeterNoFn(){
+			return $("#info-meter-no").val();
+		}
+		/**
+		 * 	设置该钢印号水表的编号
+		 */
+		function setMeterNoFn(meterNo){
+			return $("#info-meter-no").val(meterNo);
+		}
+		
+		/**
+		 * 	获取该钢印号水表的表计ID
+		 */
+		function getMeterIdFn(){
+			return $("#check-meter-id").val();
+		}
+		/**
+		 * 	设置该钢印号水表的表计ID
+		 */
+		function setMeterIdFn(meterId){
+			return $("#check-meter-id").val(meterId);
+		}
+		
+		/**
+		 * 	获取该钢印号水表的水表底数
+		 */
+		function getMeterBottomFn(){
+			return $("#info-meter-bottom").val();
+		}
+		/**
+		 * 	设置该钢印号水表的水表底数
+		 */
+		function setMeterBottomFn(changeMeterBottom){
+			return $("#info-meter-bottom").val(changeMeterBottom);
+		}
+		
+		/*
+			设置日期选择input背景色
+		*/
+		function setBackGround() {
+			$("#info-check-time").css("background-color", "white");
+		}
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/check-result/insert";
+			
+			var id= $("#check-meter-result-id").val();
+			if(id!=null && id!=""){
+				urlStr = BASE_CONTEXT_PATH + "/check-result/update";
+			}
+			var form=new FormData($("#dialog-modi-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeModiDialog();
+							}
+							util.message(res.result_msg,null,"warning");
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				modiItem(true);				
+			});
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.SendSmsLogMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.SendSmsLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="CUSTOMER_MOBILE" jdbcType="VARCHAR" property="customerMobile" />
+    <result column="TPL_ID" jdbcType="DECIMAL" property="tplId" />
+    <result column="SMS_CONTENT" jdbcType="VARCHAR" property="smsContent" />
+    <result column="RESULT" jdbcType="DECIMAL" property="result" />
+    <result column="ERRMSG" jdbcType="VARCHAR" property="errmsg" />
+    <result column="EXT" jdbcType="VARCHAR" property="ext" />
+    <result column="FEE" jdbcType="DECIMAL" property="fee" />
+    <result column="SID" jdbcType="VARCHAR" property="sid" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATION_TIME" jdbcType="TIMESTAMP" property="operationTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="PERIOD" jdbcType="VARCHAR" property="period" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, CUSTOMER_MOBILE, TPL_ID, SMS_CONTENT, RESULT, ERRMSG, EXT, FEE, 
+    SID, OPERATOR_NAME, OPERATOR_ID, OPERATION_TIME, REMARK, PERIOD
+  </sql>
+</mapper>

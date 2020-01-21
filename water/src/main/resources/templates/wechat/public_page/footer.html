@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<!-- 公共JS AND CSS -->
+<head>
+</head>
+<body>
+	<th:block th:fragment="footer(message)">
+		<!-- <meta charset="UTF-8">
+		<meta name="context-path" th:content="@{/}" /> -->
+		<!-- <title th:text="${message}"></title> -->		
+		<!-- 显示消息 -->
+		<div class="col-sm-12 " style="text-align:center;padding-top:20px;">
+			<span th:text="${message}" style="font-size:14px;"></span>		
+		</div>
+		
+		<div class="col-sm-12 " style="padding-top:20px;text-align:center; ">
+			<span style="font-size:14px; font-weight:700;">石家庄高新区供排水公司</span>			
+		</div>
+		<div class="col-sm-12 " style="text-align:center;">
+			<span style="font-size:14px;">供水热线:69099838</span>
+		</div>
+			
+		
+	</th:block>
+
+</body>
+</html>

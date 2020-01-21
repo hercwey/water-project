@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-hover table-sm" id="customer-account-item-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>地理位置</th> 
+				<th>客户名称</th>
+				<th>期间</th>
+				<!-- <th>科目</th> -->
+				<th>账单金额</th>
+				<th>违约金金额</th>
+				<!-- <th>已充值金额</th> -->
+				<th>往期欠费金额</th>
+				<th>欠费月份</th>
+				<th>欠费总金额</th>
+				<!-- <th>记账日期</th> -->
+				<!-- <th>结算状态</th> -->
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${accountItemList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 地理位置 -->
+				<td th:text="${item.place}">地理位置</td>
+				<!-- 客户名称 -->
+				<td th:text="${item.customerName}">客户名称</td>
+				<!-- 期间-->
+				<td th:text="${item.period}">期间</td>
+				<!-- 科目 -->
+				<!-- <td th:text="${item.creditSubject}">科目</td> -->
+				<!-- 账单金额 -->
+				<td th:text="${item.oweAmount}">账单金额</td>
+				<!-- <!-- 违约金金额 -->
+				<td th:text="${item.overdueOweAmount}">违约金总金额</td>
+				<!-- 已充值金额 -->
+				<!-- <td th:text="${item.DEBIT_AMOUNT}">已充值金额</td> -->
+				<!-- 往期欠费 -->
+				<td th:text="${item.pastOweAmount}">往期欠费</td>
+				<!-- 欠费月份 -->
+				<td>
+					<span th:each="pastPeriod,stat: ${item.pastPeriodList}" th:remove="tag">
+						<span class="badge badge-pill badge-warning" th:text="${pastPeriod}">警告</span>
+					</span>
+				</td>
+				<!-- 欠费总金额 -->
+				<td th:text="${item.totalOweAmount}">欠费总金额</td>
+				<!--记账日期-->
+				<!-- <td th:text="${item.accountDate}">记账日期</td> -->
+				<!--结算状态-->
+				<!-- <td th:attr="title=${item.SETTLEMENT_STATUS==2 ? item.SETTLEMENT_ERR_MSG : ''}">
+					结算状态 0=未结算（默认值）；1=结算成功；2=结算失败;3=部分结算
+					<span th:if="${item.SETTLEMENT_STATUS==0}">
+						<span class="badge badge-secondary">未结算</span>
+					</span>
+					<span th:if="${item.SETTLEMENT_STATUS==1}">
+						<span class="badge badge-success">交易成功</span>
+					</span>
+					<span th:if="${item.SETTLEMENT_STATUS==2}">
+						<span class="badge badge-danger">交易失败</span>
+					</span>
+					<span th:if="${item.SETTLEMENT_STATUS==3}">
+						<span class="badge badge-warning">部分结算</span>
+					</span>
+				</td> -->
+				<!-- 操作列 -->
+					<td class="">
+						<div class="dropdown">
+						    <button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+						      	操作
+						    </button>
+						    <div class="dropdown-menu">
+								<!-- 预览 -->
+								<a class="dropdown-item btn-sm btn-single-preview-notice"th:attr="data-bind=${item.id}, data-period=${item.period}, data-place=${item.place}">
+									<i class="fa fa-tint" aria-hidden="true">
+										<span>预览</span>
+									</i>
+								</a>
+								<!-- 欠费通知 -->
+								<a class="dropdown-item btn-sm btn-arrears-notice"th:attr="data-bind=${item.id}, data-place=${item.place}">
+									<i class="fa fa-tint" aria-hidden="true">
+										<span>欠费通知</span>
+									</i>
+								</a>
+								<!-- 停水通知 -->
+								<a class="dropdown-item btn-sm btn-water-stop-notice"th:attr="data-bind=${item.id}, data-place=${item.place}">
+									<i class="fa fa-tint" aria-hidden="true">
+										<span>停水通知</span>
+									</i>
+								</a>
+						    </div>
+						</div>
+					</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		/* 
+			预览通知单对话框
+		*/
+		$('.btn-single-preview-notice').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/print-notice/load-single-previe-notice-dialog';
+		
+			var itemId = $(this).attr("data-bind"); //条目ID	
+			var period = $(this).attr("data-period");
+			var place = $(this).attr("data-place");
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+			parms.period = period;
+			parms.place = place;
+		
+			$("#single-preview-notice-dialog").load(url, parms,openSinglePreviewDialog); //加载完毕后显示 
+		});
+		/*
+		 * 	打开(Open) 预览通知单对话框
+		 */
+		function openSinglePreviewDialog() {
+			//可拖拽
+			$("#modal-container-single-dialog-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$('#modal-container-single-dialog-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			关闭(CLOSE) 预览通知单对话框
+		 */
+		function closeSinglePreviewDialog() {
+			$("#modal-container-single-dialog-dialog").modal("hide");
+		}
+		
+		/* 
+			单个打印-停水通知单
+		*/
+		$('.btn-water-stop-notice').on('click', function() {
+			G_ARREARS_NOTICE=false;
+			var customerId = $(this).attr("data-bind"); //条目ID	
+			var place = $(this).attr("data-place");
+			printSingleConfirm(customerId, place);
+		})
+		
+		
+		/* 
+			单个打印-欠费通知单
+		*/
+		$('.btn-arrears-notice').on('click', function() {
+			G_ARREARS_NOTICE=true;
+			var customerId = $(this).attr("data-bind"); //条目ID	
+			var place = $(this).attr("data-place");
+			printSingleConfirm(customerId, place);
+		})
+		function printSingleConfirm(customerId, place){			
+			
+			var parms = new Object();
+			parms.customerId=customerId;
+			parms.place=place;
+			
+			var url = BASE_CONTEXT_PATH+"/print-notice/load-single-printer-dialog"; // 需要提交的url
+			$("#single-print-dialog").load(url,parms,function(){
+				if(!G_ARREARS_NOTICE){
+					$('.modal-body #deduct-date-div').hide(); //隐藏id为trid1的元素。
+			        $('.modal-body #end-date-div').show(); //显示id为trid2的元素。
+				} else {
+					$('.modal-body #end-date-div').hide(); //隐藏id为trid1的元素。
+			        $('.modal-body #deduct-date-div').show(); //显示id为trid2的元素。
+				}
+				showSinglePrinterDialog();
+			});		
+		}
+		
+		/*打开(Open)打印机对话框
+		*/
+		function showSinglePrinterDialog(){
+			$("#modal-container-single-print-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-single-print-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+		
+		/* 
+			关闭(CLOSE) 打印机对话框
+		*/
+		function closeSinglePrinterDialog() {
+			$("#modal-container-single-print-dialog").modal("hide");
+		}
+		
+		/*
+			参数:
+				printerId: 打印机id
+			功能:
+				开始打印单个用户通知单
+		*/
+		function startSinglePrintNotice(printerId, customerId, place, deductDate,endDate){
+				
+			var customerIdArr = new Array();
+			if(customerId !=null){
+				customerIdArr.push(customerId);
+			} else {
+				customerIdArr=getSelectedCustomerIds();
+			}
+			var period = getPeriod();
+			singlePrintNotice(customerIdArr, printerId, period, place, deductDate,endDate);  // 打印病区的[患者及药单]瓶签
+		}
+		/*
+		打印单个用户通知单
+		*/
+		function singlePrintNotice(customerIdArr,printerId,period, place, deductDate,endDate){
+			var noticeType = 1;
+			if(!G_ARREARS_NOTICE){
+				noticeType = 2;
+			}
+			var parms = getSearchParams();
+			var traceIds = parms.traceIds;
+			var oweMonth = parms.oweMonth;
+			var searchCond = parms.searchCond;
+			var customerIdJSON = customerIdArr.toString();
+			var url = BASE_CONTEXT_PATH+"/print-notice/print-single-notice"; // 需要提交的url
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : url,
+				data : {"customerIdJSON":customerIdJSON,
+						"printerId":printerId,
+						"period":period,
+						"noticeType":noticeType,
+						"place":place,
+						"deductDate":deductDate,
+						"endDate":endDate,
+						"traceIds":traceIds,
+						"oweMonth":oweMonth,
+						"searchCond":searchCond
+						},
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							util.message(res.result_msg,null,"info");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});				
+		}
+	
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedCustomerIds(){
+			var customerIdArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$("#customer-account-item-table .item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var customerId = $(this).attr("data-bind"); //
+					customerIdArr.push(customerId);
+				}
+			}); // end of item-selector
+			return customerIdArr;
+		}
+	
+				
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

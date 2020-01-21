@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/meterbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+<!-- 文件上传验证JS -->
+<script src="/commons/file-upload-validate.js" type="text/javascript"></script>
+
+
+
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="invoice-doc-dialog-edit" th:include="invoice/doc/doc_dialog_edit::dialog"></div>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label printer-main">
+		<div class="col-md-12 column">
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block" id="invoice-doc-search-div">
+				<ul class="extra-l" style="list-style: none;">
+				
+					<!-- 面板:增加/删除 -->
+					<li value="0">
+						<button type="button" class="btn btn-primary btn-sm"
+							id="btn-add">
+							<i class="fa fa-plus" aria-hidden="true"> 
+								<!-- <span style="color:black">增加</span> -->
+								<span>增加</span>
+							</i>
+						</button>
+					</li>
+					<li value="1">
+						<button type="button" class="btn btn-danger btn-sm"
+							id="btn-del">
+							<i class="fa fa-remove" aria-hidden="true"> <span>删除</span>
+							</i>
+						</button>
+					</li>
+
+					<!-- 面板:查询 -->
+					<li  class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入单据说明">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						
+						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					
+					</li>
+				</ul>
+			</div>
+
+
+			<!-- 容器:工程单据列表 -->
+			<div class="invoice-doc-table table-container" id="meters-body"></div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchInvoiceDoc(searchCond, pageNum, pageSize) {
+
+			var invoiceId = getCurrEditInvoiceId();//获取当前编辑的工程信息的ID
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			parms.searchCond=searchCond;
+			parms.invoiceId=invoiceId;
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/invoice-doc/table"
+			$(".invoice-doc-table").load(url, parms, null);
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchInvoiceDoc() {
+			var pageNum = 0;
+			var pageSize = 0;
+			var searchCond="";
+
+			searchInvoiceDoc(searchCond, pageNum, pageSize);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchInvoiceDocClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			var searchCond=$("#invoice-doc-search-div #search-cond").val();
+
+			searchInvoiceDoc(searchCond, pageNum, pageSize);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function clickPagerLoadPage() {
+			var pageNum = curr_ed_pageNum;
+			var pageSize = curr_ed_pageSize;
+			var searchCond=curr_ed_searchCond;
+
+			searchInvoiceDoc(searchCond, pageNum, pageSize);
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		/*		
+			加载(Load): 增加/编辑对话框
+			将对话框内容加载到指定的容器中
+		 */
+		function loadInvoiceDocDialog() {
+			var url = BASE_CONTEXT_PATH + '/invoice-doc/load-edit-dialog';
+			$("#invoice-doc-dialog-edit").load(url, null, openInvoiceDocDialog); //加载完毕后显示
+		}
+			
+		/*
+		 * 	打开(Open) 对话框
+		 */
+		function openInvoiceDocDialog() {
+			//可拖拽
+			$("#modal-container-invoice-doc-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$('#modal-container-invoice-doc-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			关闭(CLOSE) 对话框
+		 */
+		function closeInDocDialog() {
+			$("#modal-container-invoice-doc-dialog").modal("hide");
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchInvoiceDoc();
+
+			//---------事件绑定--------------
+			
+			/*
+				增加核对类型按钮CLICK
+			*/
+			$('#invoice-doc-search-div #btn-add').on('click', function() {
+				loadInvoiceDocDialog();  //先加载后显示对话框
+				//openAddDialog();
+			}); 
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#invoice-doc-search-div #btn-search').on('click', function() {
+				btnSearchInvoiceDocClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#invoice-doc-search-div #btn-search-reset').on('click', function() {
+				$("#invoice-doc-search-div #search-cond").val("");
+				$("#invoice-doc-search-div #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#invoice-doc-search-div #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#invoice-doc-search-div #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/*
+				btn-del-
+				批量删除按钮
+			*/
+			$('#invoice-doc-search-div #btn-del').on('click', function() {				
+				deleteEngineerDocConfirm();  //显示删除确认对话框
+			});
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

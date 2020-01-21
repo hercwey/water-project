@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+ <!-- jQuery标签输入自动完成插件 -->
+  <link th:href="@{/tagsinput/jquery.tagsinput-revisited.css}"	rel="stylesheet"  type="text/css" />	
+  <script th:src="@{/tagsinput/jquery.tagsinput-revisited.js}" type="text/javascript"></script>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-allot-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>分配:工单</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="work-order-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table-sm">
+										<tbody id="work-order-body">
+											<tr>
+												<td>
+													<!-- 工单编号-->
+													<div class="form-group form-inline">
+														<label for="" class="control-label col-sm-4" >工单编号：</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"  disabled="disabled"
+																	th:value="${currItem==null ? '' : currItem.serialNum}" 
+																	id="work-serial-num" name="serialNum" 
+																	maxlength=20 title="请输入1-20位字符" placeholder="工单编号"/>
+														</span>
+													</div>
+												</td>												
+												<td>
+													<!-- 工单标题-->
+													<div class="form-group form-inline">
+														<label for="" class="control-label col-sm-4">工单标题：</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"  disabled="disabled"
+																	th:value="${currItem==null ? '' : currItem.name}" 
+																	id="work-name" name="name" 
+																	maxlength=20 title="请输入1-20位字符" placeholder="工单标题"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 备注 -->
+													<div class="form-group form-inline">
+														<label for="" class="control-label col-sm-4"  >备注：</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.remark}" 
+																	id="work-remark" name="remark" 
+																	maxlength=200 title="请输入少于200位字符" placeholder="备注"/>
+														</span>
+													</div>
+												</td>
+												<td >
+													<div class="form-group form-inline">
+														<label for="know-type" class="control-label col-sm-4" >分配人员：</label>
+														<span class="input-group-sm col-sm-5">
+															<input type="text" class="form-control" 
+																		th:value="${workOrder==null ? '' : workOrder.userNames}" 
+																		th:attr="data-bind-orderId=${currItem==null ? '' : currItem.id}, name=${currItem==null ? '' : currItem.id}" 
+																		id="form-tags-2" name="labels" 
+																		maxlength=30 title="请输入1-30位字符" placeholder="分配人员" />
+														</span>
+													<span class="input-group-sm col-sm-3">
+														<select class="form-control" id="reserved-labels" name="userId" >
+																<!-- 默认选择第一个 -->
+																<option value="">-请选择-</option>
+																<span th:each="item,iterStat: ${userList}" th:remove="tag">
+																	<option th:value="${item.id}" th:attr="data-user-realname=${item.realname}"
+																			th:text="${item.realname}">数据字典的值</option>
+																</span>
+														</select>
+													</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td colspan="2">
+													<div class="form-group form-inline">
+														<label for="" class="control-label col-sm-2">工单执行情况：</label>
+														<span class="input-group-sm col-sm-10">
+															<textarea rows="4" cols="85" class="form-control" 
+																	id="work-allot-situation" name="dealSituation" 
+																	th:text="${currItem==null ? '' : currItem.dealSituation}" 
+																	maxlength=1000 title="请输入1-1000位字符" placeholder="工单执行情况"></textarea>
+														</span>
+													</div>
+												</td>
+											</tr>				
+										
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm"	id="btn-modify-and-back-allot">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+			var sale_item=[[${saleItem}]];
+			var G_USER_LIST = [[${userList}]];//后台返回的班次列表
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		/**
+		 * 	根据用户名称在用户列表（JS数组）中查询用户ID                                      
+		 */
+		function getUserId(name){
+			var userArr = G_USER_LIST;
+			
+			var userId = 0;
+			for(var i=0; i<userArr.length; i++){
+				var user = userArr[i];
+				var userName = user.realname;
+				if(userName==name){
+					userId = user.id;
+					break;
+				}
+			}
+			return userId;
+		}
+		
+		/**
+		 * 	增加分配工单人员时，ajax请求更新数据库
+		 */
+		function addTagAjax(workOrderId, userId){
+			var url = BASE_CONTEXT_PATH + '/work-order-allot/add-workorder-user';
+			var params = new Object();
+			params.workOrderId = workOrderId;
+			params.userId = userId;
+			$.post(url, params, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						console.log(res.result_msg);
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		/**
+		 * 	删除配工单人员时，ajax请求更新数据库
+		 */
+		function removeTagAjax(workOrderId, userId){
+			var url = BASE_CONTEXT_PATH + '/work-order-allot/delete-workorder-user';
+			var params = new Object();
+			params.workOrderId = workOrderId;
+			params.userId = userId;
+			$.post(url, params, function(res){
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						console.log(res.result_msg);
+					} else {
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		 function modiAllotItem(closeDialogFlag) {
+				//需要提交的url	
+				var url = BASE_CONTEXT_PATH + "/work-order-allot/allot-work";
+				var workOrderId= $("#work-order-id").val();
+				var remark = $("#work-remark").val();
+				var dealSituation = $("#work-allot-situation").val();
+				var parms = new Object();
+				parms.workOrderId = workOrderId;
+				parms.remark = remark;
+				parms.dealSituation = dealSituation;
+				$.post(url, parms, function(res){
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadWorkOrderAllotPage();
+							closeAllotDialog();
+							util.message(res.result_msg,null,"success");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				});
+			 }
+			 /*                 
+				加载用户下拉框同时赋值
+			*/
+			$('#reserved-labels').on('change',function() {
+				var selectUserId = $('#reserved-labels').val();
+				var selectRealname =  $(this).find("option:selected").attr("data-user-realname");
+				 $('#form-tags-2').addTag(selectRealname);
+			});
+			 
+		
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			//--------------------	标签输入框	--------------------
+			/**
+			 * 	初始化tagsinput插件
+			 */
+			 $('#form-tags-2').tagsInput({
+					'onAddTag': function(input, value) {
+						var workOrderId = input.name;
+						addTagAjax(workOrderId, getUserId(value));
+					},
+					'onRemoveTag': function(input, value) {
+						var workOrderId = input.name;
+						removeTagAjax(workOrderId, getUserId(value));
+					},
+					'onChange': function(input, value) {
+					} 
+				});
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back-allot').on('click',function() {
+				modiAllotItem(true);				
+			});
+
+		});
+	</script>
+	
+
+	
+	</th:block>
+	
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+
+<script type="text/javascript">
+
+
+</script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-bill-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span id="dialog-name">开票信息</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-bill-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="bill-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+			
+												<td>
+													<!--户名-->
+													<div class="form-group form-inline">
+														<label for="bill-name" class="col-sm-4 control-label">名称</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																th:value="${currItem==null ? '' : currItem.companyName}" 
+																class="form-control" 
+																id="bill-company-name" name="companyName" 
+																maxlength=32 title="请输入1-30" placeholder="户名"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 税号-->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-4 control-label">税号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.taxNo}" 
+																id="bill-tax-no" name="taxNo" 
+																maxlength=30 title="请输入1-30个字符" placeholder="税号"/>
+														</span>
+													</div>          
+ 												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 注册地址 -->
+													<div class="form-group form-inline">
+														<label for="bill-description" class="col-sm-4 control-label">注册地址</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.regAddress}" 
+																id="bill-reg-address" name="regAddress" 
+																maxlength=30 title="请输入1-30个字符" placeholder="注册地址"/>
+														</span>
+													</div>
+												</td>	
+												<td>
+													<!-- 财务电话 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-4 control-label">电话</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.telephone}" 
+																id="bank-telephone" name="telephone" 
+																maxlength=20 title="请输入1-20位字符" placeholder="财务电话"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 开户行-->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-4 control-label">开户行</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.accountBank}" 
+																id="bill-account-bank" name="accountBank" 
+																maxlength=30 title="请输入1-30个字符" placeholder="开户行"/>
+														</span>
+													</div>          
+ 												</td>
+												<td>
+													<!-- 帐号-->
+													<div class="form-group form-inline">
+														<label for="bill-remark" class="col-sm-4 control-label">帐号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.accountNo}" 
+																id="bill-account-no" name="accountNo" 
+																maxlength=50 title="请输入1-50个字符" placeholder="帐号"/>
+														</span>
+													</div>
+												</td>
+												
+											</tr>
+											<tr>
+												<td>
+													<!-- 专用发票额度版本 -->
+													<div class="form-group form-inline">
+														<label for="special-invoivce-amount" class="col-sm-4 control-label">专票额度版本</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="special-invoivce-amount" name="specialInvoiceAmount">
+																<span th:each="item,iterStat: ${specialAmountVersionList}" th:remove="tag">
+																	<option th:value="${item.key}" th:attr="selected=${currItem!=null && currItem.specialInvoiceAmount==item.key ? 'true':'false'}" th:text="${item.value}">值</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 专用发票额度版本-->
+													<div class="form-group form-inline">
+														<label for="normal-invoivce-amount" class="col-sm-4 control-label">普票额度版本</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="normal-invoivce-amount" name="normalInvoiceAmount">
+																<span th:each="item,iterStat: ${normalAmountVersionList}" th:remove="tag">
+																	<option th:value="${item.key}" th:attr="selected=${currItem!=null && currItem.normalInvoiceAmount==item.key ? 'true':'false'}" th:text="${item.value}">值</option>
+																</span>
+															</select>
+														</span>
+													</div>          
+ 												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 收款人-->
+													<div class="form-group form-inline">
+														<label for="bill-payee" class="col-sm-4 control-label">收款人</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.payee}" 
+																id="bill-payee" name="payee" 
+																maxlength=50 title="请输入1-50个字符" placeholder="收款人"/>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 复核人-->
+													<div class="form-group form-inline">
+														<label for="bill-checker" class="col-sm-4 control-label">复核人</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.checker}" 
+																id="bill-checker" name="checker" 
+																maxlength=30 title="请输入1-30个字符" placeholder="复核人"/>
+														</span>
+													</div>          
+ 												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 是否默认，0=是，1=否 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-4 control-label">是否默认</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="bank-is-default" name="isDefault">
+																<option value="1" th:attr="selected=${currItem!=null && currItem.isDefault==1 ? 'true':'false'}">否</option>
+																<option value="0" th:attr="selected=${currItem!=null && currItem.isDefault==0 ? 'true':'false'}">是</option>
+															</select>
+														</span>
+													</div>
+												</td>
+												<td></td>
+											</tr>
+											
+										</tbody>
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm"	id="btn-bill-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiBillItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/company-bill-info/insert";
+			
+			var customersId= $("#bill-id").val();
+			if(customersId!=null && customersId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/company-bill-info/update";
+			}
+			var form=new FormData($("#dialog-modi-bill-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadBillPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeBillDialog();
+							}
+							util.message(res.result_msg,null,"success");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+		
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-bill-modify-and-back').on('click',function() {
+				var checker = $("#bill-checker").val();
+				var payee = $("#bill-payee").val();
+				if(checker == null || checker == ''){
+					util.message("复核人不能为空");
+					return false;
+				}
+				if(payee == null || payee == ''){
+					util.message("收款人不能为空");
+					return false;
+				}
+				modiBillItem(true);				
+			});
+
+		});
+	</script>
+	
+	
+
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

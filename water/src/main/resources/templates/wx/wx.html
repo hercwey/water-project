@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style type="text/css">
+	.top{
+		top:200px!important;
+	}
+</style>
+
+</head>
+<body>
+	<!-- 正在加载阴影层 -->
+	<div id='loading'
+		style="display: none; position: absolute; left: 0; right: 0; top: 0; bottom: 0;  background:rgba(0, 0, 0, .7) url(/images/loading.gif) no-repeat center;background-size:100px;">
+			
+	</div>
+	<!-- 显示提示信息 -->
+	<div id='showed'
+		style="display: none; position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0, 0, 0, .7);">
+		<span id="show-text" 
+			style="width: 50%; text-align: center; bodder-radius: 5px; padding: 5px 15px; color: #fff; position: absolute; left: 50%; border-radius: 5px; transform: t; transform: translatex(-50%); background: #ff707c; top: -30px;transition:all .5s;">
+			tip
+		</span> 
+		<span id="show-num"
+			style='position: absolute; left: 50%; top: 50%; font-size: 50px; color: #fff; transform: translate3d(-50%, -50%, 0);'>
+			3
+		</span>
+	</div>
+	
+	<script type="text/javascript">
+		/*
+		 * 显示正在加载层
+		 */
+		function loading(){
+			$("#loading").show();
+		}
+		/*
+		 * 隐藏正在加载层
+		 */
+		function loaded(){
+			$('#loading').hide();
+		}
+		
+		/*
+		 * 提示信息
+		 */
+		function　showed(text, href){
+			$('#show-text').text(text);
+			$('#showed').show();
+			$("#show-text").addClass('top');
+			setTimeoutCustom(href);
+		}
+		/*
+		 * 提示信息定时关闭
+		 */
+		function setTimeoutCustom(href){
+			console.log(timenum);
+			setTimeout(function(){
+				$("#show-num").text(timenum);
+				if(timenum<=0){
+					$('#showed').hide();
+					
+					timenum = 2;//提示信息保留时间
+				    $("#show-num").text((timenum+1));//提示信息保留时间值
+				    $("#show-text").css("top", "-30px");
+					if(href!=null && href!=""){
+						window.location.href = href;
+					}
+					return;
+				};
+				timenum--;
+				setTimeoutCustom(href);
+			},1000);
+		}
+		
+	</script>
+</body>
+</html>

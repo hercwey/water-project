@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WaterNotifyDetailMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.WaterNotifyDetail">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="WATER_NOTIFY_ID" jdbcType="DECIMAL" property="waterNotifyId" />
+    <result column="PART_WATER_ID" jdbcType="VARCHAR" property="partWaterId" />
+    <result column="REAL_WATER_AMOUNT" jdbcType="DECIMAL" property="realWaterAmount" />
+    <result column="BASE_PRICE" jdbcType="DECIMAL" property="basePrice" />
+    <result column="SEWAGE_PRICE" jdbcType="DECIMAL" property="sewagePrice" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, WATER_NOTIFY_ID, PART_WATER_ID, REAL_WATER_AMOUNT, BASE_PRICE, SEWAGE_PRICE
+  </sql>
+</mapper>

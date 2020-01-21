@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.SysUsersMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.SysUsers">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="USERNAME" jdbcType="VARCHAR" property="username" />
+    <result column="NICKNAME" jdbcType="VARCHAR" property="nickname" />
+    <result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+    <result column="REALNAME" jdbcType="VARCHAR" property="realname" />
+    <result column="SEX" jdbcType="DECIMAL" property="sex" />
+    <result column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="TEL" jdbcType="VARCHAR" property="tel" />
+    <result column="MOBILE" jdbcType="VARCHAR" property="mobile" />
+    <result column="EMAIL" jdbcType="VARCHAR" property="email" />
+    <result column="MARRIED" jdbcType="DECIMAL" property="married" />
+    <result column="ICON_PATH" jdbcType="VARCHAR" property="iconPath" />
+    <result column="ENABLED" jdbcType="DECIMAL" property="enabled" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, USERNAME, NICKNAME, PASSWORD, REALNAME, SEX, CODE, TEL, MOBILE, EMAIL, MARRIED, 
+    ICON_PATH, ENABLED, DELETED, REMARK, CREATE_TIME
+  </sql>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchUser" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM sys_users u
+		<where>
+			u.deleted=0
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND 
+  				(
+	  				(u.username LIKE concat(concat('%',#{searchCond}),'%'))
+	  				OR
+	  				(u.nickname LIKE concat(concat('%',#{searchCond}),'%'))
+	  			)	
+  			</if>
+		</where>
+		ORDER BY u.id
+  </select>
+  
+  <!-- 按角色查询用户,返回列表 -->
+  <select id="getUserListByRoleCode" resultMap="BaseResultMap">
+		SELECT
+			U.* 
+		FROM
+			SYS_USERS U 
+		LEFT JOIN SYS_USERS_ROLES UR ON U.ID = UR.USER_ID 
+		LEFT JOIN SYS_ROLES R ON UR.ROLE_ID = R.ID 
+		<where>
+			U.DELETED=0
+			<if test="roleCode!=null and roleCode!=''">
+				AND R.ROLE_CODE = #{roleCode}
+			</if> 
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND 
+  				(
+	  				(U.USERNAME LIKE concat(concat('%',#{searchCond}),'%'))
+	  				OR
+	  				(U.NICKNAME LIKE concat(concat('%',#{searchCond}),'%'))
+	  				OR
+	  				(U.REALNAME LIKE concat(concat('%',#{searchCond}),'%'))
+	  			)	
+  			</if>
+		</where>
+		ORDER BY U.ID
+  </select>
+  
+</mapper>

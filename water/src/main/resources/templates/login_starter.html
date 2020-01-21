@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-cn">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>登录</title>
+
+<div th:include="common/common_head::headx('登录')" th:remove="tag"></div>
+
+<!-- <link rel="stylesheet" href="../assets/common/bootstrap-4.3.1/bootstrap.min.css"> -->
+<!-- <link rel="stylesheet" th:href="@{/assets/font/iconfont.css}">
+<link rel="stylesheet" th:href="@{/assets/css/login.css}"> -->
+
+<link rel="stylesheet" href="/assets/font/iconfont.css">
+<link rel="stylesheet" href="/assets/css/login.css">
+
+<!-- <script src="../assets/common/jquery-3.3.1.min.js"></script>
+  <script src="../assets/common/popper.min.js"></script>
+  <script src="../assets/common/bootstrap-4.3.1/bootstrap.min.js"></script> -->
+<!-- <script th:src="@{/assets/js/login.js}"></script> -->
+<script src="/assets/js/login.js"></script>
+</head>
+
+<body onkeydown="loginEvent(event);">
+	<div class="login-content">
+		<div class="header"></div>
+		<div id="leftCarousel" class="left-pic carousel slide"
+			data-ride="carousel">
+			<!-- 下方指示器 -->
+			<!-- <ol class="carousel-indicators">
+	        <li data-target="#leftCarousel" data-slide-to="0" class="active"></li>
+	        <li data-target="#leftCarousel" data-slide-to="1"></li>
+	        <li data-target="#leftCarousel" data-slide-to="2"></li>
+	      </ol> -->
+			<div class="carousel-inner">
+				<div class="carousel-item active" data-interval="5000"
+					style="background-image: url('/assets/img/login-bg.jpg')">
+				</div>
+				<div class="carousel-item" data-interval="5000"
+					style="background-image: url('/assets/img/login-bg.jpg')">
+				</div>
+				<div class="carousel-item" data-interval="5000"
+					style="background-image: url('/assets/img/login-bg.jpg')">
+				</div>
+			</div>
+			<!-- 左右箭头 -->
+			<!-- <a class="carousel-control-prev" href="#leftCarousel" role="button" data-slide="prev">
+	        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+	        <span class="sr-only">Previous</span>
+	      </a>
+	      <a class="carousel-control-next" href="#leftCarousel" role="button" data-slide="next">
+	        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+	        <span class="sr-only">Next</span>
+	      </a> -->
+		</div>
+		<div class="login-form">
+			<div class="logo">
+				<img src="/assets/img/logo.png" alt="">
+				<div class="logo-text">
+					<p class="text">石家庄高新区供水排水公司</p>
+					<p class="eng">Shijiazhuang Water Supply and Drainage Company</p>
+				</div>
+			</div>
+			<div class="login-wrap">
+				<h3>智慧营收系统</h3>
+				<form action="/user-login/submit" id="login-form" method="post">
+					<input type="hidden" id="public-key" th:value="${publicKey}" />
+					<div class="form-group account-group">
+						<input type="hidden" id="encrypt-username" name="username" placeholder="加密后的用户名" />
+						<input type="text" id="username" class="form-control" placeholder="请输入账号">
+					</div>
+					<div class="form-group password-group">
+						<div class="input-group">
+							<input type="hidden" id="encrypt-password" name="password" placeholder="加密后的密码" />
+							<input type="password" id="password" class="form-control" placeholder="请输入密码">
+							<div class="input-group-append" onclick="Login.togglePassword()">
+								<span class="input-group-text"> <span id="eye"
+									class="iconfont icon-hide"></span>
+								</span>
+							</div>
+						</div>
+					</div>
+				</form>
+				<!-- <button type="button" class="btn btn-primary btn-block submit-btn" id=login-submit-btn
+					onclick="Login.login()">登 &nbsp; &nbsp; &nbsp; &nbsp;录</button> -->
+				<button type="button" class="btn btn-primary btn-block submit-btn" id="login-submit-btn">登 &nbsp; &nbsp; &nbsp; &nbsp;录</button>
+
+			</div>
+			<div class="footer">copyright © 2019 all right reseverd</div>
+		</div>
+	</div>
+	
+	<!-- jsencrypt JS前端加密 -->
+	<!-- <script type="text/javascript" src="/jsencrypt/jsencrypt.min.js"></script> -->
+	<!-- <script type="text/javascript" th:src="@{/jsencrypt/jsencrypt.min.js}"></script> -->
+	<script type="text/javascript" src="/jsencrypt/jsencrypt.min.js"></script>
+	
+	<script th:inline="javascript">  
+		/*<![CDATA[*/
+		var g_error_msg = [[${error_msg}]];//登录失败信息
+		/*]]>*/  
+	</script>
+	<script type="text/javascript">
+		/**
+		 *	登录提交
+		 */
+		function loginSubmit(){
+			var username = $("#username").val();
+			var password = $("#password").val();
+			
+			if(username==null || username=="" || password==null || password==""){
+				//dialog type: success warning info error,默认为info
+				util.message("用户名或密码不能为空！",null,"error");
+				return;
+			}
+			
+			//console.log(username);
+			//console.log(password);
+			
+			//获取PUBLIC_KEY通过后台传入前端放在隐藏域中，此处直接获取
+			var publicKey = $("#public-key").val();
+			//new JSEncrypt并set公钥
+			var encrypt = new JSEncrypt();
+			encrypt.setPublicKey(publicKey);
+			//对用户名和密码进行加密
+			var encryptUsername = encrypt.encrypt(username);
+			var encryptPassword = encrypt.encrypt(password);
+			//console.log(encryptUsername);
+			//console.log(encryptPassword);
+			
+			$("#encrypt-username").val(encryptUsername);
+			$("#encrypt-password").val(encryptPassword);
+			
+			$("#login-form").submit();
+			
+		}
+		
+		/**
+		 * 回车事件，调用登录接口
+		 */
+		function loginEvent(event) {
+			if (event.keyCode === 13) {
+				loginSubmit();
+			}
+		}
+		
+		$(function(){
+			console.log("登录页面加载完成！");
+			
+			//如果登录页面在iframe中显示，则在iframe外重新加载登录页面
+			if (window!=top){
+				console.log("========== go main");
+				window.top.location.href="/main-index/starter";
+			}
+			
+			if(g_error_msg!=null && g_error_msg!=""){
+				//dialog type: success warning info error,默认为info
+				util.message(g_error_msg,null,"error");
+			}
+			
+			/**
+			 * 	绑定登录按钮的click事件
+			 */
+			$("#login-submit-btn").on("click", function(){
+				loginSubmit();
+			});
+			
+		});
+	</script>
+</body>
+
+</html>

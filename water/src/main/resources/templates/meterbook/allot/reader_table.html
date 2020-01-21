@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<!-- 保存抄表员ID -->
+	<input type="hidden" id="meter-reader-id" value="0" />
+	
+	<!-- 用户列表 -->
+	<table class="table table-hover table-sm" id="meter-reader-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<!-- <th>ID</th> -->
+				<th>用户名</th>
+				<th>昵称</th>
+				<th>真实姓名</th>
+				<th>电话</th>
+				<th>手机号</th>
+				<th>电子邮箱</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${userList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- <td th:text="${item.id}">用户ID</td> -->
+				<td th:text="${item.username}">用户名</td>
+				<td th:text="${item.nickname}">昵称</td>
+				<td th:text="${item.realname}">真实姓名</td>
+				<td th:text="${item.tel}">电话</td>
+				<td th:text="${item.mobile}">手机</td>
+				<td th:text="${item.email}">电子邮箱</td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 查看表册 -->
+					<button type="button" class="btn-meter-book-item btn btn-secondary btn-sm "
+						th:attr="bind-id=${item.id}">
+						<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i>
+						<span>查看表册</span>
+					</button>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerReader')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var meterReader_pageNum=[[${pageNum}]];
+		var meterReader_pageSize=[[${pageSize}]];
+		var meter_reader_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		/**
+		 * 	设置抄表员ID
+		 */
+		function setMeterReaderId(userId){
+			$("#meter-reader-id").val(userId);
+		}
+		/**
+		 * 	获取抄表员ID
+		 */
+		function getMeterReaderId(){
+			return $("#meter-reader-id").val();
+		}
+	
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//--------查看表册---------
+		/* 
+			绑定查看表册按钮的click事件
+		*/
+		$(".btn-meter-book-item").on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/meter-book-allot/load-meter-book-main';
+			var parms = new Object();
+			var readerId = $(this).attr("bind-id"); //条目ID
+			setMeterReaderId(readerId);//设置抄表员ID
+			parms.readerId = readerId;
+			$("#meter-book-item").load(url, parms,showMeterBookItem); //加载完毕后显示 
+			
+		});
+		
+		//--------表册分配---------
+		/* 
+			绑定查看表册按钮的click事件
+		*/
+		$(".btn-allot-meter-book").on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/meter-book-allot/load-allot-meter-book-main';
+
+			var readerId = $(this).attr("bind-id"); //条目ID
+			setMeterReaderId(readerId);//设置抄表员ID
+			
+			$("#allot-meter-book").load(url, null,showAllotMeterBook); //加载完毕后显示 
+			
+		});
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#meter-reader-table #select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$("#meter-reader-table .item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#meter-reader-table #' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$("#meter-reader-table .item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#meter-reader-table #' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+			
+			//----------Add Dialog 操作 加载,打开,关闭------------------------
+			
+			/*		
+				加载(Load): 增加/编辑对话框
+				将对话框内容加载到指定的容器中
+			 */
+			 $(".btn-add-meter-book").on('click',function() {
+				 var url = BASE_CONTEXT_PATH + '/meter-book-allot/load-add-meter-book-dialog';
+				 var itemId = $(this).attr("bind-id"); //条目ID
+				 var parms = new Object(); //参数
+				 parms.itemId = itemId;
+					
+				$("#add-meterbook-dialog").load(url, parms,openUserMeterBookDialog); //加载完毕后显示 
+			 });
+			
+				/**
+			  	打开分水量对话框
+			  	@returns
+			 */
+			function openUserMeterBookDialog() {
+				//	可拖拽
+				$("#modal-container-user-meterbook-dialog").draggable({
+					cursor : "move",
+					handle : '.modal-header'
+				}); 
+			
+				$('#modal-container-user-meterbook-dialog').modal({
+					backdrop : 'static',
+					keyboard : false
+				});
+			}
+
+		});
+		//创建分页组件实例
+		var pager=new Pager("pagerReader");
+		$(function(){			
+			pager.init(loadMeterReaderPage,meter_reader_searchCond);			
+		});
+	</script>
+</body>
+</html>

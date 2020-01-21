@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发票打印对话框-TEST页面</title>
+<div th:include="common/common_head::headx('发票打印对话框-TEST')" th:remove="tag"></div>
+</head>
+<body>
+	
+<div class="container-fluid">
+	<div class="row-fluid">
+		<!-- 对话框容器 -->
+		<div class="span12">
+			<!-- 对话框1 -->
+			<span th:include="component/normalinvoicevoldialog/normal_invoice_vol_dialog::dialog('dialog1')"  th:remove='tag'></span>			
+		</div>
+		<div class="span12">
+			 <button class="btn btn-primary" type="button" id="button1">发票卷对话框1-打开</button>			 
+		</div>
+	</div>
+</div>
+</body>
+
+<!-- 通用对话框工具JS -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<script type="text/javascript" th:src="@{/js/component/invoicepublic/InvoiceType.js}"></script>
+<!-- 打印对话框组件JS部分 -->
+<script type="text/javascript" th:src="@{/js/component/normalinvoicevoldialog/NormalInvoiceVolDialog.js}"></script>
+
+<script type="text/javascript">
+	
+	var dialog1=new NormalInvoiceVolDialog("dialog1");
+	dialog1.setChoiceCallback(choiceCallback);  //选择回调函数
+	dialog1.setExitCallback(exitCallback);   //退出回调函数
+	
+	
+	
+	//定义按钮的回调函数(外部业务函数)
+	function choiceCallback(respData){		
+		console.log("button choice callback function is called!");
+		console.log("return data is:"+ JSON.stringify(respData));
+	}
+	
+	function exitCallback(){
+		console.log("button printYes callback function is called!");		
+	}
+	
+	//page loaded ready
+	$(function() {
+		$("#button1").on('click',function(){
+			dialog1.show();
+		});	
+		
+		
+		
+	});
+</script>
+
+</html>

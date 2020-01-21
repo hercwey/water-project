@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<div th:include="common/common_head::headx('组件测试页')" th:remove="tag"></div>
+
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+</head>
+<body>
+
+<!-- <div th:include="component/districtsearcher/district_searcher::searcher('searcher2')" th:remove="tag"></div> -->
+
+<div class="" style="display: inline-block" id="customer-item-search">
+				<ul class="extra-l" style="list-style: none;">					
+					<li class="input-group-sm">
+						<div th:include="component/districtsearcher/district_searcher::searcher('searcher1')" th:remove="tag"></div>
+					</li>
+					
+					<li class="input-group-sm">
+						<div th:include="component/districtsearcher/district_searcher::searcher('searcher2')" th:remove="tag"></div>
+					</li>
+					
+					<li class="input-group-sm">
+						<!-- 客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户； -->
+						<select class="form-control btn-sm customer-status" id="customer-status" name="customerStatus" style="display:inline-block;">
+							<!-- 客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户； -->
+							<option value="">——状态——</option>
+							<option value="-1">未立户</option>
+							<option value="0,3">已立户</option>
+							<option value="1">已销户</option>
+							<option value="2">已过户</option>
+							<option value="3">过户</option>
+						</select>
+					</li>
+					<li class="input-group-sm">
+						<!-- 用户性质：1=个人；2=单位；3=水司； -->
+						<select class="form-control btn-sm customer-type" id="customer-type" name="customerType" style="display:inline-block;">
+							<option value="">——用户性质——</option>
+							<option value="1">个人</option>
+							<option value="2">单位</option>
+							<option value="3">水司</option>
+						</select>
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm btn-search"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询组件值</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm btn-search-reset"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+				</ul>
+			</div>
+	
+	
+</body>
+<script type="text/javascript"	th:src="@{/js/component/districtsearcher/DistrictSearcher.js}"></script>
+
+<script>
+	
+	//回调函数1
+	function outerFunc1(){
+		console.log("out func111 called!");
+	}
+	
+	//回调函数2
+	function outerFunc2(){
+		console.log("out func222 called!");
+	}
+	
+	//声明:两个查询组件
+	var searcher1 = new DistrictSearcher("searcher1",outerFunc1); //此处searcher的ID
+	var searcher2 = new DistrictSearcher("searcher2",outerFunc2); //此处searcher的ID
+
+	/* page load ready */
+	$(function() {
+		
+		//两个查询组件初始化.
+		searcher1.init();
+		searcher2.init();
+		
+		//reset测试  searcher1
+		$("#btn-search-reset").on('click',function(){
+			searcher1.reset();
+		});
+		
+		//get dropdown id
+		$("#btn-search").on('click',function(){
+			var blockId=searcher1.getBlockId();
+			var buildingId=searcher1.getBuildingId();
+			var unitId=searcher1.getUnitId();
+			
+			console.log("blockId is:"+blockId);
+			console.log("buildingId is:"+buildingId);
+			console.log("unitId is:"+unitId);
+			
+		});
+	});
+</script>
+
+
+
+</html>

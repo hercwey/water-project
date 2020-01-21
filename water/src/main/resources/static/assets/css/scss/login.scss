@@ -1,0 +1,187 @@
+/*
+ * @Description: 水司登录页
+ * @Author: Wang Rfan
+ * @Date: 2019-07-24 22:30:20
+ */
+
+@import "./_reset.scss";
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+.login-content {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  @include clearfix();
+  .header{
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 100px;
+    z-index: 800;
+    overflow: hidden;
+  }
+}
+
+.left-pic {
+  position: relative;
+  width: calc(100%/5*3);
+  max-width: calc(100% - 400px);
+  height: 100%;
+  // background-image: url("../img/login-bg.jpg");
+  // background-position: center;
+  // background-size: cover;
+  // background-repeat: no-repeat;
+  float: left;
+  .carousel-inner, .carousel-item, img{
+    height: 100%;
+  }
+  .carousel-item{
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  img{
+    object-fit: cover;
+  }
+}
+
+.login-form {
+  float: left;
+  width: calc(100%/5*2);
+  min-width: 400px;
+  background-color: #fff;
+  position: relative;
+  height: 100%;
+
+  .logo {
+    margin-bottom: 15px;
+    height: 80px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+
+    img {
+      height: 100%;
+      margin-right: 10px;
+      
+    }
+    p{
+      margin-bottom: 0;
+      &.text{
+        font-weight: bold;
+        letter-spacing: 3px;
+      }
+      
+      &.eng{
+        font-size: 12px;
+        letter-spacing: -1px;
+      }
+    }
+  }
+
+  .login-wrap {
+    height: calc(100% - 160px);
+    width: 55%;
+    margin: 0 auto;
+    padding-top: 100px;
+
+    h3 {
+      color: #0560c8;
+      font-size: 28px;
+      padding: 0 0 15px;
+      text-align: center;
+      margin-bottom: 40px;
+      letter-spacing: 8px;
+    }
+
+    .form-group{
+      input{
+        &:-internal-autofill-selected{
+          box-shadow: 0 0 0px 1000px #fff inset;
+        }
+        &:-webkit-autofill {
+          box-shadow: 0 0 0px 1000px #fff inset;
+        }
+        &:-moz-autofill {
+          box-shadow: 0 0 0px 1000px #fff inset;
+        }
+        &:autofill {
+          box-shadow: 0 0 0px 1000px #fff inset;
+        }
+      }
+    }
+
+    .account-group {
+      margin-bottom: 1.5rem;
+
+      input {
+        border-width: 0;
+        border-bottom-width: 2px;
+        border-radius: 0;
+
+        &::placeholder {
+          color: #aaa;
+        }
+      }
+    }
+
+    .password-group {
+      .input-group {
+
+        input {
+          border-width: 0;
+          border-bottom-width: 2px;
+          border-radius: 0;
+
+          &::placeholder {
+            color: #aaa;
+          }
+        }
+
+        .form-control {
+          border-right: 0;
+        }
+
+        .input-group-append {
+          cursor: pointer;
+
+          .input-group-text {
+            border-width: 0;
+            border-bottom-width: 2px;
+            border-radius: 0;
+            background-color: #fff;
+          }
+        }
+      }
+    }
+
+    .submit-btn {
+      border-radius: 60px;
+      background-color: #1b74db;
+      width: 80%;
+      margin: 0 auto;
+      margin-top: 40px;
+    }
+  }
+
+  .footer {
+    text-align: center;
+    color: #999;
+    height: 80px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}

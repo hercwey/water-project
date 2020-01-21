@@ -1,0 +1,229 @@
+@charset "UTF-8";
+/* 普通发票样式表 */
+/* 抗锯齿 */
+body,html{
+	-webkit-font-smoothing: antialiased; /*chrome、safari*/
+	-moz-osx-font-smoothing: grayscale;/*firefox*/
+	line-height:1.0;
+}
+
+/* 发票容器样式 */
+#invoice-normal-container{
+	padding-top:50px;
+	padding-bottom:50px; 
+	background-color:#999;
+}
+
+/* 发票容器放大与缩小 */
+/* #invoice-special-container{
+	transform: scale(0.9);
+	transform-origin: 0 0;
+} */ 
+/* 发票容器放大与缩小,针对firefox */
+ /* #invoice-special-container.zoom-out{ 
+	zoom: 0.9; 
+	-moz-transform: scale(0.9); 
+	-moz-transform-origin: 0 0;
+} */ 
+
+/* 发票背景 */
+.invoice-normal{
+	background-color:white;
+	padding-top:20px;
+	padding-bottom:20px;
+	padding-left:50px;
+	padding-right:50px;
+	width:1000px;
+	background-image: url(/images/invoice_back.png);
+	background-repeat: space;
+	 
+}
+
+/* 设置字体粗细及颜色 */
+.invoice-normal span{
+	font-weight:800;
+	color:#0174DF;  /* 普通发票为蓝字发票  #0174DF */
+}
+
+/* 普通发票代码 */
+.invoice-normal .invoice-dm{
+	color:black;
+}
+
+/* 普通发票编码 */
+.invoice-normal .invoice-hm{
+	color:black;
+}
+
+/* 普通发票开票日期 */
+.invoice-normal .issue-invoice-date{
+	color:black;
+}
+
+/* 普通发票详情页部分字体颜色 */
+.invoice-normal .invoice-detail span{
+	color:black;
+}
+
+/* 金额合计 */
+.invoice-normal .invoice-amount-sum-col span{
+	color:black;
+}
+
+/* 税额合计 */
+.invoice-normal .invoice-tax-sum-col span{
+	color:black;
+}
+
+/* 价税合计-中文 */
+.invoice-normal .invoice-price-tax-sum-chinese-col .invoice-price-tax-sum-chinese {
+	color:black;
+}
+/* 价税合计-数字 */
+.invoice-normal .invoice-price-tax-sum-number-col span{
+	color:black;
+}
+
+/* 购方名称 */
+.invoice-normal .buyer-name-col span{
+	color:black;
+}
+/* 购方税号 */
+.invoice-normal .buyer-tax-no-col span{
+	color:black;
+}
+/* 购方地址及电话 */
+.invoice-normal .buyer-address-tel-col span{
+	color:black;
+}
+/* 购方银行及账号 */
+.invoice-normal .buyer-bank-account-no-col span{
+	color:black;
+}
+
+/* 销方名称 */
+.invoice-normal .saler-name-col span{
+	color:black;
+}
+/* 销方税号 */
+.invoice-normal .saler-tax-no-col span{
+	color:black;
+}
+/* 销方地址及电话 */
+.invoice-normal .saler-address-tel-col span{
+	color:black;
+}
+/* 销方银行及账号 */
+.invoice-normal .saler-bank-account-no-col span{
+	color:black;
+}
+
+/* 表格线的颜色 */
+.invoice-normal table td {
+	border:1px solid  #0174DF ;  /* 普通发票为蓝字发票  #0080FF  专用发票为灰色  */ 
+}
+
+/* 2019/12/21 */
+.invoice-normal tbody tr .input-group{
+	/* border: solid 1px black; */
+	height:25px;
+}
+
+/* 发票详情表格外边框颜色 暂时不处理此部分的内容 */
+.invoice-normal table.invoice-detail tbody tr{
+	/* border: solid 1px black; */
+	height:20px;
+}
+
+.invoice-normal table.invoice-detail tbody tr .input-group{
+	/* border: solid 1px black; */
+	height:20px;
+}
+/* ---------------------------- */
+
+
+/* 发票详情input获取焦点时样式 */
+.invoice-normal table.invoice-detail input[type=text]:focus{ 
+	outline: 2px solid #084B8A;   /* #AFECAB #8FBC8F */	
+}
+
+
+/* 表格中所有P标签 */
+.invoice-normal td p{
+	 margin-bottom:0px;
+}
+
+/* 表格行的高度 */
+.invoice-normal tr{
+	height:25px;
+} 
+
+/* 普通发票-详情字体 */
+.invoice-normal tr td table span{
+	font-weight:400;	
+	font-family:Song;
+	font-size:0.9em;
+}
+
+/* 所有input */
+.invoice-normal input{
+	font-weight:400;	
+	font-family:Song;
+	font-size:0.9em;
+}
+
+
+/* 普通发票-详情条目-当前行 */
+.invoice-normal tr td table tbody tr.curr{
+	background-color:lightgray;
+}
+
+/* 普通发票-详情条目-mouse-hover */
+.invoice-normal tr td table tbody tr:hover{
+	background-color:#8FBC8F;  
+}
+
+/* 普通发票-行选择器颜色-详情列表的第一列 */
+/* 普通发票与专用发票相同 */
+.invoice-normal tr td table tbody tr td.selected span {
+	color:blue;
+}
+
+
+/* 下划线 */
+.invoice-normal hr{
+	border-bottom: medium none; 
+	border-left: medium none; 
+	height: 5px;
+	border-top: #0174DF 5px double; /* 普通发票为蓝字发票 ,专用发票为black */
+	border-right: medium none; 
+	margin-top:0px;
+	margin-bottom:0px;
+	padding-top:-10px;
+	padding-bottom:0px; 
+}
+
+/* 备注 placeholder垂直居中 */
+.invoice-normal .invoice-remark-input {
+	  resize:none;
+      width:100%;
+      height:100px;
+      font-weight:400;
+      font-family:Song;
+      font-size:0.9em; 
+      text-align:left; 
+      border:0px;
+      padding:0px;      
+    }
+.invoice-normal .invoice-remark-input::-webkit-input-placeholder{
+  height: 100px;line-height: 100px
+}    /* 使用webkit内核的浏览器 */
+.invoice-normal .invoice-remark-input:-moz-placeholder{
+  height: 100px;line-height: 100px
+}                  /* Firefox版本4-18 */
+.invoice-normal .invoice-remark-input::-moz-placeholder{
+  height: 100px;line-height: 100px
+}                  /* Firefox版本19+ */
+.invoice-normal .invoice-remark-input:-ms-input-placeholder{
+  height: 100px;line-height: 100px
+}

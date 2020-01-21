@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style type="text/css">
+/* 输入布局 */
+.table-layout td{
+	border:0px;
+	/* padding:0px; */
+}
+
+</style>
+
+</head>
+<body>
+	<div class="card">
+		<h5 class="card-header">
+			<!-- 估抄保存 -->
+				<button type="button" class="btn btn-info" id="meter-read-config-save-estimate-btn">
+					<i class="fa fa-cloud-upload" aria-hidden="true">&nbsp;保存</i>
+				</button>
+		</h5>
+		<div class="card-body">
+				
+			<form class="form-horizontal " role="form" id="meter-read-config-form">
+									
+				<!-- 采用表格进行布局 -->
+				<!-- 配置部分 -->
+				<table class="table table-sm table-layout" style="width:80%;margin:auto;">
+				
+					<tbody id ="meter-read-config-body">
+						<tr>
+							<td>估抄：</td>
+							<td>
+								<input type="text" style="display:inline-block;"
+											th:value="${estimateCurrItem==null ? '' : estimateCurrItem.num}"
+											th:attr="data-type=1,data-id=${estimateCurrItem==null ? '' : estimateCurrItem.id}" 
+											class="form-control col-sm-6 estimate read-mode" 
+											id="estimate-num" name="estimateNum" 
+											maxlength=10 title="请输入1-10位字符" placeholder="估抄" />
+									<b>次</b>
+								<br>
+								<b>注：</b>此处配置估抄次数，去前几次估抄的平均水量
+							</td>
+						</tr>
+						<tr>
+							<td>预抄：</td>
+							<td>
+								<input type="text" style="display:inline-block;"
+											th:value="${preditCurrItem==null ? '' : preditCurrItem.num}" 
+											class="form-control col-sm-6 predit read-mode" 
+											th:attr="data-type=2,data-id=${preditCurrItem==null ? '' : preditCurrItem.id}" 
+											id="predit-num" name="preditNum" 
+											maxlength=10 title="请输入1-10位字符" placeholder="预抄" />
+									<b>次</b>
+								<br>
+								<b>注：</b>此处配置预抄次数，去前几次预抄的平均水量
+							</td>
+						</tr>
+						<tr>
+							<td>备注：</td>
+							<td>
+								<textarea rows="3" cols="20" class="form-control col-sm-6" 
+										id="read-mode-remake" name="remark" 
+										th:text="${estimateCurrItem==null ? '' : estimateCurrItem.remark}" 
+										maxlength=100 title="请输入1-100位字符" placeholder="备注"></textarea>
+							</td>
+						</tr>
+						
+					</tbody>
+					
+				</table>
+																						
+			</form>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+	
+			function getMeterReadConfigParms(){
+				
+				var remake = $("#read-mode-remake").val();
+				
+				var meterReadConfigArr = new Array();
+				
+				$("#meter-read-config-body .read-mode").each(function(){
+					var num = $(this).val();
+					var type = $(this).attr("data-type");//类型
+					var id = $(this).attr("data-id");//ID
+					
+					var obj = new Object();
+					obj.id = id;
+					obj.type = type;
+					obj.num = num;
+					obj.remark = remake;
+					meterReadConfigArr.push(obj);
+				});
+				var meterReadConfigJSON = JSON.stringify(meterReadConfigArr);
+				console.log(meterReadConfigJSON);
+				
+				var params = new Object();
+				params.meterReadConfigJSON = meterReadConfigJSON;
+				return params;
+				
+			}	
+	
+	
+		
+		/**
+		 * 保存配置信息到DB
+		 */
+		function saveFn(){
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/meter-read-config/save";
+			
+			var parms = getMeterReadConfigParms();
+			if(!parms){
+				return false;
+			}
+			$.post(urlStr, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"info");
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+	
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/**
+			 * 绑定估抄配置的保存按钮的click事件
+			 */
+			$("#meter-read-config-save-estimate-btn").on("click", function(){
+				saveFn();
+			});
+		});
+	</script>
+</body>
+</html>

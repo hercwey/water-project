@@ -1,0 +1,25 @@
+
+<!-- <input type="hidden" class="editor-id" th:value="${editorId}"> -->
+<!-- 规则 -->
+<td>
+	<!-- <input type="number" class="form-control part-water-rate" th:value="${item.partWaterRate}" th:attr="data-meter-id=${meterId}" placeholder="百分比" οnkeypress='return( /[\d]/.test(String.fromCharCode(event.keyCode) ) )' /> -->
+	<!-- 规则编辑器 -->
+	<div th:include="rule_config/rule_config_fragment::ruleEditor(${editorId})" th:remove="tag"></div>
+</td>
+<!-- 价格 -->
+<td class='input-group-sm'>
+	<select class="form-control input-sm water-price-id" id="" name="">
+		<!-- 默认选择第一个 -->
+		<option value="">-请选择-</option>
+		<span th:each="waterPrice,iterStatus: ${waterPriceList}" th:remove="tag"> 
+			<!-- <option th:value="${waterPrice.id}" th:attr="selected=${item.waterPriceId==waterPrice.id ? 'true':'false'}"</option> -->
+			<option th:value="${waterPrice.id}" th:text="${waterPrice.ladderName}">名称</option>
+		</span>
+	</select>
+</td>
+<td>
+	<input type="hidden" th:id="'rule-id-'+${editorId}" value="" placeholder="用于保存规则ID" />
+	<button type="button" class="btn btn-danger btn-sm btn-del-rule" title="删除" th:attr="onclick='javascript:deleteRow(&quot;'+${editorId}+'&quot;);'">
+		<i class="fa fa-trash-o" aria-hidden="true"></i>
+	</button>
+</td>

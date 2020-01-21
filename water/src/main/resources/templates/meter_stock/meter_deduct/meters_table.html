@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<!-- 表计列表 -->
+	<table class="table table-hover table-sm" id="meter-table">
+		<thead>
+			<tr>
+				<th>
+					<!-- <input type="checkbox" class="select-all-toggle"> -->
+					
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th>水表编号</th>
+				<th>口径</th>
+				<th>水表类型</th>
+				<th>状态</th>
+				<th>生产厂家</th>
+				<th>水表位置</th>
+				<th >操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${meterList}">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.ID},data-bind=${item.ID}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.ID}"></label>
+					</div> 
+				</td>
+				<!-- 编号 -->
+				<td>
+					<span th:if="${item.NUM<1 && item.NUM>=0}">
+						<span class="badge badge-danger" name="meterNo" th:text="${item.METER_NO}" style="cursor: pointer;"></span>
+					</span>
+					<span th:if="${item.NUM<=2 && item.NUM>=1}">
+						<span class="badge badge-warning" name="meterNo" th:text="${item.METER_NO}" style="cursor: pointer;"></span>
+					</span>
+					<span th:if="${item.NUM<0}">
+						<span class="badge badge-danger" name="meterNo" th:text="${item.METER_NO}" style="cursor: pointer;"></span>
+					</span>
+				</td>
+				<!-- 口径 -->
+				<td th:text="${item.caliberValue}">口径</td>
+				<!-- 水表类型-->
+				<td th:text="${item.meterTypeValue}">水表类型 </td>
+				<!-- 生命周期 -->
+				<td th:text="${item.cycleStatusStr}">生命周期</td>
+				<!-- 生产厂家 -->
+				<td th:text="${item.factoryValue}">生产厂家</td>
+				<td th:text="${item.PLACE}">水表位置</td>
+				<!-- 操作列 -->
+				<td>
+					<div class="dropdown">
+					    <button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+					      	操作
+					    </button>
+					    <div class="dropdown-menu">
+					    	<!-- 表计基本信息 -->
+							<a class="dropdown-item btn-info-detail-single btn-sm" th:id="'btn-info-detail-'+${item.ID}"
+								th:attr="bind-id=${item.ID}">
+								<i class="fa fa-file-o" aria-hidden="true"></i><span>详情</span>
+							</a>
+							<!-- 编辑表计基本信息 -->
+							<!-- <a class="dropdown-item btn-edit-meter-single btn-sm" th:id="'btn-info-detail-'+${item.id}"
+								th:attr="bind-id=${item.id}">
+								<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i><span>编辑</span>
+							</a> -->
+							<a class="dropdown-item deduct-meter btn-sm" th:attr="bind-id=${item.ID}, data-cycle-status=${item.CYCLE_STATUS}">
+								<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i><span>检测</span>
+							</a>
+							<!-- <span th:if="${item.cycleStatus==5}"> -->
+								<a class="dropdown-item btn-check-result btn-sm" 
+									th:attr="bind-id=${item.ID}">
+									<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i><span>检测结果</span>
+								</a>
+							<!-- </span> -->
+							<a class="dropdown-item unused-meter btn-sm" th:attr="bind-id=${item.ID}, data-cycle-status=${item.CYCLE_STATUS}">
+								<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i><span>报废</span>
+							</a>
+					    </div>
+					</div>
+					
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			//------------------------------	表计档案详情功能	------------------------------
+			/**
+			 * 绑定详情按钮的click事件，查看表计档案
+			 */
+			$(".btn-info-detail-single").on("click", function(){
+				
+				var meterId = $(this).attr("bind-id");//表计ID
+				setMeterIdFn(meterId);//设置用户当前编辑的表计ID
+				
+				var params = {"meterId":meterId};
+					
+				loadMeterBaseList(params, loadMeterBaseListCallback);//加载表计基本信息
+				
+			});
+			/**
+			 * 加载表计基本信息回调
+			 */
+			function loadMeterBaseListCallback(){
+				showMeterDetailTab();//显示表计档案选项卡
+				transferTabs(G_TABS_METER_ITEM_NAV, G_METERS_DETAIL_TAB, "show");//显示表计档案选项卡
+				transferTabs(G_TABS_METER_DETAIL_NAV, G_METER_BASE_DETAIL_TAB, "show");//显示表计档案选项卡中的表计基本信息选项卡
+			}
+			
+			/**
+			 * 绑定检测结果选项卡
+			 */
+			$(".btn-check-result").on("click", function(){
+				
+				var meterId = $(this).attr("bind-id");//表计ID
+				setMeterIdFn(meterId);//设置用户当前编辑的表计ID
+				
+				var params = {"meterId":meterId};
+					
+				loadCheckResultMainList(params, checkResultCallback);//加载检测结果
+				
+			});
+			function checkResultCallback(){
+				showMeterCheckResultTab();
+			}
+			
+			//------------------------------	编辑功能	------------------------------
+			/**
+			 * 	绑定编辑按钮的click事件
+			 */
+			$(".btn-edit-meter-single").on("click", function(){
+				
+				var meterId = $(this).attr("bind-id");//表计ID
+				setMeterIdFn(meterId);//设置用户当前编辑的表计ID
+				
+				var url = BASE_CONTEXT_PATH + "/meter-deduct/load-edit-dialog";
+				var parms = {"meterId": meterId};
+				$("#meters-edit-dialog").load(url, parms, openEditDialog);
+			});
+			
+			/*
+				检测水表按钮CLICK
+			*/
+			$('.deduct-meter').on('click', function() {
+				var url = BASE_CONTEXT_PATH + '/meter-deduct/load-meter-out-stcock-dialog';
+				var parms = new Object();
+				var meterId = $(this).attr("bind-id");//表计ID
+				var cycleStatus = $(this).attr("data-cycle-status");//表计生命周期状态
+				if(cycleStatus == 2){
+					util.message("水表处于待启用状态，请先执行换表，再进行检测");
+					return false;
+				}
+				if(cycleStatus == 3){
+					util.message("水表处于正在使用状态，请先执行换表，再进行检测");
+					return false;
+				}
+				setMeterIdFn(meterId);//设置用户当前编辑的表计ID
+				parms.meterId = meterId;
+				$("#meter-out-stock-doc-dialog").load(url, parms, openMeterOutStockDialog); //加载完毕后显示
+			});
+			
+			/*
+				水表报废按钮CLICK
+			*/
+			$('.unused-meter').on('click', function() {
+				var url = BASE_CONTEXT_PATH + '/meter-deduct/load-meter-unused-dialog';
+				var parms = new Object();
+				var meterId = $(this).attr("bind-id");//表计ID
+				var cycleStatus = $(this).attr("data-cycle-status");//表计生命周期状态
+				if(cycleStatus == 3){
+					util.message("水表处于正在使用状态，请先执行换表，再进行报废");
+					return false;
+				}
+				setMeterIdFn(meterId);//设置用户当前编辑的表计ID
+				parms.meterId = meterId;
+				$("#meter-unused-dialog").load(url, parms, openMeterUnusedDialog); //加载完毕后显示
+			}); 
+			
+			
+			
+
+		});
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(loadPageClickPageNum,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>

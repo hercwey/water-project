@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CustomersMapper">
+	<resultMap id="BaseResultMap"
+		type="com.learnbind.ai.model.Customers">
+		<!-- WARNING - @mbg.generated -->
+		<id column="ID" jdbcType="DECIMAL" property="id" />
+		<result column="PROP_NAME" jdbcType="VARCHAR" property="propName" />
+		<result column="PROP_TEL" jdbcType="VARCHAR" property="propTel" />
+		<result column="PROP_MOBILE" jdbcType="VARCHAR" property="propMobile" />
+		<result column="PROP_EMAIL" jdbcType="VARCHAR" property="propEmail" />
+		<result column="CUSTOMER_NAME" jdbcType="VARCHAR" property="customerName" />
+		<result column="USED_NAME" jdbcType="VARCHAR" property="usedName" />
+		<result column="SETTLE_TIME" jdbcType="TIMESTAMP" property="settleTime" />
+		<result column="ADDRESS" jdbcType="VARCHAR" property="address" />
+		<result column="ID_TYPE" jdbcType="DECIMAL" property="idType" />
+		<result column="ID_NO" jdbcType="VARCHAR" property="idNo" />
+		<result column="CUSTOMER_TYPE" jdbcType="DECIMAL" property="customerType" />
+		<result column="CUSTOMER_TEL" jdbcType="VARCHAR" property="customerTel" />
+		<result column="CUSTOMER_MOBILE" jdbcType="VARCHAR" property="customerMobile" />
+		<result column="CUSTOMER_EMAIL" jdbcType="VARCHAR" property="customerEmail" />
+		<result column="WATER_USE" jdbcType="VARCHAR" property="waterUse" />
+		<result column="INDUSTRY" jdbcType="VARCHAR" property="industry" />
+		<result column="USE_NUM" jdbcType="DECIMAL" property="useNum" />
+		<result column="WATER_STATUS" jdbcType="DECIMAL" property="waterStatus" />
+		<result column="NOTIFY_MODE" jdbcType="DECIMAL" property="notifyMode" />
+		<result column="DISCOUNT_TYPE" jdbcType="DECIMAL" property="discountType" />
+		<result column="CUSTOMER_CODE" jdbcType="VARCHAR" property="customerCode" />
+		<result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+		<result column="DEDUCT_TYPE" jdbcType="DECIMAL" property="deductType" />
+		<result column="ROOM" jdbcType="VARCHAR" property="room" />
+		<result column="IS_PART_WATER" jdbcType="DECIMAL" property="isPartWater" />
+		<result column="CHARGE_MODE" jdbcType="DECIMAL" property="chargeMode" />
+		<result column="PRICE_CODE" jdbcType="VARCHAR" property="priceCode" />
+		<result column="REMARK" jdbcType="VARCHAR" property="remark" />
+		<result column="PREPAYMENT_CUSTOMER" jdbcType="VARCHAR" property="prepaymentCustomer" />
+    
+	</resultMap>
+	<sql id="Base_Column_List">
+		<!-- WARNING - @mbg.generated -->
+		ID, PROP_NAME, PROP_TEL, PROP_MOBILE, PROP_EMAIL, CUSTOMER_NAME,
+		USED_NAME, SETTLE_TIME,
+		ADDRESS, ID_TYPE, ID_NO, CUSTOMER_TYPE, CUSTOMER_TEL, CUSTOMER_MOBILE,
+		CUSTOMER_EMAIL,
+		WATER_USE, INDUSTRY, USE_NUM, WATER_STATUS, NOTIFY_MODE, DISCOUNT_TYPE,
+		CUSTOMER_CODE,
+		DELETED, DEDUCT_TYPE, ROOM, IS_PART_WATER, CHARGE_MODE, PRICE_CODE, REMARK, PREPAYMENT_CUSTOMER 
+	</sql>
+
+	<!-- 查询名称,返回列表 -->
+	<select id="searchCustomers" resultMap="BaseResultMap">
+		SELECT
+		*
+		FROM customers r
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			deleted = 0
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				r.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR r.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR r.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR r.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR r.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR r.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR r.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR r.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+			<!-- 客户类型 -->
+			<if test="customerType!=null">
+				AND r.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<if test="statusList!=null and statusList.size()>0">
+				AND r.STATUS IN
+				<foreach item="item" index="index" collection="statusList"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY r.id DESC
+	</select>
+	<!-- 根据表计id查询客户集合 -->
+	<select id="getCustomerListByMeterId" resultType="map">
+		SELECT
+		C.*,
+		CM.DEFAULT_CUSTOMER
+		FROM
+		CUSTOMERS C LEFT JOIN CUSTOMER_METER CM ON C.ID = CM.CUSTOMER_ID
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			C.DELETED = 0 AND CM.DELETED=0
+			<if test="meterId!=null">
+				AND CM.METER_ID = #{meterId}
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+		</where>
+		<!-- ORDER BY C.ID DESC -->
+	</select>
+
+	<!-- 根据地理位置查询客户集合 -->
+	<select id="getCustomerListByLocationId" resultType="map">
+		SELECT
+		C.*
+		FROM
+		CUSTOMERS C LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			C.DELETED = 0 AND LC.DELETED=0
+			<if test="locationId!=null">
+				AND LC.LOCATION_ID = #{locationId}
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+		</where>
+		<!-- ORDER BY C.ID DESC -->
+	</select>
+
+
+	<!-- 查询名称,返回列表 -->
+	<select id="searchCustomerAgreement" resultMap="BaseResultMap">
+		SELECT
+		*
+		FROM
+		customers c
+		INNER JOIN CUSTOMER_AGREEMENT a ON c.id = a.customer_id
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			c.deleted = 0
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+			AND a.AGREEMENT_TYPE = #{agreementType}
+		</where>
+		ORDER BY c.id DESC
+	</select>
+
+	<!-- 查询名称,返回列表 -->
+	<select id="searchTripartAgreement" resultMap="BaseResultMap">
+		SELECT
+		*
+		FROM
+		customers c
+		INNER JOIN CUSTOMER_AGREEMENT a ON c.id = a.customer_id
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			c.deleted = 0
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+			AND a.AGREEMENT_TYPE = '1' OR a.AGREEMENT_TYPE = '2'
+		</where>
+		ORDER BY c.id DESC
+	</select>
+
+	<!-- 根据id查询客户名称 -->
+	<select id="getCustomerNameById" resultType="String">
+		SELECT
+		PROP_NAME
+		FROM customers
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			deleted = 0
+			<if test="id!=null and id!='' ">
+				AND ID = #{id}
+			</if>
+		</where>
+	</select>
+
+	<!-- 根据id查询客户名称 -->
+	<select id="getCustomersList" resultMap="BaseResultMap">
+		SELECT
+			DISTINCT C.*
+		FROM
+			CUSTOMERS C
+			LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			C.DELETED=0
+			AND LC.DELETED=0
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<!-- 客户类型 -->
+			<if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if>
+			<!-- 查询条件（匹配业主姓名和客户姓名） -->
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR c.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+			<if test="statusList!=null and statusList.size()>0">
+				AND C.STATUS IN
+				<foreach item="item" index="index" collection="statusList"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY C.ID DESC
+	</select>
+
+	<!-- 查询用户编号(微信客户查询自己的客户编号) -->
+	<select id="searchCustomerNo" resultMap="BaseResultMap">
+		SELECT
+		C.*
+		FROM
+		CUSTOMERS C
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			C.DELETED=0
+			AND (
+			(C.PROP_NAME =#{customerName}
+			AND C.PROP_MOBILE =#{telNo} )
+			OR
+			(
+			C.CUSTOMER_NAME =#{customerName}
+			AND C.CUSTOMER_MOBILE=#{telNo}
+			)
+			)
+
+		</where>
+		ORDER BY C.ID
+	</select>
+
+	<!-- 根据表计id查询绑定的默认客户信息 -->
+	<select id="selectCustomerBidMeterInfo"
+		resultMap="BaseResultMap">
+		SELECT
+		c.*
+		FROM
+		customers c
+		INNER JOIN customer_meter cm ON cm.CUSTOMER_ID = c.id
+		WHERE
+		c.deleted = 0
+		AND cm.DEFAULT_CUSTOMER = 0
+		AND cm.DELETED =0
+		AND cm.METER_ID = #{meterId}
+		ORDER BY C.ID
+	</select>
+
+	<select id="getInsertAccountCustomerList" resultType="map">
+		SELECT
+			C.ID AS CUSTOMER_ID,
+			LM.TRACE_IDS
+		FROM
+			CUSTOMERS C
+		LEFT JOIN CUSTOMER_METER CM ON C.ID=CM.CUSTOMER_ID
+		LEFT JOIN LOCATION_METER LM ON CM.METER_ID=LM.METER_ID
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			C.DELETED=0 
+			AND CM.DELETED=0
+			AND LM.DELETED=0
+			AND CM.DEFAULT_CUSTOMER=0
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<!-- 查询条件（匹配业主姓名和客户姓名） -->
+			<if test="searchCond!=null and searchCond!='' ">
+	 			AND (
+	 				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+	 			)
+	 		</if>
+	  	</where>
+	  		GROUP BY
+				C.ID, LM.TRACE_IDS
+	  		ORDER BY 
+	  			C.ID 
+  </select>
+  
+  <!--   根据客户的门牌号和地理位置的traceIds查询客户 -->
+  <select id="getCustomerList" resultMap="BaseResultMap">
+  	SELECT
+		C.* 
+	FROM
+		customers C
+		LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID 
+	WHERE
+		C.DELETED=0 AND LC.DELETED=0
+		<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+		<if test="traceIds!=null and traceIds!=''">
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+		</if>
+		<!-- 客户类型 -->
+		<if test="customerType!=null">
+			AND C.CUSTOMER_TYPE = #{customerType}
+		</if>
+		<!-- 查询条件（匹配业主姓名和客户姓名） -->
+		<if test="searchCond!=null and searchCond!='' ">
+ 			AND (
+ 				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+ 				OR c.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+ 			)
+ 		</if>
+ 		<if test="statusList!=null and statusList.size()>0">
+			AND C.STATUS IN 
+			<foreach item="item" index="index" collection="statusList" open="(" separator="," close=")">
+            	#{item}
+       		</foreach>
+		</if>
+  </select>
+  
+  <!-- 根据地理位置查询客户集合 -->
+  <select id="getCustomerListByTraceIds" resultType="map">
+		SELECT
+			C.*, LC.TRACE_IDS
+		FROM
+			CUSTOMERS C 
+			LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID 
+			LEFT JOIN LOCATION L ON L.ID = LC.LOCATION_ID 
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			C.DELETED=0
+			AND L.DELETED=0
+			AND LC.DEFAULT_CUSTOMER=0
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC	.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<!-- 查询条件（匹配业主姓名和客户姓名） -->
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+		</where>
+		
+		ORDER BY
+		C.ID
+	</select>
+
+	<!-- 根据客户的门牌号和地理位置的traceIds查询客户 -->
+	<select id="getCustomerListByRoom" resultMap="BaseResultMap">
+		SELECT
+			C.*
+		FROM
+			customers C
+		LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID
+		WHERE
+			C.DELETED=0 AND LC.DELETED=0
+			AND C.ROOM = #{room}
+			AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+	</select>
+
+	<!-- 根据地理位置查询客户集合 -->
+	<!-- <select id="getCustomerListByTraceIds" resultType="map">
+		SELECT
+		C.*, LC.TRACE_IDS
+		FROM
+		CUSTOMERS C LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID
+		LEFT JOIN LOCATION L ON L.ID = LC.LOCATION_ID
+		<where>
+			删除状态，1=已删除，0=未删除（默认）
+			C.DELETED = 0 AND LC.DELETED=0
+			<if test="traceIds!=null || traceIds!= ''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+		</where>
+		ORDER BY CAST( REGEXP_REPLACE(L.PYCODE, '[a-zA-Z]*[-]*', '') AS int )
+	</select> -->
+
+
+	<!-- 根据id查询客户名称 -->
+	<select id="getCustomerData" resultMap="BaseResultMap">
+		SELECT
+		C.*
+		FROM
+		CUSTOMERS C
+		LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID
+		<where>
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+		</where>
+		ORDER BY C.ID DESC
+	</select>
+
+	<!-- 打印通知单是查询默认客户 -->
+	<select id="getDefaultCustomerList" resultMap="BaseResultMap">
+		SELECT
+		C.*
+		FROM
+		CUSTOMERS C
+		LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID
+		LEFT JOIN CUSTOMER_METER CM ON CM.CUSTOMER_ID = C.ID
+		LEFT JOIN (SELECT
+			CUSTOMER_ID,
+			count(period) as num
+		FROM
+			customer_account_item 
+		WHERE
+			deleted = 0 
+			AND DEBIT_AMOUNT != CREDIT_AMOUNT 
+			AND CREDIT_AMOUNT - DEBIT_AMOUNT > 0
+			AND DEBIT_CREDIT = '2'
+			group by CUSTOMER_ID) T ON T.CUSTOMER_ID = C.ID
+		<where>
+			C.DELETED=0 AND LC.DELETED=0 AND CM.DELETED=0 AND
+			CM.DEFAULT_CUSTOMER=0
+			<if test="oweMonth!=null and oweMonth ==1">
+				AND T.num=#{oweMonth}
+			</if>
+			<if test="oweMonth!=null and oweMonth ==2">
+				AND T.num=#{oweMonth}
+			</if>
+			<if test="oweMonth!=null and oweMonth ==3">
+				AND T.num&gt;=#{oweMonth}
+			</if>
+			
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<if test="customerType!=null and customerType!=''">
+				AND C.CUSTOMER_TYPE=#{customerType}
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+		</where>
+		ORDER BY C.ID ASC
+	</select>
+
+
+	<!-- 打印通知单是查询默认客户 -->
+	<select id="getDefaultUnitCustomerList"
+		resultMap="BaseResultMap">
+		SELECT
+		DISTINCT C.*
+		FROM
+		CUSTOMERS C
+		LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID
+
+		<where>
+			C.DELETED=0 AND LC.DELETED=0
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<if test="customerType!=null and customerType!=''">
+				AND C.CUSTOMER_TYPE=#{customerType}
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+		</where>
+		ORDER BY C.ID ASC
+	</select>
+	<!-- 根据客户名称/开票名称查询客户 -->
+	<select id="getList" resultMap="BaseResultMap">
+		SELECT
+			*
+			FROM
+		CUSTOMERS
+			<where>
+				ID IN (
+					SELECT
+					C.ID
+					FROM
+					CUSTOMERS C LEFT JOIN CUSTOMER_BILL_INFO B ON C.ID = B.CUSTOMER_ID
+					<where>
+						1=1
+						<if test="customerName!=null and customerName!=''">
+							AND (
+							C.CUSTOMER_NAME LIKE CONCAT('%', CONCAT( #{customerName}, '%' ))
+							OR B.CUSTOMER_NAME LIKE CONCAT('%', CONCAT( #{customerName}, '%' ))
+							)
+						</if>
+					</where>
+					GROUP BY
+						C.ID 
+				)
+			</where>
+  </select>
+
+	<select id="getNotifyCustomerList" resultMap="BaseResultMap">
+		SELECT
+		DISTINCT
+		C.*
+		FROM
+		CUSTOMERS C
+		LEFT JOIN PARTITION_WATER P ON P.CUSTOMER_ID = C.ID
+		LEFT JOIN LOCATION_METER LM ON P.METER_ID = LM.METER_ID
+		<where>
+			C.DELETED=0 AND LM.DELETED=0 AND P.DELETED=0 
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LM.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<if test="period!=null and period!=''">
+				AND P.PERIOD=#{period}
+			</if>
+			<if test="customerType!=null and customerType!=''">
+				AND C.CUSTOMER_TYPE=#{customerType}
+			</if>
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+		</where>
+		ORDER BY C.ID ASC
+	</select>
+	<!-- 查询预存客户 -->
+	<select id="getPrepaymentCustomerList" resultMap="BaseResultMap">
+		SELECT
+			DISTINCT C.*
+		FROM
+			CUSTOMERS C
+			LEFT JOIN LOCATION_CUSTOMER LC ON C.ID = LC.CUSTOMER_ID
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认） -->
+			C.DELETED=0
+			AND LC.DELETED=0
+			<!-- 是否预存客户：0=普通客户（默认值）；1=预存客户； -->
+			AND C.PREPAYMENT_CUSTOMER=1
+			<!-- 地理位置痕迹ID(ID-ID-ID-ID) -->
+			<if test="traceIds!=null and traceIds!=''">
+				AND LC.TRACE_IDS LIKE CONCAT(#{traceIds}, '%')
+			</if>
+			<!-- 客户类型 -->
+			<!-- <if test="customerType!=null">
+				AND C.CUSTOMER_TYPE = #{customerType}
+			</if> -->
+			<!-- 查询条件（匹配业主姓名和客户姓名） -->
+			<if test="searchCond!=null and searchCond!='' ">
+				AND (
+				C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+				OR c.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+				)
+			</if>
+			<!-- <if test="statusList!=null and statusList.size()>0">
+				AND C.STATUS IN
+				<foreach item="item" index="index" collection="statusList"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if> -->
+		</where>
+		ORDER BY C.ID DESC
+	</select>
+</mapper>

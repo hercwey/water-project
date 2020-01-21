@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>表计档案详细信息</title>
+
+</head>
+
+<body>
+
+	<th:block th:fragment="dialog">
+		<br>
+		<table class="table" id="meter-detail-table">
+			<tbody>
+				<tr>
+					<td>水表口径：</td>
+					<td th:text="${meter==null ? '' : meter.caliberValue}"></td>
+					<td>水表编号：</td>
+					<td th:text="${meter==null ? '' : meter.meterNo}"></td>
+				</tr>
+				<tr>
+					<td>水表厂家：</td>
+					<td th:text="${meter==null ? '' : meter.factoryValue}"></td>
+					<td>水表厂家电话：</td>
+					<td th:text="${meter==null ? '' : meter.factoryPhone}"></td>
+				</tr>
+				<tr>
+					<td>水表钢印号：</td>
+					<td th:text="${meter==null ? '' : meter.steelSealNo}"></td>
+					<td>水表检定证书编号：</td>
+					<td th:text="${meter==null ? '' : meter.certificateNo}"></td>
+				</tr>
+				<tr>
+					<td>水表检定日期：</td>
+					<td th:text="${meter==null ? '' : meter.checkDateStr}"></td>
+					<td>水表有效日期：</td>
+					<td th:text="${meter==null ? '' : meter.effectiveDateStr}"></td>
+				</tr>
+				<tr>
+					<td>轮换上限：</td>
+					<td th:text="${meter==null ? '' : meter.upperLimit}"></td>
+					<td>新表表底数：</td>
+					<td th:text="${meter==null ? '' : meter.newMeterBottom}"></td>
+				</tr>
+				<tr>
+					<td>水表用途：</td>
+					<td th:text="${meter==null ? '' : meter.meterUseValue}"></td>
+					<td>水表类型：</td>
+					<td th:text="${meter==null ? '' : meter.meterTypeValue}"></td>
+				</tr>
+				<tr>
+					<td>水表型号：</td>
+					<td th:text="${meter==null ? '' : meter.meterModelValue}"></td>
+					<td>备注：</td>
+					<td th:text="${meter==null ? '' : meter.remark}"></td>
+				</tr>
+				<tr>
+					<td>采集器地址：</td>
+					<td th:text="${meter==null ? '' : meter.collectorAddr}"></td>
+					<td>表地址</td>
+					<td th:text="${meter==null ? '' : meter.meterAddress}"></td>
+				</tr>
+				<tr>
+					<td>水表生命周期状态：</td>
+					<td th:text="${meter==null ? '' : meter.cycleStatusStr}"></td>
+					<td>描述：</td>
+					<td th:text="${meter==null ? '' : meter.description}"></td>
+				</tr>
+			</tbody>
+		</table>
+
+	</th:block>
+	
+</body>
+</html>

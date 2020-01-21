@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!-- 表计信息 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<table class="table table-sm table-bordered">
+				<thead>
+					<tr>
+						<th>
+							字段
+						</th>
+						<th>
+							值
+						</th>
+						<th>
+							字段
+						</th>
+						<th>
+							值
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							位置
+						</td>
+						<td>
+							<span th:text="${meter.place}"></span>
+						</td>
+						<td>
+							描述
+						</td>
+						<td>
+							<span th:text="${meter.description}"></span>
+						</td>
+					</tr>
+					<tr >
+						<td>
+							水表口径
+						</td>
+						<td>
+							<span th:text="${meter.caliber}"></span>
+						</td>
+						<td>
+							厂家
+						</td>
+						<td>
+							<span th:text="${meter.factory}"></span>
+						</td>
+					</tr>
+					<tr >
+						<td>
+							采集器地址
+						</td>
+						<td>
+							<span th:text="${meter.collectorAddr}"></span>
+						</td>
+						<td>
+							表计地址
+						</td>
+						<td>
+							<span th:text="${meter.meterAddress}"></span>
+						</td>
+					</tr>
+					<tr >
+						<td>
+							虚/实表
+						</td>
+						<td>
+							<span th:text="${meter.virtualReal}"></span>
+						</td>
+						<td>
+							表号
+						</td>
+						<td>
+							<span th:text="${meter.meterNo}"></span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							检定证书
+						</td>
+						<td>							
+							<span th:text="${meter.certificateNo}"></span>
+						</td>
+						<td>
+							钢印号
+						</td>
+						<td>							
+							<span th:text="${meter.steelSealNo}"></span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+ <link rel="stylesheet"	href="/css/commform.css" />
+<!-- <link rel="stylesheet"	href="/css/searchpanel.css" /> -->
+
+<style>
+
+/* 时间查询条件样式 */
+.extra-r li {
+	float: right;	
+	cursor: pointer;
+}
+
+/* placeholder color */
+/* chrome浏览器 */
+#search-cond::-webkit-input-placeholder{
+ color: lightblue; 
+}
+#search-cond:-moz-placeholder{
+color: lightblue;
+}
+#search-cond::-moz-placeholder{
+color: lightblue;
+}
+#search-cond:-ms-input-placeholder{
+color: lightblue;
+}
+
+</style>
+
+
+
+</head>
+<body>	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label location-meter-main">
+		<div class="col-md-12 column">
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block;width:100%;" id="seach-bind-meter-div">
+				<ul class="extra-r" style="list-style: none; ">
+					<!-- 查询按钮 -->
+					<!-- <li>
+						<button type="button" class="btn btn-success btn-sm btn-search"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						
+						<button type="button" class="btn btn-warning btn-sm btn-search-reset"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>					
+					</li>
+					面板:查询
+					<li>
+						<input type="text" class="form-control btn-sm search-cond" id="search-cond" placeholder="请输入厂家名称">
+					</li> -->
+					<li>
+						<div class="input-group input-group-sm">
+							<input type="text" class="form-control search-cond" id="search-cond"
+								placeholder="请输入厂家名称" style="display: inline-block;" />
+							<div class="input-group-append">
+								<button type="button"
+									class="btn btn-success input-group-text btn-search" id="btn-search"
+									title="查询" style="height: 100%; display: inline-block;">
+									<i class="fa fa-search" aria-hidden="true"></i>
+								</button>
+								<button type="button"
+									class="btn btn-success input-group-text btn-search-reset" id="btn-search-reset"
+									title="清除" style="height: 100%; display: inline-block;">
+									<i class="fa fa-times" aria-hidden="true"></i>
+								</button>								
+							</div>
+						</div>
+
+					</li>
+					
+				</ul>
+			</div>
+
+			<!-- <hr style="height:1px;border:none;border-top:1px solid blue;"> -->
+
+			<!-- 容器:字典列表 -->
+			<div class="meter-table table-container"></div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数-----------------
+		
+		/**	
+			公共查询函数			
+			查询类型列表
+			
+		*/
+		function searchLocationMeter(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/psmeter/mtable"
+			$(".meter-table").load(url, parms, null);
+		}
+		
+		/* function triggerResize(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		} */	
+		
+		/**
+			功能:
+				获取查询参数			
+			返回查询参数
+			参数结构如下:
+				{
+					locationId:"",  //tree node's id
+					traceIds:"",	// tree node traceIds 用于将Tree结构转换为线性结构
+					searchCond:""	//查询条件,表计编号等.
+				}
+				
+		*/
+		function getSearchLocationMeterParams(){
+			var parms = new Object();  //初始化请求参数
+			
+			//(1)获取LocationTree当前结点内容.
+			var selectedTreeNode = locationTree.getSelectedTreeNode(); 
+			if(selectedTreeNode!=null){
+				console.log("search treeNode id is:"+selectedTreeNode.id);
+				parms.locationId = selectedTreeNode.id;   	//tree node id
+				parms.traceIds = selectedTreeNode.traceIds;  //tree node traceId
+			}
+			//(2)读取输入框的查询条件
+			const SEARCH_COND="#seach-bind-meter-div #search-cond";
+			var searchCond = $(SEARCH_COND).val();			
+			parms.searchCond=searchCond;
+			
+			return parms;
+		}
+		
+		/* $('.meter-table .table tr').draggable({
+            helper: "clone",
+            start: function (event, ui) {
+                var old_left_data = JSON.stringify($('#tb_order_left').bootstrapTable("getData"));
+                var old_right_data = JSON.stringify($('#tb_order_right').bootstrapTable("getData"));
+                var odata = { index: ++i_statuindex, left_data: old_left_data, right_data: old_right_data };
+                arrdata.push(odata);
+            },
+            stop: function (event, ui) {
+            }
+        }); */
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认表计列表)
+		*/
+		function defaultSearchLocationMeter() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数:获取普通查询参数（不包括分页信息）
+			var parms = new Object();
+			parms = getSearchLocationMeterParams();
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			searchLocationMeter(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchLocationMeterClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			var parms = getSearchLocationMeterParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			searchLocationMeter(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadLocationMeterPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchLocationMeterParams();	//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchLocationMeter(parms);
+		}
+
+		/*
+			page load ready
+		*/
+		$(function() {
+			//------------init-------------
+			
+			//(1)加载默认表计列表
+			defaultSearchLocationMeter();  //主页:默认查询(加载默认列表)
+
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#seach-bind-meter-div #btn-search').on('click', function() {
+				btnSearchLocationMeterClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#seach-bind-meter-div #btn-search-reset').on('click', function() {
+				const COND_SELECTOR="#seach-bind-meter-div .search-cond";
+				//清除其中的内容并获得焦点
+				$(COND_SELECTOR).val("");
+				$(COND_SELECTOR).focus();  
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+				当按下回车按钮时查询.
+			*/
+			$('#seach-bind-meter-div .search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$(this).trigger("click");	                
+	            }	
+			});
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

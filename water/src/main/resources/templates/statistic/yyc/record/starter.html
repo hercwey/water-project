@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('拖欠水费用户登记表')" th:remove="tag"></div>
+<!-- 页面正在加载loading-->
+<script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>
+</head>
+<body>
+	<!-- 参数配置主页 -->
+	<!-- <div class="container-fluid"> -->
+	<div class="container-fluid">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<!-- 业务页面 -->
+				<div id="container">
+					<!-- content -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		$(function() {
+			/* 
+				加载用户框架页
+			*/
+			function loadList(parms, callback) {
+				var url = "/stat/yyc/record/main";
+				var callbackFunc = callback;
+				var containerId = "#container";
+				loadPage(containerId, url, parms, callbackFunc);
+			}
+			
+			/* 
+				加载框架页面 
+			*/
+			loadList(null, null);
+		})
+	</script>
+
+</body>
+</html>

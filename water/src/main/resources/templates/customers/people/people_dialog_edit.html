@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+
+<script type="text/javascript">
+
+
+</script>
+
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-people-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>编辑:客户-人口调整</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-people-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="people-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									<!-- 当前所编辑条目的客户ID -->
+									<input type="hidden" id="people-customer-id" name="customerId" th:value="${currItem==null ? '' : currItem.customerId}" />
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!--增加人数-->
+													<div class="form-group form-inline">
+														<label for="people-name" class="col-sm-4 control-label">增加人数</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																th:value="${currItem==null ? '' : currItem.addNum}" 
+																class="form-control" 
+																id="people-add-num" name="addNum" 
+																maxlength=5 title="请输入1-5" placeholder="增加人数"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>	
+												<td>
+													<!-- 起始日期 -->
+													<div class="form-group form-inline">
+														<label for="people-description" class="col-sm-4 control-label">起始日期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control input-sm Wdate"
+																id="people-start-time" name="startTime"		
+																th:value="${currItem==null ? '' : currItem.startTimeStr}"				
+																onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+																placeholder="起始日期" style="background-color: white;" title="立户时间">
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>											
+												<td>
+													<!-- 终止日期 -->
+													<div class="form-group form-inline">
+														<label for="customers-description" class="col-sm-4 control-label"> 终止日期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control input-sm Wdate"
+																id="people-end-time" name="endTime"		
+																th:value="${currItem==null ? '' : currItem.endTimeStr}"				
+																onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+																placeholder=" 终止日期" style="background-color: white;" title=" 终止日期">
+														</span>
+													</div>
+												</td>
+																								
+											</tr>
+											
+										</tbody>
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-people-modify-and-back">保存&返回</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiPeopleItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/customer-people/insert";
+			
+			var customersId= $("#people-id").val();
+			if(customersId!=null && customersId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/customer-people/update";
+			}
+			var form=new FormData($("#dialog-modi-people-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), */
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPeoplePage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closePeopleDialog();
+							}
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+	
+		/*
+			设置input背景色
+		*/
+		function setBackGround() {
+			$("#people-start_time").css("background-color", "white");
+		}
+		function setBackGround() {
+			$("#people-end_time").css("background-color", "white");
+		}
+		function setBackGround() {
+			$("#people-create_time").css("background-color", "white");
+		}
+		
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-people-modify-and-back').on('click',function() {
+				modiPeopleItem(true);				
+			});
+
+		});
+	</script>
+	
+	
+
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

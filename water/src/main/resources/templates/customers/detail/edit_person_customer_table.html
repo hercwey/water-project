@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+								
+	<!-- 表单内容 -->
+	<!-- form-inline -->
+										
+	<!-- 采用表格进行布局 -->
+	<!-- 配置费规则部分 -->
+	<table class="table ">
+		<tbody>
+			<tr>
+				<td>客户编号：</td>
+				<td th:text="${customer==null ? '' : customer.customerCode}"></td>
+				<td>立户时间：</td>
+				<td th:text="${customer==null ? '' : customer.settleTimeStr}"></td>
+			</tr>
+			<tr>
+				<td>客户名称：</td>
+				<td th:text="${customer==null ? '' : customer.customerName}"></td>
+				<td>客户电话：</td>
+				<td th:text="${customer==null ? '' : customer.customerTel}"></td>
+			</tr>
+			<tr>
+				<td>客户手机：</td>
+				<td th:text="${customer==null ? '' : customer.customerMobile}"></td>
+				<td>客户邮箱 ：</td>
+				<td th:text="${customer==null ? '' : customer.customerEmail}"></td>
+			</tr>
+			<tr>
+				<td>证件类型：</td>
+				<td th:text="${customer==null ? '身份证' : customer.idTypeStr}"></td>
+				<td>证件号码 ：</td>
+				<td th:text="${customer==null ? '' : customer.idNo}"></td>
+			</tr>
+			<tr>
+				<td>地址：</td>
+				<td th:text="${customer==null ? '身份证' : customer.address}"></td>
+				<td>门牌号 ：</td>
+				<td th:text="${customer==null ? '' : customer.room}"></td>
+			</tr>
+			<tr>
+				<td>水价分类 ：</td>
+				<td th:text="${customer==null ? '' : customer.waterUseValue}"></td>
+				<td>水价 ：</td>
+				<td th:text="${customer==null ? '' : customer.waterPriceName}"></td>
+			</tr>
+			<tr>
+				<td>政策减免 ：</td>
+				<td th:text="${customer==null ? '' : customer.discountName}"></td>
+				<td>用水状态 ：</td>
+				<td th:text="${customer==null ? '停水' : customer.waterStatusStr}"></td>
+			</tr>
+			<tr>
+				<td>批量代扣方式 ：</td>
+				<td th:text="${customer==null ? '其他' : customer.deductTypeStr}"></td>
+				<td>通知方式 ：</td>
+				<td th:text="${customer==null ? '微信' : customer.notifyModeStr}"></td>
+			</tr>
+			<tr>
+				<td>用水人数 ：</td>
+				<td th:text="${customer==null ? '' : customer.useNum}"></td>
+				<td>地理位置 ：</td>
+				<td th:text="${locationName}"></td>
+			</tr>
+			<tr>
+				<td>备注 ：</td>
+				<td th:text="${customer==null ? '' : customer.remark}"></td>
+				<td></td>
+				<td></td>
+			</tr>
+			
+		</tbody>
+	</table>
+																				
+	<!-- 选择地理位置页面 -->
+	<!-- <div th:include="customers/location_select" th:remove="tag"></div> -->
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		/* $.validator.setDefaults({//验证成功后，保存数据
+		    submitHandler: function() {
+		    	modiItem(true);
+		     	//alert("提交事件!");
+		    }
+		}); */
+		//------------------业务操作----------------------
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//initScroll();//初始化滚动条
+			//windowResize();
+			//$("html").getNiceScroll().resize();
+	        //$("html").getNiceScroll().onResize();
+			
+			//初始化表单验证
+			$("#edit-customer-tab-form").validate({//设置正则验证
+			    rules: {
+			        propEmail: {
+			          required: true,
+			          email: true
+			        },
+			      },
+			      messages: {
+			        propEmail: "请输入一个正确的邮箱",
+			      }
+			});
+			
+			
+			var G_JMSHYS = "JMSHYS";//用水性质是居民生活用水时,属于阶梯水价
+			
+			//如果用户选择的是居民用水性质,则不需要选择水价,执行的是阶梯水价
+			var waterUse = $("#customers-water-use").find("option:selected").val();
+			if(waterUse == G_JMSHYS){
+				$("#customers-price-code").attr("disable", true);
+			}
+			
+			/**
+			 * 	绑定用水性质的change事件，用于切换对就的价格
+			 */
+			$("#customers-water-use").on('change',function() {//用水性质下拉框改变事件
+				var url = BASE_CONTEXT_PATH + "/water-price/get-water-price";
+				var waterPriceList = null;
+				var waterUse = $("#customers-water-use").find("option:selected").val();
+				if(waterUse ==null || waterUse==""){
+					$("#customers-price-code").empty();
+					var html = "<option value='' data-price-type-code=''>-请选择-</option>";
+					$("#customers-price-code").append(html);
+					$("#customers-price-code").attr("disabled", true);
+				} else if(waterUse == G_JMSHYS){
+					$("#customers-price-code").attr("disabled", true);
+				} else {
+					$("#customers-price-code").attr("disabled", false);
+				}
+				var parms = new Object();
+				parms.waterUse = waterUse;
+				$.post(url, parms, function(res){
+				 	if(res != null && res != "") {
+				 		waterPriceList = res;
+				 		
+				 		$("#customers-price-code").empty();
+				 		var html = "";
+				 		if(waterUse == G_JMSHYS){
+				 			html += "<option value='' data-price-type-code=''>-阶梯水价-</option>";
+				 		}
+				 		$.each(waterPriceList, function(){
+				 			html += "<option value='"+this.priceCode+"'>"+this.ladderName+"</option>";
+				 		});
+				 		$("#customers-price-code").append(html);
+					} 
+				});
+			});
+			
+		});
+	</script>
+	
+	
+	</th:block>
+	
+</body>
+</html>

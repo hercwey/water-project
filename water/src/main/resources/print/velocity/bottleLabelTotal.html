@@ -1,0 +1,71 @@
+<html> 
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>
+<style type="text/css" mce_bogus="1">
+@page{
+	size:70mm 90mm;
+	margin:0px;
+}
+.mybodySt{font-family: SimSun; font-size: 11px; padding:10px 5px;margin:0px;}
+.myheadSt,.mycontentSt,.myTheadSt{width:100%;}
+.mytableSt{width:100%;table-layout:fixed;word-break:break-strict;}
+.mytableSt tr{width:100%;height:20px;line-height:20px;font-size: 12px;}
+.mytableSt td{text-align:center;}
+.myfootSt{margin-top:2px;width:100%;height:25px;line-height:25px;text-align:center;}
+.foot_item{float:left;text-align:left;width:33%;font-size:13px;}
+.bdLeft{border-left:1px solid #000000;border-bottom:1px solid #000000;}
+.bdRight{border-right:1px solid #000000;border-bottom:1px solid #000000;}
+.bdBottom{border-bottom:1px solid #000000;}
+.myheadtwooo{width:350px;border:1px solid;margin: 10px auto;padding: 10px;min-height:320px;}
+</style>
+</head>
+<body class="mybodySt">
+<div class="myheadtwo">
+	<div class="myheadSt">
+		<div style="width:100%;height:16px;line-height:16px;font-size:14px;text-align:center;">PIVAS
+		#if($isPack)
+			#if($isPack=='1')
+				打包
+			#else
+				配置
+			#end
+		#end
+		药品汇总单</div>
+		<div style="width:100%;height:14px;line-height:14px;font-size:12px;text-align:center;">$sysDate</div>
+		<div style="width:100%;height:25px;line-height:25px;font-size:22px;text-align:center;">$wardName</div>
+	</div>
+	
+	<div class="mycontentSt">
+		<table class="mytableSt" border="0" cellpadding="0" cellspacing="0">
+			<thead class="myTheadSt">
+				<tr>
+					<td class="bdBottom" style="width:10%">货位</td>
+					<td class="bdBottom" style="width:68%">药品名称[规格]</td>
+					<td class="bdBottom" style="width:12%">数量</td>
+					<td class="bdBottom" style="width:10%">单位</td>
+				</tr>
+			</thead>
+			#foreach($element in $medicamentList)
+				<tr> 
+					<td class="bdLeft">#if(${element.shelfNo})${element.shelfNo}#end</td>
+					<td class="bdBottom" style="text-align:left">#if(${element.drugAliasName})${element.drugAliasName}#end[#if(${element.specifications})${element.specifications}#end]</td>
+					<td class="bdBottom">#if(${element.quantity})${element.quantity}#end</td>
+					<td class="bdRight">#if(${element.packingUnit})${element.packingUnit}#end</td>
+				</tr>
+			#end
+		</table>
+	
+	</div>
+	#if($footIsShow)
+		<div class="myfootSt">
+			<div style="width:98%;margin:0 auto;">
+				<div class="foot_item">排药：</div>
+				<div class="foot_item">核对：</div>
+				<div class="foot_item">签收：</div>
+			</div>
+		</div>
+	#end
+</div>
+</body>
+</html>

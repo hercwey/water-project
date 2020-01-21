@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.UserMeterBookMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.UserMeterBook">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="USER_ID" jdbcType="DECIMAL" property="userId" />
+    <result column="METER_BOOK_ID" jdbcType="DECIMAL" property="meterBookId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, USER_ID, METER_BOOK_ID
+  </sql>
+  
+  <delete id="deleteByMeterBookIdList">
+  	delete from USER_METER_BOOK where meter_book_id in
+	<foreach close=")" collection="meterBookIdList" index="index" item="item" open="(" separator=",">  
+		 #{item}
+	　　</foreach>
+	AND USER_ID=#{readerId}
+  </delete>
+  
+</mapper>

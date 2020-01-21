@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+
+<script type="text/javascript">
+</script>
+
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-customer-message-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-lg">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>详情：表计信息</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="dialog-modi-bank-form">
+									
+									<!-- 当前所编辑条目的ID -->
+									<input type="hidden" id="customer-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table ">
+									<tbody>
+										<tr>
+											<td>
+												<!-- 地理位置 -->
+												<div class="form-group form-inline">
+													<label for="meters-description" class="col-sm-4 control-label">地理位置</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="hidden" id="prev-location-id" name="prevLocationId" th:value="${location==null ? '' : location.id}" placeholder="原来绑定的地理位置ID" />
+														<input type="hidden" id="select-location-id" name="locationId" th:value="${location==null ? '' : location.id}" placeholder="当前选择的地理位置ID" />
+														<input type="hidden" id="location-traceids" name="traceIds" value="" placeholder="保存地理位置traceIds">
+														<input type="text" onclick="showHideLocationTree.show(&apos;select-location-name&apos;); return false;" id="select-location-name" class="form-control select-ztree-btn" readonly 
+															th:value="${place==null ? '' : place}" placeholder="请选择地理位置" title="请选择地理位置"   required/>
+													</span>
+												</div>	
+											</td>														
+											<td>
+												<!-- 客户编号 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">客户编号</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control"
+															th:value="${currItem==null ? '' : currItem.customerCode}"
+															id="customers-customer_mode" name="customerCode" 
+															maxlength=20 title="请输入1-20个字符" placeholder="客户编号" required="required" />
+													</span>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- 客户类型-->
+												<div class="form-group form-inline">
+													<label for="user-sex" class="col-sm-4 control-label">客户类型</label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control " id="customers-customer_type" name="customerType" th:value="${currItem==null ? 1 : currItem.customerType}"  required>
+															<!-- 默认选择第一个 -->
+															<option value="1" th:attr="selected=( ${currItem!=null && currItem.customerType==1} )? 'selcted' ">个人</option>
+															<option value="2" th:attr="selected=( ${currItem!=null && currItem.customerType==2} )? 'selcted' ">单位</option>
+															<option value="3" th:attr="selected=( ${currItem!=null && currItem.customerType==3} )? 'selcted' ">水司</option>												
+														</select>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 立户时间-->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">立户时间</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control  input-sm Wdate"
+															id="customers-settle_time" name="settleTime"		
+															th:value="${currItem==null ? '' : currItem.settleTimeStr}"				
+															onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+															placeholder="立户时间" style="background-color: white;" title="请选择立户时间"  required/>
+													</span>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!--业主名称-->
+												<div class="form-group form-inline">
+													<label for="customers-name" class="col-sm-4 control-label">业主名称</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text"
+															th:value="${currItem==null ? '' : currItem.propName}" 
+															class="form-control " 
+															id="customers-prop_name" name="propName" 
+															maxlength=10 title="请输入1-10个字符" placeholder="业主名称"  required/>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 业主电话 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">业主电话</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control "
+															th:value="${currItem==null ? '' : currItem.propTel}" 
+															id="customers-prop_tel" name="propTel" 
+															maxlength=15 title="请输入1-15个字符" placeholder="业主电话" required/>
+													</span>
+												</div>
+											</td>
+										</tr>
+										
+										<tr>
+											<td>
+												<!-- 业主手机 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">业主手机 </label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control "
+																th:value="${currItem==null ? '' : currItem.propMobile}" 
+																id="customers-prop_mobile" name="propMobile" 
+																maxlength=15 title="请输入1-15位字符" placeholder="业主手机" required/>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 业主邮箱 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">业主邮箱 </label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control  "
+																th:value="${currItem==null ? '' : currItem.propEmail}" 
+																id="customers-prop_email" name="propEmail" 
+																maxlength=30 title="请输入1-30个字符" placeholder="业主邮箱" required/>
+													</span>
+												</div>          
+												</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- 客户名称 -->
+												<div class="form-group form-inline">
+													<label for="customers-name" class="col-sm-4 control-label">客户名称</label> 
+													<span class="input-group-sm col-sm-8"> 
+														<input type="text"
+															class="form-control  "
+															th:value="${currItem==null ? '' : currItem.customerName}"
+															id="customers-customer-name" name="customerName"
+															maxlength=10 title="请输入1-10个字符" placeholder="客户名称" />
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 客户电话 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">客户电话</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control"
+															th:value="${currItem==null ? '' : currItem.customerTel}" 
+															id="customers-customer_tel" name="customerTel" 
+															maxlength=15 title="请输入1-15个字符" placeholder="客户电话"/>
+													</span>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- 客户手机 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">客户手机</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control"
+															th:value="${currItem==null ? '' : currItem.customerMobile}" 
+															id="customers-customer_mobile" name="customerMobile" 
+															maxlength=15 title="请输入1-15个字符" placeholder="客户手机"/>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 客户邮箱 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">客户邮箱</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control "
+															th:value="${currItem==null ? '' : currItem.customerEmail}" 
+															id="customers-customer_email" name="customerEmail" 
+															maxlength=25 title="请输入1-25个字符" placeholder="客户邮箱"/>
+													</span>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- 证件类型-->
+												<div class="form-group form-inline">
+													<label for="user-sex" class="col-sm-4 control-label">证件类型</label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control " id="customers-id_type" name="idType" th:value="${currItem==null ? 1 : currItem.idType}" required>
+															<!-- 默认选择第一个 -->
+															<option value="1" th:attr="selected=( ${currItem!=null && currItem.idType==1} )? 'selcted' ">身份证</option>
+															<option value="2" th:attr="selected=( ${currItem!=null && currItem.idType==2} )? 'selcted' ">驾驶证</option>												
+														</select>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 证件号码 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">证件号码</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control"
+															th:value="${currItem==null ? '' : currItem.idNo}" 
+															id="customers-id-no" name="idNo" 
+															maxlength=20 title="请输入1-20个字符" placeholder="证件号码" required/>
+													</span>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- 地址 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">地址</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control  "
+															th:value="${currItem==null ? '' : currItem.address}" 
+															id="customers-address" name="address" 
+															maxlength=50 title="请输入1-50个字符" placeholder="地址" required/>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 门牌号 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">门牌号</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="text" class="form-control"
+															th:value="${currItem==null ? '' : currItem.room}" 
+															id="customers-room" name="room" 
+															maxlength=30 title="请输入1-30个字符" placeholder="门牌号"/>
+													</span>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- 政策减免-->
+												<div class="form-group form-inline">
+													<label for="user-sex" class="col-sm-4 control-label">政策减免</label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control " id="customers-discount_type" name="discountType" th:value="${currItem==null ? '' : currItem.discountType}">
+															<!-- 默认选择第一个 -->
+															<option value="0">-请选择-</option>
+															<span th:each="item,iterStat: ${discountList}" th:remove="tag">
+																<option th:value="${item.id}"  th:attr="selected=${currItem!=null && item.id==currItem.discountType ? 'true':'false'}"
+																		th:text="${item.name}">数据字典的值</option>
+															</span>
+															
+														</select>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 是否合并收费，0=否；1=是； -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">是否合并收费 </label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control  " id="customers-charge-mode" name="chargeMode" th:value="${currItem==null ? 0 : currItem.chargeMode}" required>
+															<!-- 默认选择第一个 -->
+															<option value="0" th:attr="selected=( ${currItem!=null && currItem.chargeMode==0} )? 'selcted' ">是</option>
+															<option value="1" th:attr="selected=( ${currItem!=null && currItem.chargeMode==1} )? 'selcted' ">否</option>												
+														</select>
+													</span>
+												</div>
+											</td>
+											
+										</tr>
+										<tr>
+											<td>
+												<!-- 扣费方式-->
+												<div class="form-group form-inline">
+													<label for="user-sex" class="col-sm-4 control-label">扣费方式</label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control "  id="customers-deduct-type" name="deductType" th:value="${currItem==null ? 1 : currItem.deductType}" required>
+															<!-- 默认选择第一个 -->
+															<option value="1" th:attr="selected=( ${currItem!=null && currItem.deductType==1} )? 'selcted' ">其他</option>
+															<option value="2" th:attr="selected=( ${currItem!=null && currItem.deductType==2} )? 'selcted' ">建行自动扣费</option>
+															<option value="3" th:attr="selected=( ${currItem!=null && currItem.deductType==3} )? 'selcted' ">民行自动扣费</option>												
+														</select>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 通知方式，0:全闭;1:微信打开,短信关闭2:短信打开,微信关闭3:全开 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">通知方式</label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control  " id="customers-notify_mode" name="notifyMode" th:value="${currItem==null ? 1 : currItem.notifyMode}" required>
+															<!-- 默认选择第一个 -->
+															<option value="0" th:attr="selected=( ${currItem!=null && currItem.notifyMode==0} )? 'selcted' ">全闭</option>
+															<option value="1" th:attr="selected=( ${currItem!=null && currItem.notifyMode==1} )? 'selcted' ">微信</option>
+															<option value="2" th:attr="selected=( ${currItem!=null && currItem.notifyMode==2} )? 'selcted' ">短信</option>
+															<option value="3" th:attr="selected=( ${currItem!=null && currItem.notifyMode==3} )? 'selcted' ">全开</option>
+															<!-- <option value="3" th:attr="selected=( ${currItem!=null && currItem.notifyMode==3} )? 'selcted' ">电子邮件</option> -->												
+														</select>
+													</span>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- 行业性质 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">行业性质</label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control " id="customers-industry" name="industry" th:value="${currItem==null ? '' : currItem.industry}" required>
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${tradeTypeList}" th:remove="tag">
+																<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.industry ? 'true':'false'}"
+																		th:text="${item.value}">数据字典的值</option>
+															</span>
+														</select>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 用水状态-->
+												<div class="form-group form-inline">
+													<label for="user-sex" class="col-sm-4 control-label">用水状态</label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control  " id="customers-water_status" name="waterStatus" th:value="${currItem==null ? 1 : currItem.waterStatus}" required>
+															<!-- 默认选择第一个 -->
+															<option value="0" th:attr="selected=( ${currItem!=null && currItem.waterStatus==0} )? 'selcted' ">正常</option>
+															<option value="1" th:attr="selected=( ${currItem!=null && currItem.waterStatus==1} )? 'selcted' ">停水</option>												
+														</select>
+													</span>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- 是否分水量，0=否；1=是； -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">是否分水量 </label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control  " id="customers-is-part-water" name="isPartWater" th:value="${currItem==null ? 0 : currItem.isPartWater}" required>
+															<!-- 默认选择第一个 -->
+															<option value="0" th:attr="selected=( ${currItem!=null && currItem.isPartWater==0} )? 'selcted' ">否</option>
+															<option value="1" th:attr="selected=( ${currItem!=null && currItem.isPartWater==1} )? 'selcted' ">是</option>												
+														</select>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 用水人数 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">用水人数 </label>
+													<span class="input-group-sm col-sm-8">
+														<input type="number" class="form-control  "
+															th:value="${currItem==null ? '3' : currItem.useNum}" 
+															id="customers-use_num" name="useNum" 
+															maxlength=2 title="请输入1-10个人数" placeholder="用水人数" required/>
+													</span>
+												</div>
+											</td>
+										</tr>
+										
+										<tr>
+											<td>
+												<!-- 用水性质 -->
+												<div class="form-group form-inline">
+													<label for="customers-description" class="col-sm-4 control-label">用水性质</label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control" id="customers-water-use" name="waterUse" th:value="${currItem==null ? '' : currItem.waterUse}" required>
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${priceTypeMapList}" th:remove="tag">
+																<option th:value="${item.PRICE_TYPE_CODE}"  th:attr="selected=${currItem!=null && item.PRICE_TYPE_CODE==currItem.waterUse ? 'true':'false'}"
+																		th:text="${item.PRICE_TYPE_NAME}">数据字典的值</option>
+															</span>
+															
+														</select>
+													</span>
+												</div>
+											</td>
+											<td>
+												<!-- 水价 -->
+												<div class="form-group form-inline">
+													<label for="" class="col-sm-4 control-label">水价</label>
+													<span class="input-group-sm col-sm-8">
+														<select class="form-control" id="meter-price-code" name="priceCode" th:value="${currItem==null ? '' : currItem.priceCode}" >
+															<!-- 默认选择第一个 -->
+															<option value="" >-请选择-</option>
+															<span th:each="item,iterStat: ${waterPriceList}" th:remove="tag">
+																<option th:value="${item.priceCode}"  th:attr="selected=${currItem!=null && item.priceCode==currItem.priceCode ? 'true':'false'}"
+																		th:text="${item.ladderName}">数据字典的值</option>
+															</span>
+														</select>
+													</span>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm"	data-dismiss="modal">关闭</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+		});
+	</script>
+	
+	
+
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

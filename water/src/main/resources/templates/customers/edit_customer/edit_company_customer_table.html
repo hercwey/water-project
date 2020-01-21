@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+								
+		<!-- 表单内容 -->
+		<!-- form-inline -->
+
+		<!-- 收费方式，0：合并收费(默认值)，1单独收费；针对一表多户 -->
+		<input type="hidden" id="customers-charge-mode" name="chargeMode" value="1" >
+											
+		<!-- 采用表格进行布局 -->
+		<table class="table-layout table ">
+			<tbody>
+				<tr>
+					<!-- <td>
+						客户编号
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">客户编号&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control"
+									th:value="${currItem==null ? '' : currItem.customerCode}"
+									id="customers-customer_mode" name="customerCode" 
+									maxlength=20 title="请输入1-20个字符" placeholder="客户编号" required />
+							</span>
+						</div>
+					</td> -->
+					<td>
+						<!-- 分组 -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">片区分组</label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control" id="location-code" name="" th:value="${locationBlockCode==null ? '' : locationBlockCode}" required>
+									<!-- 默认选择第一个 -->
+									<option value="">-请选择-</option>
+									<span th:each="item,iterStat: ${locationBlockList}" th:remove="tag">
+										<option th:value="${item.code}"th:attr="selected=${locationBlockCode!=null && item.code==locationBlockCode ? 'true':'false'}" th:text="${item.name}">地理位置-小区</option>
+									</span>
+								</select>
+							</span>
+						</div>
+					</td>
+					<td>
+						<!-- 立户时间-->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">立户时间</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control  input-sm Wdate"
+									id="customers-settle_time" name="settleTime"		
+									th:value="${currItem==null ? '' : currItem.settleTimeStr}"				
+									onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked: setBackGround});"
+									placeholder="立户时间" style="background-color: white;" title="请选择立户时间"  />
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<!-- 单位名称 -->
+						<div class="form-group form-inline">
+							<label for="customers-name" class="col-sm-4 control-label">单位名称&nbsp<i style="color: red">*</i></label> 
+							<span class="input-group-sm col-sm-8"> 
+								<input type="text"
+									class="form-control  "
+									th:value="${currItem==null ? '' : currItem.customerName}"
+									id="customers-customer-name" name="customerName"
+									maxlength=50 title="请输入1-50个字符" placeholder="单位名称" required/>
+							</span>
+						</div>
+					</td>
+					<td>
+						<!-- 单位电话 -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">单位电话</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control"
+									th:value="${currItem==null ? '' : currItem.customerTel}" 
+									id="customers-customer_tel" name="customerTel" 
+									maxlength=15 title="请输入1-15个字符" placeholder="单位电话"/>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<!-- 联系人手机 -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">联系人手机&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control"
+									th:value="${currItem==null ? '' : currItem.customerMobile}" 
+									id="customers-customer_mobile" name="customerMobile" 
+									maxlength=15 title="请输入1-15个字符" placeholder="联系人手机" required/>
+							</span>
+						</div>
+					</td>
+					<td>
+						<!-- 邮箱 -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">邮箱</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control "
+									th:value="${currItem==null ? '' : currItem.customerEmail}" 
+									id="customers-customer_email" name="customerEmail" 
+									maxlength=25 title="请输入1-25个字符" placeholder="邮箱"/>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<!-- 地址 -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">地址</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control  "
+									th:value="${currItem==null ? '' : currItem.address}" 
+									id="customers-address" name="address" 
+									maxlength=50 title="请输入1-50个字符" placeholder="地址" />
+							</span>
+						</div>
+					</td>
+					<td>
+						<!-- 行业性质 -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">行业性质&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control " id="customers-industry" name="industry" th:value="${currItem==null ? '' : currItem.industry}" required>
+									<!-- 默认选择第一个 -->
+									<option value="" >-请选择-</option>
+									<span th:each="item,iterStat: ${tradeTypeList}" th:remove="tag">
+										<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.industry ? 'true':'false'}"
+												th:text="${item.value}">数据字典的值</option>
+									</span>
+								</select>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<!-- 水价分类 -->
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label">水价分类&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control" id="customers-water-use" name="waterUse" th:value="${currItem==null ? '' : currItem.waterUse}" required>
+									<!-- 默认选择第一个 -->
+									<option value="" >-请选择-</option>
+									<span th:each="item,iterStat: ${priceTypeMapList}" th:remove="tag">
+										<option th:value="${item.PRICE_TYPE_CODE}"  th:attr="selected=${currItem!=null && item.PRICE_TYPE_CODE==currItem.waterUse ? 'true':'false'}, data-price-type-code=${item.PRICE_TYPE_CODE}"
+												th:text="${item.PRICE_TYPE_NAME}">数据字典的值</option>
+									</span>
+								</select>
+							</span>
+						</div>
+					</td>
+					<td>
+						<!-- 水价 -->
+						<div class="form-group form-inline">
+							<label for="" class="col-sm-4 control-label">水价&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control" id="customers-price-code" name="priceCode" th:value="${currItem==null ? '' : currItem.priceCode}">
+									<!-- 默认选择第一个 -->
+									<option value="" >-请选择-</option>
+									<span th:each="item,iterStat: ${waterPriceList}" th:remove="tag">
+										<option th:value="${item.priceCode}"  th:attr="selected=${currItem!=null && item.priceCode==currItem.priceCode ? 'true':'false'}"
+												th:text="${item.ladderName}">数据字典的值</option>
+									</span>
+								</select>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<!-- <tr>
+					<td>
+						价格分类
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">价格分类&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control" id="customers-water_use" name="waterUse" th:value="${currItem==null ? '' : currItem.waterUse}" required>
+									默认选择第一个
+									<option value="" >-请选择-</option>
+									<span th:each="item,iterStat: ${priceTypeMapList}" th:remove="tag">
+										<option th:value="${item.PRICE_TYPE_CODE}"  th:attr="selected=${currItem!=null && item.PRICE_TYPE_CODE==currItem.waterUse ? 'true':'false'}"
+												th:text="${item.PRICE_TYPE_NAME}">数据字典的值</option>
+									</span>
+									
+								</select>
+							</span>
+						</div>
+					</td>
+					<td>
+						价格
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">价格&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control" id="customers-water_use" name="waterUse" th:value="${currItem==null ? '' : currItem.waterUse}" required>
+									默认选择第一个
+									<option value="" >-请选择-</option>
+									<span th:each="item,iterStat: ${priceTypeMapList}" th:remove="tag">
+										<option th:value="${item.PRICE_TYPE_CODE}"  th:attr="selected=${currItem!=null && item.PRICE_TYPE_CODE==currItem.waterUse ? 'true':'false'}"
+												th:text="${item.PRICE_TYPE_NAME}">数据字典的值</option>
+									</span>
+									
+								</select>
+							</span>
+						</div>
+					</td>
+				</tr> -->
+				<tr>
+					<td>
+						<!-- 批量代扣方式-->
+						<div class="form-group form-inline">
+							<label for="user-sex" class="col-sm-4 control-label">代扣方式</label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control "  id="customers-deduct-type" name="deductType" th:value="${currItem==null ? 1 : currItem.deductType}" required>
+									<!-- 默认选择第一个 -->
+									<option value="1" th:attr="selected=( ${currItem!=null && currItem.deductType==1} )? 'selcted' ">其他</option>
+									<option value="2" th:attr="selected=( ${currItem!=null && currItem.deductType==2} )? 'selcted' ">建行自动扣费</option>
+									<option value="3" th:attr="selected=( ${currItem!=null && currItem.deductType==3} )? 'selcted' ">民行自动扣费</option>
+									<option value="4" th:attr="selected=( ${currItem!=null && currItem.deductType==4} )? 'selcted' ">无卡用户扣预存水费</option>												
+								</select>
+							</span>
+						</div>
+					</td>
+					<td>
+						<!-- 通知方式，0:全闭;1:微信打开,短信关闭2:短信打开,微信关闭3:全开 -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">通知方式</label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control  " id="customers-notify_mode" name="notifyMode" th:value="${currItem==null ? 1 : currItem.notifyMode}" required>
+									<!-- 默认选择第一个 -->
+									<option value="3" th:attr="selected=( ${currItem!=null && currItem.notifyMode==3} )? 'selcted' ">全开</option>
+									<option value="1" th:attr="selected=( ${currItem!=null && currItem.notifyMode==1} )? 'selcted' ">微信</option>
+									<option value="2" th:attr="selected=( ${currItem!=null && currItem.notifyMode==2} )? 'selcted' ">短信</option>
+									<option value="0" th:attr="selected=( ${currItem!=null && currItem.notifyMode==0} )? 'selcted' ">全闭</option>
+									<!-- <option value="3" th:attr="selected=( ${currItem!=null && currItem.notifyMode==3} )? 'selcted' ">电子邮件</option> -->												
+								</select>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<!-- 是否分水量，0=否；1=是； -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">是否分水量</label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control  " id="customers-is-part-water" name="isPartWater" th:value="${currItem==null ? 0 : currItem.isPartWater}">
+									<!-- 默认选择第一个 -->
+									<option value="0" th:attr="selected=( ${currItem!=null && currItem.isPartWater==0} )? 'selcted' ">否</option>
+									<option value="1" th:attr="selected=( ${currItem!=null && currItem.isPartWater==1} )? 'selcted' ">是</option>												
+								</select>
+							</span>
+						</div>
+					</td>
+					<td>
+						<!-- 用水状态-->
+						<div class="form-group form-inline">
+							<label for="user-sex" class="col-sm-4 control-label">用水状态</label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control  " id="customers-water_status" name="waterStatus" th:value="${currItem==null ? 1 : currItem.waterStatus}">
+									<!-- 默认选择第一个 -->
+									<option value="0" th:attr="selected=( ${currItem!=null && currItem.waterStatus==0} )? 'selcted' ">正常</option>
+									<option value="1" th:attr="selected=( ${currItem!=null && currItem.waterStatus==1} )? 'selcted' ">停水</option>												
+								</select>
+							</span>
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<!-- 是否为预存客户 -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">是否预存&nbsp<i style="color: red">*</i></label>
+							<span class="input-group-sm col-sm-8">
+								<select class="form-control  " id="customers-prepayment-customer" name="prepaymentCustomer" th:value="${currItem==null ? 0 : currItem.prepaymentCustomer}" required>
+									<!-- 默认选择第一个 -->
+									<option value="0" th:attr="selected=( ${currItem!=null && currItem.prepaymentCustomer==0} )? 'selcted' ">否</option>
+									<option value="1" th:attr="selected=( ${currItem!=null && currItem.prepaymentCustomer==1} )? 'selcted' ">是</option>
+								</select>
+							</span>
+						</div>
+					</td>
+					<td>
+						<!-- 备注 -->
+						<div class="form-group form-inline">
+							<label for="customers-description" class="col-sm-4 control-label">备注</label>
+							<span class="input-group-sm col-sm-8">
+								<input type="text" class="form-control  "
+									th:value="${currItem==null ? '' : currItem.remark}" 
+									id="customers-remark" name="remark" 
+									maxlength=50 title="请输入备注信息" placeholder="备注" />
+							</span>
+						</div>
+					</td>
+				<td>
+					<!-- 门牌号 -->
+					<!-- <div class="form-group form-inline">
+						<label for="customers-description" class="col-sm-4 control-label">门牌号</label>
+						<span class="input-group-sm col-sm-8">
+							<input type="text" class="form-control"
+								th:value="${currItem==null ? '' : currItem.room}" 
+								id="customers-room" name="room" 
+								maxlength=30 title="请输入1-30个字符" placeholder="门牌号"/>
+						</span>
+					</div> -->
+				</td>
+			</tr>
+				
+			</tbody>
+		</table>
+																					
+	<!-- 选择地理位置页面 -->
+	<!-- <div th:include="customers/location_select" th:remove="tag"></div> -->
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		/* $.validator.setDefaults({//验证成功后，保存数据
+		    submitHandler: function() {
+		    	//modiItem(true);
+		     	alert("提交事件!");
+		    }
+		}); */
+		//------------------业务操作----------------------
+		
+		//--------------------page loaded ready-----------------------
+		$(function() {
+			
+			//initScroll();//初始化滚动条
+			windowResize();
+			
+			//初始化表单验证
+			$("#edit-customer-tab-form").validate({//设置正则验证
+			    rules: {
+			        propEmail: {
+			          required: true,
+			          email: true
+			        },
+			      },
+			      messages: {
+			        propEmail: "请输入一个正确的邮箱",
+			      }
+			});
+			
+			
+			var G_JMSHYS = "JMSHYS";//用水性质是居民生活用水时,属于阶梯水价
+			
+			//如果用户选择的是居民用水性质,则不需要选择水价,执行的是阶梯水价
+			var waterUse = $("#customers-water-use").find("option:selected").val();
+			if(waterUse == G_JMSHYS){
+				$("#customers-price-code").attr("disable", true);
+			}
+			
+			/**
+			 * 	绑定用水性质的change事件，用于切换对就的价格
+			 */
+			$("#customers-water-use").on('change',function() {//用水性质下拉框改变事件
+				
+				var waterPriceList = null;
+				var waterUse = $("#customers-water-use").find("option:selected").val();
+				
+				if(waterUse ==null || waterUse==""){
+					$("#customers-price-code").empty();
+					var html = "<option value='' data-price-type-code=''>-请选择-</option>";
+					$("#customers-price-code").append(html);
+					$("#customers-price-code").attr("disabled", true);
+				} else if(waterUse == G_JMSHYS){
+					$("#customers-price-code").attr("disabled", true);
+				} else {
+					$("#customers-price-code").attr("disabled", false);
+				}
+				
+				var url = BASE_CONTEXT_PATH + "/water-price/get-water-price";
+				var parms = new Object();
+				parms.waterUse = waterUse;
+				$.post(url, parms, function(res){
+				 	if(res != null && res != "") {
+				 		waterPriceList = res;
+				 		
+				 		$("#customers-price-code").empty();
+				 		var html = "";
+				 		if(waterUse == G_JMSHYS){
+				 			html += "<option value='' data-price-type-code=''>-阶梯水价-</option>";
+				 		}
+				 		$.each(waterPriceList, function(){
+				 			html += "<option value='"+this.priceCode+"'>"+this.ladderName+"</option>";
+				 		});
+				 		$("#customers-price-code").append(html);
+					} 
+				});
+			});
+			//---------------click event process binding---------------
+			
+		});
+	</script>
+	
+	
+	</th:block>
+	
+</body>
+</html>

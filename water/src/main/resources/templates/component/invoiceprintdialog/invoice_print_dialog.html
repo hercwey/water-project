@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发票打印对话框-组件UI部分</title>
+</head>
+<body>
+	<th:block th:fragment="dialog(dialogId)">
+	<div class="modal fade print-dialog" th:id="${dialogId}" role="dialog"	aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document" >
+			<div class="modal-content">
+				<!-- 对话框头 -->
+				<div class="modal-header" style="background-color:darkcyan;height:30px;padding-top:0px;padding-bottom:0px;">
+					<!-- <h5 class="modal-title">Modal title</h5> -->
+					<span style="height:30px; line-height:30px;padding:0px;margin:0px;color:white;">
+						<i class="fa fa-print" aria-hidden="true" style="color:lightblue;"></i>
+						<span class="dialog-title">Modal title</span>
+					</span>
+					<!-- <button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">×</span>
+					</button> -->
+				</div>
+				
+				<style>
+					.print-dialog ul{
+						list-style-type:none;
+						padding-left:0px;
+						margin-left:20px;
+						margin-right:20px;		
+         				
+					}
+					.print-dialog ul li{						
+						margin-bottom:5px;
+						text-align:left;
+					}
+				</style>
+				<!-- 对话框主体 -->
+				<div class="modal-body" style="font-size:14px;">
+					<br/>							
+					<ul>
+						
+						<li >
+							<span>默认打印机:</span>
+							<span>采用开票软件设置的默认打印机.</span>
+						</li>
+						<li >
+							<strong><span style="font-size:14px;">请确认(1)打印机已经打开(2)已经安装发票卷(3)核对发票号码</span></strong>	
+							<span>核对以上完毕后,请按【打印】按钮开始打印.</span>						
+						</li>																
+						<li style="text-align:center;">
+							<span>向下调整:</span>
+							<span><input type="number" class="top-offset" style="width:80px;"   οninput="value=value.replace(/[^\d]/g,'')"></span>
+							<span>毫米</span>
+						</li>
+						<li style="text-align:center">
+							<span>向右调整:</span>
+							<span><input type="number" class="left-offset" style="width:80px;" οninput="value=value.replace(/[^\d]/g,'')"></span>
+							<span>毫米</span>
+						</li>
+						<li>
+							<hr>
+						</li>	
+						<li style="text-align:center">
+							<span>每页暂停:</span>
+							<span><input type="checkbox" class="pause-page" style="width:110px;"></span>							
+						</li>
+						<li>
+							<hr>
+						</li>	
+						<li style="text-align:center;">
+							<span class="print-message">当前页：1/2</span>
+							<!-- <span style="margin-left:10px;">发票号码:</span>
+							<strong><span>12345678</span></strong> -->
+							
+						</li>					
+					</ul>					
+					
+				</div>
+				<!-- 对话框底部按钮 -->
+				<div class="modal-footer" style="display:inline-block;">
+					<!-- <button type="button" class="btn btn-sm btn-primary  button-preview" >预览</button> -->
+					<button type="button" class="btn  btn-default  button-print-no"	 data-dismiss="modal" style="float:left;">不打印</button>
+					<button type="button" class="btn  btn-primary  button-print-continue" style="float:right;">继续打印</button>
+					<button type="button" class="btn  btn-primary  button-print-yes" style="float:right;">开始打印</button>
+					<button type="button" class="btn  btn-primary  button-print-close"  data-dismiss="modal"   style="float:right;">打印完毕</button>					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end of dialog -->
+	</th:block>
+</body>
+</html>

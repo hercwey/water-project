@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>地理位置</title>
+<style type="text/css">
+	ul.ztree {margin-top: 10px;border: 1px solid #617775;background: #f0f6e4;width:100%;height:360px;overflow-y:scroll;overflow-x:auto;}
+</style>
+</head>
+<body>
+
+	<!-- 编辑地理位置对话框 -->
+	<div class="container" id="location-edit-dialog"></div>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label">
+		<div>
+			
+		</div>
+		<div class="col-md-12 column">
+			<!-- 查询面板 -->
+			<div class="row" id="search-div">
+				<div class="col-md-12 column" style="display:inline-block;">
+					<form id="search-form">
+						<input type="text" class="form-control" id="search-cond" placeholder="请输入编码/名称"  style="width:60%; display:inline-block;" />
+						<button type="button" class="btn btn-success" id="search-btn" style="display:inline-block;">
+							<i class="fa fa-search" aria-hidden="true"></i>
+						</button>
+					</form>
+				</div>
+			</div>
+			<!-- 容器:列表 -->
+			<div class="batch-table table-container">
+				<ul id="location-ztree" class="ztree"></ul>
+			</div>
+			
+		</div>
+	</div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var zLocationNodes = [[${locationListJson}]];
+			/* var zNodes = [{"id":1, "pId":0, "name":"test1"},
+		    {"id":11, "pId":1, "name":"test11"},
+		    {"id":12, "pId":1, "name":"test12"},
+		    {"id":111, "pId":11, "name":"test111"}]; */
+		    //var zNodes = [{"createTime":"1523362262000","icon":"/index/images/li1.png","isHttps":0,"level":1,"module":"业务管理","name":"业务管理","parentId":0,"privilegeCode":"PIVAS_MENU_1","privilegeId":1,"seq":1,"sysCode":1,"type":0}];
+			//console.log("zNodes:"+zNodes);
+			//console.log("zNodes:"+JSON.stringify(zNodes));
+		/*]]>*/
+	</script>
+
+	<script type="text/javascript">
+		
+		/**
+		 * 	ztree加载中
+		 */
+		function locationZTreeLoading(){
+			$("#location-ztree").html("<li id='ztree-loading'>正在加载中，请稍等...</li>");
+		}
+		/**
+		 * 	ztree加载完成
+		 */
+		function locationZTreeLoaded(){
+			$("#location-ztree #ztree-loading").remove();
+		}
+	
+		var ztreeLocationSetting = {
+			async: {
+				enable: true,
+				url: "/location/get-nodes",
+				autoParam: ["id"]
+			},
+			view: {
+				selectedMulti: false//禁止多点同时选中的功能
+			},
+			check: {
+				enable: true,
+				chkStyle: "checkbox",
+			},
+			data: {
+				key: {
+					name: "name",
+				},
+				simpleData: {
+					enable:true,
+					idKey: "id",
+					pIdKey: "pid",
+					rootPId: 0
+				}
+			},
+			callback: {
+				onClick: zTreeLocationOnClick,//节点被点击的事件回调函数
+				beforeAsync: zTreeBeforeAsync,//用于捕获异步加载之前的事件回调函数
+				onAsyncError: zTreeOnAsyncError,//用于捕获异步加载正常结束的事件回调函数
+				onAsyncSuccess: zTreeOnAsyncSuccess,//用于捕获异步加载出现异常错误的事件回调函数
+			},
+		};
+		
+		/**
+		 * 	异步加载之前的事件回调函数
+		 */
+		function zTreeBeforeAsync(treeId, treeNode) {
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				locationZTreeLoading();//ztree加载中
+			}
+			
+			return true;
+		};
+		/**
+		 * 	异步加载正常结束的回调函数
+		 */
+		function zTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				locationZTreeLoaded();//ztree加载完成
+			}
+			
+			//console.log("treeId:"+treeId+", treeNode:"+treeNode);
+		  	//console.log(msg);
+		  	/* if(msg!=null){
+				//var treeObj = $.fn.zTree.getZTreeObj("location-ztree");
+				//var newNodes = treeObj.addNodes(treeNode, msg);
+			} */
+		};
+		/**
+		 * 	异步加载出现异常错误的回调函数
+		 */
+		function zTreeOnAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown) {
+			if(treeNode==null || typeof(treeNode)=="undefined"){
+				locationZTreeLoaded();//ztree加载完成
+			}
+			
+			console.log("treeId:"+treeId+", treeNode:"+treeNode);
+			console.log("textStatus:"+textStatus);
+			console.log("errorThrown:"+errorThrown);
+		    console.log("XMLHttpRequest:"+XMLHttpRequest);
+		};
+		
+		/*
+		 * 节点被点击的事件回调函数
+		 */
+		function zTreeLocationOnClick(event, treeId, treeNode) {
+		    
+			G_SELECTED_LOCATION_NODE = treeNode;//当前选择的地理位置节点
+		    //console.log("G_SELECTED_LOCATION_NODE:"+JSON.stringify(G_SELECTED_LOCATION_NODE));
+		    
+		}
+		
+		/**
+		 * 	取消选中的节点
+		 */
+		function cancelLocationCurrSelectedNode(){
+			var treeObj = $.fn.zTree.getZTreeObj("location-ztree");
+			treeObj.cancelSelectedNode();//取消所有选中的节点
+		}
+		
+		$(function(){
+			//console.log("start init");
+			$.fn.zTree.init($("#location-ztree"), ztreeLocationSetting);
+		});
+		
+	</script>
+	<script type="text/javascript">
+		/*
+		 * 	点击编辑按钮时执行，打开编辑选项卡
+		 */
+		function searchLocationDetailFn(location){
+			
+			//console.log("---"+JSON.stringify(location));
+			if(location==null || location.id==0){
+				util.message("请选择要修改的地理位置！");
+				return;
+			}
+			
+			var url = BASE_CONTEXT_PATH + "/location-meter/load-location-detail-dialog";
+			$("#location-edit-dialog").load(url, function(){
+				//编辑对话框加载完成
+				SearchLocationDetailCallback(location);
+			});
+			
+		}
+		
+		/**
+		 * 编辑操作回调函数
+		 */
+		function SearchLocationDetailCallback(location){
+			
+			$("#location-form #location-id").val(location.id);//ID
+			$("#location-form #location-level").val(location.locationLevel);//级别
+			$("#location-form #location-pid").val(location.pid);//父类型ID
+			$("#location-form #location-code").val(location.code);//编码
+			$("#location-form #location-name").val(location.name);//名称
+			$("#location-form #location-node-type").val(location.localNodeType);//节点类型
+			$("#location-form #location-remark").val(location.remark);//备注
+			$("#location-form #location-sortno").val(location.sortNo);//排序
+	
+			$("#modal-title-span").text("查看：地理位置");
+			
+			$("#location-form #location-pid").attr("disabled", true);//设置父节点ID（pid）的disabled属性
+			$("#location-form #location-code").attr("disabled", true);//设置编码的disabled属性
+			$("#location-form #location-name").attr("disabled", true);//设置名称的disabled属性
+			$("#location-form #location-node-type").attr("disabled", true);//设置节点类型的disabled属性
+			$("#location-form #location-remark").attr("disabled", true);//设置备注的disabled属性
+			$("#location-form #location-sortno").attr("disabled", true);//设置排序的disabled属性
+			
+			openEditDialog("modal-container-location-edit");//打开对话框
+		}
+		
+		
+		//------------------------------	地理位置查询部分	------------------------------
+		/**
+		 * 	绑定查询面板中查询按钮的click事件
+		 */
+		$("#search-form #search-btn").on("click", function(){
+			
+			var searchCond = $("#search-form #search-cond").val();//查询条件
+			if(searchCond==null || searchCond==""){
+				$.fn.zTree.init($("#location-ztree"), ztreeLocationSetting);
+				return;
+			}
+			
+			searchLocation(searchCond);//根据条件查询地理位置并展开对应节点
+			
+		});
+		/**
+		 * 	根据条件查询地理位置并展开对应节点
+		 */
+		function searchLocation(searchCond){
+			var url = BASE_CONTEXT_PATH + "/location/search";// 需要提交的url
+			var params = {"searchCond":searchCond};
+			$.post(url, params, function(res){
+				//console.log(res);//由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						var locationList = res.locationList;
+						$.fn.zTree.init($("#location-ztree"), ztreeLocationSetting, locationList);
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+		}
+	</script>
+
+</body>
+</html>

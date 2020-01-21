@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-12 column">
+
+			<div class="" style="display: inline-block" id="general-search-form">
+				<ul class="extra-l" style="list-style: none; padding-inline-start: 20px;">
+					<li>
+						<button type="button" class="btn btn-primary btn-sm btn-add"
+							id="btn-add">
+							<i class="fa fa-plus" aria-hidden="true"><span>增加</span></i>
+						</button>
+					</li>
+					<!-- <li>
+						<button type="button" class="btn btn-danger btn-sm"
+							id="btn-del">
+							<i class="fa fa-remove" aria-hidden="true"> <span>删除</span></i>
+						</button>
+					</li> -->
+					
+					<li class="input-group-sm">
+						<div th:include="component/districtsearcher/district_searcher::searcher('location-searcher')" th:remove="tag"></div>
+					</li>
+					<li class="input-group-sm">
+						<!-- 客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户； -->
+						<select class="form-control btn-sm customer-status" id="customer-status" name="customerStatus" style="display:inline-block;">
+							<!-- 客户状态：-1=未立户；0=已立户；1=已销户；2=已过户；3=过户； -->
+							<option value="">—状态—</option>
+							<option value="-1">未立户</option>
+							<option value="0,3">已立户</option>
+							<option value="1">已销户</option>
+							<option value="2">已过户</option>
+							<option value="3">过户</option>
+						</select>
+					</li>
+					<li class="input-group-sm">
+						<!-- 用户性质：1=个人；2=单位；3=水司； -->
+						<select class="form-control btn-sm customer-type" id="customer-type" name="customerType" style="display:inline-block;">
+							<option value="">—用户性质—</option>
+							<option value="1">个人</option>
+							<option value="2">单位</option>
+							<option value="3">水司</option>
+						</select>
+					</li>
+					<!-- 面板:查询 -->
+					<li class="input-group-sm">
+						<input type="text" class="form-control search-cond" id="search-cond" placeholder="客户姓名/电话/手机号/客户编号" title="请输入客户姓名、电话、手机号、客户编号等查询">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm btn-search"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+					</li>
+					<li>
+						<button type="button" class="btn btn-warning btn-sm btn-search-reset"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					</li>
+					<!-- <li>
+						<button type="button" class="btn btn-warning btn-sm btn-edit-deduct-type"	id="btn-edit-deduct-type">
+							<i class="fa fa-undo" aria-hidden="true"> <span>修改批量代扣方式</span></i>
+						</button>
+					</li> -->
+					<!-- <li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-export-customers-excel">
+							<i class="fa fa-download" aria-hidden="true"> <span>导出EXCEL</span>	</i>
+						</button>
+					</li>
+					 -->
+					<li>
+						<div class="dropdown">
+							<button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+								操作
+							</button>
+							<div class="dropdown-menu">
+								<a class="dropdown-item btn-sm btn-del" >
+									<i class="fa fa-trash-o" aria-hidden="true">
+										<span>删除</span>
+									</i>
+								</a>
+								<div class="dropdown-divider" style="border-top: 0.8px solid blue;"></div>
+								<a class="dropdown-item btn-sm btn-export-customers-excel">
+									<i class="fa fa-download" aria-hidden="true">
+										<span>导出EXCEL</span>
+									</i>
+								</a>
+							</div>
+						</div>
+					</li>
+			</div>
+
+
+
+
+		</div>
+	</div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+				
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+					
+		});
+	</script>
+
+
+
+</body>
+</html>

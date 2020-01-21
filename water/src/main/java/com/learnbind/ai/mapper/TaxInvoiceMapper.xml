@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.TaxInvoiceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.TaxInvoice">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <id column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+    <result column="FPJH" jdbcType="VARCHAR" property="fpjh" />
+    <result column="FPZL" jdbcType="VARCHAR" property="fpzl" />
+    <result column="FPDM" jdbcType="VARCHAR" property="fpdm" />
+    <result column="FPHM" jdbcType="VARCHAR" property="fphm" />
+    <result column="JYM" jdbcType="VARCHAR" property="jym" />
+    <result column="XFMC" jdbcType="VARCHAR" property="xfmc" />
+    <result column="XFSH" jdbcType="VARCHAR" property="xfsh" />
+    <result column="XFDZDH" jdbcType="VARCHAR" property="xfdzdh" />
+    <result column="XFYHZH" jdbcType="VARCHAR" property="xfyhzh" />
+    <result column="GFMC" jdbcType="VARCHAR" property="gfmc" />
+    <result column="GFSH" jdbcType="VARCHAR" property="gfsh" />
+    <result column="GFDZDH" jdbcType="VARCHAR" property="gfdzdh" />
+    <result column="GFYHZH" jdbcType="VARCHAR" property="gfyhzh" />
+    <result column="BZ" jdbcType="VARCHAR" property="bz" />
+    <result column="SKR" jdbcType="VARCHAR" property="skr" />
+    <result column="FHR" jdbcType="VARCHAR" property="fhr" />
+    <result column="KPR" jdbcType="VARCHAR" property="kpr" />
+    <result column="HJJE" jdbcType="DECIMAL" property="hjje" />
+    <result column="HJSE" jdbcType="DECIMAL" property="hjse" />
+    <result column="QDBZ" jdbcType="VARCHAR" property="qdbz" />
+    <result column="XSDJBH" jdbcType="VARCHAR" property="xsdjbh" />
+    <result column="KPRQ" jdbcType="TIMESTAMP" property="kprq" />
+    <result column="KPBZ" jdbcType="VARCHAR" property="kpbz" />
+    <result column="JQGG" jdbcType="VARCHAR" property="jqgg" />
+    <result column="ZFBZ" jdbcType="DECIMAL" property="zfbz" />
+    <result column="ZFRQ" jdbcType="TIMESTAMP" property="zfrq" />
+    <result column="ZFR" jdbcType="VARCHAR" property="zfr" />
+    <result column="DYBZ" jdbcType="VARCHAR" property="dybz" />
+    <result column="DYRQ" jdbcType="TIMESTAMP" property="dyrq" />
+    <result column="DYR" jdbcType="VARCHAR" property="dyr" />
+    <result column="CHBZ" jdbcType="DECIMAL" property="chbz" />
+    <result column="CHRQ" jdbcType="TIMESTAMP" property="chrq" />
+    <result column="CHR" jdbcType="VARCHAR" property="chr" />
+    <result column="BSBZ" jdbcType="VARCHAR" property="bsbz" />
+    <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, CUSTOMER_ID, FPJH, FPZL, FPDM, FPHM, JYM, XFMC, XFSH, XFDZDH, XFYHZH, GFMC, GFSH, GFDZDH, 
+    GFYHZH, BZ, SKR, FHR, KPR, HJJE, HJSE, QDBZ, XSDJBH, KPRQ, KPBZ, JQGG, ZFBZ, ZFRQ, 
+    ZFR, DYBZ, DYRQ, DYR, CHBZ, CHRQ, CHR, BSBZ, DELETED
+  </sql>
+  
+  <!-- 根据条件查询,返回列表 -->
+  <select id="getTaxInvocie" resultMap="BaseResultMap">
+		SELECT 
+			T.* 
+		FROM TAX_INVOICE T
+		LEFT JOIN CUSTOMERS C ON C.ID=T.CUSTOMER_ID
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			T.deleted = 0
+			<if test="bean.searchCond!=null and bean.searchCond!='' ">
+  				AND (
+  					T.FPDM LIKE concat(concat('%',#{bean.searchCond}),'%')
+  					OR T.FPHM LIKE concat(concat('%',#{bean.searchCond}),'%')
+  					OR T.XFMC LIKE concat(concat('%',#{bean.searchCond}),'%')
+  					OR T.GFMC LIKE concat(concat('%',#{bean.searchCond}),'%')
+  					OR C.CUSTOMER_NAME LIKE concat(concat('%',#{bean.searchCond}),'%')
+  				)
+  			</if>
+  			<!-- 发票种类 -->
+  			<if test="bean.fpzl!=null and bean.fpzl!='' ">
+  				AND T.FPZL=#{bean.fpzl}
+  			</if>
+  			<!-- 购方名称 -->
+  			<if test="bean.gfmc!=null and bean.gfmc!='' ">
+  				AND T.GFMC LIKE concat(concat('%',#{bean.gfmc}),'%')
+  			</if>
+  			<!-- 购方税号 -->
+  			<if test="bean.gfsh!=null and bean.gfsh!='' ">
+  				AND T.GFSH LIKE concat(concat('%',#{bean.gfsh}),'%')
+  			</if>
+  			<!-- 发票代码 -->
+  			<if test="bean.fpdm!=null and bean.fpdm!='' ">
+  				AND T.FPDM LIKE concat(concat('%',#{bean.fpdm}),'%')
+  			</if>
+  			<!-- 发票号码 -->
+  			<if test="bean.fphm!=null and bean.fphm!='' ">
+  				AND T.FPHM LIKE concat(concat('%',#{bean.fphm}),'%')
+  			</if>
+  			<!-- 按时间查询发票日期 -->
+			<if test="bean.startDate!=null and bean.startDate!=''">
+				AND T.KPRQ &gt;= to_date(#{bean.startDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="bean.endDate!=null and bean.endDate!=''">
+				AND T.KPRQ &lt;= to_date(#{bean.endDate}, 'yyyy-MM-dd HH24:Mi:ss') 
+			</if>
+			<if test="bean.year!=null and bean.year!=''">
+				AND to_char(T.KPRQ, 'yyyy')  = #{bean.year}
+			</if>
+			<if test="bean.month!=null and bean.month!=''">
+				AND to_char(T.KPRQ, 'yyyy-MM')  = #{bean.month}
+			</if>
+			<!-- 打印状态 -->
+			<if test="bean.dybzArr!=null and bean.dybzArr.size>0">
+				AND T.DYBZ IN 
+				<foreach item="item" index="index" collection="bean.dybzArr" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<!-- 作废状态 -->
+			<if test="bean.zfbzArr!=null and bean.zfbzArr.size>0">
+				AND T.ZFBZ IN 
+				<foreach item="item" index="index" collection="bean.zfbzArr" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+			<!-- 作废状态 -->
+			<if test="bean.bsbzArr!=null and bean.bsbzArr.size>0">
+				AND T.BSBZ IN 
+				<foreach item="item" index="index" collection="bean.bsbzArr" open="(" separator="," close=")">
+		             #{item}
+		        </foreach>
+			</if>
+  			
+		</where>
+		ORDER BY T.id DESC
+  </select>
+  
+    <!-- 根据条件查询,返回列表 -->
+  <select id="getPreTaxInvocie" resultMap="BaseResultMap">
+		SELECT 
+			T.* 
+		FROM TAX_INVOICE T
+		<where>
+			<!--删除状态，1=已删除，0=未删除（默认）  -->
+			T.deleted = 0
+  			<!-- 发票种类 -->
+  			<if test="customerId!=null and customerId!='' ">
+  				AND T.CUSTOMER_ID=#{customerId}
+  			</if>
+  				AND T.KPRQ=(SELECT MAX(KPRQ) FROM TAX_INVOICE)
+		</where>
+  </select>
+  
+  <!-- 统计开票金额 -->
+  <select id="getStatTaxInvoiceAmount" resultType="map">
+  	SELECT 
+		SUM( HJJE ) AS SUM_HJJE,
+		SUM( HJSE ) AS SUM_HJSE 
+	FROM
+		TAX_INVOICE 
+	<where>
+		<!-- 删除标志，0：未删除；1：己删除 -->
+		DELETED = 0
+		<!-- 开票标志，0：开票；1：校验 -->
+		AND KPBZ = '0' 
+		<if test="kprq!=null and kprq!=''">
+			<!-- AND TO_CHAR ( KPRQ, 'YYYY-MM-DD' ) = #{kprq} -->
+			AND TO_CHAR ( KPRQ, 'YYYY-MM' ) = #{kprq}
+		</if>
+		<!-- 发票种类，0：专用发票；2：普通发票；12：机动车票；51：电子发票 -->
+		<if test="fpzl!=null and fpzl!=''"> 
+			AND FPZL = #{fpzl} 
+		</if>
+		
+		<!-- 作废标志，0:未作废；2:己作废 -->
+		<if test="zfbz!=null">
+			AND ZFBZ = #{zfbz} 
+		</if>
+		<!-- 冲红标志，0：未冲红；1：己冲红 -->
+		<if test="chbz!=null">
+			AND CHBZ = #{chbz} 
+		</if>
+	</where>
+  </select>
+</mapper>

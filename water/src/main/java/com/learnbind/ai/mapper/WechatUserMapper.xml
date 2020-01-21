@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WechatUserMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.WechatUser">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="SUBSCRIBE" jdbcType="DECIMAL" property="subscribe" />
+    <result column="OPENID" jdbcType="VARCHAR" property="openid" />
+    <result column="NICKNAME" jdbcType="VARCHAR" property="nickname" />
+    <result column="SEX" jdbcType="DECIMAL" property="sex" />
+    <result column="PROVINCE" jdbcType="VARCHAR" property="province" />
+    <result column="CITY" jdbcType="VARCHAR" property="city" />
+    <result column="COUNTRY" jdbcType="VARCHAR" property="country" />
+    <result column="HEADIMGURL" jdbcType="VARCHAR" property="headimgurl" />
+    <result column="PRIVILEGE" jdbcType="VARCHAR" property="privilege" />
+    <result column="UNIONID" jdbcType="VARCHAR" property="unionid" />
+    <result column="SUBSCRIBE_TIME" jdbcType="TIMESTAMP" property="subscribeTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="GROUPID" jdbcType="VARCHAR" property="groupid" />
+    <result column="TAGID_LIST" jdbcType="VARCHAR" property="tagidList" />
+    <result column="SUBSCRIBE_SCENE" jdbcType="VARCHAR" property="subscribeScene" />
+    <result column="QR_SCENE" jdbcType="VARCHAR" property="qrScene" />
+    <result column="QR_SCENE_STR" jdbcType="VARCHAR" property="qrSceneStr" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, SUBSCRIBE, OPENID, NICKNAME, SEX, PROVINCE, CITY, COUNTRY, HEADIMGURL, PRIVILEGE, 
+    UNIONID, SUBSCRIBE_TIME, REMARK, GROUPID, TAGID_LIST, SUBSCRIBE_SCENE, QR_SCENE, 
+    QR_SCENE_STR
+  </sql>
+</mapper>

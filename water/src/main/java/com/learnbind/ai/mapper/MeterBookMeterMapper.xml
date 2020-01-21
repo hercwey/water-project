@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.MeterBookMeterMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.MeterBookMeter">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="METER_BOOK_ID" jdbcType="DECIMAL" property="meterBookId" />
+    <result column="METER_ID" jdbcType="DECIMAL" property="meterId" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, METER_BOOK_ID, METER_ID, CUSTOMER_ID
+  </sql>
+  
+  <select id="searchMeterBookMeterList" resultMap="BaseResultMap">
+  	SELECT
+		mb.*,
+		c.CUSTOMER_NAME,
+		m.PLACE 
+	FROM
+		METER_BOOK_METER mb
+		LEFT JOIN customers c ON mb.customer_id = c.id
+		LEFT JOIN meters m ON mb.meter_id = m.id
+	WHERE
+		mb.METER_BOOK_ID=#{meterBookId}
+		<if test="searchCond!=null and searchCond!=''">
+			AND (
+  					C.CUSTOMER_CODE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.PROP_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_NAME LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_TEL LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.CUSTOMER_MOBILE LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR C.ROOM LIKE concat(concat('%',#{searchCond}),'%')
+	 				OR m.PLACE  LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+			
+		</if>
+	ORDER BY m.SORT_VALUE ASC
+  </select>
+</mapper>

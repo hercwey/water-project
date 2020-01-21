@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WechatOrderMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.WechatOrder">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="OPEN_ID" jdbcType="VARCHAR" property="openId" />
+    <result column="UNION_ID" jdbcType="VARCHAR" property="unionId" />
+    <result column="APP_ID" jdbcType="VARCHAR" property="appId" />
+    <result column="ORDER_NO" jdbcType="VARCHAR" property="orderNo" />
+    <result column="ORDER_DATE" jdbcType="TIMESTAMP" property="orderDate" />
+    <result column="PREPAY_ID" jdbcType="VARCHAR" property="prepayId" />
+    <result column="RESULT_CODE" jdbcType="DECIMAL" property="resultCode" />
+    <result column="ERR_CODE" jdbcType="VARCHAR" property="errCode" />
+    <result column="ERR_CODE_DES" jdbcType="VARCHAR" property="errCodeDes" />
+    <result column="ORDER_AMOUNT" jdbcType="DECIMAL" property="orderAmount" />
+    <result column="PAY_AMOUNT" jdbcType="DECIMAL" property="payAmount" />
+    <result column="BILL_IDS" jdbcType="VARCHAR" property="billIds" />
+    <result column="ORDER_TYPE" jdbcType="DECIMAL" property="orderType" />
+    <result column="MCH_ID" jdbcType="VARCHAR" property="mchId" />
+    <result column="ACCOUNT_ITEM_ID" jdbcType="VARCHAR" property="accountItemId" />
+    <result column="TRANSACTION_ID" jdbcType="VARCHAR" property="transactionId" />
+    <result column="RESULT_CODE_CALLBACK" jdbcType="DECIMAL" property="resultCodeCallback" />
+    <result column="CUSTOMER_ID" jdbcType="DECIMAL" property="customerId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, OPEN_ID, UNION_ID, APP_ID, ORDER_NO, ORDER_DATE, PREPAY_ID, RESULT_CODE, ERR_CODE, 
+    ERR_CODE_DES, ORDER_AMOUNT, PAY_AMOUNT, BILL_IDS, ORDER_TYPE, MCH_ID, ACCOUNT_ITEM_ID, TRANSACTION_ID, RESULT_CODE_CALLBACK, CUSTOMER_ID
+  </sql>
+</mapper>

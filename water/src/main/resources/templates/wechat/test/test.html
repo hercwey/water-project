@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')" 	th:remove="tag"></div>
+</head>
+<body>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">			 
+			<button type="button" class="btn btn-warning"  id="btn-test">
+				TEST
+			</button>
+			<button type="button" class="btn btn-warning"  id="btn-read">
+				READ
+			</button>
+		</div>
+	</div>
+	
+	<div id="test-container"></div>
+	
+</div>
+
+<script>
+
+	//-------------------parent class------------------
+	//parent class
+	function Person (name) {
+	    this.name = name;
+	};
+	
+	Person.prototype.getName = function () {    //对原型进行扩展
+	    return this.name;
+	};
+	
+	//-----------------sub class---------------------------
+	
+	function SubClass1 (age) {
+	    this.age = age;
+	};
+	
+	SubClass1.prototype = new Person('老明');   //这一句是关键 //通过构造器函数创建出一个新对象，把老对象的东西都拿过来。
+	
+	SubClass1.prototype.getAge = function () {
+	    return this.age;
+	};
+	
+	//-------------------------------------
+	
+	//Parent.prototype.getName = function () {   //可以重写从父类继承来的方法,会优先调用自己的。
+	//    console.log(222);
+	//};
+	
+	var result = new SubClass1(22);
+	console.log(result.getName());  //老明　　//调用了从Person原型中继承来的方法(继承到了当前对象的原型中)　　
+	console.log(result.getAge());   //22 　　//调用了从Parent原型中扩展来的方法
+	
+	/*
+		测试用class
+	*/
+	function HelloParameter(){
+		
+		//this.parms=new Object();
+		
+		var parms=new Object();
+		
+		//设置值
+		this.setValue=function(parmx){
+			console.log("setValue  parmx  is"+JSON.stringify(parmx));
+			this.parms=parmx;
+			console.log("setValue  this.parms  is"+JSON.stringify(this.parms));
+		}
+		
+		//读值
+		this.readValue=function(){
+			console.log("readValue  this.parms  is"+JSON.stringify(this.parms));
+		}
+		
+		this.clearValue=function(){
+			console.log("clear  this.parms  ");
+			this.parms=null;			
+		}
+		
+		this.loadPage=function(){
+			var url=BASE_CONTEXT_PATH+'/wechat/loadpage'
+			
+			console.log("loadPage  this.parms  is"+JSON.stringify(this.parms));
+			
+			//$('#test-container').load(url,this.parms,callBack);
+			$('#test-container').load(url,this.parms,callBackOuter);
+		}
+		
+		//can't work
+		callBack=function(){
+			console.log("in callBack before reset: "+JSON.stringify(this.parms));
+			this.parms=null;	
+			console.log("in callBack after reset: "+JSON.stringify(this.parms));
+		}
+		
+		//can not work
+		callBack1=function(){
+			console.log("in callBack before reset: "+JSON.stringify(this.parms));
+			//this.parms=null;
+			clearValue();
+			console.log("in callBack after reset: "+JSON.stringify(this.parms));
+		}
+		//can not work
+		callBack2=function(){
+			console.log("in callBack before reset: "+JSON.stringify(this.parms));
+			//this.parms=null;
+			this.clearValue();
+			console.log("in callBack after reset: "+JSON.stringify(this.parms));
+		}
+		
+		// can't work
+		callBack4=function(){
+			console.log("in callBack before reset: "+JSON.stringify(this.parms));
+			//this.parms=null;
+			//this.clearValue();
+			var test=new HelloParameter()
+			
+			test.clearValue();
+			
+			console.log("in callBack after reset: "+JSON.stringify(this.parms));
+		}	
+		
+	}
+	
+	var test=new HelloParameter()
+	
+	//can work
+	function callBackOuter(){
+		test.clearValue();	
+	}
+
+	$(function(){
+		
+		
+		
+		$('#btn-test').on('click',function(){
+			var parmx=new Object();
+			parmx.field1='field1';
+			parmx.field2='field2';
+			
+			test.setValue(parmx);
+			test.readValue();
+			
+			console.log("===============================");
+			
+			
+			test.loadPage();
+			
+			//test.clearValue();
+			
+			
+		});
+		
+		
+		$('#btn-read').on('click',function(){
+			test.readValue();
+		});
+		
+	});
+
+
+</script>
+
+
+</body>
+</html>

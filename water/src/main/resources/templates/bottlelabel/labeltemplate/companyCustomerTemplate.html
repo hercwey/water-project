@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>通知单模板</title>
+<!-- .pdf文件下载  download -->
+ <script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+ <script src="https://cdn.bootcss.com/jspdf/1.3.4/jspdf.debug.js"></script>
+<!-- jQuery 2.2.3 -->
+<script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!-- <link href="src/main/resources/static/font-awesome/4.7.0/css/font-awesome.css"  rel="stylesheet" /> -->
+
+<style>
+	/* 横线的样式  */
+	
+	/* 页大小 */	
+	@page{
+		size:70mm 90mm portrait;
+	}
+	
+	/* 横线样式 */
+	hr{
+		background-color:red;height: 1px;width:100%;border: none;
+	}
+	
+	
+	/* 
+	@font-face {
+    font-family: glyphicons;
+    font-size: small;    
+    src: url('src/main/resources/static/font-awesome/4.7.0/fonts/fontawesome-webfont.woff') format('woff');
+	} 
+	*/
+
+		
+</style>
+
+
+</head>
+<body style = "font-family: SimSun;" >
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<table class="table table-sm">
+				
+					<tbody  th:each="item,iterStat: ${textData}">
+						<!-- 标题信息 -->
+						<div class="row">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-12" style="text-align:center;font-size:20px;font-weight:bold;">
+										<span>水费通知单</span>
+									</div>
+								</div>
+								<br/>
+								<div class="row">
+									<div class="col-md-12">
+										<span style="float:right" th:text=${item.sysdate}>通知单时间</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br/>
+						<!-- 通知单内容 -->
+						<div class="row">
+							<div class="col-md-12">
+								<table class="table-layout table" style="width: 100%">
+									<tr>
+										<th>开票名称：</th>
+										<td colspan="3"  th:text=${item.customerName}></td>
+									</tr>
+									<!-- <tr>
+										<th>上次查表：</th>
+										<td th:text=${item.preRead}+'吨'></td>
+										<th>本次查表：</th>
+										<td th:text=${item.currRead}+'吨'></td>
+									</tr>
+									<tr>
+										<th>基础水费价格：</th>
+										<td th:text=${item.basePrice}+'元'></td>
+										<th>金额：</th>
+										<td th:text=${item.totalBasePrice}+'元'></td>
+									</tr>
+									<tr>
+										<th>污水处理费价格：</th>
+										<td th:text=${item.treatmentFee}+'元'></td>
+										<th>金额：</th>
+										<td th:text=${item.totalTreatmentFee}+'元'></td>
+									</tr>
+									<tr>
+										<th>水量合计：</th>
+										<td th:text=${item.currAmount}+'吨'></td>
+										<th>金额合计：</th>
+										<td th:text=${item.totalCurrWaterFee}+'元'></td>
+									</tr> -->
+									<tr>
+										<th>往期欠费：</th>
+										<td th:text=${item.pastOweAmount}+'元'></td>
+										<th>本月欠费合计：</th>
+										<td th:text=${item.totalWaterFee}+'元'></td>
+									</tr>
+									<tr>
+										<th>余额代扣：</th>
+										<td th:text=${item.balanceWithhold}+'元'></td>
+										<th>应缴水费：</th>
+										<td th:text=${item.waterFeePayable}+'元'></td>
+									</tr>
+								</table>
+							</div>
+							<hr/>
+							
+							<table class="table-layout table" style="width: 100%;text-align:center;" >
+								<thead>
+									<tr>
+										<th>描述</th> 
+										<th>表底</th>
+										<!-- <th>本期表底</th> -->
+										<th>水量</th>
+										<th>基础水费</th>
+										<th>污水处理费</th>
+										<th>合计</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="record,iterStat: ${item.recordMapList}">
+									
+										<td th:text=${record.meterPlace}>描述</td>
+										<td th:text=${record.recordStr}>上期表底</td>
+										<!-- <td th:text=${record.currRead}>本期表底</td> -->
+										<td th:text=${record.currAmount}>水量</td>
+										<td th:text=${record.basePriceStr}>基础水价</td>
+										<td th:text=${record.treatmentStr}>污水处理费</td>
+										<td th:text=${record.totalCurrWaterFee}>合计</td>
+									</tr>
+									<tr  style="background:#000000;height:1px;width:100%">
+								        <td colspan="6" height="1px;"></td>
+								     </tr>
+									<tr>
+										<td>合计：</td>
+										<td></td>
+										<td th:text=${item.sumWaterAmount}></td>
+										<td th:text=${item.sumBasePriceFee}></td>
+										<td th:text=${item.sumTreatmentFee}></td>
+										<td th:text=${item.sumWaterFee}></td>
+									</tr>
+								</tbody>
+							</table>
+							
+							<hr/>
+							<div class="row">
+								<!-- 标题信息 -->
+								<div class="row">
+									<div class="col-md-12">
+										<div class="row">
+											<div class="col-md-12" style="text-align:center;font-size:18px;font-weight:bold;">
+												<span>注意事项</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div class="row">
+									<div class="col-md-12">
+										<span>&nbsp;	1、此单不作为报销凭证，用户接到水费通知后请及时核对并对自水费通知单签发之日起15日内到石家庄高新区供水排水公司交纳水费，逾期不交的，应按交纳水费金额每日加收5%的违约金，连续两个月不交水费的，暂停供水。</span> 
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<span>&nbsp;2、用户对水表和表井应做好维护工作，表井内要保持整洁，不准在表井上堆放东西和埋压，以免影响查表。</span> 
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<span>&nbsp;3、如有疑义请于两日内拨打电话： 69099835  69099838 查询，否则视为对本通知书的全部认可。</span> 
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<table class="table-layout table" style="width: 100%">
+											<tr>
+												<th>收费人：</th>
+												<td>&nbsp;&nbsp;</td>
+												<th>签收人：</th>
+												<span style="float:right">石家庄高新技术产业开发区供水排水公司</span> 
+											</tr>
+										</table>
+									</div>
+								</div>
+								<br/><br/><br/><br/><br/>
+							</div>
+						</div>
+						<span th:if="${iterStat.count%2==0}">
+							<br/><br/><br/><br/>
+						</span>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>	
+</body>
+
+</html>

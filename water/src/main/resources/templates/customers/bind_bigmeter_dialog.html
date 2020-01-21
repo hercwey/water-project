@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+<style>
+.role-main a {
+	text-decoration: none;
+	color: black;
+}
+
+.role-main a:visited {
+	text-decoration: none;
+}
+
+.role-main a:hover {
+	text-decoration: none;
+}
+
+.role-main .container a:hover {
+	text-decoration: none;
+	color: blue;
+}
+
+.extra-l  a {
+	color: black;
+}
+
+.role-table tr:hover {
+	background-color: #CCFFCC;
+}
+
+.medic-label i {
+	color: white;
+}
+
+.medic-label .table-container i {
+	color: black;
+}
+
+.medic-label a i {
+	cursor: pointer;
+}
+
+/* 时间查询条件样式 */
+.extra-l li {
+	float: left;
+	margin: auto 10px;
+	cursor: pointer;
+}
+
+/* placeholder color */
+/* chrome浏览器 */
+#search-cond::-webkit-input-placeholder{
+ color: lightblue; 
+}
+#search-cond:-moz-placeholder{
+color: lightblue;
+}
+#search-cond::-moz-placeholder{
+color: lightblue;
+}
+#search-cond:-ms-input-placeholder{
+color: lightblue;
+}
+
+</style>
+
+</head>
+<body>
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+
+			<div class="modal fade" id="modal-container-bind-bigmeter-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			
+				<div class="modal-dialog modal-md" style="max-width: 1200px">
+				
+					<div class="modal-content">
+					
+						<!-- 头部 -->
+						<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+							<h5 class="modal-title" id="myModalLabel">
+								<span>选择:表计列表</span>
+								<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+							</h5>
+							<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+						</div>
+
+						<!-- 主体(用于展示表单) -->
+						<div class="modal-body" >
+							<div th:include="customers/bind_bigmeter_page" th:remove="tag"></div>
+							<!-- 加载客户列表 -->
+						</div>
+
+						<!-- 尾部 -->
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+							<!-- <button type="button" class="btn btn-primary"	id="btn-modify-and-back">确认过户</button> -->
+						</div>
+						
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		/*]]>*/
+	</script>
+
+</body>
+</html>

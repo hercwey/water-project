@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>汇总上报结果</title>
+</head>
+<link rel="stylesheet" href="/jsonview/jquery.jsonview.css" />
+<body>
+	<!-- 处理结果 -->
+	<span id="resultJSON"></span>
+	
+	<!-- <span th:text="${resultJSON}"></span> -->
+	
+	<!-- <span th:each="item,itor:${inventoryList}">
+		<span th:text="${item.RETCODE}"></span>
+	</span> -->
+	
+</body>
+
+<script type="text/javascript" src="/jsonview/jquery.jsonview.js"></script>
+
+<!-- 嵌入式脚本,用于thymeleaf数据传递(json格式) -->
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		//后台向前端直接传递数据
+		var resultObj = [[${resultObj}]];  			//返回结果:对象
+		var resultJSON = [[${resultJSON}]];  		//返回结果:JSON格式
+		
+		//console.log("test data is:"+inventoryList[0].RETCODE);  //error-not defined
+		//console.log("test data is:"+inventoryList[0].retcode);  //ok
+		//console.log("the result is:"+JSON.stringify(inventoryList));  //全部小字 生成的JSON字段均为小写
+		
+	/*]]>*/
+</script>
+	
+<script type="text/javascript">
+
+	/*
+		功能:
+			以JSON格式显示结果
+	*/
+	function showResult(json){
+		const containerId="#resultJSON";
+		$(containerId).JSONView(json);
+	}
+	
+	$(function(){
+		//var resultJSON=JSON.stringify(inventoryList);  //全部小写
+		showResult(resultJSON);		
+	});
+</script>	
+
+
+</html>

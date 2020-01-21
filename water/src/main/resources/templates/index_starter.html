@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-cn">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>首页</title>
+
+<div th:include="common/common_head::headx('首页')" th:remove="tag"></div>
+
+<link rel="stylesheet" th:href="@{/assets/common/noty/noty.css}">
+<link rel="stylesheet"
+	th:href="@{/assets/common/noty/themes/metroui.css}">
+<link rel="stylesheet"
+	th:href="@{/assets/common/metismenu/metisMenu.min.css}">
+<link rel="stylesheet"
+	th:href="@{/assets/common/daterangepicker/daterangepicker.css}">
+<link rel="stylesheet"
+	th:href="@{/assets/common/bootstrap-select/css/bootstrap-select.css}">
+<link rel="stylesheet" th:href="@{/assets/font/iconfont.css}">
+<link rel="stylesheet" th:href="@{/assets/css/layout.css}">
+
+<script th:src="@{/assets/common/moment.min.js}"></script>
+<script th:src="@{/assets/common/moment-zh-cn.js}"></script>
+<script th:src="@{/assets/common/jquery.nicescroll.min.js}"></script>
+<script th:src="@{/assets/common/metismenu/metisMenu.min.js}"></script>
+<script
+	th:src="@{/assets/common/bootstrap-select/js/bootstrap-select.min.js}"></script>
+<script
+	th:src="@{/assets/common/bootstrap-select/js/i18n/defaults-zh_CN.min.js}"></script>
+<script th:src="@{/assets/common/noty/noty.min.js}"></script>
+<script th:src="@{/assets/common/daterangepicker/daterangepicker.js}"></script>
+
+<script th:src="@{/assets/js/layout.js}"></script>
+<link rel="stylesheet"	href="/css/commform.css" />
+
+<!-- 显示/隐藏正在加载阴影 -->
+<script th:src="@{/pivas/js/common/Loading.js}"></script>
+<!-- 设置ajax公共请求头 -->
+<!-- <script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>	 -->
+
+</head>
+
+<body>
+
+	<!-- 修改密码对话框 -->
+	<div id="edit-password-dialog" ></div>
+	
+	<div class="header">
+		<nav class="navbar navbar-expand">
+			<div class="navbar-brand">
+				<div class="logo-content">
+					<img src="/assets/img/logo.png" alt="石家庄高新区供水排水公司">
+					<div class="logo-text">
+						<p class="text">石家庄高新区供水排水公司</p>
+						<!-- <p class="eng">Shijiazhuang Water Supply and Drainage Company</p> -->
+					</div>
+				</div>
+
+			</div>
+			<div id="navCollapse" class="collapse navbar-collapse">
+				<ul id="headerNav" class="navbar-nav mr-auto">
+					<!-- type 类型，0:菜单目录 1:菜单 2:功能 -->
+		            <span th:each="item,iterStat : ${privilegeList}" th:remove="tag">
+		            	<span th:if="${item.rightLevel==0}" th:remove="tag">
+							<li th:attr="class='nav-item '+ ${iterStat.index==0 ? 'active' : ''}" th:onclick="'Layout.headerNavSelect(this,'+${item.id}+');'">
+								<a class="nav-link" href="javascript:void(0);">
+									<!-- <span class="iconfont icon-account"></span> -->
+									<img th:src="${item.rightIcon}"> 
+									<span th:text="${item.rightName}" th:remove="tag">日常维护</span>
+								</a>
+							</li>
+						</span>
+		            </span>
+					<!-- type 类型，0:菜单目录 1:菜单 2:功能 -->
+		            <!-- <span th:each="item,iterStat : ${privilegeList}" th:remove="tag">
+		            	<span th:if="${item.rightLevel==0}" th:remove="tag">
+				            <li th:id="'menu_'+${item.id}" th:onclick="'menuShowSub(&quot;menu_'+${item.id}+'&quot;)'">
+								<span class="lt-menu-icon"><img th:src="'/index/images/li'+${iterStat.count}+'.png'"></span>
+								<span class="lt-menu-icon"><img th:src="${item.rightIcon}"></span>
+								<a style="cursor: default;color: white;" th:text="${item.rightName}">业务管理</a>
+							</li>
+						</span>
+		            </span> -->
+					<!-- <li class="nav-item active"
+						onclick="Layout.headerNavSelect(this,0)"><a class="nav-link"
+						href="#"> <span class="iconfont icon-account"></span>
+							<img src="/assets/img/icon/maintenance.png"> 日常维护
+					</a></li>
+					<li class="nav-item" onclick="Layout.headerNavSelect(this,1)">
+						<a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
+							<img src="/assets/img/icon/computer_system.png"> 系统管理
+					</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
+							<img src="/assets/img/icon/delivery_file.png"> 档案管理
+					</a></li>
+					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
+							<img src="/assets/img/icon/money.png"> 营业管理
+					</a></li>
+					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
+							<img src="/assets/img/icon/settings.png"> 数据配置
+					</a></li>
+					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
+							<img src="/assets/img/icon/statistics.png"> 系统分析
+					</a></li>
+					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
+							<img src="/assets/img/icon/computer.png"> 营收系统
+					</a></li> -->
+				</ul>
+				<div class="navbar-text">
+					<div id="date" class="date"></div>
+					<div class="operater">
+						<ul>
+							<li>
+					        	<a href="/upload/app/app-aiwater.apk" style="color: yellow">APP</a>
+					       	</li>
+							<li onclick="initUserInfo()">[<span class="user-name" th:text="${userName}">系统管理员</span>] 欢迎登录！
+							</li>
+							<li><button class="btn btn-link btn-sm" onclick="changepass()">修改密码</button></li>
+							<li><button class="btn btn-link btn-sm"onclick="openLogout()">退出</button></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</nav>
+	</div>
+	<div id="contentWrapper" class="content-wrapper">
+		<div class="left-nav">
+			<div class="left-menu-wrapper">
+				<span th:each="firstMenu,iterStat : ${privilegeList}" th:remove="tag">
+					<span th:if="${firstMenu.rightLevel==0}" th:remove="tag">
+						<ul th:id="'menu'+${firstMenu.id}" th:attr="class='left-menu '+'leftmenu-'+${firstMenu.id}">
+							<span th:each="secondMenu,iterStat : ${privilegeList}" th:remove="tag">
+								<span th:if="${secondMenu.rightLevel==1 && firstMenu.id==secondMenu.pid}" th:remove="tag">
+									<li>
+										<a class="has-arrow"> 
+											<span class="iconfont icon-menuoff"></span> 
+											<span class="menu-label" th:text="${secondMenu.rightName}">二级菜单</span>
+										</a>
+										<ul class="nav-second-level">
+											<span th:each="privilege,iterStatus : ${privilegeList}" th:remove="tag">
+					   							<span th:if="${privilege.rightLevel==2 && secondMenu.id==privilege.pid}" th:remove="tag">
+													<li th:attr="data-url=${privilege.rightLink}">
+														<a href="#" th:text="${privilege.rightName}">三级菜单</a>
+													</li>
+												</span>
+											</span>
+										</ul>
+									</li>
+								</span>
+							</span>
+						</ul>
+					</span>
+				</span>
+            	
+				<!-- <ul id="menu0" class="left-menu">
+					<li><a> <span class="iconfont icon-menuoff"></span> <span
+							class="menu-label"> 字典维护</span>
+					</a></li>
+					<li><a class="has-arrow"> <span
+							class="iconfont icon-menuoff"></span> <span class="menu-label">
+								水表检测</span>
+					</a>
+						<ul class="nav-second-level">
+							<li><a href="#">2-1</a></li>
+							<li><a href="#">2-2</a></li>
+						</ul></li>
+					<li><a class="has-arrow"> <span
+							class="iconfont icon-menuoff"></span> <span class="menu-label">
+								抄表员考核</span>
+					</a>
+						<ul class="nav-second-level">
+							<li><a href="#">3-1</a></li>
+							<li><a class="has-arrow"><span>3-2</span></a>
+								<ul class="nav-third-level">
+									<li><a href="#">3-2-1</a></li>
+									<li><a href="#">3-2-2</a></li>
+									<li><a href="#">3-2-3</a></li>
+								</ul></li>
+						</ul></li>
+				</ul> -->
+				<!-- <ul id="menu1" class="left-menu">
+					<li><a> <span class="iconfont icon-menuoff"></span> <span
+							class="menu-label"> 字典维护2</span>
+					</a></li>
+					<li><a class="has-arrow"> <span
+							class="iconfont icon-menuoff"></span> <span class="menu-label">
+								水表检测2</span>
+					</a>
+						<ul class="nav-second-level">
+							<li><a href="#">2-1</a></li>
+							<li><a href="#">2-2</a></li>
+						</ul></li>
+					<li><a class="has-arrow"> <span
+							class="iconfont icon-menuoff"></span> <span class="menu-label">
+								抄表员考核</span>
+					</a>
+						<ul class="nav-second-level">
+							<li><a href="#">3-1</a></li>
+							<li><a class="has-arrow"><span>3-2</span></a>
+								<ul class="nav-third-level">
+									<li><a href="#">3-2-1</a></li>
+									<li><a href="#">3-2-2</a></li>
+									<li><a href="#">3-2-3</a></li>
+								</ul></li>
+						</ul></li>
+				</ul> -->
+			</div>
+		</div>
+		<div class="main-container">
+			<!-- 左侧菜单显示隐藏 -->
+			<div class="hamburger-btn" onclick="Layout.toggleSidebar()">
+				<span class="iconfont icon-menuoff"></span>
+			</div>
+			<ol id="topBreadcrumb" class="breadcrumb" >
+			</ol>
+			<div class="page-container">
+				<iframe id="page-container-iframe" src="/welcome" frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%;" height="100%;">
+					<!-- 此处加载内容 -->
+	    		</iframe>
+			</div>
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+		//双击隐藏左侧菜单栏
+		$("#topBreadcrumb").dblclick(function () {
+			Layout.toggleSidebar();
+			window.getSelection().empty();//取消页面文字选中
+		})
+	
+		//修改密码
+		function changepass(){
+			var url = BASE_CONTEXT_PATH + '/main-index/edit-password-dialog';
+			$("#edit-password-dialog").load(url, null, openEditPasswordDialog); //加载完毕后显示
+		}
+			
+		/*
+		 * 	打开(Open) 修改密码对话框
+		 */
+		function openEditPasswordDialog() {
+			//可拖拽
+			$("#modal-container-edit-password-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			});
+			//点击对话框外部,不关闭对话框 
+			$('#modal-container-edit-password-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			关闭(CLOSE) 修改密码对话框
+		 */
+		function closeEditPasswordDialog() {
+			$("#modal-container-edit-password-dialog").modal("hide");
+		}
+	
+		/**
+		 * 登出
+		 */
+		function openLogout(){
+			//location.href=BASE_CONTEXT_PATH + "/user-logout";
+			location.href=BASE_CONTEXT_PATH + "/logout";
+		}
+		
+		var is_load_welcome_page = false;//是否需要加载欢迎页面
+		/**
+		 * 	绑定三级菜单的click事件，点击后获取三级菜单的url，并在iframe中加载
+		 */
+		$(".left-nav .left-menu-wrapper ul.left-menu ul.nav-second-level li").on("click", function(){
+			is_load_welcome_page = true;//是否需要加载欢迎页面
+			
+			var url = $(this).attr("data-url");
+			$("#page-container-iframe").attr("src", url);
+		});
+		/**
+		 * 	绑定一级菜单的click事件，点击后根据is_load_welcome_page变量判断是否需要在iframe中加载欢迎页面，需要则加载，不需要不做操作
+		 */
+		$("#navCollapse ul.navbar-nav li").on("click", function(){
+			if(is_load_welcome_page){
+				is_load_welcome_page = false;//是否需要加载欢迎页面
+				var url = BASE_CONTEXT_PATH+"/welcome";
+				$("#page-container-iframe").attr("src", url);
+			}
+			
+		});
+	
+	</script>
+</body>
+
+</html>

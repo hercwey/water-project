@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+<!-- 日期组件 -->
+<!-- <script src="/calendar/WdatePicker.js" type="text/javascript"></script> -->
+<!-- 文件上传验证JS -->
+<script src="/commons/file-upload-validate.js" type="text/javascript"></script>
+<!-- ajax file upload js -->
+<script src="/jquery/ajaxFileUpload.js" type="text/javascript"></script>
+</head>
+<body>
+	<br>
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="card">
+				<h5 class="card-header">
+					电子档案
+					<!-- <span th:class="${FUNCTION_MODULE=='MODULE_MANAGE' ? '' : 'd-none'}"> -->
+						<button type="button" class="btn btn-primary btn-sm" id="btn-show-erecord-upload">上传</button>
+					<!-- </span> -->
+				</h5>
+				<div class="card-body" id="erecord-item-body">
+					<!-- 表计-电子档案列表 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 加入协议上传对话框 -->
+	<div id="erecord-dialog-edit"></div>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/**
+		 * 	加载表计-电子档案列表
+		 */
+		function loadERecordItem() {
+
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meter-erecord/load-erecord-item"
+			$("#erecord-item-body").load(url, parms, null);
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//加载默认列表
+			loadERecordItem();//加载表计-电子档案列表
+
+			//---------事件绑定--------------
+			
+			/**
+			 * 	加载电子文件上传对话框，并打开
+			 */
+			$("#btn-show-erecord-upload").on("click", function() {
+				
+				//加载字典列表页面
+				var url = BASE_CONTEXT_PATH + "/meter-erecord/load-erecord-dialog"
+				$("#erecord-dialog-edit").load(url, null, function(){
+					openERecordUploadDialog();//打开上传对话框
+				});
+			});
+			
+		});
+	</script>
+
+</body>
+</html>

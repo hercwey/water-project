@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>客户账单列表页面</title>
+</head>
+<body>
+	<!-- 列表 -->
+	<table class="table table-hover table-sm" id="invoice-bill-table">
+		<thead>
+			<tr>
+				<!-- <th>
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th> -->
+				<th>期间</th>
+				<th>水价</th>
+				<th>基础水价</th>
+				<th>污水水价</th>
+				<th>合计水价</th>
+				<th>合计水量</th>
+				<th>基础水费</th>
+				<th>污水水费</th>
+				<th>合计水费</th>
+				<th>是否已选择</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${billList}" th:attr="data-bill-id=${item.id}, data-customer-id=${item.customerId}, data-period=${item.period}, data-water-use=${item.waterUse}, data-base-price=${item.basePrice}, data-sewage-price=${item.sewagePrice}, data-total-price=${item.totalPrice}, data-water-amount=${item.waterAmount}, data-base-water-fee=${item.baseWaterFee}, data-sewage-water-fee=${item.sewageWaterFee}, data-total-water-fee=${item.totalWaterFee}" title="双击选择/取消">
+			
+				<!-- 条目选择器 -->
+				<!-- <td>
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.ID},data-bind=${item.ID}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.ID}"></label>
+					</div> 
+				</td> -->
+				
+				<!-- <span th:if="${item.invoiceSize==1}">
+					客户名称
+					<td th:attr="colspan=${item.invoiceSize}" th:text="${item.CUSTOMER_NAME}">客户名称 </td>
+				</span> -->
+				
+				<!-- <span th:if="${item.invoiceSize>1}">
+				
+				</span> -->
+				
+				
+				
+				<!-- 期间 -->
+				 <!-- th:attr="rowspan=${item.invoiceSize}" -->
+				<td th:text="${item.period}">期间</td>
+				
+				<!-- 水价 -->
+				<td th:text="${item.waterUse}">水价</td>
+				<!-- 基础水价 -->
+				<td th:text="${item.basePrice}">基础水价</td>
+				<!-- 污水水价 -->
+				<td th:text="${item.sewagePrice}">污水水价</td>
+				<!-- 合计水价 -->
+				<td th:text="${item.totalPrice}">合计水价</td>
+				<!-- 水量 -->
+				<td th:text="${item.waterAmount}">合计水量</td>
+				<!-- 基础水费 -->
+				<td th:text="${item.baseWaterFee}">基础水费</td>
+				<!-- 污水水费 -->
+				<td th:text="${item.sewageWaterFee}">污水水费</td>
+				<!-- 合计水费 -->
+				<td th:text="${item.totalWaterFee}">合计水费</td>
+				<!-- 是否已选择 -->
+				<td th:attr="class='selected-flag selected-flag-'+${item.id}, data-bill-id=${item.id}"></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager(${dialogId}+'-pager-customer-bill')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		//var curr_pageNum=[[${pageNum}]];
+		//var curr_pageSize=[[${pageSize}]];
+		//var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+	</script>
+</body>
+</html>

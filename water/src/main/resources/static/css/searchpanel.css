@@ -1,0 +1,33 @@
+@charset "UTF-8";
+
+.extra-l  a {
+	color: black;
+}
+
+/* 时间查询条件样式 */
+.extra-l li {
+	float: left;
+	margin: auto 1px;
+	cursor: pointer;
+}
+
+/* added by srd on 2019/01/04 */
+ul.extra-l {
+	margin-right: 30px;
+    margin-bottom: 1px;
+}
+
+/* placeholder color */
+/* chrome浏览器 */
+#search-cond::-webkit-input-placeholder{
+ color: lightblue; 
+}
+#search-cond:-moz-placeholder{
+color: lightblue;
+}
+#search-cond::-moz-placeholder{
+color: lightblue;
+}
+#search-cond:-ms-input-placeholder{
+color: lightblue;
+}

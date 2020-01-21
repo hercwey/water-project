@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.SysRolesMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.SysRoles">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="ROLE_CODE" jdbcType="VARCHAR" property="roleCode" />
+    <result column="ROLE_NAME" jdbcType="VARCHAR" property="roleName" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, ROLE_CODE, ROLE_NAME, REMARK, CREATE_TIME
+  </sql>
+  
+  <!-- 查询名称,返回列表 -->
+  <select id="searchRole" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM sys_roles r
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (r.role_name LIKE concat(concat('%',#{searchCond}),'%'))
+  			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+  
+  
+  <!-- 根据用户ID查询用户角色 -->
+  <select id="getListByUserId" resultMap="BaseResultMap">
+		SELECT
+			r.*
+		FROM
+			sys_roles r
+		LEFT JOIN sys_users_roles ur ON r.id = ur.role_id
+		<where>
+			1=1
+			<if test="userId!=null and userId!=''">
+				AND ur.user_id = #{userId}
+			</if>
+		</where>
+		ORDER BY r.id DESC
+  </select>
+  
+</mapper>

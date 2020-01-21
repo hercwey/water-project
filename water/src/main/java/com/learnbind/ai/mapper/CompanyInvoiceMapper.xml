@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.CompanyInvoiceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.CompanyInvoice">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="SHORT_CODE" jdbcType="VARCHAR" property="shortCode" />
+    <result column="COMPANY_NAME" jdbcType="VARCHAR" property="companyName" />
+    <result column="REG_ADDRESS" jdbcType="VARCHAR" property="regAddress" />
+    <result column="TELEPHONE" jdbcType="VARCHAR" property="telephone" />
+    <result column="ACCOUNT_BANK" jdbcType="VARCHAR" property="accountBank" />
+    <result column="ACCOUNT_NO" jdbcType="VARCHAR" property="accountNo" />
+    <result column="TAX_NO" jdbcType="VARCHAR" property="taxNo" />
+    <result column="ENABLED" jdbcType="DECIMAL" property="enabled" />
+    <result column="IS_DEFAULT" jdbcType="DECIMAL" property="isDefault" />
+    <result column="CHECKER" jdbcType="VARCHAR" property="checker" />
+    <result column="PAYEE" jdbcType="VARCHAR" property="payee" />
+    <result column="SPECIAL_INVOICE_AMOUNT" jdbcType="VARCHAR" property="specialInvoiceAmount" />
+    <result column="NORMAL_INVOICE_AMOUNT" jdbcType="VARCHAR" property="normalInvoiceAmount" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, SHORT_CODE, COMPANY_NAME, REG_ADDRESS, TELEPHONE, ACCOUNT_BANK, ACCOUNT_NO, TAX_NO, 
+    ENABLED, IS_DEFAULT, CHECKER, PAYEE, SPECIAL_INVOICE_AMOUNT, NORMAL_INVOICE_AMOUNT 
+  </sql>
+  
+  
+   <!-- 查询名称,返回列表 -->
+  <select id="searchCond" resultMap="BaseResultMap">
+		SELECT 
+			* 
+		FROM COMPANY_INVOICE b
+		<where>
+			1=1
+			<if test="searchCond!=null and searchCond!='' ">
+  				AND (
+  					b.COMPANY_NAME LIKE concat(concat('%',#{searchCond}),'%')
+  					OR b.REG_ADDRESS LIKE concat(concat('%',#{searchCond}),'%')
+  					OR b.TAX_NO LIKE concat(concat('%',#{searchCond}),'%')
+  				)
+  			</if>
+		</where>
+		ORDER BY b.id DESC
+  </select>
+</mapper>

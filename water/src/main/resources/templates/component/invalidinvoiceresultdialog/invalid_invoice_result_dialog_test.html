@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>未使用发票作废-结果对话框-TEST页面</title>
+<div th:include="common/common_head::headx('未使用发票作废-结果对话框-TEST')" th:remove="tag"></div>
+</head>
+<body>
+	
+<div class="container-fluid">
+	<div class="row-fluid">
+		<!-- 对话框容器 -->
+		<div class="span12">
+			<!-- 对话框1 -->
+			<span th:include="component/invalidinvoiceresultdialog/invalid_invoice_result_dialog::dialog('dialog1')"  th:remove='tag'></span>			
+		</div>
+		<div class="span12">
+			 <button class="btn btn-primary" type="button" id="button1">发票作废结果对话框1-打开</button>			 
+		</div>
+	</div>
+</div>
+</body>
+
+<!-- 通用对话框工具JS -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 发票作废进度对话框组件JS部分 -->
+<script type="text/javascript" th:src="@{/js/component/invalidinvoiceresultdialog/InvalidInvoiceResultDialog.js}"></script>
+
+<script type="text/javascript">
+	
+	var dialog1=new InvalidInvoiceResultDialog("dialog1");
+	
+	
+	
+	//page loaded ready
+	$(function() {
+		$("#button1").on('click',function(){
+			//dialog1.setInvoiceDM("DM-123");
+			//dialog1.setInvoiceHM("HM-456");
+			//dialog1.setRefreshValue(100);
+			dialog1.show();
+			//dialog1.startProgress();  //启动进度条.
+		});	
+		
+		
+		
+	});
+</script>
+
+</html>

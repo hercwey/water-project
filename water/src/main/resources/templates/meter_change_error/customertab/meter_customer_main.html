@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<link rel="stylesheet"	href="/css/meterbody.css" />
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="customer-dialog-edit" ></div>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label water-main">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block" id="search-bind-customer-div">
+				<ul class="extra-l" style="list-style: none;">
+			
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入客户名称">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						
+						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+					
+					</li>
+				</ul>
+			</div>
+
+
+			<!-- 容器:字典列表 -->
+			<div class="customer-table table-container" id="meters-body"></div>
+
+		</div>
+	</div>
+
+	<!-- footer -->
+	<!-- <div th:include="/thymeleaf/common/_footer::footer" class="footer"></div> -->
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function getSearchCustomerParams(){
+			//初始化请求参数
+			var parms = new Object();
+			var searchCond = $("#search-bind-customer-div .search-cond").val();
+			var meterId = getMeterIdFn();//获取用户当前编辑的表计ID
+			parms.meterId = meterId;
+			parms.searchCond=searchCond;
+			return parms;
+		}
+		
+		function searchCustomer(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meters/ctable"
+			$(".customer-table").load(url, parms, customerResizeFuncx);
+		}
+		
+		function customerResizeFuncx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchCustomer() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchCustomerParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			searchCustomer(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchCustomerClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchCustomerParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchCustomer(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadCustomerPage(searchCond, pageNum, pageSize) {
+			var parms = getSearchCustomerParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchCustomer(parms);
+		}
+
+		
+		//----------Add Dialog 操作 加载,打开,关闭------------------------
+		
+		
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchCustomer();
+
+			//---------事件绑定--------------
+			
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#search-bind-customer-div #btn-search').on('click', function() {
+				btnSearchCustomerClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#search-bind-customer-div #btn-search-reset').on('click', function() {
+				$("#search-bind-customer-div #search-cond").val("");
+				$("#search-bind-customer-div #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#search-bind-customer-div #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#search-bind-customer-div #btn-search').trigger("click");	                
+	            }	
+			});
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

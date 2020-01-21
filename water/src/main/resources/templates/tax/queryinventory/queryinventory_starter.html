@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('获取库存信息')" th:remove="tag"></div>
+<title>获取库存信息</title>
+</head>
+<body>	
+	<div class="container-fluid">
+	<h5>获取库存信息</h5>
+	<div class="row-fluid">
+		<div class="col-12">			
+			<form class="form-horizontal">							
+				<div class="control-group">
+					<div class="controls">
+						 <span style="margin-right:10px;">选择发票类型</span>			
+						 <!-- 默认选定前两种类型的发票 -->			
+						 <label class="checkbox"><input type="checkbox" class="invoice-type" value="0"  checked="checked" />0:专用发票</label>
+						 <label class="checkbox"><input type="checkbox" class="invoice-type" value="2"  checked="checked" />2:普通发票</label>
+						 <label class="checkbox"><input type="checkbox" class="invoice-type" value="12"/>12:机动发票</label>
+						 <label class="checkbox"><input type="checkbox" class="invoice-type" value="51"/>51:电子发票</label>
+					</div>
+				</div>
+			</form>			
+		</div>
+		 <button type="button" class="btn btn-sm btn-primary" id="btn-query-inventory">查询</button>
+	</div>
+	<div class="row-fluid">
+		<div class="col-12">
+			<!-- 查询结果容器 -->
+			<div id="query-invoiceinventory-result-container">
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+
+
+
+<!-- 嵌入式脚本,用于thymeleaf数据传递(json格式) -->
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		//后台向前端直接传递数据
+		//var returnObj = [[${returnObj}]]; 
+	/*]]>*/
+</script>
+
+<script type="text/javascript">
+
+	/*
+		获取库存信息
+		前端操作对象
+	 */
+	function QueryInventory(){
+		
+	}
+	
+	/*
+		功能:
+			获取查询参数(发票类型列)
+		返回: Array
+			发票类型列表,形式如下所示:
+			[
+				0,2
+			]		
+	*/
+	QueryInventory.prototype.getQueryParam=function(){
+		const invoiceTypeClass=".invoice-type";
+		
+		//用户选择的发票类型列表
+		var invoiceTypeArr=new Array();
+		
+		//迭代用户选择的发票类型
+		$(invoiceTypeClass).each(function(index, elem) {			
+			var selected=$(this).is(':checked');  //判定是否选择
+			if(selected==true){
+				var value=$(this).val();
+				//console.log("finded");
+				invoiceTypeArr.push(value);
+			}			
+		});
+		
+		return invoiceTypeArr;		
+	}
+	
+	/*
+		功能:
+			发送查询请求
+	*/
+	QueryInventory.prototype.sendRequest=function(invoiceTypeList){
+		const url=BASE_CONTEXT_PATH+"/tax/queryinventory/query";  //请求地址
+		const query_container="#query-invoiceinventory-result-container";  //存放查询结果容器	
+		
+		var param=new Object();
+		param.invoiceTypeList=invoiceTypeList;
+		
+		$(query_container).load(url,param,loadSuccess);  //采用load动态加载查询结果
+		
+		/*
+			查询发票库存完毕
+		*/
+		function loadSuccess(){			
+			//triggerWindowEvent();
+		}
+		
+		function triggerWindowEvent(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		
+	}
+	
+	/*
+		功能:通过查询对象查询发票库存
+		prev cond(前件):
+			执行了initListener函数(已经初始化)
+			触发查询按钮  trigger query button click
+		next cond(后件):
+			无
+	*/	
+	QueryInventory.prototype.query=function(){
+		const BTN_QUERY="#btn-query-inventory";
+		$(BTN_QUERY).trigger('click');  
+	}
+	
+	/*
+		功能:初始化监听器
+	*/
+	QueryInventory.prototype.initListener=function(){
+		var self=this; //reference instance Object of QueryInventory ;
+		
+		const BTN_QUERY="#btn-query-inventory";
+		$(BTN_QUERY).on('click',startQuery);  //开始查询按钮
+		
+		//click event's listener
+		/*
+		* 开始查询
+		*/
+		function startQuery(){
+			//console.log("btn clicked!");
+			var parms=self.getQueryParam();			
+			/* for(var i=0;i<parms.length;i++){
+				console.log("selected invoice type is:"+parms[i]);
+			} */			
+			
+			//有效性验证
+			const msg="未选择发票类型";
+			if(parms.length<=0){				
+				util.message(msg,null,"warning");
+				//dialog type: success warning info error,默认为info
+			}
+			else{
+				self.sendRequest(parms);	
+			}				
+		}  //end of startQuery  
+		
+	}	
+	
+	//查询库存对象	
+	var queryInventory= new QueryInventory();   
+	
+	/* 
+		page loaded ready 
+	*/
+	$(function(){		
+		queryInventory.initListener();  //初始化按钮监听器
+		queryInventory.query();			//开始查询发票库存
+		
+	});
+	
+
+</script>
+
+
+</html>

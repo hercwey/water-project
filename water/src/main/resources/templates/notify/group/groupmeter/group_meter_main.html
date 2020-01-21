@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>分组-表计主页面</title>
+<!-- JS Scripts-->
+<!-- <script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script> -->
+
+
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-6 column">
+			<!-- 加载已选择的表计 -->
+			<div class="selected-meter-main"></div>
+		</div>
+		<div class="col-md-6 column">
+			<!-- 加载未选择的表计 -->
+			<div class="unselected-meter-main"></div>
+		</div> 
+	</div>
+
+	<!-- 分页组件JS -->
+	<!-- <script src="/js/pager/Pagers.js" type="text/javascript"></script> -->
+	
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		//var firstName = [[${firstName}]];
+		//var secondName = [[${secondName}]];
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//-------------------PAGE LOADED READY--------------------
+		
+		/**
+		 * 	加载已选择的表计主页面
+		 */
+		function loadSelectedMeterMain(parms) {
+			var groupId = getNotifyGroupId();//获取当前分组的分组ID 
+			var parms = new Object();
+			parms.groupId = groupId;
+				
+			//加载已选择的表计列表页面
+			var url = BASE_CONTEXT_PATH+'/water-notify-group/load-selected-meter-main';
+			$(".selected-meter-main").load(url, parms, triggerResize);
+		}
+		/**
+		 * 	加载未选择的表计主页面
+		 */
+		function loadUnselectedMeterMain(parms) {
+			//加载未选择的表计列表页面
+			var url = BASE_CONTEXT_PATH+'/water-notify-group/load-unselected-meter-main';
+			$(".unselected-meter-main").load(url, null, triggerResize);
+		}
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		$(function() {
+			//------------init-------------
+			loadSelectedMeterMain();//加载已选择的表计主页面
+			loadUnselectedMeterMain();//加载未选择的表计主页面
+			//---------事件绑定--------------
+			
+		});
+	</script>
+
+
+
+</body>
+</html>

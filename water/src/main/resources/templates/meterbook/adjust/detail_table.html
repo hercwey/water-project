@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户档案详细信息</title>
+
+</head>
+
+<body>
+	<div class="row">
+		<div class="col-md-6">
+			<table class="table table-sm" id="customer-detail-table">
+				<tr>
+					<td>客户名称：</td>
+					<td th:text="${customer==null ? '' : customer.customerName}"></td>
+					<td>业主名称：</td>
+					<td th:text="${customer==null ? '' : customer.propName}"></td>
+				</tr>
+				<tr>
+					<td>业主电话：</td>
+					<td th:text="${customer==null ? '' : customer.propTel}"></td>
+					<td>业主手机：</td>
+					<td th:text="${customer==null ? '' : customer.propMobile}"></td>
+				</tr>
+				<tr>
+					<td>业主邮件：</td>
+					<td th:text="${customer==null ? '' : customer.propEmail}"></td>
+					<td>曾用名：</td>
+					<td th:text="${customer==null ? '' : customer.usedName}"></td>
+				</tr>
+				<tr>
+					<td>立户时间：</td>
+					<td th:text="${customer==null ? '' : customer.settleTimeStr}"></td>
+					<td>地址：</td>
+					<td th:text="${customer==null ? '' : customer.address}"></td>
+				</tr>
+				<tr>
+					<td>证件类型：</td>
+					<td th:text="${customer==null ? '' : customer.idTypeStr}"></td>
+					<td>证件号：</td>
+					<td th:text="${customer==null ? '' : customer.idNo}"></td>
+				</tr>
+				<tr>
+					<td>客户类型：</td>
+					<td th:text="${customer==null ? '' : customer.customerTypeStr}"></td>
+					<td>客户电话：</td>
+					<td th:text="${customer==null ? '' : customer.customerTel}"></td>
+				</tr>
+				<tr>
+					<td>客户手机：</td>
+					<td th:text="${customer==null ? '' : customer.customerMobile}"></td>
+					<td>客户电子邮件：</td>
+					<td th:text="${customer==null ? '' : customer.customerEmail}"></td>
+				</tr>
+				<tr>
+					<td>客户编号：</td>
+					<td th:text="${customer==null ? '' : customer.customerCode}"></td>
+					<td>用水性质：</td>
+					<td th:text="${customer==null ? '' : customer.waterUseValue}"></td>
+				</tr>
+				<tr>
+					<td>行业性质：</td>
+					<td th:text="${customer==null ? '' : customer.industryValue}"></td>
+					<td>用水人数：</td>
+					<td th:text="${customer==null ? '' : customer.useNum}"></td>
+				</tr>
+				<tr>
+					<td>用水状态：</td>
+					<td th:text="${customer==null ? '' : customer.waterStatusStr}"></td>
+					<td>通知方式：</td>
+					<td th:text="${customer==null ? '' : customer.notifyModeStr}"></td>
+				</tr>
+				<tr>
+					<td>减免政策：</td>
+					<td th:text="${customer==null ? '' : customer.discountName}"></td>
+					<td>扣费方式：</td>
+					<td th:text="${customer==null ? '' : customer.deductTypeStr}"></td>
+				</tr>
+				<tr>
+					<td>房间号：</td>
+					<td th:text="${customer==null ? '' : customer.room}"></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-md-6">
+			<table class="table table-sm" id="meter-detail-table">
+				<tr>
+					<td>水表口径：</td>
+					<td th:text="${meter==null ? '' : meter.caliberValue}"></td>
+					<td>水表编号：</td>
+					<td th:text="${meter==null ? '' : meter.meterNo}"></td>
+				</tr>
+				<tr>
+					<td>水表位置：</td>
+					<td th:text="${meter==null ? '' : meter.place}"></td>
+					<td>水表厂家：</td>
+					<td th:text="${meter==null ? '' : meter.factoryValue}"></td>
+				</tr>
+				<tr>
+					<td>水表厂家电话：</td>
+					<td th:text="${meter==null ? '' : meter.factoryPhone}"></td>
+					<td>水表检定证书编号：</td>
+					<td th:text="${meter==null ? '' : meter.certificateNo}"></td>
+				</tr>
+				<tr>
+					<td>水表检定日期：</td>
+					<td th:text="${meter==null ? '' : meter.checkDateStr}"></td>
+					<td>水表有效日期：</td>
+					<td th:text="${meter==null ? '' : meter.effectiveDateStr}"></td>
+				</tr>
+				<tr>
+					<td>水表钢印号：</td>
+					<td th:text="${meter==null ? '' : meter.steelSealNo}"></td>
+					<td>新表表底数：</td>
+					<td th:text="${meter==null ? '' : meter.newMeterBottom}"></td>
+				</tr>
+				<tr>
+					<td>拆换表表底数：</td>
+					<td th:text="${meter==null ? '' : meter.changeMeterBottom}"></td>
+					<td>水表用途：</td>
+					<td th:text="${meter==null ? '' : meter.meterUseValue}"></td>
+				</tr>
+				<tr>
+					<td>水表类型：</td>
+					<td th:text="${meter==null ? '' : meter.meterTypeValue}"></td>
+					<td>轮换上限：</td>
+					<td th:text="${meter==null ? '' : meter.upperLimit}"></td>
+				</tr>
+				<tr>
+					<td>表计状态：</td>
+					<td th:text="${meter==null ? '' : meter.meterStatusStr}"></td>
+					<td>水表型号：</td>
+					<td th:text="${meter==null ? '' : meter.meterModelValue}"></td>
+				</tr>
+				<tr>
+					<td>抄表方式：</td>
+					<td th:text="${meter==null ? '' : meter.readModeValue}"></td>
+					<td>备注：</td>
+					<td th:text="${meter==null ? '' : meter.remark}"></td>
+				</tr>
+				<tr>
+					<td>虚实表：</td>
+					<td th:text="${meter==null ? '' : meter.virtualRealStr}"></td>
+					<td>表地址</td>
+					<td th:text="${meter==null ? '' : meter.meterAddress}"></td>
+				</tr>
+				<tr>
+					<td>采集器地址：</td>
+					<td th:text="${meter==null ? '' : meter.collectorAddr}"></td>
+					<td>通道号</td>
+					<td th:text="${meter==null ? '' : meter.channelNo}"></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<th:block th:fragment="dialog">
+		
+		
+		
+
+	</th:block>
+	
+	
+	<script type="text/javascript">
+
+	
+	
+	</script>
+</body>
+</html>

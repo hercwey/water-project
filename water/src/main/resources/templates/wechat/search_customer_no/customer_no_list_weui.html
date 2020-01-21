@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!-- wechat-用户编号结果列表-使用中 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, height=device-height, initial-scale=1">
+<!-- 通用css及JS lib -->
+<!-- <div th:include="common/common_head_wechat::headx('石家庄高新区供水排水公司')"
+	th:remove="tag"></div> -->
+
+<style>
+hr.style-two { /*透明渐变水平线*/
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	border: 0;
+	height: 5px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0),
+		rgba(0, 0, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+.center {
+	width: auto;
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul.customer-no-list {
+	padding-left: 0px;
+}
+
+ul.customer-no-list li {
+	list-style: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+</style>
+
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h5 style="text-align: center; margin-top: 10px;">用户编号</h5>
+				<hr class="style-two" /> -->
+				<!-- <div th:include="wechat/public_page/header::header('用户编号')"
+					th:remove="tag"></div> -->
+
+				<!-- <div class="form-horizontal " role="form" id="bind-customer-form"> -->
+				<!-- 用户编号-->
+				<div class="" style="text-align: center;">
+					<ul class="customer-no-list " style="list-sytle-type: none;">
+						<!-- 如果列表为空时显示未查询到用户编号 -->
+						<span th:if="${#lists.isEmpty(customerList)}" th:remove="tag">
+							<li>
+
+							<div class="input-group">
+								<!-- prepend -->
+								<div class="input-group-prepend"  >
+									<strong> <span class="input-group-text" style="font-size:18px;">未查询到用户编号</span> </strong>
+								</div>
+							</div>
+							</li>						
+						</span>
+					
+						<span th:if="${not #lists.isEmpty(customerList)}" th:remove="tag">
+							<li th:each="customer,iter:${customerList}">
+
+								<div class="weui-form-preview rounded  border-radius  w"
+									style="background-color: white;margin-left:10px;margin-right:10px;">
+
+									<!-- 当点击此处时,打开或收缩帐单BODY -->
+									<div class="weui-form-preview__hd rounded">
+										<!-- ${#dates.format(date, 'dd/MMM/yyyy HH:mm')} -->
+										<label class="weui-form-preview__label">序号</label>
+										<em class="weui-form-preview__value" style="font-size: 20px;"  th:text="${iter.count}"></em>
+									</div>
+
+									<div class="weui-form-preview__bd">
+										<div class="weui-form-preview__item">
+											<label class="weui-form-preview__label">用户编号</label> <span
+												class="weui-form-preview__value" th:text="${customer.customerCode}">用户编号</span>
+										</div>
+										<div class="weui-form-preview__item">
+											<label class="weui-form-preview__label">门牌号</label> <span
+												class="weui-form-preview__value" th:text="${customer.address}+${customer.room}">用户门牌号码</span>
+										</div>
+									</div>
+									<div class="weui-btn-area">
+											<a href="javascript:;"
+										class="weui-btn weui-btn_primary search-btn-bind block"
+										th:attr="data-bind-customer-code=${customer.customerCode}">去绑定</a>
+									</div>
+
+								</div> 
+						</li>
+
+						</span>
+
+					</ul>
+
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		
+	</div>
+	
+	<!-- <script type="text/javascript" src="/weui/js/php.js"></script> -->
+
+<script type="text/javascript">
+
+	function CustomerNoList(){
+		
+		/*
+			收集绑定所使用的信息
+		*/
+		this.getParams=function(customerCode){
+			//获取查询用户编号的条件值
+			var tempParms=searchCustomerNo.getRequestParms();  //来自于查询页面
+			tempParms.customerCode=customerCode;
+			return tempParms;			
+		}
+		
+		/*
+			开始绑定
+			将参数传递到绑定页面中. 自前台传递即可.
+		*/
+		this.startBind=function(){
+			
+		}
+		
+		
+	}
+
+	$(function(){
+		
+		var customerNoList=new CustomerNoList();
+		
+		//查询页面:绑定按钮
+		//将参数传递给绑定页面
+		$(".search-btn-bind").on('click',function(){
+			
+			var customerCode=$(this).attr("data-bind-customer-code");
+			console.log("customerCode:"+customerCode);
+			
+			var parms=customerNoList.getParams(customerCode);
+			
+			customerRelation.triggerCustomerBind(parms);	
+		});
+		
+		
+	});
+
+</script>
+
+
+
+</body>
+</html>

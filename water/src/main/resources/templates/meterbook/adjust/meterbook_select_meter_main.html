@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+
+</head>
+<body>
+
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label role-main">
+		<div class="col-md-6 column">
+			<div class="card" style="height:100%;">
+				<h5 class="card-header" th:text="${firstName}">
+					我的表计
+				</h5>
+				<div class="card-body">
+					<!-- 加载我的表册包含的表计 -->
+					<!-- <div th:include="meterbook/adjust/first_meterbook_select_main"></div> -->
+					<div class="first-meter-book-select-main"></div>
+					
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6 column">
+			<div class="card" style="height:100%;">
+				<h5 class="card-header" th:text="${secondName}">
+					全部表计
+				</h5>
+				<div class="card-body">
+					<!-- 加载全部表册包含的表计 -->
+					<!-- <div th:include="meterbook/adjust/second_meterbook_select_main"></div> -->
+					<div class="second-meter-book-select-main"></div>
+				</div>
+			</div>
+		</div> 
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//-------------------PAGE LOADED READY--------------------
+		function loadFirstBook(parms) {
+			//加载字典列表页面
+			var url = "/meter-book-adjust/first-meter-book-select-main";
+			$(".first-meter-book-select-main").load(url, null, triggerResize);
+		}
+		function loadSecondBook(parms) {
+			//加载字典列表页面
+			var url = "/meter-book-adjust/second-meter-book-select-main";
+			$(".second-meter-book-select-main").load(url, null, triggerResize);
+		}
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		$(function() {
+			//------------init-------------
+			loadFirstBook();
+			loadSecondBook();
+			//---------事件绑定--------------
+			
+		});
+	</script>
+
+
+
+</body>
+</html>

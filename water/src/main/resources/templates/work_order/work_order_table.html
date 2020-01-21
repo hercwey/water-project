@@ -1,0 +1,507 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+<style type="text/css">
+.detal-situation-class {
+max-width: 150px;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+
+</style>
+</head>
+<body>
+	<!-- 批次列表 -->
+	<table class="table table-sm">
+		<thead>
+			<tr>
+				<th style="width:50px;">
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th>
+				<th >工单编号</th>
+				<th >工单标题</th>
+				<th >工单类型</th>
+				<th >工单状态</th>
+				<th >分配人员</th>
+				<th >工单执行情况</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${workOrderList}" id="tr-item">
+			
+				<!-- 条目选择器 -->
+				<td>
+					
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td>
+				
+				<!-- 工单编号 -->
+				<td th:text="${item.serialNum}">工单编号</td>
+				<!-- 工单标题 -->
+				<td th:text="${item.name}">工单标题</td>
+				<!-- 工单类型 -->
+				<td th:text="${item.typeStr}">工单类型</td>
+				<!-- 工单状态-->
+				<td th:text="${item.statusStr}">工单状态</td>
+				<!-- 分配人员-->
+				<td th:text="${item.users}">分配人员</td>
+				<!-- 工单执行情况-->
+				<td class="detal-situation-class" th:text="${item.dealSituationStr}" th:attr="bind-id=${item.id}" id="toEdit"  name="toEdit" style="cursor: pointer;">
+					
+				</td>
+				<!-- 操作列 -->
+				<td>
+					<!-- 客户-账户状态：0=未分配；1=已分配；2=处理中；3=申请完成；4=已完成 -->
+					<span th:if="${item.status==0}">
+						<!-- 分配工单  -->
+						<button type="button" class="btn-allot-work btn btn-secondary btn-sm "
+							th:attr="bind-id=${item.id}, data-status=${item.status}">
+							<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>工单分配</span>
+						</button>
+					</span>
+					
+					<!-- 客户-账户状态：0=未分配；1=已分配；2=处理中；3=申请完成；4=已完成 -->
+					<span th:if="${item.status==1}">
+						<!-- 处理工单  -->
+						<button type="button" class="btn-deal-work btn btn-secondary btn-sm "
+							th:attr="bind-id=${item.id}, data-status=${item.status}">
+							<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>工单处理</span>
+						</button>
+					</span>
+					
+					<!-- 客户-账户状态：0=未分配；1=已分配；2=处理中；3=申请完成；4=已完成 -->
+					<span th:if="${item.status==2}">
+						<!-- 完成工单  -->
+						<button type="button" class="btn-apply-work btn btn-secondary btn-sm "
+							th:attr="bind-id=${item.id}, data-status=${item.status}">
+							<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>完成工单</span>
+						</button>
+					</span>
+					
+					<!-- 客户-账户状态：0=未分配；1=已分配；2=处理中；3=申请完成；4=已完成 -->
+					<span th:if="${item.status==3}">
+						<!-- 结束工单  -->
+						<button type="button" class="btn-complete-work btn btn-secondary btn-sm "
+							th:attr="bind-id=${item.id}, data-status=${item.status}">
+							<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>结束工单</span>
+						</button>
+					</span>
+					<span th:class="${FUNCTION_MODULE=='MODULE_OPERAT' ? '' : 'd-none'}">
+						<!-- 修改 -->
+						<button type="button" class="modi-single btn btn-secondary btn-sm "
+							th:attr="bind-id=${item.id}">
+							<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"></i> <span>编辑</span>
+						</button>
+						<!-- 删除 -->
+						<button type="button" class="del-single btn btn-secondary btn-sm"
+							th:attr="bind-id=${item.id}">
+							<i class="fa fa-times fa-1x" aria-hidden="true"></i> <span>删除</span>
+						</button>
+					</span>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pagerWorkOrder')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_work_pageNum=[[${pageNum}]];
+		var curr_work_pageSize=[[${pageSize}]];
+		var curr_work_searchCond=[[${searchCond}]];
+		
+		var pageInfo=[[${pageInfo}]];
+		//console.log("pageInfo is :"+JSON.stringify(pageInfo));
+		
+		console.log("pageInfo---pagesize is :"+pageInfo.pageSize);
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		/**
+		*点击工单执行情况弹窗
+		*/
+		$("td[name='toEdit']").click(function(){
+			var url = BASE_CONTEXT_PATH+'/work-order-allot/load-dealsituation-detail';
+
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.workOrderId = itemId;
+
+			$("#deal-situation-detail").load(url, parms,openDealSituationDialog); //加载完毕后显示 
+		})
+		/**
+		  	打开工单执行情况参话框
+		  	@returns
+		 */
+		function openDealSituationDialog() {
+			//	可拖拽
+			$("#modal-container-deal-situation-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-deal-situation-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:工单执行情况
+		*/
+		function closeDealSituationDialog() {
+			$("#modal-container-deal-situation-dialog").modal("hide");
+		}
+		
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function delBatchItem(ids) {
+			var urlStr = BASE_CONTEXT_PATH+"/work-order-allot/delete"; // 需要提交的url
+			
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadWorkOrderAllotPage();
+							
+							util.message(res.result_msg,null,"warning");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+	
+		//--------------批量删除-----------------
+		
+		/*
+			批量删除确认
+		*/
+		function deleteConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录? ", "xxx", "ok_callback_name", "cancel_callback_name")			
+		}
+		
+		/*
+			批量删除确认:确认(回调)
+		*/
+		function ok_callback_name(id){
+			var ids=getSelectedIds();  //此函数定义于_table.html中
+			delBatchItem(ids);
+		}
+		
+		/*
+			批量删除确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.del-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //分录ID
+			//console.log("itemId:" + itemId);
+			util.delConfirm("确认删除此条目?", itemId, "deleteSingle");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteSingle(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			delBatchItem(idsArr);
+		}
+				
+		//--------单个修改-----------------
+		/* 
+			加载修改批次对话框 
+		*/
+		$('.modi-single').on('click',function() {
+			
+			//改变标签名称
+			$("#add-edit-title").find('p').text("编辑");
+			var url = BASE_CONTEXT_PATH+'/work-order-allot/loadmodidialog';
+
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.itemId = itemId;
+
+			$("#order-dialog-edit").load(url, parms,openModiDialog); //加载完毕后显示 
+			
+		});
+		
+		/**
+		  	打开修改参话框
+		  	@returns
+		 */
+		function openModiDialog() {
+			//	可拖拽
+			$("#modal-container-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:修改对话框 
+		*/
+		function closeModiDialog() {
+			$("#modal-container-dialog").modal("hide");
+		}
+		
+		//--------分配工单----------------------------------
+		/* 
+			加载分配工单对话框 
+		*/
+		$('.btn-allot-work').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/work-order-allot/loadallotdialog';
+
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.workOrderId = itemId;
+
+			$("#allot-dialog-edit").load(url, parms,openAllotDialog); //加载完毕后显示 
+			
+		});
+		
+		/**
+		  	打开分配工单参话框
+		  	@returns
+		 */
+		function openAllotDialog() {
+			//	可拖拽
+			$("#modal-container-allot-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-allot-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:关闭分配工单对话框
+		*/
+		function closeAllotDialog() {
+			$("#modal-container-allot-dialog").modal("hide");
+		}
+		
+		//--------处理工单----------------------------------
+		/* 
+			加载处理工单对话框 
+		*/
+		$('.btn-deal-work').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/work-order-allot/loaddealdialog';
+
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.workOrderId = itemId;
+
+			$("#deal-dialog-edit").load(url, parms,openDealDialog); //加载完毕后显示 
+			
+		});
+		
+		/**
+		  	打开处理工单参话框
+		  	@returns
+		 */
+		function openDealDialog() {
+			//	可拖拽
+			$("#modal-container-deal-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-deal-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:关闭处理工单对话框
+		*/
+		function closeDealDialog() {
+			$("#modal-container-deal-dialog").modal("hide");
+		}
+		
+		//--------完成工单----------------------------------
+		/* 
+			加载分配工单对话框 
+		*/
+		$('.btn-apply-work').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/work-order-allot/loadapplydialog';
+
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.workOrderId = itemId;
+
+			$("#apply-dialog-edit").load(url, parms,openApplyDialog); //加载完毕后显示 
+			
+		});
+		
+		/**
+		  	打开分配工单参话框
+		  	@returns
+		 */
+		function openApplyDialog() {
+			//	可拖拽
+			$("#modal-container-apply-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-apply-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+
+		/* 
+			close dialog:关闭完成工单对话框
+		*/
+		function closeApplyDialog() {
+			$("#modal-container-apply-dialog").modal("hide");
+		}
+		
+		//--------结束工单----------------------------------
+		/* 
+			加载结束工单对话框 
+		*/
+		$('.btn-complete-work').on('click',function() {
+			var url = BASE_CONTEXT_PATH+'/work-order-allot/loadcompletedialog';
+	
+			var itemId = $(this).attr("bind-id"); //条目ID			
+			var parms = new Object(); //参数
+			parms.workOrderId = itemId;
+	
+			$("#complete-dialog-edit").load(url, parms,openCompleteDialog); //加载完毕后显示 
+			
+		});
+		
+		/**
+		  	打开分配工单参话框
+		  	@returns
+		 */
+		function openCompleteDialog() {
+			//	可拖拽
+			$("#modal-container-complete-dialog").draggable({
+				cursor : "move",
+				handle : '.modal-header'
+			}); 
+		
+			$('#modal-container-complete-dialog').modal({
+				backdrop : 'static',
+				keyboard : false
+			});
+		}
+	
+		/* 
+			close dialog:关闭完成工单对话框
+		*/
+		function closeCompleteDialog() {
+			$("#modal-container-complete-dialog").modal("hide");
+		}
+				
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		//创建分页组件实例
+		var pager=new Pager("pagerWorkOrder");
+		$(function(){			
+			pager.init(loadWorkOrderAllotPage,curr_work_searchCond);			
+		});
+	</script>
+</body>
+</html>

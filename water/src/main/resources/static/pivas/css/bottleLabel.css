@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+@page{
+		size:70mm 90mm ;
+	}
+
+hr{
+	height: 5px; border: none; border-top: 5px dotted #ff0000;	
+}
+
+.rePrint{
+	color:green;
+}
