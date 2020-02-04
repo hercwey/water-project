@@ -97,6 +97,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring().antMatchers("/device/**");
 		web.ignoring().antMatchers("/subscribe/**");
 		web.ignoring().antMatchers("/meter/**");
+		web.ignoring().antMatchers("/cmd/**");
 		
 	}
 

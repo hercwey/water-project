@@ -44,6 +44,9 @@
 		ID = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="save" parameterType="com.learnbind.ai.model.iot.CommandBean">
+  	<selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+　　		SELECT WM_COMMAND_SEQ_GENERATOR.CURRVAL FROM DUAL
+	</selectKey>
     INSERT INTO WM_COMMAND
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="commandId != null">
@@ -94,13 +97,13 @@
         #{appId,jdbcType=VARCHAR},
       </if>
       <if test="deviceId != null">
-        (select id from wm_device where deviceId=#{deviceId,jdbcType=VARCHAR}),
+        (select id from WM_DEVICE where DEVICE_ID=#{deviceId,jdbcType=VARCHAR}),
       </if>
       <if test="serviceId != null">
-        (select id from wm_service where serviceName=#{serviceId,jdbcType=VARCHAR}),
+        (select id from WM_SERVICE where SERVICE_NAME=#{serviceId,jdbcType=VARCHAR}),
       </if>
       <if test="method != null">
-        (select id from wm_command_method where methodName=#{method,jdbcType=BIGINT}),
+        (select id from WM_COMMAND_METHOD where METHOD_NAME=#{method,jdbcType=VARCHAR}),
       </if>
       <if test="methodParams != null">
         #{methodParams,jdbcType=VARCHAR},
@@ -129,8 +132,8 @@
     </trim>
   </insert>
   
-  <update id="update" parameterType="com.learnbind.ai.model.iot.CommandBean">
-    update wm_command
+  <update id="modify" parameterType="com.learnbind.ai.model.iot.CommandBean">
+    UPDATE WM_COMMAND
     <set>
       <if test="commandId != null">
         COMMAND_ID = #{commandId,jdbcType=VARCHAR},
@@ -139,13 +142,13 @@
         APP_ID = #{appId,jdbcType=VARCHAR},
       </if>
       <if test="deviceId != null">
-        DEVICE_ID = (select id from wm_device where deviceId=#{deviceId,jdbcType=VARCHAR}),
+        DEVICE_ID = (select id from WM_DEVICE where DEVICE_ID=#{deviceId,jdbcType=VARCHAR}),
       </if>
       <if test="serviceId != null">
-        SERVICE_ID = (select id from wm_service where serviceName=#{serviceId,jdbcType=VARCHAR}),
+        SERVICE_ID = (select id from WM_SERVICE where SERVICE_NAME=#{serviceId,jdbcType=VARCHAR}),
       </if>
       <if test="method != null">
-        METHOD_ID = (select id from wm_command_method where methodName=#{method,jdbcType=BIGINT}),
+        METHOD_ID = (select id from WM_COMMAND_METHOD where METHOD_NAME=#{method,jdbcType=BIGINT}),
       </if>
       <if test="methodParams != null">
         METHOD_PARAMS = #{methodParams,jdbcType=VARCHAR},
@@ -181,7 +184,7 @@
         REMARK = #{desc,jdbcType=VARCHAR},
       </if>
     </set>
-    where DEVICE_ID = (select id from wm_device where deviceId=#{deviceId,jdbcType=VARCHAR})
+    where DEVICE_ID = (select id from WM_DEVICE where DEVICE_ID=#{deviceId,jdbcType=VARCHAR})
     and COMMAND_ID = #{commandId,jdbcType=VARCHAR}
   </update>
   

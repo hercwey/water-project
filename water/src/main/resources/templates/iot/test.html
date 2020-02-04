@@ -18,7 +18,19 @@
 	_starter页面---load---_main页面---load---_table页面
 	 
 -->
-
+<style type="text/css">
+	/* 列表选中行的颜色 */
+	.selected-color{
+		background: #8FBC8F;
+		color: #fff
+		
+	}
+	table tbody tr:hover{
+		cursor: default;
+		background: #8FBC8F;
+		color: #fff
+	}
+</style>
 </head>
 <body>
 	<!-- 批次管理主页 -->
@@ -70,9 +82,17 @@
 			</h5>
 			<div class="card-body">
 				<div class="row clearfix">
-					<div class="col-md-12 column">
+					<div class="col-md-3 column">
 						<button type="button" class="btn btn-info btn-sm" id="btn-query-device">
-							<i class="fa fa-search" aria-hidden="true"> <span>查询设备</span></i>
+							<i class="fa fa-search" aria-hidden="true"> <span>查询设备列表</span></i>
+						</button>
+					</div>
+					<div class="col-md-3 column">
+						<input type="number" class="form-control btn-sm" id="command-value" name="" value="" placeholder="命令值" />
+					</div>
+					<div class="col-md-6 column">
+						<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-to-device">
+							<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送命令</span></i>
 						</button>
 					</div>
 				</div>
@@ -90,7 +110,7 @@
 								Card footer
 							</div>
 						</div> -->
-						<table class="table table-bordered table-sm table-hover device-item-table">
+						<table class="table table-bordered table-sm device-item-table">
 							<thead>
 								<tr>
 									<th>序号</th>
@@ -123,7 +143,7 @@
 				<div class="row clearfix">
 					<div class="col-md-12 column">
 						<button type="button" class="btn btn-info btn-sm" id="btn-search-device-up-data">
-							<i class="fa fa-info" aria-hidden="true"> <span>查询设备上报数据</span></i>
+							<i class="fa fa-search" aria-hidden="true"> <span>查询设备上报数据</span></i>
 						</button>
 					</div>
 				</div>
@@ -145,6 +165,9 @@
 	</script>
 
 	<script type="text/javascript">
+	
+		var SELECTED_DEVICE_ID = null;//用户已选择的设备
+	
 		$(function() {
 			
 			//------------------初始化-----------------------------------------------------------------------------
@@ -252,12 +275,36 @@
 				}); */
 			});
 			
-			//------------------查询设备部分----------------------------------------------------------------------------
+			//------------------查询设备列表部分----------------------------------------------------------------------------
 			/**
-			 * 	查询设备
+			 * 	查询设备列表
 			 */
 			$("#btn-query-device").on("click", function(){
 				defaultQueryDeviceList();//默认查询设备列表（默认查询第1页，每页5条数据）
+			});
+			
+			/**
+			 * 	发送命令到设备（给水表发送命令）
+			 */
+			$("#btn-send-cmd-to-device").on("click", function(){
+				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
+				if(deviceId==null || deviceId==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要发送命令的设备！",null,"warning");
+					return false;
+				}
+				
+				var cmdVal = $("#command-value").val();//命令值
+				if(cmdVal==null || cmdVal==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请输入需要发送的命令值！",null,"warning");
+					return false;
+				}
+				
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
 			});
 			
 			
@@ -277,14 +324,17 @@
 		 */
 		function defaultQueryDeviceList(){
 			
-			var pageNo = 1;
-			var pageSize = 10;
+			var pageNo = 0;
+			var pageSize = 5;
 			queryDeviceList(pageNo, pageSize);//通用查询设备列表
 		}
 		/**
 		 * 	通用查询设备列表
 		 */
 		function queryDeviceList(pageNo, pageSize){
+			
+			SELECTED_DEVICE_ID = null;//用户已选择的设备，用户重新查询设备或点击分页查询后设置已选择的设备为空
+			
 			var url = BASE_CONTEXT_PATH + "/device/queryDevices/"+pageNo+"/"+pageSize;
 			
 			$.get(url, null, function(res){
@@ -303,6 +353,8 @@
 					console.log("----------devices:"+JSON.stringify(devices));
 					initDeviceItemBody(pageNo, pageSize, devices);//初始化设备列表
 					initDeviceItemPager(totalCount, pageNo, pageSize);//初始化设备列表分页
+					initDeviceListener();//初始化绑定设备列表tr的click事件
+					windowResize();//初始化windows窗口滚动条
 					return false;
 				}
 				//dialog type: success warning info error,默认为info
@@ -316,7 +368,7 @@
 			
 			console.log("----------设备列表对象:"+JSON.stringify(devices));
 			
-			var count = (pageNo-1)*pageSize;//当前页默认序号
+			var count = (pageNo)*pageSize;//当前页默认序号
 			
 			var domObj = $("table.device-item-table tbody.device-item-body");
 			
@@ -334,23 +386,42 @@
 		 */
 		function getDeviceBodyTr(count, device){
 			console.log("----------设备对象:"+JSON.stringify(device));
+			var deviceId = device.deviceId;
 			var deviceInfo = device.deviceInfo;
 			console.log("----------设备信息对象:"+JSON.stringify(deviceInfo));
 			
-			var statusStr = "";
-			if(deviceInfo.status==null || deviceInfo.status=="OFFLINE"){
+			
+			var status = deviceInfo.status;//状态
+			var nodeId = deviceInfo.nodeId;//设备识别码
+			var deviceType = deviceInfo.deviceType;//设备类型
+			var manufacturerName = deviceInfo.manufacturerName;//厂商名称
+			
+			var statusStr = "";//状态
+			if(status==null || status=="OFFLINE"){
 				statusStr = "<span class='badge badge-secondary'>离线</span>";
 			}else{
 				statusStr = "<span class='badge badge-success'>在线</span>";
 			}
 			
-			var html = "<tr>"
+			var nodeIdStr = "";//设备识别码
+			if(nodeId!=null && nodeId!=""){
+				nodeIdStr = nodeId;
+			}
+			var deviceTypeStr = "";//设备类型
+			if(deviceType!=null && deviceType!=""){
+				deviceTypeStr = deviceType;
+			}
+			var manufacturerNameStr = "";//厂商名称
+			if(manufacturerName!=null && manufacturerName!=""){
+				manufacturerNameStr = manufacturerName;
+			}
+			var html = "<tr data-device-id='"+deviceId+"'>"
 					 + "<td>"+count+"</td>"	//序号
 					 + "<td>"+statusStr+"</td>"	//状态
 					 + "<td></td>"	//设备名称
-					 + "<td>"+deviceInfo.nodeId+"</td>"	//设备识别码
-					 + "<td>"+deviceInfo.deviceType+"</td>"	//设备类型
-					 + "<td>"+deviceInfo.manufacturerName+"</td>"	//厂商名称
+					 + "<td>"+nodeIdStr+"</td>"	//设备识别码
+					 + "<td>"+deviceTypeStr+"</td>"	//设备类型
+					 + "<td>"+manufacturerNameStr+"</td>"	//厂商名称
 					 + "</tr>";
 			return html;
 		}
@@ -382,30 +453,119 @@
 				html += '<span class="page-link" style="color:black;">';
 				html += 		'<span>';
 				html += 			'共<strong><span>'+totalCount+'</span></strong>条, ';
-				html += 			'<span>当前'+pageNo+'/'+totalPage+'页</span>';
+				html += 			'<span>当前'+(pageNo+1)+'/'+totalPage+'页</span>';
 				html += 		'</span>';
 				html += '</span>';
 				html += '</li>';
 				if(totalCount>0){
 					//queryDeviceList(pageNo, pageSize);//通用查询设备列表
-					if(pageNo==1){
+					if(pageNo!=0){
+						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList(0, '+pageSize+');">首页</a></li>';
+					}
+					if(pageNo<=0){
 						console.log("----------当前页是第一页，不需要查询上一页！");
 					}else{
 						var prePage = pageNo-1;
 						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList('+prePage+', '+pageSize+');">上一页</a></li>';
 					}
-					if(pageNo>=totalPage){
+					if(pageNo>=(totalPage-1)){
 						console.log("----------当前页是最后一页，不需要查询下一页！");
 					}else{
 						var nextPage = pageNo+1;
 						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList('+nextPage+', '+pageSize+');">下一页</a></li>';
 					}
-					
+					if(pageNo!=(totalPage-1)){
+						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList('+(totalPage-1)+', '+pageSize+');">尾页</a></li>';
+					}
 				}else{
 					html += '<li><span class="page-link" style="color:darkblue;"><span>未查询到记录</span></span></li>';
 				}
 				html += '</ul>';
 			return html;
+		}
+		
+		//------------------查询设备上传数据（水表上传数据列表）部分，初始化完成后绑定click事件----------------------------------------------------------------------------
+		/**
+		 * 	初始化绑定设备列表tr的click事件
+		 */
+		function initDeviceListener(){
+			
+			var domObj = $("table.device-item-table tbody.device-item-body tr");
+			
+			domObj.on("click", function(){
+				
+				domObj.removeClass("selected-color");//清除所有已选中的行
+				
+				var deviceId = $(this).attr("data-device-id");
+				
+				$(this).addClass("selected-color");
+				
+				SELECTED_DEVICE_ID = deviceId;//用户已选择的设备，用户选择设备行后设置已选择的设备的值
+				console.log("----------用户已选择的设备："+deviceId);
+			});
+		}
+		
+		//------------------向设备发送命令部分----------------------------------------------------------------------------
+		/**
+		 * 	向设备（水表）发送命令
+		 */
+		function sendCommandAjaxRequest(){
+			var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
+			if(deviceId==null || deviceId==""){
+				//dialog type: success warning info error,默认为info
+				util.message("请选择需要发送命令的设备！",null,"warning");
+				return false;
+			}
+			
+			var cmdVal = $("#command-value").val();//命令值
+			if(cmdVal==null || cmdVal==""){
+				//dialog type: success warning info error,默认为info
+				util.message("请输入需要发送的命令值！",null,"warning");
+				return false;
+			}
+			
+			console.log("----------向设备【"+deviceId+"】发送命令【"+cmdVal+"】");
+			
+			//var data = '{"deviceId":"替换设备DeviceId","serviceId":"JRprotocol","method":"JRprotocolXY","paras":{"value":"12"}}';
+			var paras = new Object();
+			paras.value = cmdVal;//命令值
+			var parasJson = JSON.stringify(paras);
+			
+			var dataObj = new Object();
+			//dataObj.deviceId = "e793e8a7-ddc7-4873-aca3-7d594f0a801a";//离线
+			//dataObj.deviceId = "dadb87c6-c2c4-4e27-b112-f660d2457519";//在线
+			dataObj.deviceId = deviceId;
+			dataObj.serviceId = "JRprotocol";
+			dataObj.method = "JRprotocolXY";
+			dataObj.paras = paras;
+			
+			var dataJson = JSON.stringify(dataObj);
+			
+			console.log("----------发送命令："+dataJson);
+			
+			var urlStr = BASE_CONTEXT_PATH + "/cmd/send";
+			$.ajax({
+				type: "post",
+				url: urlStr,
+				dataType : "json",
+				contentType : "application/json",      //网上很多介绍加上此参数的，后来我发现不加入这个参数才会请求成功。
+				data: dataJson,
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					var result = res;//$.parseJSON(res);
+					/* if(result.status==200){
+					
+					} */
+					//dialog type: success warning info error,默认为info
+					util.message(result.status+":"+result.message,null,"warning");
+			    }
+			});
+		}
+		/**
+		 * 	取消向设备（水表）发送命令
+		 */
+		function cancelSendCommandAjaxRequest(){
+			console.log("----------取消发送命令");
 		}
 		
 		//------------------查询设备上传数据（水表上传数据列表）部分----------------------------------------------------------------------------
@@ -416,7 +576,7 @@
 		function defaultSearchDeviceUpData(){
 			var searchCond = null;
 			var pageNum = 1;
-			var pageSize = 2;
+			var pageSize = 5;
 			clickMeterListPager(searchCond, pageNum, pageSize);
 		}
 		/**
@@ -428,6 +588,7 @@
 			
 			$(".device-up-data-item").load(url, parms, function(){
 				console.log("----------查询设备上报数据列表完成");
+				windowResize();//初始化windows窗口滚动条
 			});
 		}
 		/*
@@ -440,6 +601,12 @@
 			parms.pageSize=pageSize;
 	
 			searchDeviceUpData(parms);
+		}
+		
+		//------------------初始化滚动条部分----------------------------------------------------------------------------
+		function windowResize(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
 		}
 	</script>
 
