@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WmMeterMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.iot.WmMeter">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="DEVICE_ID" jdbcType="DECIMAL" property="deviceId" />
+    <result column="GATEWAY_ID" jdbcType="VARCHAR" property="gatewayId" />
+    <result column="REQUEST_ID" jdbcType="VARCHAR" property="requestId" />
+    <result column="SERVICE_ID" jdbcType="VARCHAR" property="serviceId" />
+    <result column="SERVICE_TYPE" jdbcType="VARCHAR" property="serviceType" />
+    <result column="EVENT_TIME" jdbcType="VARCHAR" property="eventTime" />
+    <result column="METER_TYPE" jdbcType="DECIMAL" property="meterType" />
+    <result column="METER_ADDR" jdbcType="VARCHAR" property="meterAddr" />
+    <result column="FACTORY_CODE" jdbcType="VARCHAR" property="factoryCode" />
+    <result column="CTRL_CODE" jdbcType="VARCHAR" property="ctrlCode" />
+    <result column="DATA_DI" jdbcType="DECIMAL" property="dataDi" />
+    <result column="METER_SEQUENCE" jdbcType="DECIMAL" property="meterSequence" />
+    <result column="METER_DATA" jdbcType="VARCHAR" property="meterData" />
+    <result column="METER_CHECKSUM" jdbcType="DECIMAL" property="meterChecksum" />
+    <result column="JSON_DATA" jdbcType="VARCHAR" property="jsonData" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, DEVICE_ID, GATEWAY_ID, REQUEST_ID, SERVICE_ID, SERVICE_TYPE, EVENT_TIME, METER_TYPE, 
+    METER_ADDR, FACTORY_CODE, CTRL_CODE, DATA_DI, METER_SEQUENCE, METER_DATA, METER_CHECKSUM, 
+    JSON_DATA, CREATE_TIME, UPDATE_TIME
+  </sql>
+  
+  <insert id="save" parameterType="com.learnbind.ai.model.iot.MeterBean">
+        INSERT INTO WM_METER (
+			DEVICE_ID,
+			GATEWAY_ID,
+			REQUEST_ID,
+			SERVICE_ID,
+			SERVICE_TYPE,
+			EVENT_TIME,
+			METER_TYPE,
+			METER_ADDR,
+			FACTORY_CODE,
+			CTRL_CODE,
+			DATA_DI,
+			METER_SEQUENCE,
+			METER_DATA,
+			METER_CHECKSUM,
+			JSON_DATA,
+			CREATE_TIME,
+			UPDATE_TIME 
+			)
+		VALUES
+			(
+				(
+				SELECT
+					ID 
+				FROM
+					WM_DEVICE 
+				WHERE
+					DEVICE_ID = #{deviceId,jdbcType=VARCHAR}
+				),
+				#{gatewayId,jdbcType=VARCHAR},
+				#{requestId,jdbcType=VARCHAR},
+				#{serviceId,jdbcType=VARCHAR},
+				#{serviceType,jdbcType=VARCHAR},
+				#{eventTime,jdbcType=VARCHAR},
+				#{meterType,jdbcType=BIGINT},
+				#{meterAddr,jdbcType=VARCHAR},
+				#{factoryCode,jdbcType=VARCHAR},
+				#{ctrlCode,jdbcType=BIGINT},
+				#{dataDI,jdbcType=BIGINT},
+				#{sequence,jdbcType=BIGINT},
+				#{data,jdbcType=VARCHAR},
+				#{checksum,jdbcType=BIGINT},
+				#{jsonData,jdbcType=VARCHAR},
+				SYSDATE,
+				SYSDATE 
+				)
+    </insert>
+<!-- ID, DEVICE_ID, GATEWAY_ID, REQUEST_ID, SERVICE_ID, SERVICE_TYPE, EVENT_TIME, METER_TYPE, 
+    METER_ADDR, FACTORY_CODE, CTRL_CODE, DATA_DI, METER_SEQUENCE, METER_DATA, METER_CHECKSUM, 
+    JSON_DATA, CREATE_TIME, UPDATE_TIME -->
+    <update id="updateById" parameterType="com.learnbind.ai.model.iot.MeterBean">
+        update wm_meter
+        set 
+        	DEVICE_ID = #{deviceId,jdbcType=BIGINT},
+            GATEWAY_ID = #{gatewayId,jdbcType=VARCHAR},
+            REQUEST_ID = #{requestId,jdbcType=VARCHAR},
+            SERVICE_ID = #{serviceId,jdbcType=VARCHAR},
+            SERVICE_TYPE = #{serviceType,jdbcType=VARCHAR},
+            EVENT_TIME = #{eventTime,jdbcType=VARCHAR},
+            METER_TYPE = #{meterType,jdbcType=BIGINT},
+            METER_ADDR = #{meterAddr,jdbcType=VARCHAR},
+            FACTORY_CODE = #{factoryCode,jdbcType=VARCHAR},
+            CTRL_CODE = #{ctrlCode,jdbcType=BIGINT},
+            DATA_DI = #{dataDI,jdbcType=BIGINT},
+            METER_SEQUENCE = #{sequence,jdbcType=BIGINT},
+            METER_DATA = #{data,jdbcType=VARCHAR},
+            METER_CHECKSUM = #{checksum,jdbcType=BIGINT},
+            JSON_DATA = #{jsonData,jdbcType=VARCHAR},
+            UPDATE_TIME = SYSDATE
+        where 
+        	ID = #{id,jdbcType=BIGINT}
+  </update>
+  
+</mapper>

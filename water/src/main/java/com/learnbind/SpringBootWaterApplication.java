@@ -12,7 +12,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 
 /**
 *	Copyright (c) 2018 by Hz
-*	@ClassName:     SpringBootWsdApplication.java
+*	@ClassName:     SpringBootWaterApplication.java
 *	@Description:   启动类 
 * 
 *	@author:        lenovo
@@ -25,10 +25,10 @@ import tk.mybatis.spring.annotation.MapperScan;
 @MapperScan("com.learnbind.ai.dao")
 //@MapperScan(basePackages = "com.learnbind.ai.dao")
 @ServletComponentScan("com.learnbind.ai.common.util")
-public class SpringBootWsdApplication {
+public class SpringBootWaterApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootWsdApplication.class, args);
+		SpringApplication.run(SpringBootWaterApplication.class, args);
 	}
 	
 	/**

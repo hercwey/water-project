@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WmCommandMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.iot.WmCommand">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="COMMAND_ID" jdbcType="VARCHAR" property="commandId" />
+    <result column="APP_ID" jdbcType="VARCHAR" property="appId" />
+    <result column="DEVICE_ID" jdbcType="DECIMAL" property="deviceId" />
+    <result column="SERVICE_ID" jdbcType="DECIMAL" property="serviceId" />
+    <result column="METHOD_ID" jdbcType="DECIMAL" property="methodId" />
+    <result column="METHOD_PARAMS" jdbcType="VARCHAR" property="methodParams" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="EXPIRE_TIME" jdbcType="DECIMAL" property="expireTime" />
+    <result column="PLATFORM_ISSUED_TIME" jdbcType="VARCHAR" property="platformIssuedTime" />
+    <result column="ISSUED_TIMES" jdbcType="DECIMAL" property="issuedTimes" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, COMMAND_ID, APP_ID, DEVICE_ID, SERVICE_ID, METHOD_ID, METHOD_PARAMS, OPERATOR_ID, 
+    STATUS, REMARK, EXPIRE_TIME, PLATFORM_ISSUED_TIME, ISSUED_TIMES, CREATE_TIME
+  </sql>
+  
+  <select id="selectById" resultType="com.learnbind.ai.model.iot.CommandBean">
+    SELECT
+		* 
+	FROM
+		WM_COMMAND 
+	WHERE
+		ID = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteById" parameterType="java.lang.Long">
+    DELETE 
+	FROM
+		WM_COMMAND 
+	WHERE
+		ID = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="save" parameterType="com.learnbind.ai.model.iot.CommandBean">
+    INSERT INTO WM_COMMAND
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="commandId != null">
+        COMMAND_ID,
+      </if>
+      <if test="appId != null">
+        APP_ID,
+      </if>
+      <if test="deviceId != null">
+        DEVICE_ID,
+      </if>
+      <if test="serviceId != null">
+        SERVICE_ID,
+      </if>
+      <if test="method != null">
+        METHOD_ID,
+      </if>
+      <if test="methodParams != null">
+        METHOD_PARAMS,
+      </if>
+      <if test="operatorId != null">
+        OPERATOR_ID,
+      </if>
+      <if test="databaseStatus != null">
+        STATUS,
+      </if>
+      <if test="desc != null">
+        REMARK,
+      </if>
+      <if test="expireTime != null">
+        EXPIRE_TIME,
+      </if>
+      <if test="platformIssuedTime != null">
+        PLATFORM_ISSUED_TIME,
+      </if>
+      <if test="issuedTimes != null">
+        ISSUED_TIMES,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="commandId != null">
+        #{commandId,jdbcType=VARCHAR},
+      </if>
+      <if test="appId != null">
+        #{appId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null">
+        (select id from wm_device where deviceId=#{deviceId,jdbcType=VARCHAR}),
+      </if>
+      <if test="serviceId != null">
+        (select id from wm_service where serviceName=#{serviceId,jdbcType=VARCHAR}),
+      </if>
+      <if test="method != null">
+        (select id from wm_command_method where methodName=#{method,jdbcType=BIGINT}),
+      </if>
+      <if test="methodParams != null">
+        #{methodParams,jdbcType=VARCHAR},
+      </if>
+      <if test="operatorId != null">
+        #{operatorId,jdbcType=BIGINT},
+      </if>
+      <if test="databaseStatus != null">
+        #{databaseStatus,jdbcType=INTEGER},
+      </if>
+      <if test="desc != null">
+        #{desc,jdbcType=VARCHAR},
+      </if>
+      <if test="expireTime != null">
+        #{expireTime,jdbcType=BIGINT},
+      </if>
+      <if test="platformIssuedTime != null">
+        #{platformIssuedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="issuedTimes != null">
+        #{issuedTimes,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        SYSDATE,
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.learnbind.ai.model.iot.CommandBean">
+    update wm_command
+    <set>
+      <if test="commandId != null">
+        COMMAND_ID = #{commandId,jdbcType=VARCHAR},
+      </if>
+      <if test="appId != null">
+        APP_ID = #{appId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null">
+        DEVICE_ID = (select id from wm_device where deviceId=#{deviceId,jdbcType=VARCHAR}),
+      </if>
+      <if test="serviceId != null">
+        SERVICE_ID = (select id from wm_service where serviceName=#{serviceId,jdbcType=VARCHAR}),
+      </if>
+      <if test="method != null">
+        METHOD_ID = (select id from wm_command_method where methodName=#{method,jdbcType=BIGINT}),
+      </if>
+      <if test="methodParams != null">
+        METHOD_PARAMS = #{methodParams,jdbcType=VARCHAR},
+      </if>
+      <if test="operatorId != null">
+        OPERATOR_ID = #{operatorId,jdbcType=BIGINT},
+      </if>
+      <if test="databaseStatus != null">
+        STATUS = #{databaseStatus,jdbcType=INTEGER},
+      </if>
+      <if test="desc != null">
+        REMARK = #{desc,jdbcType=VARCHAR},
+      </if>
+      <if test="expireTime != null">
+        EXPIRE_TIME = #{expireTime,jdbcType=BIGINT},
+      </if>
+      <if test="platformIssuedTime != null">
+        PLATFORM_ISSUED_TIME = #{platformIssuedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="issuedTimes != null">
+        ISSUED_TIMES = #{issuedTimes,jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByDeviceCommand" parameterType="com.learnbind.ai.model.iot.CommandBean">
+    update wm_command
+    <set>
+      <if test="databaseStatus != null">
+        STATUS = #{databaseStatus,jdbcType=INTEGER},
+      </if>
+      <if test="desc != null">
+        REMARK = #{desc,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where DEVICE_ID = (select id from wm_device where deviceId=#{deviceId,jdbcType=VARCHAR})
+    and COMMAND_ID = #{commandId,jdbcType=VARCHAR}
+  </update>
+  
+</mapper>

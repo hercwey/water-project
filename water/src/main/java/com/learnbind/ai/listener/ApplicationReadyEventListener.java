@@ -14,6 +14,7 @@ import com.learnbind.ai.model.CcbBatchWithholdRecord;
 import com.learnbind.ai.service.ccb.CcbBatchWithholdRecordService;
 import com.learnbind.ai.service.ccb.CcbScheduleTask;
 import com.learnbind.ai.service.ccb.CcbWithholdRecordQueue;
+import com.learnbind.ai.service.iot.impl.AuthService;
 
 import tk.mybatis.mapper.entity.Example;
 
@@ -41,6 +42,8 @@ public class ApplicationReadyEventListener implements  ApplicationListener<Appli
 	private CcbBatchWithholdRecordService ccbBatchWithholdRecordService;//CCB批量代扣记录
 	@Autowired
 	private CcbScheduleTask ccbScheduleTask;//ccb定时任务
+	@Autowired
+	private AuthService authService;//iot
 	
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
@@ -48,7 +51,8 @@ public class ApplicationReadyEventListener implements  ApplicationListener<Appli
     	log.info("----------	系统启动成功......");
     	log.info("----------	"+event.getClass());
     	
-    	this.setDataToQueue();//查询已上传的批量代扣文件记录，并增加到待处理队列
+    	//this.setDataToQueue();//查询已上传的批量代扣文件记录，并增加到待处理队列
+    	//authService.login();
     	
     }
     

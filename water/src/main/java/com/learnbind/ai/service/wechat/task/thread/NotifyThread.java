@@ -35,7 +35,7 @@ public class NotifyThread extends Thread {
 	BlockingQueue<WxMsgNotifyTask> tasks = new ArrayBlockingQueue<WxMsgNotifyTask>(10000);
 
 	public NotifyThread() {
-		this.start();
+		//this.start();
 	}
 
 	@Override

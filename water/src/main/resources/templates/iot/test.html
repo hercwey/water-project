@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('IOT接入测试')" th:remove="tag"></div>
+<!-- 页面正在加载js -->
+<script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>
+<!-- 显示/隐藏正在加载阴影 -->
+<script th:src="@{/pivas/js/common/Loading.js}"></script>
+<!-- 
+	包装页面,也可以不使用此页面,直接使用内容页面.
+	_starter:页面为包装页面,用于加载_search
+	_main:主页面包括:操作面板(增加,删除,查询)+数据列表容器
+	_table:页面:数据列表页面
+	_dialog_add:增加对话框
+	_dialog_modi:修改对话框
+		
+	_starter页面---load---_main页面---load---_table页面
+	 
+-->
+
+</head>
+<body>
+	<!-- 批次管理主页 -->
+	<!-- <div class="container-fluid"> -->
+	<br />
+	<div class="container">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<button type="button" class="btn btn-primary btn-sm" id="btn-get-token">
+					<i class="fa fa-get-pocket" aria-hidden="true"> <span>获取Token并自动订阅</span></i>
+				</button>
+				<button type="button" class="btn btn-primary btn-sm" id="btn-refresh-token">
+					<i class="fa fa-refresh" aria-hidden="true"> <span>刷新Token并自动订阅</span></i>
+				</button>
+				<button type="button" class="btn btn-primary btn-sm" id="btn-subscribe-device">
+					<i class="fa fa-flag-checkered" aria-hidden="true"> <span>手动订阅</span></i>
+				</button>
+			</div>
+		</div>
+		<br />
+		<div class="row clearfix">
+			<div class="col-md-3 column">
+				<input type="number" class="form-control btn-sm" id="verify-code" name="" value="" placeholder="verifyCode" />
+			</div>				
+			<div class="col-md-9 column">
+				<button type="button" class="btn btn-info btn-sm" id="btn-register-device">
+					<i class="fa fa-info" aria-hidden="true"> <span>注册设备</span></i>
+				</button>
+				<button type="button" class="btn btn-info btn-sm" id="btn-query-device">
+					<i class="fa fa-search" aria-hidden="true"> <span>查询设备</span></i>
+				</button>
+			</div>
+		</div>
+		
+	</div>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			//var G_FUNCTION_MODULE = [[${FUNCTION_MODULE}]];//模块功能标识，用于页面显示不同功能，或发送请求时当参数使用
+		/*]]>*/
+		
+	</script>
+
+	<script type="text/javascript">
+		$(function() {
+			//------------------订阅部分----------------------------------------------------------------------------
+			/**
+			 * 	获取Token并自动订阅
+			 */
+			$("#btn-get-token").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/auth/login";
+				$.post(url, function(res){
+					console.log("----------"+res);
+					var result = $.parseJSON(res);
+					/* if(result.status==200){
+						
+					} */
+					//dialog type: success warning info error,默认为info
+					util.message(result.status+":"+result.message,null,"warning");
+				});
+			});
+			/**
+			 * 	刷新Token并自动订阅
+			 */
+			$("#btn-refresh-token").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/auth/refreshToken";
+				$.post(url, function(res){
+					console.log("----------"+res);
+					var result = $.parseJSON(res);
+					/* if(result.status==200){
+					
+					} */
+					//dialog type: success warning info error,默认为info
+					util.message(result.status+":"+result.message,null,"warning");
+				});
+			});
+			
+			//------------------设备数据变动消息订阅部分----------------------------------------------------------------------------
+			/**
+			 * 	设备数据变动消息订阅
+			 */
+			$("#btn-subscribe-device").on("click", function(){
+				
+				var url = BASE_CONTEXT_PATH + "/subscribe/deviceData";
+				
+				$.post(url, null, function(res){
+					console.log("----------"+res);
+					var result = $.parseJSON(res);
+					/* if(result.status==200){
+					
+					} */
+					//dialog type: success warning info error,默认为info
+					util.message(result.status+":"+result.message,null,"warning");
+				});
+			});
+			
+			//------------------注册设备部分----------------------------------------------------------------------------
+			/**
+			 * 	注册设备
+			 */
+			$("#btn-register-device").on("click", function(){
+				
+				var verifyCode = $("#verify-code").val();
+				if(verifyCode==null || verifyCode==""){
+					//dialog type: success warning info error,默认为info
+					util.message("verifyCode不能为空！",null,"warning");
+					return false;
+				}
+				
+				//var data = '{"verifyCode":"VERIFY_CODE","manufacturerId":"JR0912X","manufacturerName":"JRIWA","model":"JR0912Y","protocolType":"CoAP","deviceType":"JRNBWaterMeter"}';
+				var dataObj = new Object();
+				dataObj.verifyCode = verifyCode;
+				dataObj.manufacturerId = "JR0912X";
+				dataObj.manufacturerName = "JRIWA";
+				dataObj.model = "JR0912Y";
+				dataObj.protocolType = "CoAP";
+				dataObj.deviceType = "JRNBWaterMeter";
+				
+				var dataJson = JSON.stringify(dataObj);
+				
+				console.log("----------请求数据："+dataJson);
+				
+				var urlStr = BASE_CONTEXT_PATH + "/device/register";
+				$.ajax({
+					type: "post",
+					url: urlStr,
+					dataType : "json",
+					contentType : "application/json",      //网上很多介绍加上此参数的，后来我发现不加入这个参数才会请求成功。
+					data: dataJson,
+					success: function(res){
+						console.log("----------"+res);
+						//dialog type: success warning info error,默认为info
+						util.message(res,null,"warning");
+				    }
+				});
+				
+				/* var parms = {"data": data};
+				$.post(url, parms, function(res){
+					console.log("----------"+res);
+					//dialog type: success warning info error,默认为info
+					util.message(res,null,"warning");
+				}); */
+			});
+			
+			//------------------查询设备部分----------------------------------------------------------------------------
+			/**
+			 * 	查询设备
+			 */
+			$("#btn-query-device").on("click", function(){
+				
+				var url = BASE_CONTEXT_PATH + "/device/queryDevices/1/10";
+				
+				$.get(url, null, function(res){
+					console.log("----------"+res);
+					//dialog type: success warning info error,默认为info
+					util.message(res,null,"warning");
+				});
+			});
+			
+		});
+	</script>
+
+</body>
+</html>

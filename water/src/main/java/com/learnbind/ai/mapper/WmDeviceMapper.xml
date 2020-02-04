@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.WmDeviceMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.iot.WmDevice">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="DEVICE_ID" jdbcType="VARCHAR" property="deviceId" />
+    <result column="VERIFY_CODE" jdbcType="VARCHAR" property="verifyCode" />
+    <result column="MANUFACTURER_ID" jdbcType="VARCHAR" property="manufacturerId" />
+    <result column="MANUFACTURER_NAME" jdbcType="VARCHAR" property="manufacturerName" />
+    <result column="DEVICE_TYPE" jdbcType="VARCHAR" property="deviceType" />
+    <result column="MODEL" jdbcType="VARCHAR" property="model" />
+    <result column="PROTOCOL_TYPE" jdbcType="VARCHAR" property="protocolType" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPATE_TIME" jdbcType="TIMESTAMP" property="upateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, DEVICE_ID, VERIFY_CODE, MANUFACTURER_ID, MANUFACTURER_NAME, DEVICE_TYPE, MODEL, 
+    PROTOCOL_TYPE, CREATE_TIME, UPATE_TIME
+  </sql>
+  
+  <insert id="save" parameterType="com.learnbind.ai.model.iot.DeviceBean">
+	INSERT INTO 
+		WM_DEVICE 
+			( 
+			DEVICE_ID, 
+			VERIFY_CODE, 
+			MANUFACTURER_ID, 
+			MANUFACTURER_NAME, 
+			DEVICE_TYPE, 
+			MODEL, 
+			PROTOCOL_TYPE, 
+			CREATE_TIME, 
+			UPATE_TIME 
+			)
+	VALUES
+		(
+		#{ deviceId, jdbcType = VARCHAR }, 
+		#{ verifyCode, jdbcType = VARCHAR }, 
+		#{ manufacturerId, jdbcType = VARCHAR }, 
+		#{ manufacturerName, jdbcType = VARCHAR },
+		#{ deviceType, jdbcType = VARCHAR }, 
+		#{ model, jdbcType = VARCHAR }, 
+		#{ protocolType, jdbcType = VARCHAR },
+		SYSDATE,
+		SYSDATE
+		)
+	</insert>
+
+    <update id="updateById" parameterType="com.learnbind.ai.model.iot.DeviceBean">
+        UPDATE 
+        	WM_DEVICE 
+		SET 
+			DEVICE_ID = #{ deviceId, jdbcType = VARCHAR },
+			VERIFY_CODE = #{ verifyCode, jdbcType = VARCHAR },
+			MANUFACTURER_ID = #{ manufacturerId, jdbcType = VARCHAR },
+			MANUFACTURER_NAME = #{ manufacturerName, jdbcType = VARCHAR },
+			DEVICE_TYPE = #{ deviceType, jdbcType = VARCHAR },
+			MODEL = #{ model, jdbcType = VARCHAR },
+			PROTOCOL_TYPE = #{ protocolType, jdbcType = VARCHAR },
+			UPATE_TIME = SYSDATE 
+		WHERE
+			ID = #{ id, jdbcType = BIGINT}
+  </update>
+
+  <update id="updateByDeviceId" parameterType="com.learnbind.ai.model.iot.DeviceBean">
+        UPDATE 
+        	WM_DEVICE 
+		SET 
+			DEVICE_ID = #{ deviceId, jdbcType = VARCHAR },
+			VERIFY_CODE = #{ verifyCode, jdbcType = VARCHAR },
+			MANUFACTURER_ID = #{ manufacturerId, jdbcType = VARCHAR },
+			MANUFACTURER_NAME = #{ manufacturerName, jdbcType = VARCHAR },
+			DEVICE_TYPE = #{ deviceType, jdbcType = VARCHAR },
+			MODEL = #{ model, jdbcType = VARCHAR },
+			PROTOCOL_TYPE = #{ protocolType, jdbcType = VARCHAR },
+			UPATE_TIME = SYSDATE 
+		WHERE
+			DEVICE_ID = #{ deviceId, jdbcType = BIGINT}
+  </update>
+  
+</mapper>

@@ -89,6 +89,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		//测试时使用,生产环境屏蔽即可.
 		web.ignoring().antMatchers("/wechat/**");
 		web.ignoring().antMatchers("/commons/**");
+		
+		//IOT接入平台测试
+		web.ignoring().antMatchers("/iot/**");
+		web.ignoring().antMatchers("/auth/**");
+		web.ignoring().antMatchers("/device/**");
+		web.ignoring().antMatchers("/subscribe/**");
+		
 	}
 
 	@Override

@@ -15,7 +15,7 @@
 	<!-- ZYC 计算机上的maven库 -->
 	<!-- <classPathEntry	location="D:\software\Java_maven\mvn_repo\com\oracle\ojdbc6\11.1.0.7.0\ojdbc6-11.1.0.7.0.jar"/> -->
 	<!-- SRD 计算机上的maven库 -->
-	<classPathEntry	location="D:\Program Files\Repositories\Maven\com\oracle\ojdbc6\12.1.0.1-atlassian-hosted\ojdbc6-12.1.0.1-atlassian-hosted.jar"/>
+	<classPathEntry	location="D:\Maven\Repositories\Maven\com\oracle\ojdbc6\12.1.0.1-atlassian-hosted\ojdbc6-12.1.0.1-atlassian-hosted.jar"/>
 		
 	<!-- 此处指定生成针对MyBatis3的DAO -->
 	<!-- 一个数据库一个context -->
@@ -61,16 +61,16 @@
 			<property name="forceBigDecimals" value="false"/>
 		</javaTypeResolver>
 		<!-- 生成模型的包名和位置-->
-		<javaModelGenerator targetPackage="com.learnbind.ai.model" targetProject="src/main/java">
+		<javaModelGenerator targetPackage="com.learnbind.ai.model.iot" targetProject="src/main/java">
 			<property name="enableSubPackages" value="true"/>
 			<property name="trimStrings" value="true"/>
 		</javaModelGenerator>
 		<!-- 生成映射文件的包名和位置-->
-		<sqlMapGenerator targetPackage="com.learnbind.ai.mapper" targetProject="src/main/java">
+		<sqlMapGenerator targetPackage="com.learnbind.ai.mapper.iot" targetProject="src/main/java">
 			<property name="enableSubPackages" value="true"/>
 		</sqlMapGenerator>
 		<!-- 生成DAO的包名和位置-->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="com.learnbind.ai.dao" targetProject="src/main/java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="com.learnbind.ai.dao.iot" targetProject="src/main/java">
 			<property name="enableSubPackages" value="true"/>
 		</javaClientGenerator>
 		
@@ -366,9 +366,9 @@
 		
 		<!-- 统计报表部分 -->
 		<!-- 月抄表率 -->
-		<table tableName="STAT_MONTH_READ_METER_RATE" domainObjectName="StatMonthReadMeterRate" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+		<!-- <table tableName="STAT_MONTH_READ_METER_RATE" domainObjectName="StatMonthReadMeterRate" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
 			<generatedKey column="ID" sqlStatement="JDBC"/>
-		</table>
+		</table> -->
 		<!-- 月用水量 -->
 		<!-- <table tableName="STAT_MONTH_USE_WATER" domainObjectName="StatMonthUseWater" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
 			<generatedKey column="ID" sqlStatement="JDBC"/>
@@ -397,5 +397,18 @@
 		<!-- <table tableName="STAT_WATER_FEE_NO_TAX_DETAIL" domainObjectName="StatWaterFeeNoTaxDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
 			<generatedKey column="ID" sqlStatement="JDBC"/>
 		</table> -->
+		
+		<!-- IOT接入 命令表 -->
+		<table tableName="WM_COMMAND" domainObjectName="WmCommand" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>
+		<!-- IOT接入 设备表 -->
+		<table tableName="WM_DEVICE" domainObjectName="WmDevice" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>
+		<!-- IOT接入 水表表 -->
+		<table tableName="WM_METER" domainObjectName="WmMeter" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="ID" sqlStatement="JDBC"/>
+		</table>
 	</context>
 </generatorConfiguration>
