@@ -95,7 +95,18 @@ public class JsonResult {
     public String toString() {
         //FIXME G11 临时方案，需要优化
         String result = "{}";
-        result = "{\"code\":\"" + code + "\",\"status\":\"" + status + "\",\"message\":\"" + message + "\",\"data\":\"" + data.replace("\"","\\\"") + "\"}";
+        result = "{\"code\":\"" + code + "\",\"status\":\"" + status + "\",\"message\":\"" + message.replace("\"","\\\"") + "\",\"data\":\"" + data.replace("\"","\\\"") + "\"}";
+        
+        //String line = getLineSeparator();
+        result = result.replaceAll("\\n", "");//替换所有换行为空，否则前端JS解析JSON时会出错
+        
         return result;
+    }
+    
+    /**
+     * @return
+     */
+    private String getLineSeparator() {
+    	return System.getProperty("line.separator");
     }
 }

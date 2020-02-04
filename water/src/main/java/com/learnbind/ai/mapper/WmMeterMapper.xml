@@ -107,4 +107,14 @@
         	ID = #{id,jdbcType=BIGINT}
   </update>
   
+  <!-- 查询 -->
+  <select id="searchList" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		WM_METER 
+	ORDER BY
+		ID DESC
+  </select>
+  
 </mapper>

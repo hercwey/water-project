@@ -25,31 +25,114 @@
 	<!-- <div class="container-fluid"> -->
 	<br />
 	<div class="container">
-		<div class="row clearfix">
-			<div class="col-md-12 column">
-				<button type="button" class="btn btn-primary btn-sm" id="btn-get-token">
-					<i class="fa fa-get-pocket" aria-hidden="true"> <span>获取Token并自动订阅</span></i>
-				</button>
-				<button type="button" class="btn btn-primary btn-sm" id="btn-refresh-token">
-					<i class="fa fa-refresh" aria-hidden="true"> <span>刷新Token并自动订阅</span></i>
-				</button>
-				<button type="button" class="btn btn-primary btn-sm" id="btn-subscribe-device">
-					<i class="fa fa-flag-checkered" aria-hidden="true"> <span>手动订阅</span></i>
-				</button>
+		<div class="card">
+			<h5 class="card-header">
+				订阅按钮部分
+			</h5>
+			<div class="card-body">
+				<div class="row clearfix">
+					<div class="col-md-12 column">
+						<button type="button" class="btn btn-primary btn-sm" id="btn-get-token">
+							<i class="fa fa-get-pocket" aria-hidden="true"> <span>获取Token并自动订阅</span></i>
+						</button>
+						<button type="button" class="btn btn-primary btn-sm" id="btn-refresh-token">
+							<i class="fa fa-refresh" aria-hidden="true"> <span>刷新Token并自动订阅</span></i>
+						</button>
+						<button type="button" class="btn btn-primary btn-sm" id="btn-subscribe-device">
+							<i class="fa fa-flag-checkered" aria-hidden="true"> <span>手动订阅</span></i>
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 		<br />
-		<div class="row clearfix">
-			<div class="col-md-3 column">
-				<input type="number" class="form-control btn-sm" id="verify-code" name="" value="" placeholder="verifyCode" />
-			</div>				
-			<div class="col-md-9 column">
-				<button type="button" class="btn btn-info btn-sm" id="btn-register-device">
-					<i class="fa fa-info" aria-hidden="true"> <span>注册设备</span></i>
-				</button>
-				<button type="button" class="btn btn-info btn-sm" id="btn-query-device">
-					<i class="fa fa-search" aria-hidden="true"> <span>查询设备</span></i>
-				</button>
+		<div class="card">
+			<h5 class="card-header">
+				注册设备部分
+			</h5>
+			<div class="card-body">
+				<div class="row clearfix">
+					<div class="col-md-3 column">
+						<input type="number" class="form-control btn-sm" id="verify-code" name="" value="" placeholder="verifyCode" />
+					</div>				
+					<div class="col-md-9 column">
+						<button type="button" class="btn btn-info btn-sm" id="btn-register-device">
+							<i class="fa fa-info" aria-hidden="true"> <span>注册设备</span></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+		<div class="card">
+			<h5 class="card-header">
+				查询设备列表部分
+			</h5>
+			<div class="card-body">
+				<div class="row clearfix">
+					<div class="col-md-12 column">
+						<button type="button" class="btn btn-info btn-sm" id="btn-query-device">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询设备</span></i>
+						</button>
+					</div>
+				</div>
+				<br />
+				<div class="row clearfix">
+					<div class="col-md-12 column">
+						<!-- <div class="card">
+							<h5 class="card-header">
+								设备列表
+							</h5>
+							<div class="card-body">
+								
+							</div>
+							<div class="card-footer">
+								Card footer
+							</div>
+						</div> -->
+						<table class="table table-bordered table-sm table-hover device-item-table">
+							<thead>
+								<tr>
+									<th>序号</th>
+									<th>状态</th>
+									<th>设备名称</th>
+									<th>设备识别码</th>
+									<th>设备类型</th>
+									<th>厂商名称</th>
+								</tr>
+							</thead>
+							<tbody class="device-item-body">
+								<!-- 此处显示设备列表 -->
+							</tbody>
+						</table>
+					</div>				
+				</div>
+				<div class="row clearfix">
+					<div class="col-md-12 column device-item-pager">
+						<!-- 此处显示设备列表的分页 -->
+					</div>				
+				</div>
+			</div>
+		</div>
+		<br />
+		<div class="card">
+			<h5 class="card-header">
+				查询设备上报数据部分
+			</h5>
+			<div class="card-body">
+				<div class="row clearfix">
+					<div class="col-md-12 column">
+						<button type="button" class="btn btn-info btn-sm" id="btn-search-device-up-data">
+							<i class="fa fa-info" aria-hidden="true"> <span>查询设备上报数据</span></i>
+						</button>
+					</div>
+				</div>
+				<br />
+				<div class="row clearfix">
+					<div class="col-md-12 column device-up-data-item">
+						<!-- 此处显示设备上报数据列表 -->
+					</div>				
+				</div>
 			</div>
 		</div>
 		
@@ -63,6 +146,9 @@
 
 	<script type="text/javascript">
 		$(function() {
+			
+			//------------------初始化-----------------------------------------------------------------------------
+			
 			//------------------订阅部分----------------------------------------------------------------------------
 			/**
 			 * 	获取Token并自动订阅
@@ -148,9 +234,13 @@
 					contentType : "application/json",      //网上很多介绍加上此参数的，后来我发现不加入这个参数才会请求成功。
 					data: dataJson,
 					success: function(res){
-						console.log("----------"+res);
+						console.log("----------"+JSON.stringify(res));
+						var result = res;//$.parseJSON(res);
+						/* if(result.status==200){
+						
+						} */
 						//dialog type: success warning info error,默认为info
-						util.message(res,null,"warning");
+						util.message(result.status+":"+result.message,null,"warning");
 				    }
 				});
 				
@@ -167,17 +257,190 @@
 			 * 	查询设备
 			 */
 			$("#btn-query-device").on("click", function(){
-				
-				var url = BASE_CONTEXT_PATH + "/device/queryDevices/1/10";
-				
-				$.get(url, null, function(res){
-					console.log("----------"+res);
-					//dialog type: success warning info error,默认为info
-					util.message(res,null,"warning");
-				});
+				defaultQueryDeviceList();//默认查询设备列表（默认查询第1页，每页5条数据）
+			});
+			
+			
+			//------------------查询设备上传数据部分----------------------------------------------------------------------------
+			/**
+			 * 	查询设备上传数据
+			 */
+			$("#btn-search-device-up-data").on("click", function(){
+				defaultSearchDeviceUpData();//默认查询设备上报数据（默认查询第1页，每页2条数据）
 			});
 			
 		});
+		
+		//------------------查询设备-初始化设备列表部分----------------------------------------------------------------------------
+		/**
+		 * 	默认查询设备列表（默认查询第1页，每页5条数据）
+		 */
+		function defaultQueryDeviceList(){
+			
+			var pageNo = 1;
+			var pageSize = 10;
+			queryDeviceList(pageNo, pageSize);//通用查询设备列表
+		}
+		/**
+		 * 	通用查询设备列表
+		 */
+		function queryDeviceList(pageNo, pageSize){
+			var url = BASE_CONTEXT_PATH + "/device/queryDevices/"+pageNo+"/"+pageSize;
+			
+			$.get(url, null, function(res){
+				console.log("----------result:"+res);
+				var result = $.parseJSON(res);
+				var data = result.data;
+				console.log("----------data:"+data);
+				if(data!=null && data!=""){
+					var dataObj = $.parseJSON(data);
+					var totalCount = dataObj.totalCount;
+					var pageNo = dataObj.pageNo;
+					var pageSize = dataObj.pageSize;
+					
+					var devices = dataObj.devices;
+					//var deviceList = $.parseJSON(devices);
+					console.log("----------devices:"+JSON.stringify(devices));
+					initDeviceItemBody(pageNo, pageSize, devices);//初始化设备列表
+					initDeviceItemPager(totalCount, pageNo, pageSize);//初始化设备列表分页
+					return false;
+				}
+				//dialog type: success warning info error,默认为info
+				util.message(result.status+":"+result.message,null,"warning");
+			});
+		}
+		/**
+		 * 	初始化设备列表
+		 */
+		function initDeviceItemBody(pageNo, pageSize, devices){
+			
+			console.log("----------设备列表对象:"+JSON.stringify(devices));
+			
+			var count = (pageNo-1)*pageSize;//当前页默认序号
+			
+			var domObj = $("table.device-item-table tbody.device-item-body");
+			
+			domObj.empty();
+			
+			var html = "";
+			$.each(devices, function(index){
+				var tr = getDeviceBodyTr((count+(index+1)), this);
+				html += tr;
+			});
+			domObj.append(html);
+		}
+		/**
+		 * 	获取设备每行信息HTML
+		 */
+		function getDeviceBodyTr(count, device){
+			console.log("----------设备对象:"+JSON.stringify(device));
+			var deviceInfo = device.deviceInfo;
+			console.log("----------设备信息对象:"+JSON.stringify(deviceInfo));
+			
+			var statusStr = "";
+			if(deviceInfo.status==null || deviceInfo.status=="OFFLINE"){
+				statusStr = "<span class='badge badge-secondary'>离线</span>";
+			}else{
+				statusStr = "<span class='badge badge-success'>在线</span>";
+			}
+			
+			var html = "<tr>"
+					 + "<td>"+count+"</td>"	//序号
+					 + "<td>"+statusStr+"</td>"	//状态
+					 + "<td></td>"	//设备名称
+					 + "<td>"+deviceInfo.nodeId+"</td>"	//设备识别码
+					 + "<td>"+deviceInfo.deviceType+"</td>"	//设备类型
+					 + "<td>"+deviceInfo.manufacturerName+"</td>"	//厂商名称
+					 + "</tr>";
+			return html;
+		}
+		
+		//------------------查询设备-初始化设备列表分页部分----------------------------------------------------------------------------
+		/**
+		 * 	初始化设备列表分页
+		 */
+		function initDeviceItemPager(totalCount, pageNo, pageSize){
+			
+			console.log("----------共"+totalCount+"条, 当前"+pageNo+"/"+pageSize+"页");
+			
+			var domObj = $(".device-item-pager");
+			
+			domObj.empty();
+			
+			var html = getDevicePagerHtml(totalCount, pageNo, pageSize);
+			domObj.append(html);
+		}
+		/**
+		 * 	获取设备每行信息HTML
+		 */
+		function getDevicePagerHtml(totalCount, pageNo, pageSize){
+			
+			var totalPage = Math.ceil(totalCount/pageSize);//向上取整,有小数就整数部分加1 
+			
+			var html = '<ul class="pagination" style="float: right;">';
+				html += '<li class="page-item">';
+				html += '<span class="page-link" style="color:black;">';
+				html += 		'<span>';
+				html += 			'共<strong><span>'+totalCount+'</span></strong>条, ';
+				html += 			'<span>当前'+pageNo+'/'+totalPage+'页</span>';
+				html += 		'</span>';
+				html += '</span>';
+				html += '</li>';
+				if(totalCount>0){
+					//queryDeviceList(pageNo, pageSize);//通用查询设备列表
+					if(pageNo==1){
+						console.log("----------当前页是第一页，不需要查询上一页！");
+					}else{
+						var prePage = pageNo-1;
+						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList('+prePage+', '+pageSize+');">上一页</a></li>';
+					}
+					if(pageNo>=totalPage){
+						console.log("----------当前页是最后一页，不需要查询下一页！");
+					}else{
+						var nextPage = pageNo+1;
+						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList('+nextPage+', '+pageSize+');">下一页</a></li>';
+					}
+					
+				}else{
+					html += '<li><span class="page-link" style="color:darkblue;"><span>未查询到记录</span></span></li>';
+				}
+				html += '</ul>';
+			return html;
+		}
+		
+		//------------------查询设备上传数据（水表上传数据列表）部分----------------------------------------------------------------------------
+		
+		/**
+		 * 	默认查询设备上报数据（默认查询第1页，每页2条数据）
+		 */
+		function defaultSearchDeviceUpData(){
+			var searchCond = null;
+			var pageNum = 1;
+			var pageSize = 2;
+			clickMeterListPager(searchCond, pageNum, pageSize);
+		}
+		/**
+		 * 	通用查询设备上报数据
+		 */
+		function searchDeviceUpData(parms){
+			
+			var url = BASE_CONTEXT_PATH + "/meter/search-meters";
+			
+			$(".device-up-data-item").load(url, parms, function(){
+				console.log("----------查询设备上报数据列表完成");
+			});
+		}
+		/*
+		 * 	分页查询
+		 */
+		function clickMeterListPager(searchCond, pageNum, pageSize) {
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+	
+			searchDeviceUpData(parms);
+		}
 	</script>
 
 </body>

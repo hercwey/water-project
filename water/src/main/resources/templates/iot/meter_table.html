@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 列表 -->
+	<table class="table table-bordered table-sm table-hover" id="meter-table">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>事件时间</th>
+				<th>表类型</th>
+				<th>表地址</th>
+				<th>表厂商代码</th>
+				<th>控制码</th>
+				<th>数据标识</th>
+				<th>序列号</th>
+				<th>数据字节</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${meterList}">
+				
+				<!-- ID -->
+				<td th:text="${item.id}">ID</td>
+				<!-- 事件时间 -->
+				<td th:text="${item.eventTime}">事件时间</td>
+				<!-- 表类型 -->
+				<td th:text="${item.meterType}">表类型</td>
+				<!-- 表地址 -->
+				<td th:text="${item.meterAddr}">表地址</td>
+				<!-- 表厂商代码 -->
+				<td th:text="${item.factoryCode}">表厂商代码</td>
+				<!-- 控制码 -->
+				<td th:text="${item.ctrlCode}">控制码</td>
+				<!-- 数据标识 -->
+				<td th:text="${item.dataDi}">数据标识</td>
+				<!-- 序列号 -->
+				<td th:text="${item.meterSequence}">序列号</td>
+				<!-- 数据字节 -->
+				<td th:text="${item.meterData}">数据字节</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- <hr style="height: 1px; border: none; border-top: 1px solid blue;"> -->
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+		});
+		
+		//创建分页组件实例
+		var pager=new Pager("pager1");
+		$(function(){			
+			pager.init(clickMeterListPager, null);			
+		});
+	</script>
+</body>
+</html>

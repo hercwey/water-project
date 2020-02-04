@@ -66,6 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring().antMatchers("/tools/**");//工具
 		web.ignoring().antMatchers("/pivas/**");//工具
 		web.ignoring().antMatchers("/images/**");//工具
+		web.ignoring().antMatchers("/js/**");//
 		web.ignoring().antMatchers("/favicon.ico");//ico
 		web.ignoring().antMatchers("/MP_verify_7Q8vmV0IbBm49kw9.txt");//微信验证文件
 		
@@ -95,6 +96,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring().antMatchers("/auth/**");
 		web.ignoring().antMatchers("/device/**");
 		web.ignoring().antMatchers("/subscribe/**");
+		web.ignoring().antMatchers("/meter/**");
 		
 	}
 

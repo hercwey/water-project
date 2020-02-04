@@ -1,11 +1,14 @@
 package com.learnbind.ai.service.iot.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.learnbind.ai.dao.WmMeterMapper;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterBean;
+import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.IMeterService;
 
 
@@ -20,4 +23,10 @@ public class MeterService implements IMeterService {
         int result = wmMeterMapper.save(meterBean);
         return JsonResult.success(result,result+"");
     }
+
+	@Override
+	public List<WmMeter> searchList() {
+		return wmMeterMapper.searchList();
+	}
+    
 }

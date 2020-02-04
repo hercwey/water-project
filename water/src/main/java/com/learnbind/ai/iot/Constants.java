@@ -40,8 +40,8 @@ public class Constants {
     public static final String DEVICE_DATA_CHANGED = "deviceDatasChanged";
 
     //Paths of certificates.
-    public static String SELF_CERT_PATH = "/src/resource/cert/outgoing.CertwithKey.pkcs12";
-    public static String TRUST_CA_PATH = "/src/resource/cert/ca.jks";
+    public static String SELF_CERT_PATH = "/src/main/resources/cert/outgoing.CertwithKey.pkcs12";
+    public static String TRUST_CA_PATH = "/src/main/resources/cert/ca.jks";
 
     //Password of certificates.
     public static String SELF_CERT_PWD = "IoM@1234";

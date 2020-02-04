@@ -1,11 +1,13 @@
 package com.learnbind.ai.controller.iot;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.learnbind.ai.model.iot.DeviceBean;
@@ -28,10 +30,10 @@ public class DeviceController {
         //TODO 调用IoT平台，注册设备接口
         JsonResult registerResult = deviceService.registerDevice(deviceBean);
         String registerResponse = registerResult.getData();
-        DeviceRegisterRspBean registerRspBean = DeviceRegisterRspBean.parseJson(registerResponse);
-        deviceBean.setDeviceId(registerRspBean.getDeviceId());
 
-        if (registerResult.getData() != null && !registerResult.getData().contains("error_code")) {
+        if (StringUtils.isNotBlank(registerResponse) && !registerResult.getData().contains("error_code")) {
+        	DeviceRegisterRspBean registerRspBean = DeviceRegisterRspBean.parseJson(registerResponse);
+            deviceBean.setDeviceId(registerRspBean.getDeviceId());
             JsonResult modifyResult = deviceService.modifyDevice(deviceBean);
         }
 
