@@ -36,7 +36,7 @@
 	<!-- 批次管理主页 -->
 	<!-- <div class="container-fluid"> -->
 	<br />
-	<div class="container">
+	<div class="container-fluid">
 		<div class="card">
 			<h5 class="card-header">
 				订阅按钮部分
@@ -151,6 +151,28 @@
 				<div class="row clearfix">
 					<div class="col-md-12 column device-up-data-item">
 						<!-- 此处显示设备上报数据列表 -->
+					</div>				
+				</div>
+			</div>
+		</div>
+		
+		<br />
+		<div class="card">
+			<h5 class="card-header">
+				查询发送指令记录部分
+			</h5>
+			<div class="card-body">
+				<div class="row clearfix">
+					<div class="col-md-12 column">
+						<button type="button" class="btn btn-info btn-sm" id="btn-search-send-cmd-record">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询发送指令记录</span></i>
+						</button>
+					</div>
+				</div>
+				<br />
+				<div class="row clearfix">
+					<div class="col-md-12 column send-cmd-record-item">
+						<!-- 此处显示发送指令记录列表 -->
 					</div>				
 				</div>
 			</div>
@@ -314,6 +336,14 @@
 			 */
 			$("#btn-search-device-up-data").on("click", function(){
 				defaultSearchDeviceUpData();//默认查询设备上报数据（默认查询第1页，每页2条数据）
+			});
+			
+			//------------------查询发送指令记录部分----------------------------------------------------------------------------
+			/**
+			 * 	查询发送指令记录
+			 */
+			$("#btn-search-send-cmd-record").on("click", function(){
+				defaultSearchSendCmdRecord();//默认查询发送指令记录（默认查询第1页，每页2条数据）
 			});
 			
 		});
@@ -601,6 +631,41 @@
 			parms.pageSize=pageSize;
 	
 			searchDeviceUpData(parms);
+		}
+		
+		//------------------查询发送指令记录部分----------------------------------------------------------------------------
+		
+		/**
+		 * 	默认查询发送指令记录（默认查询第1页，每页2条数据）
+		 */
+		function defaultSearchSendCmdRecord(){
+			var searchCond = null;
+			var pageNum = 1;
+			var pageSize = 5;
+			clickSendCmdRecordListPager(searchCond, pageNum, pageSize);
+		}
+		/**
+		 * 	通用查询发送指令记录
+		 */
+		function searchSendCmdRecord(parms){
+			
+			var url = BASE_CONTEXT_PATH + "/cmd/search-send-cmd-records";
+			
+			$(".send-cmd-record-item").load(url, parms, function(){
+				console.log("----------查询发送指令记录列表完成");
+				windowResize();//初始化windows窗口滚动条
+			});
+		}
+		/*
+		 * 	分页查询
+		 */
+		function clickSendCmdRecordListPager(searchCond, pageNum, pageSize) {
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+	
+			searchSendCmdRecord(parms);
 		}
 		
 		//------------------初始化滚动条部分----------------------------------------------------------------------------

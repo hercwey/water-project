@@ -188,4 +188,31 @@
     and COMMAND_ID = #{commandId,jdbcType=VARCHAR}
   </update>
   
+  <!-- 查询发送命令记录 -->
+  <select id="searchList" resultType="map">
+  	SELECT
+		C.ID,
+		C.COMMAND_ID,
+		C.APP_ID,
+		C.DEVICE_ID,
+		C.SERVICE_ID,
+		C.METHOD_PARAMS,
+		C.STATUS,
+		C.PLATFORM_ISSUED_TIME,
+		D.DEVICE_ID AS DEVICE_IDS,
+		S.SERVICE_NAME 
+	FROM
+		WM_COMMAND C
+		LEFT JOIN WM_DEVICE D ON C.DEVICE_ID = D.ID
+		LEFT JOIN WM_SERVICE S ON C.SERVICE_ID = S.ID 
+	ORDER BY
+		ID DESC
+  	<!-- SELECT
+		* 
+	FROM
+		WM_COMMAND 
+	ORDER BY
+		ID DESC -->
+  </select>
+  
 </mapper>

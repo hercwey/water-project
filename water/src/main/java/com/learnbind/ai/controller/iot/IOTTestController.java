@@ -15,6 +15,11 @@ public class IOTTestController {
     @Autowired
     ISubscribeService subscribeService;
 
+    @RequestMapping(value = "/starter")
+    public String starter() {
+        return "iot/starter";
+    }
+    
     @RequestMapping(value = "/test")
     public String test() {
         return "iot/test";

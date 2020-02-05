@@ -1,6 +1,7 @@
 package com.learnbind.ai.service.iot.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,4 +70,10 @@ public class CommandService implements ICommandService {
         int result = wmCommandMapper.updateByDeviceCommand(commandBean);
         return JsonResult.success(result,result+"");
     }
+
+	@Override
+	public List<Map<String, Object>> searchList() {
+		return wmCommandMapper.searchList();
+	}
+    
 }

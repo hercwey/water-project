@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('IOT接入测试')" th:remove="tag"></div>
+<!-- 页面正在加载js -->
+<script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>
+<!-- 显示/隐藏正在加载阴影 -->
+<script th:src="@{/pivas/js/common/Loading.js}"></script>
+<!-- 
+	包装页面,也可以不使用此页面,直接使用内容页面.
+	_starter:页面为包装页面,用于加载_search
+	_main:主页面包括:操作面板(增加,删除,查询)+数据列表容器
+	_table:页面:数据列表页面
+	_dialog_add:增加对话框
+	_dialog_modi:修改对话框
+		
+	_starter页面---load---_main页面---load---_table页面
+	 
+-->
+</head>
+<body>
+	<!-- 批次管理主页 -->
+	<!-- <div class="container-fluid"> -->
+	<br />
+	<div class="container">
+		<iframe id="page-container-iframe" src="/iot/test" frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%;" height="100%;">
+			<!-- 此处加载内容 -->
+   		</iframe>
+	</div>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			//var G_FUNCTION_MODULE = [[${FUNCTION_MODULE}]];//模块功能标识，用于页面显示不同功能，或发送请求时当参数使用
+		/*]]>*/
+		
+	</script>
+	<script type="text/javascript">
+		$(function(){
+			initIframeHeight();//初始化iframe高度
+		});
+		
+		/**
+		 * 	初始化iframe高度
+		 */
+		function initIframeHeight(){
+			/* $(document).height()：整个网页的文档高度
+			$(window).height()：浏览器可视窗口的高度
+			$(document.body).height();//浏览器当前窗口文档body的高度 */
+			var height = $(document).height();
+			height = (height-70)+"px";
+			$("#page-container-iframe").css("height", height);
+		}
+	</script>
+</body>
+</html>
