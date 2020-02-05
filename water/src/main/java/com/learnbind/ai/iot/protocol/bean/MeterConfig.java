@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.learnbind.ai.iot.protocol.util.BCDUtil;
 import com.learnbind.ai.iot.protocol.util.ByteUtil;
+import com.learnbind.ai.iot.protocol.util.ProtoUtil;
 
 public class MeterConfig extends MeterBase {
 

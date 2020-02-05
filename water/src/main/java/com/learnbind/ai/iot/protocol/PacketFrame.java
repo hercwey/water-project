@@ -1,12 +1,12 @@
 package com.learnbind.ai.iot.protocol;
 
-import com.space.meter.protocol.util.BCDUtil;
-import com.space.meter.protocol.util.ByteUtil;
-import com.space.meter.protocol.util.ProtoUtil;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import static com.space.meter.protocol.Protocol.*;
+import com.learnbind.ai.iot.protocol.util.BCDUtil;
+import com.learnbind.ai.iot.protocol.util.ByteUtil;
+import com.learnbind.ai.iot.protocol.util.ProtoUtil;
+import static com.learnbind.ai.iot.protocol.Protocol.*;
 
 /**
  * CJ-T188数据帧结构

@@ -1,15 +1,25 @@
 package com.learnbind.ai.iot.protocol;
 
-import com.space.meter.protocol.bean.*;
-import com.space.meter.protocol.util.HexStringUtils;
-import com.space.meter.protocol.util.ProtoUtil;
 import org.apache.tomcat.util.buf.HexUtils;
+
+import com.learnbind.ai.iot.protocol.bean.MeterBase;
+import com.learnbind.ai.iot.protocol.bean.MeterConfigReadCmd;
+import com.learnbind.ai.iot.protocol.bean.MeterConfigReadResp;
+import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
+import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteResp;
+import com.learnbind.ai.iot.protocol.bean.MeterReadWaterCmd;
+import com.learnbind.ai.iot.protocol.bean.MeterReadWaterResp;
+import com.learnbind.ai.iot.protocol.bean.MeterReport;
+import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
+import com.learnbind.ai.iot.protocol.bean.MeterValveControlResp;
+import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdCmd;
+import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdResp;
+import com.learnbind.ai.iot.protocol.util.ProtoUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.space.meter.protocol.Protocol.*;
-
+import static com.learnbind.ai.iot.protocol.Protocol.*;
 /**
  * 报文编解码器, 解析和打包的总入口
  */
