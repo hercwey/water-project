@@ -2,6 +2,7 @@ package com.learnbind.ai.model.iot;
 
 import java.util.Date;
 
+import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.learnbind.ai.iot.protocol.PacketCodec;
 import com.learnbind.ai.iot.protocol.PacketFrame;
@@ -202,6 +203,12 @@ public class MeterBean {
         meterBean.setJsonData(data);
 
         ServiceBean serviceBean = uploadMessageBean.getService();
+        if (serviceBean == null) {
+            JSONArray services= uploadMessageBean.getServices();
+            if (services.size() > 0) {
+                serviceBean = ServiceBean.parseJson(services.getJSONObject(0).toJSONString());
+            }
+        }
         if (serviceBean != null) {
             PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(serviceBean.getData().getJRprotocolXY()));
             meterBean.setServiceId(serviceBean.getServiceId());

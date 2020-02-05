@@ -1,6 +1,9 @@
 package com.learnbind.ai.model.iot;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ServiceBean {
     @JsonProperty("serviceId")
@@ -42,5 +45,18 @@ public class ServiceBean {
 
     public void setEventTime(String eventTime) {
         this.eventTime = eventTime;
+    }
+    
+    public static ServiceBean parseJson(String data) {
+        ServiceBean bean = new ServiceBean();
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            bean = mapper.readValue(data, ServiceBean.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bean;
     }
 }
