@@ -26,7 +26,9 @@ public class AuthController {
 
     @RequestMapping(value = "/refreshToken", method = RequestMethod.POST)
     public ResponseEntity<String> refreshToken() {
-        JsonResult jsonResult = authService.refreshToken();
+        //FIXME G11 调用此接口后token失效（暂时替换成调用登录接口）
+//      JsonResult jsonResult = authService.refreshToken();
+    	JsonResult jsonResult = authService.login();
         return ResponseEntity.ok(jsonResult.toString());
     }
 }
