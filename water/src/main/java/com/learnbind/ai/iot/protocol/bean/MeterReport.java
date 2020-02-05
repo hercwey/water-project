@@ -1,10 +1,10 @@
 package com.learnbind.ai.iot.protocol.bean;
 
+import com.space.meter.protocol.util.BCDUtil;
+import com.space.meter.protocol.util.ByteUtil;
+import com.space.meter.protocol.util.ProtoUtil;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-
-import com.learnbind.ai.iot.protocol.util.BCDUtil;
-import com.learnbind.ai.iot.protocol.util.ByteUtil;
 
 public class MeterReport extends MeterBase {
 
@@ -12,14 +12,14 @@ public class MeterReport extends MeterBase {
     private String meterTime;      // 表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
     private int totalVolume;       // 累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
     private float sampleUnit;      // 采样参数：单位M3
-    private String batteryVoltage; // 电池电压：单位V
+    private int batteryVoltage;    // 电池电压：单位V
     private short meterStatus;     // 表状态字：2字节
-    private byte signal;           // 信号强度：1字节
+    private String signal;         // 信号强度
     private float pressure;        // 压力值：xx.yyyy
 
     // 内部使用缓冲区变量, 共26字节
     private byte[] meterNumberBytes     = new byte[6];    // 表号: 6字节, 水表资产编号，BCD格式；
-    private byte[] meterTimeBytes       = new byte[7];    // 表当前时间: 7字节，年、月、星期、日、时、分、秒，BCD格式；
+    private byte[] meterTimeBytes       = new byte[7];    // 表当前时间: 7字节，秒/分/时/日/星期/月/年，BCD格式；
     private byte[] totalVolumeBytes     = new byte[4];    // 累计使用量：4字节，与机械装置对于的表读数，HEX格式；
     private byte[] sampleUnitBytes      = new byte[1];    // 采样参数：1字节，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样，HEX格式；
     private byte[] batteryVoltageBytes  = new byte[2];    // 电池电压：2字节，单位为毫伏，BCD格式；(上层应用使用单位为V, 保留3为小数)
@@ -31,12 +31,12 @@ public class MeterReport extends MeterBase {
 
     public MeterReport(byte[] dataBytes){
 
-        // 判断长度
+        // 校验接收数据的长度
         if (dataBytes.length < getBytesLength()){
-            throw new RuntimeException("上报数据长度过短, 无法解析");
+            throw new RuntimeException("上报数据解析: 长度过短, 无法解析");
         }
 
-        // 解析数据缓冲区
+        // 将缓冲区的数据按字段顺序拆分
         int pos = 0;
         pos += ByteUtil.arrayCopy(dataBytes, pos, meterNumberBytes);
         pos += ByteUtil.arrayCopy(dataBytes, pos, meterTimeBytes);
@@ -47,47 +47,27 @@ public class MeterReport extends MeterBase {
         pos += ByteUtil.arrayCopy(dataBytes, pos, signalBytes);
         pos += ByteUtil.arrayCopy(dataBytes, pos, pressureBytes);
 
-        meterNumber = BCDUtil.bcd2String(meterNumberBytes);
-        meterTime = BCDUtil.bcd2String(meterTimeBytes);
-        totalVolume = ByteUtil.getInt(totalVolumeBytes);
-        sampleUnit = MeterConfig.convertSampleUnit(sampleUnitBytes);
-        batteryVoltage = BCDUtil.bcd2String(batteryVoltageBytes);
-        meterStatus = ByteUtil.getShort(meterStatusBytes);
-        signal = ByteUtil.getByte(signalBytes);
-
-        // 解析压力值, BCD格式, 前一个字节表示整数, 后两个字节为小数
-        byte[] pressureInt = new byte[1];
-        byte[] pressureFloat = new byte[2];
-
-        pos = 0;
-        pos += ByteUtil.arrayCopy(pressureBytes, pos, pressureInt);
-        pos += ByteUtil.arrayCopy(pressureBytes, pos, pressureFloat);
-
-        // 拼接为小数
-        String pressureStr = BCDUtil.bcd2String(pressureInt) + "." + BCDUtil.bcd2String(pressureFloat);
-        pressure = Float.valueOf(pressureStr);
+        // 解析到成员变量
+        meterNumber     = ProtoUtil.parseMeterNumber(meterNumberBytes);
+        meterTime       = ProtoUtil.parseMeterTime(meterTimeBytes); // TODO: 可优化为Date
+        totalVolume     = ProtoUtil.parseTotalVolume(totalVolumeBytes);
+        sampleUnit      = ProtoUtil.parseSampleUnit(sampleUnitBytes);
+        batteryVoltage  = ProtoUtil.parseBatteryVoltage(batteryVoltageBytes);
+        meterStatus     = ProtoUtil.parseMeterStatusFlag(meterStatusBytes);
+        signal          = ProtoUtil.parseSignal(signalBytes);
+        pressure        = ProtoUtil.parsePressure(pressureBytes);
     }
 
     public byte[] encodeBytes(){
 
-        BCDUtil.setBcdBytes(meterNumberBytes, meterNumber);
-        BCDUtil.setBcdBytes(meterTimeBytes, meterTime);
-        ByteUtil.setBytes(totalVolumeBytes, totalVolume);
-
-        sampleUnitBytes[0] =  MeterConfig.convertSampleUnit(sampleUnit);
-
-        BCDUtil.setBcdBytes(batteryVoltageBytes, batteryVoltage);
-        ByteUtil.setBytes(meterStatusBytes, meterStatus);
-
-        ByteUtil.setBytes(signalBytes, signal);
-
-        // 转换压力值,
-        byte[] pressureInt = new byte[1];
-        byte[] pressureFloat = new byte[2];
-        BCDUtil.setBcdBytes(pressureInt, pressure * 10000 / 10000 + "");
-        BCDUtil.setBcdBytes(pressureFloat, pressure * 10000 % 10000 + "");
-        System.arraycopy(pressureInt, 0, pressureBytes, 0, 1);
-        System.arraycopy(pressureFloat, 0, pressureBytes, 1, 2);
+        ProtoUtil.packMeterNumber(meterNumberBytes, meterNumber);
+        ProtoUtil.packMeterTime(meterTimeBytes, meterTime);
+        ProtoUtil.packTotalVolume(totalVolumeBytes, totalVolume);
+        ProtoUtil.packSampleUnit(sampleUnitBytes, sampleUnit);
+        ProtoUtil.packBatteryVoltage(batteryVoltageBytes, batteryVoltage);
+        ProtoUtil.packMeterStatusFlag(meterStatusBytes, meterStatus);
+        ProtoUtil.packSignal(signalBytes, signal);
+        ProtoUtil.packPressure(pressureBytes, pressure);
 
         return ByteUtil.concatAll(meterNumberBytes,
                 meterTimeBytes,
@@ -142,11 +122,11 @@ public class MeterReport extends MeterBase {
         this.sampleUnit = sampleUnit;
     }
 
-    public String getBatteryVoltage() {
+    public int getBatteryVoltage() {
         return batteryVoltage;
     }
 
-    public void setBatteryVoltage(String batteryVoltage) {
+    public void setBatteryVoltage(int batteryVoltage) {
         this.batteryVoltage = batteryVoltage;
     }
 
@@ -158,11 +138,11 @@ public class MeterReport extends MeterBase {
         this.meterStatus = meterStatus;
     }
 
-    public byte getSignal() {
+    public String getSignal() {
         return signal;
     }
 
-    public void setSignal(byte signal) {
+    public void setSignal(String signal) {
         this.signal = signal;
     }
 

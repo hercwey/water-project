@@ -4,8 +4,8 @@ import com.learnbind.ai.iot.protocol.util.ByteUtil;
 
 public class MeterConfigWriteCmd extends MeterBase {
 
-    private short configFlag;     // 参数修改标识：2字节, 写表配置数据时，以此值（HEX格式）定义
-    private MeterConfig config;
+    private short configFlag;       // 参数修改标识：2字节, 写表配置数据时，以此值（HEX格式）定义
+    private MeterConfig config;     // 表的配置参数
 
     public MeterConfigWriteCmd(){
         config = new MeterConfig();
