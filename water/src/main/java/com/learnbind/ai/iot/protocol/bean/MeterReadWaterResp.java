@@ -1,8 +1,8 @@
 package com.learnbind.ai.iot.protocol.bean;
 
-import com.space.meter.protocol.util.BCDUtil;
-import com.space.meter.protocol.util.ByteUtil;
-import com.space.meter.protocol.util.ProtoUtil;
+import com.learnbind.ai.iot.protocol.util.BCDUtil;
+import com.learnbind.ai.iot.protocol.util.ByteUtil;
+import com.learnbind.ai.iot.protocol.util.ProtoUtil;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 

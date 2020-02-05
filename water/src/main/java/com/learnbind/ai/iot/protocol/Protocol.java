@@ -1,8 +1,5 @@
 package com.learnbind.ai.iot.protocol;
 
-import com.space.meter.protocol.util.BCDUtil;
-import com.space.meter.protocol.util.ByteUtil;
-
 public class Protocol {
 
     /* 协议数据标识 */

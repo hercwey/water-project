@@ -1,4 +1,4 @@
-package com.space.meter.protocol.util;
+package com.learnbind.ai.iot.protocol.util;
 
 public class ProtoUtil {
     /**
