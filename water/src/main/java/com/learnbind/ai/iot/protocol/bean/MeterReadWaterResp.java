@@ -1,19 +1,26 @@
 package com.learnbind.ai.iot.protocol.bean;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.space.meter.protocol.util.BCDUtil;
+import com.space.meter.protocol.util.ByteUtil;
+import com.space.meter.protocol.util.ProtoUtil;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.learnbind.ai.iot.protocol.util.BCDUtil;
-import com.learnbind.ai.iot.protocol.util.ByteUtil;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class MeterReadWaterResp extends MeterBase {
 
+    private String meterNumber;             // 表号， 6字节数字字符串
+    private float sampleUnit;               // 数据采样单位M3
+    private List<WaterVolume> listWater;    // 月冻结水量数据链表
+
     public class WaterVolume {
         public String date;     // 时间格式: yyyymmdd
-        public int volume;    // 累积使用水量
+        public int volume;      // 累积使用水量
 
         public WaterVolume(){}
         public WaterVolume(byte[] waterBytes) {
@@ -59,15 +66,12 @@ public class MeterReadWaterResp extends MeterBase {
         }
     }
 
-    private String meterNumber;             // 表号， 6字节数字字符串
-    private float sampleUnit;               // 数据采样单位M3
-    private List<WaterVolume> listWater;    // 月冻结水量数据链表
 
     public MeterReadWaterResp(){}
     public MeterReadWaterResp(byte[] dataBytes) {
 
         byte[] meterNumberBytes = new byte[6];    // 表号: 6字节, 水表资产编号，BCD格式；
-        byte[] sampleUnitBytes = new byte[1];     // 采样参数: 1字节，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样，HEX格式；
+        byte[] sampleUnitBytes  = new byte[1];    // 采样参数: 1字节，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样，HEX格式；
         byte[] waterVolumeBytes = new byte[12*7]; // 月冻结：12 * 7个字节, (上1月冻结数据7；上2月冻结数据7；……上12月冻结数据7)
 
         int pos = 0;
@@ -75,12 +79,9 @@ public class MeterReadWaterResp extends MeterBase {
         pos += ByteUtil.arrayCopy(dataBytes, pos, sampleUnitBytes);
         pos += ByteUtil.arrayCopy(dataBytes, pos, waterVolumeBytes);
 
-
-        // 解析表号
-        meterNumber = BCDUtil.bcd2String(meterNumberBytes);
-
-        // 解析数据采样单位
-        sampleUnit = MeterConfig.convertSampleUnit(sampleUnitBytes);
+        // 解析数据到成员变量
+        meterNumber = ProtoUtil.parseMeterNumber(meterNumberBytes); // 解析表号
+        sampleUnit = ProtoUtil.parseSampleUnit(sampleUnitBytes); // 解析数据采样单位
 
         // 解析月冻结数据为List数组
         listWater = new ArrayList<>();
@@ -94,9 +95,12 @@ public class MeterReadWaterResp extends MeterBase {
     }
 
     public byte[] encodeBytes(){
-        byte[] meterNumberBytes = BCDUtil.string2Bcd(meterNumber);    // 表号: 6字节, 水表资产编号，BCD格式；
-        byte[] sampleUnitBytes = new byte[1];     // 采样参数: 1字节，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样，HEX格式；
-        sampleUnitBytes[0] = MeterConfig.convertSampleUnit(sampleUnit);
+        byte[] meterNumberBytes = new byte[6];    // 表号: 6字节, 水表资产编号，BCD格式；
+        byte[] sampleUnitBytes  = new byte[1];    // 采样参数: 1字节，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样，HEX格式；
+
+        // 封装
+        ProtoUtil.packMeterNumber(meterNumberBytes, meterNumber);
+        ProtoUtil.packSampleUnit(sampleUnitBytes, sampleUnit);
 
         List<byte[]> waterVolumeBytesList = new ArrayList<>(); // 月冻结：12 * 7个字节, (上1月冻结数据7；上2月冻结数据7；……上12月冻结数据7)
         for (WaterVolume volume : listWater){
@@ -104,7 +108,6 @@ public class MeterReadWaterResp extends MeterBase {
         }
 
         byte[] waterVolumeBytes = ByteUtil.concatAll(waterVolumeBytesList);
-
         return ByteUtil.concatAll(meterNumberBytes, sampleUnitBytes, waterVolumeBytes);
     }
 
