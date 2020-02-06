@@ -15,13 +15,18 @@
     <result column="PROTOCOL_TYPE" jdbcType="VARCHAR" property="protocolType" />
     <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
     <result column="UPATE_TIME" jdbcType="TIMESTAMP" property="upateTime" />
+    
+    <result column="METER_TYPE" jdbcType="INTEGER" property="meterType" />
+    <result column="METER_ADDRESS" jdbcType="VARCHAR" property="meterAddress" />
+    <result column="METER_FACTORY_CODE" jdbcType="VARCHAR" property="meterFactoryCode" />
+    <result column="METER_SEQUENCE" jdbcType="INTEGER" property="meterSequence" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--
       WARNING - @mbg.generated
     -->
     ID, DEVICE_ID, VERIFY_CODE, MANUFACTURER_ID, MANUFACTURER_NAME, DEVICE_TYPE, MODEL, 
-    PROTOCOL_TYPE, CREATE_TIME, UPATE_TIME
+    PROTOCOL_TYPE, CREATE_TIME, UPATE_TIME, METER_TYPE, METER_ADDRESS, METER_FACTORY_CODE, METER_SEQUENCE 
   </sql>
   
   <insert id="save" parameterType="com.learnbind.ai.model.iot.DeviceBean">
@@ -36,7 +41,11 @@
 			MODEL, 
 			PROTOCOL_TYPE, 
 			CREATE_TIME, 
-			UPATE_TIME 
+			UPATE_TIME, 
+			METER_TYPE, 
+			METER_ADDRESS,
+			METER_FACTORY_CODE,
+			METER_SEQUENCE 
 			)
 	VALUES
 		(
@@ -48,7 +57,11 @@
 		#{ model, jdbcType = VARCHAR }, 
 		#{ protocolType, jdbcType = VARCHAR },
 		SYSDATE,
-		SYSDATE
+		SYSDATE,
+		#{ meterType, jdbcType = INTEGER }, 
+		#{ meterAddress, jdbcType = VARCHAR }, 
+		#{ meterFactoryCode, jdbcType = VARCHAR }, 
+		#{ meterSequence, jdbcType = INTEGER }, 
 		)
 	</insert>
 
@@ -63,7 +76,11 @@
 			DEVICE_TYPE = #{ deviceType, jdbcType = VARCHAR },
 			MODEL = #{ model, jdbcType = VARCHAR },
 			PROTOCOL_TYPE = #{ protocolType, jdbcType = VARCHAR },
-			UPATE_TIME = SYSDATE 
+			UPATE_TIME = SYSDATE, 
+			METER_TYPE = #{ meterType, jdbcType = INTEGER },
+			METER_ADDRESS = #{ meterAddress, jdbcType = VARCHAR },
+			METER_FACTORY_CODE = #{ meterFactoryCode, jdbcType = VARCHAR },
+			METER_SEQUENCE = #{ meterSequence, jdbcType = INTEGER } 
 		WHERE
 			ID = #{ id, jdbcType = BIGINT}
   </update>
@@ -79,9 +96,21 @@
 			DEVICE_TYPE = #{ deviceType, jdbcType = VARCHAR },
 			MODEL = #{ model, jdbcType = VARCHAR },
 			PROTOCOL_TYPE = #{ protocolType, jdbcType = VARCHAR },
-			UPATE_TIME = SYSDATE 
+			UPATE_TIME = SYSDATE,
+			METER_TYPE = #{ meterType, jdbcType = INTEGER },
+			METER_ADDRESS = #{ meterAddress, jdbcType = VARCHAR },
+			METER_FACTORY_CODE = #{ meterFactoryCode, jdbcType = VARCHAR },
+			METER_SEQUENCE = #{ meterSequence, jdbcType = INTEGER } 
 		WHERE
 			DEVICE_ID = #{ deviceId, jdbcType = BIGINT}
   </update>
-  
+  <!-- 查询 -->
+  <select id="getDeviceByDeviceId" parameterType="com.learnbind.ai.model.iot.DeviceBean" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		WM_DEVICE 
+	WHERE
+		DEVICE_ID = #{ deviceId, jdbcType = VARCHAR }
+  </select>
 </mapper>

@@ -13,6 +13,7 @@ import com.learnbind.ai.iot.util.IoTRequestUtil;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.DeviceRegisterRspBean;
 import com.learnbind.ai.model.iot.JsonResult;
+import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.service.iot.IDeviceService;
 
 @Service
@@ -95,6 +96,11 @@ public class DeviceService implements IDeviceService {
         //TODO G11 是否同步本地数据？
         return jsonResult;
     }
+
+	@Override
+	public WmDevice getDeviceByDeviceId(DeviceBean deviceBean) {
+		return wmDeviceMapper.getDeviceByDeviceId(deviceBean);
+	}
 
 
 }

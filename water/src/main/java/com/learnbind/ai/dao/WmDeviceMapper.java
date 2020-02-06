@@ -9,4 +9,5 @@ public interface WmDeviceMapper extends Mapper<WmDevice> {
 	int save(DeviceBean device);
     int updateById(DeviceBean device);
     int updateByDeviceId(DeviceBean device);
+    WmDevice getDeviceByDeviceId(DeviceBean device);
 }

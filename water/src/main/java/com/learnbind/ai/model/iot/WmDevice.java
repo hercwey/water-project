@@ -3,6 +3,10 @@ package com.learnbind.ai.model.iot;
 import java.util.Date;
 import javax.persistence.*;
 
+/**
+ * @author LoveS
+ *
+ */
 @Table(name = "WM_DEVICE")
 public class WmDevice {
     @Id
@@ -36,6 +40,18 @@ public class WmDevice {
 
     @Column(name = "UPATE_TIME")
     private Date upateTime;
+
+    @Column(name = "METER_TYPE")
+    private Integer meterType=0;
+
+    @Column(name = "METER_ADDRESS")
+    private String meterAddress="";
+
+    @Column(name = "METER_FACTORY_CODE")
+    private String meterFactoryCode="";
+
+    @Column(name = "METER_SEQUENCE")
+    private Integer meterSequence=1;
 
     /**
      * @return ID
@@ -176,8 +192,61 @@ public class WmDevice {
     public void setUpateTime(Date upateTime) {
         this.upateTime = upateTime;
     }
+    
+    /**
+     * @return METER_TYPE
+     */
+    public Integer getMeterType() {
+		return meterType;
+	}
 
-    @Override
+    /**
+     * @param meterType
+     */
+	public void setMeterType(Integer meterType) {
+		this.meterType = meterType;
+	}
+	/**
+     * @return METER_ADDRESS
+     */
+	public String getMeterAddress() {
+		return meterAddress;
+	}
+
+    /**
+     * @param meterAddress
+     */
+	public void setMeterAddress(String meterAddress) {
+		this.meterAddress = meterAddress == null ? null : meterAddress.trim();
+	}
+	/**
+     * @return METER_FACTORY_CODE
+     */
+	public String getMeterFactoryCode() {
+		return meterFactoryCode;
+	}
+
+    /**
+     * @param meterFactoryCode
+     */
+	public void setMeterFactoryCode(String meterFactoryCode) {
+		this.meterFactoryCode = meterFactoryCode == null ? null : meterFactoryCode.trim();
+	}
+	/**
+     * @return METER_SEQUENCE
+     */
+	public Integer getMeterSequence() {
+		return meterSequence;
+	}
+
+    /**
+     * @param meterSequence
+     */
+	public void setMeterSequence(Integer meterSequence) {
+		this.meterSequence = meterSequence;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
@@ -193,6 +262,10 @@ public class WmDevice {
         sb.append(", protocolType=").append(protocolType);
         sb.append(", createTime=").append(createTime);
         sb.append(", upateTime=").append(upateTime);
+        sb.append(", meterType=").append(meterType);
+        sb.append(", meterAddress=").append(meterAddress);
+        sb.append(", meterFactoryCode=").append(meterFactoryCode);
+        sb.append(", meterSequence=").append(meterSequence);
         sb.append("]");
         return sb.toString();
     }
