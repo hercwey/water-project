@@ -2,10 +2,14 @@ package com.learnbind.ai.model.iot;
 
 import java.util.Date;
 
+import org.apache.http.util.Args;
+
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.learnbind.ai.iot.protocol.PacketCodec;
 import com.learnbind.ai.iot.protocol.PacketFrame;
+import com.learnbind.ai.iot.protocol.bean.MeterReport;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 
 public class MeterBean {
@@ -193,7 +197,7 @@ public class MeterBean {
         this.updatetime = updatetime;
     }
 
-    public static MeterBean fromUploadDataJson(String data) {
+	public static MeterBean fromUploadDataJson(String data) {
         MeterBean meterBean = new MeterBean();
         UploadMessageBean uploadMessageBean = UploadMessageBean.parseJson(data);
 
@@ -221,10 +225,30 @@ public class MeterBean {
             meterBean.setCtrlCode(packetFrame.getCtrlCode());
             meterBean.setDataDI((short)packetFrame.getDataDI());
             meterBean.setSequence(packetFrame.getSequence());
-            meterBean.setData(HexStringUtils.bytesToHexString(packetFrame.getData()));
+            //meterBean.setData(HexStringUtils.bytesToHexString(packetFrame.getData()));
             meterBean.setChecksum(Integer.valueOf(packetFrame.getChecksum()));
+            
+            MeterReport meterReport = (MeterReport)PacketCodec.decodeData(packetFrame);
+            MeterDataBean meterDataBean = new MeterDataBean();
+            
+            meterDataBean.setMeterNumber(meterReport.getMeterNumber());
+            meterDataBean.setMeterTime(meterReport.getMeterTime());
+            meterDataBean.setTotalVolume(meterReport.getTotalVolume());
+            meterDataBean.setSampleUnit(meterReport.getSampleUnit()+"");
+            meterDataBean.setBatteryVoltage(meterReport.getBatteryVoltage());
+            meterDataBean.setMeterStatus(meterReport.getMeterStatus()+"");
+            meterDataBean.setSignal(meterReport.getSignal());
+            meterDataBean.setPressure(meterReport.getPressure()+"");
+            meterBean.setData(MeterDataBean.toJsonString(meterDataBean));
         }
 
         return meterBean;
     }
+	
+	
+	public static void main(String[] args) {
+		String data = "{\"notifyType\":\"deviceDatasChanged\",\"requestId\":null,\"deviceId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"gatewayId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"services\":[{\"serviceId\":\"JRprotocol\",\"serviceType\":\"JRprotocol\",\"data\":{\"JRprotocolXY\":\"681054360745404358811d1f903054360745404347580805010220222222220305358108210000003d16\"},\"eventTime\":\"20200205T085850Z\"}]}";
+		MeterBean meterBean = MeterBean.fromUploadDataJson(data);
+		System.out.println(JSON.toJSON(meterBean));
+	}
 }
