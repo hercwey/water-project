@@ -93,4 +93,32 @@ public class AuthService implements IAuthService {
         }
         return jsonResult;
     }
+
+	@Override
+	public JsonResult taskRefreshToken() {
+		String accessToken = null;
+        JsonResult jsonResult = JsonResult.fail(0,"Unknown Error");
+        try {
+            String appId = Constants.APP_ID;
+            String secret = Constants.SECRET;
+            String urlLogin = Constants.APP_AUTH;
+
+            Map<String, String> param = new HashMap<>();
+            param.put("appId", appId);
+            param.put("secret", secret);
+
+            jsonResult = IoTRequestUtil.doPostFormUrlEncodedGetStatusLine(urlLogin, param);
+
+            Map<String, String> dataMap = new HashMap<>();
+            dataMap = JsonUtil.jsonString2SimpleObj(jsonResult.getData(), dataMap.getClass());
+            accessToken = dataMap.get("accessToken");
+            System.out.println("accessToken:" + accessToken);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Constants.accessToken = accessToken;
+        return jsonResult;
+	}
+    
 }
