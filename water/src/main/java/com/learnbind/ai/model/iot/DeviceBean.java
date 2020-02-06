@@ -2,8 +2,11 @@ package com.learnbind.ai.model.iot;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 
 import java.io.IOException;
+
+import javax.persistence.Column;
 
 public class DeviceBean {
 
@@ -93,6 +96,15 @@ public class DeviceBean {
     private String createTime;
     @JsonProperty("updateTime")
     private String updateTime;
+    
+    @JsonProperty("meterType")
+    private Integer meterType=0;
+    @JsonProperty("meterAddress")
+    private String meterAddress="";
+    @JsonProperty("meterFactoryCode")
+    private String meterFactoryCode="";
+    @JsonProperty("meterSequence")
+    private Integer meterSequence=1;
 
     public Long getId() {
         return id;
@@ -174,7 +186,39 @@ public class DeviceBean {
         this.updateTime = updateTime;
     }
 
-    public static DeviceBean parseJson(String data) {
+    public Integer getMeterType() {
+		return meterType;
+	}
+
+	public void setMeterType(Integer meterType) {
+		this.meterType = meterType;
+	}
+
+	public String getMeterAddress() {
+		return meterAddress;
+	}
+
+	public void setMeterAddress(String meterAddress) {
+		this.meterAddress = meterAddress;
+	}
+
+	public String getMeterFactoryCode() {
+		return meterFactoryCode;
+	}
+
+	public void setMeterFactoryCode(String meterFactoryCode) {
+		this.meterFactoryCode = meterFactoryCode;
+	}
+
+	public Integer getMeterSequence() {
+		return meterSequence;
+	}
+
+	public void setMeterSequence(Integer meterSequence) {
+		this.meterSequence = meterSequence;
+	}
+
+	public static DeviceBean parseJson(String data) {
         DeviceBean deviceBean = new DeviceBean();
 
         try {
@@ -186,4 +230,23 @@ public class DeviceBean {
 
         return deviceBean;
     }
+	
+	public static DeviceBean fromWmDevice(WmDevice wmDevice) {
+		DeviceBean deviceBean = new DeviceBean();
+		deviceBean.setId(wmDevice.getId());
+		deviceBean.setDeviceId(wmDevice.getDeviceId());
+		deviceBean.setVerifyCode(wmDevice.getVerifyCode());
+		deviceBean.setManufacturerId(wmDevice.getManufacturerId());
+		deviceBean.setManufacturerName(wmDevice.getManufacturerName());
+		deviceBean.setDeviceType(wmDevice.getDeviceType());
+		deviceBean.setModel(wmDevice.getModel());
+		deviceBean.setProtocolType(wmDevice.getProtocolType());
+		deviceBean.setCreateTime(wmDevice.getCreateTime().toString());
+		deviceBean.setUpdateTime(wmDevice.getUpateTime().toString());
+		deviceBean.setMeterType(wmDevice.getMeterType());
+		deviceBean.setMeterAddress(wmDevice.getMeterAddress());
+		deviceBean.setMeterFactoryCode(wmDevice.getMeterFactoryCode());
+		deviceBean.setMeterSequence(wmDevice.getMeterSequence());
+		return deviceBean;
+	}
 }

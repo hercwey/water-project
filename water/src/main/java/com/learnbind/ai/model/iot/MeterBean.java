@@ -231,14 +231,16 @@ public class MeterBean {
             MeterReport meterReport = (MeterReport)PacketCodec.decodeData(packetFrame);
             MeterDataBean meterDataBean = new MeterDataBean();
             
-            meterDataBean.setMeterNumber(meterReport.getMeterNumber());
-            meterDataBean.setMeterTime(meterReport.getMeterTime());
-            meterDataBean.setTotalVolume(meterReport.getTotalVolume());
-            meterDataBean.setSampleUnit(meterReport.getSampleUnit()+"");
-            meterDataBean.setBatteryVoltage(meterReport.getBatteryVoltage());
-            meterDataBean.setMeterStatus(meterReport.getMeterStatus()+"");
-            meterDataBean.setSignal(meterReport.getSignal());
-            meterDataBean.setPressure(meterReport.getPressure()+"");
+            if (meterReport != null) {
+            	meterDataBean.setMeterNumber(meterReport.getMeterNumber());
+                meterDataBean.setMeterTime(meterReport.getMeterTime());
+                meterDataBean.setTotalVolume(meterReport.getTotalVolume());
+                meterDataBean.setSampleUnit(meterReport.getSampleUnit()+"");
+                meterDataBean.setBatteryVoltage(meterReport.getBatteryVoltage());
+                meterDataBean.setMeterStatus(meterReport.getMeterStatus()+"");
+                meterDataBean.setSignal(meterReport.getSignal());
+                meterDataBean.setPressure(meterReport.getPressure()+"");
+			}
             meterBean.setData(MeterDataBean.toJsonString(meterDataBean));
         }
 

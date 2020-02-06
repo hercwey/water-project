@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.learnbind.ai.constant.PagerConstant;
+import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterBean;
+import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iot.WmMeter;
+import com.learnbind.ai.service.iot.IDeviceService;
 import com.learnbind.ai.service.iot.IMeterService;
 
 @Controller
@@ -25,6 +28,8 @@ public class MeterController {
 
     @Autowired
     IMeterService meterService;
+    @Autowired
+    IDeviceService deviceService;
 
     @RequestMapping(value = "/uploadDeviceData", method = RequestMethod.POST)
     @ResponseBody
@@ -34,6 +39,21 @@ public class MeterController {
         MeterBean meterBean = MeterBean.fromUploadDataJson(data);
         //TODO 水表数据保存
         JsonResult jsonResult = meterService.save(meterBean);
+        //TODO 水表数据封装信息保存（表类型、表地址、表厂商）
+        DeviceBean deviceBean = new DeviceBean();
+        deviceBean.setDeviceId(meterBean.getDeviceId());
+        WmDevice wmDevice = deviceService.getDeviceByDeviceId(deviceBean);
+        
+        if (wmDevice != null) {
+        	deviceBean = DeviceBean.fromWmDevice(wmDevice);
+            deviceBean.setMeterType(meterBean.getMeterType());
+            deviceBean.setMeterAddress(meterBean.getMeterAddr());
+            deviceBean.setMeterFactoryCode(meterBean.getFactoryCode());
+            
+            deviceService.modifyDevice(deviceBean);
+            
+		}
+        
         jsonResult.setData(data);
         return ResponseEntity.ok(jsonResult.toString());
     }
