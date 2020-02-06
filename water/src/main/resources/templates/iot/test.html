@@ -7,6 +7,8 @@
 <script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>
 <!-- 显示/隐藏正在加载阴影 -->
 <script th:src="@{/pivas/js/common/Loading.js}"></script>
+<!-- 引入通用对话框工具 -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
 <!-- 
 	包装页面,也可以不使用此页面,直接使用内容页面.
 	_starter:页面为包装页面,用于加载_search
@@ -33,6 +35,14 @@
 </style>
 </head>
 <body>
+	
+	<!-- 发送水表配置指令对话框 -->
+	<div id="command-meter-config-dialog" th:include="iot/command_meter_config_dialog::dialog"></div>
+	<!-- 发送开关阀指令对话框 -->
+	<div id="command-openclose-dialog" th:include="iot/command_openclose_dialog::dialog"></div>
+	<!-- 发送水量阀值指令对话框 -->
+	<div id="command-water-amount-dialog" th:include="iot/command_water_amount_dialog::dialog"></div>
+
 	<!-- 批次管理主页 -->
 	<!-- <div class="container-fluid"> -->
 	<br />
@@ -93,6 +103,16 @@
 					<div class="col-md-6 column">
 						<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-to-device">
 							<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送命令</span></i>
+						</button>
+						
+						<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-meter-config">
+							<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水表配置指令</span></i>
+						</button>
+						<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-open-close">
+							<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送开关阀指令</span></i>
+						</button>
+						<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-water-amount">
+							<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水量阈值指令</span></i>
 						</button>
 					</div>
 				</div>
@@ -188,6 +208,9 @@
 
 	<script type="text/javascript">
 	
+		var G_OPEN_CLOSE_COMMAND_DIALOG_ID = "modal-container-command-openclose";//开关阀指令发送对话框ID
+		var G_METER_CONFIG_COMMAND_DIALOG_ID = "modal-container-command-meter-config";//水表配置指令发送对话框ID
+		var G_WATER_AMOUNT_COMMAND_DIALOG_ID = "modal-container-command-water-amount";//水量阀值指令发送对话框ID
 		var SELECTED_DEVICE_ID = null;//用户已选择的设备
 	
 		$(function() {
@@ -329,6 +352,57 @@
 				
 			});
 			
+			/**
+			 * 	发送水表配置指令到设备（给水表发送指令）
+			 */
+			$("#btn-send-cmd-meter-config").on("click", function(){
+				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
+				if(deviceId==null || deviceId==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要发送命令的设备！",null,"warning");
+					return false;
+				}
+				
+				DialogUtil.openDialogFn(G_METER_CONFIG_COMMAND_DIALOG_ID);//打开发送水表配置指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			});
+			/**
+			 * 	发送开关阀指令到设备（给水表发送指令）
+			 */
+			$("#btn-send-cmd-open-close").on("click", function(){
+				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
+				if(deviceId==null || deviceId==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要发送命令的设备！",null,"warning");
+					return false;
+				}
+				
+				DialogUtil.openDialogFn(G_OPEN_CLOSE_COMMAND_DIALOG_ID);//打开发送开关阀指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			});
+			/**
+			 * 	发送水量阀值指令到设备（给水表发送指令）
+			 */
+			$("#btn-send-cmd-water-amount").on("click", function(){
+				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
+				if(deviceId==null || deviceId==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要发送命令的设备！",null,"warning");
+					return false;
+				}
+				
+				DialogUtil.openDialogFn(G_WATER_AMOUNT_COMMAND_DIALOG_ID);//打开发送水量阀值指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			});
 			
 			//------------------查询设备上传数据部分----------------------------------------------------------------------------
 			/**

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发送开关阀指令对话框</title>
+
+<!-- 发送开关阀指令:对话框 -->
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-command-openclose" role="dialog"	aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span id="modal-title-span">开关阀指令</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<div class="row clearfix">
+									<div class="col-md-12 column mx-auto">
+										<button type="button" class="btn btn-warning btn-sm" id="btn-send-command-close" data-command="99H">关阀</button>
+										<button type="button" class="btn btn-success btn-sm" id="btn-send-command-open" data-command="55H">开阀</button> 
+										<button type="button" class="btn btn-info btn-sm" id="btn-send-command-open-50" data-command="A1H">打开50%</button>
+										<button type="button" class="btn btn-info btn-sm" id="btn-send-command-open-25" data-command="A2H">打开25%</button>
+										<button type="button" class="btn btn-info btn-sm" id="btn-send-command-open-125" data-command="A3H">打开12.5%</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+	
+		/**
+		 * 	发送开/关阀指令通用函数
+		 */
+		function sendCommandOpenCloseFn(cmd){
+			alert("发送指令："+cmd);
+		}
+		
+		$(function(){
+			/**
+			 * 	绑定关阀按钮的click事件
+			 */
+			 $("#modal-container-command-openclose #btn-send-command-close").on("click", function(){
+				var cmd = $(this).attr("data-command");
+				if(cmd==null || cmd==""){
+					alert("指令为空，请重新初始化对话框！");
+					return false;
+				}
+				
+				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
+			});
+			/**
+			 * 	绑定开阀按钮的click事件
+			 */
+			 $("#modal-container-command-openclose #btn-send-command-open").on("click", function(){
+				var cmd = $(this).attr("data-command");
+				if(cmd==null || cmd==""){
+					alert("指令为空，请重新初始化对话框！");
+					return false;
+				}
+				
+				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
+			});
+			/**
+			 * 	绑定打开50%按钮的click事件
+			 */
+			$("#modal-container-command-openclose #btn-send-command-open-50").on("click", function(){
+				var cmd = $(this).attr("data-command");
+				if(cmd==null || cmd==""){
+					alert("指令为空，请重新初始化对话框！");
+					return false;
+				}
+				
+				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
+			});
+			/**
+			 * 	绑定打开25%按钮的click事件
+			 */
+			 $("#modal-container-command-openclose #btn-send-command-open-25").on("click", function(){
+				var cmd = $(this).attr("data-command");
+				if(cmd==null || cmd==""){
+					alert("指令为空，请重新初始化对话框！");
+					return false;
+				}
+				
+				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
+			});
+			/**
+			 * 	绑定打开125%按钮的click事件
+			 */
+			 $("#modal-container-command-openclose #btn-send-command-open-125").on("click", function(){
+				var cmd = $(this).attr("data-command");
+				if(cmd==null || cmd==""){
+					alert("指令为空，请重新初始化对话框！");
+					return false;
+				}
+				
+				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
+			});
+		});
+	
+	</script>
+	
+	</th:block>
+
+</body>
+</html>
