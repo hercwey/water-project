@@ -1,7 +1,12 @@
 package com.learnbind.ai.model.iot;
 
+import org.apache.tomcat.util.buf.HexUtils;
+import org.springframework.security.crypto.encrypt.BytesEncryptor;
+
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
+import com.learnbind.ai.iot.protocol.bean.MeterReport;
 
 public class MeterDataBean {
 
@@ -79,5 +84,27 @@ public class MeterDataBean {
 	
 	public static MeterDataBean fromJson(String json) {
 		return JSON.parseObject(json, MeterDataBean.class);
+	}
+	
+	public static MeterDataBean fromMeterReport(MeterReport meterReport) {
+        MeterDataBean meterDataBean = new MeterDataBean();
+		if (meterReport != null) {
+        	meterDataBean.setMeterNumber(meterReport.getMeterNumber());
+            meterDataBean.setMeterTime(meterReport.getMeterTime());
+            meterDataBean.setTotalVolume(meterReport.getTotalVolume());
+            meterDataBean.setSampleUnit(meterReport.getSampleUnit()+"");
+            meterDataBean.setBatteryVoltage(meterReport.getBatteryVoltage());
+            meterDataBean.setMeterStatus(meterReport.getMeterStatus()+"");
+            meterDataBean.setSignal(meterReport.getSignal());
+            meterDataBean.setPressure(meterReport.getPressure()+"");
+		}
+		return meterDataBean;
+	}
+	
+	public static MeterDataBean fromHexData(String data) {
+		byte[] bytes = HexUtils.fromHexString(data);
+		
+		MeterReport meterReport = new MeterReport(bytes);
+		return fromMeterReport(meterReport);
 	}
 }
