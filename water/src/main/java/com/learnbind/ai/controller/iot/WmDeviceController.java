@@ -24,8 +24,10 @@ import com.learnbind.ai.iot.protocol.CommandGenerator;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigReadCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
+import com.learnbind.ai.iot.protocol.bean.MeterReadWaterCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdCmd;
+import com.learnbind.ai.model.iot.MeterConfigBean;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.service.iot.WmDeviceService;
 
@@ -193,6 +195,36 @@ public class WmDeviceController {
 
 	}
 	
+	//----------------加载发送指令对话框部分----------------------------------------------------------------------------------
+	@RequestMapping(value = "/load-send-cmd-dialog")
+	public String loadSendCmdDialog(Model model, Long itemId, Integer cmdType) {
+		
+		String htmlPath = "iot/command_meter_config_dialog";//默认为表配置对话框
+		//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+		if(cmdType==1) {//1=水表配置指令；
+			System.out.println("----------加载水表配置指令对话框");
+			htmlPath = "iot/command_meter_config_dialog";//默认为表配置对话框
+			
+			WmDevice device = wmDeviceService.selectByPrimaryKey(itemId);
+			MeterConfigBean meterConfigBean = null;
+			if(device!=null) {
+				String meterConfig = device.getMeterConfig();
+				meterConfigBean = MeterConfigBean.fromJson(meterConfig);
+			}
+			model.addAttribute("meterConfigBean", meterConfigBean);
+			
+		}else if(cmdType==2) {//2=开/关阀指令；
+			System.out.println("----------加载开/关阀指令对话框");
+			htmlPath = "iot/command_openclose_dialog";//默认为表配置对话框
+		}else if(cmdType==3) {//3=水量阀值指令；
+			System.out.println("----------加载水量阀值指令对话框");
+			htmlPath = "iot/command_water_amount_dialog";//默认为表配置对话框
+		}
+		
+		return htmlPath;
+	}
+	
+	//----------------生成指令部分----------------------------------------------------------------------------------
 	/**
 	 * @Title: cmdGenerator
 	 * @Description: 生成指令
@@ -220,13 +252,19 @@ public class WmDeviceController {
 	    	}
 	    	//----------
 			
-	    	//TODO cmdAction是否需要值，待确认
 			//if(StringUtils.isBlank(cmdAction) || meterType==null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) || sequence==null) {
 	    	if(meterType==null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) || sequence==null) {
 				return RequestResultUtil.getResultFail("参数错误！");
 			}
+	    	//如果命令动作为空且指令类型为4=读月冻结指令或5=读表配置指令时可以继续生成指令
+	    	//或如果命令动作不为空且指令类型不为4=读月冻结指令，且不为5=读表配置指令时可以继续生成指令
+	    	if((StringUtils.isBlank(cmdAction) && cmdType!=null && (cmdType==4 || cmdType==5)) || (StringUtils.isNotBlank(cmdAction) && cmdType!=null && (cmdType!=4 && cmdType!=5))) {
+	    		log.debug("----------允许生成指令类型："+cmdType+"，指令动作："+cmdAction);
+	    	}else {
+	    		return RequestResultUtil.getResultFail("参数错误！");
+	    	}
 			
-			log.debug("----------生成指令动作："+cmdAction);
+	    	log.debug("----------继续生成指令类型："+cmdType+"，指令动作："+cmdAction);
 			
 			//生成开/关阀指令
 			String command = null;
@@ -392,9 +430,7 @@ public class WmDeviceController {
 	 */
 	private String generatorReadMonthFreezeCommand(byte meterType, String meterAddress, String meterFactoryCode, byte sequence) {
 		
-		//TODO 
-		MeterVolumeThresholdCmd cmd = new MeterVolumeThresholdCmd();
-    	//cmd.setThreshold(cmdAction.shortValue());
+		MeterReadWaterCmd cmd = new MeterReadWaterCmd();
 
 //    	byte meterType = meterTypeI.byteValue();
 //    	byte sequence = sequenceI.byteValue();
