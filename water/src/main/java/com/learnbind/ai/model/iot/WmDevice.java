@@ -52,9 +52,12 @@ public class WmDevice {
 
     @Column(name = "METER_SEQUENCE")
     private Integer meterSequence=1;
-    
+
     @Column(name = "METER_NUMBER")
     private String meterNumber;
+    
+    @Column(name = "METER_CONFIG")
+    private String meterConfig;
 
     /**
      * @return ID
@@ -256,6 +259,15 @@ public class WmDevice {
 	public void setMeterNumber(String meterNumber) {
 		this.meterNumber = meterNumber;
 	}
+	
+
+	public String getMeterConfig() {
+		return meterConfig;
+	}
+
+	public void setMeterConfig(String meterConfig) {
+		this.meterConfig = meterConfig;
+	}
 
 	@Override
     public String toString() {
@@ -278,6 +290,7 @@ public class WmDevice {
         sb.append(", meterFactoryCode=").append(meterFactoryCode);
         sb.append(", meterSequence=").append(meterSequence);
         sb.append(", meterNumber=").append(meterNumber);
+        sb.append(", meterConfig=").append(meterConfig);
         sb.append("]");
         return sb.toString();
     }

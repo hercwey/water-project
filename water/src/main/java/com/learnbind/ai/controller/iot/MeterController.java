@@ -22,7 +22,6 @@ import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterBean;
 import com.learnbind.ai.model.iot.MeterDataBean;
-import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.IDeviceService;
 import com.learnbind.ai.service.iot.IMeterService;
@@ -44,11 +43,21 @@ public class MeterController {
         MeterBean meterBean = MeterBean.fromUploadDataJson(data);
         //TODO 水表数据保存
         JsonResult jsonResult = meterService.save(meterBean);
+        
+        //如果是水表配置信息，则更新数据库device表内容（待优化）
+        if (meterBean.getData().contains("serverIp")) {
+        	DeviceBean deviceBean = new DeviceBean();
+        	deviceBean.setDeviceId(meterBean.getDeviceId());
+        	deviceBean = DeviceBean.fromWmDevice(deviceService.getDeviceByDeviceId(deviceBean));
+        	
+        	deviceBean.setMeterConfig(meterBean.getData());
+        	deviceService.modifyDevice(deviceBean);
+		}
+        /**
         //TODO 水表数据封装信息保存（表类型、表地址、表厂商）
         DeviceBean deviceBean = new DeviceBean();
         deviceBean.setDeviceId(meterBean.getDeviceId());
         WmDevice wmDevice = deviceService.getDeviceByDeviceId(deviceBean);
-        
         if (wmDevice != null) {
         	deviceBean = DeviceBean.fromWmDevice(wmDevice);
             deviceBean.setMeterType(meterBean.getMeterType());
@@ -58,7 +67,7 @@ public class MeterController {
             deviceService.modifyDevice(deviceBean);
             
 		}
-        
+        */
         jsonResult.setData(data);
         return ResponseEntity.ok(jsonResult.toString());
     }

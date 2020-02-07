@@ -36,6 +36,14 @@
 	WHERE
 		ID = #{id,jdbcType=BIGINT}
   </select>
+  <select id="selectByCommandId" parameterType="com.learnbind.ai.model.iot.CommandBean" resultType="com.learnbind.ai.model.iot.CommandBean">
+    SELECT
+		* 
+	FROM
+		WM_COMMAND 
+	WHERE
+		COMMAND_ID = #{commandId,jdbcType=VARCHAR}
+  </select>
   <delete id="deleteById" parameterType="java.lang.Long">
     DELETE 
 	FROM

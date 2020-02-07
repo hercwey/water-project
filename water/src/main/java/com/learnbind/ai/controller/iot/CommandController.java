@@ -12,13 +12,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.learnbind.ai.constant.PagerConstant;
+import com.learnbind.ai.iot.protocol.PacketCodec;
+import com.learnbind.ai.iot.protocol.PacketFrame;
+import com.learnbind.ai.iot.protocol.bean.MeterBase;
+import com.learnbind.ai.iot.protocol.bean.MeterConfig;
+import com.learnbind.ai.iot.protocol.bean.MeterConfigReadCmd;
+import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
+import com.learnbind.ai.iot.protocol.bean.MeterReport;
+import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.model.iot.CommandBean;
 import com.learnbind.ai.model.iot.CommandResultBean;
+import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
+import com.learnbind.ai.model.iot.MeterConfigBean;
+import com.learnbind.ai.model.iot.MeterDataBean;
 import com.learnbind.ai.service.iot.ICommandService;
+import com.learnbind.ai.service.iot.IDeviceService;
 
 @Controller
 @RequestMapping("/cmd")
@@ -26,6 +40,8 @@ public class CommandController {
 
     @Autowired
     ICommandService commandService;
+    @Autowired
+    IDeviceService deviceService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     @ResponseBody
@@ -74,12 +90,35 @@ public class CommandController {
         CommandBean commandBean = new CommandBean();
         commandBean.setDeviceId(commandResultBean.getDeviceId());
         commandBean.setCommandId(commandResultBean.getCommandId());
-        if (commandResultBean.getResultCode()!=null && commandResultBean.getResultCode().equalsIgnoreCase("FAILED")) {
-            commandBean.setDatabaseStatus(-1);
-        } else {
+        if (commandResultBean.getResultCode()!=null && commandResultBean.getResultCode().equalsIgnoreCase("SUCCESS")) {
             commandBean.setDatabaseStatus(2);
+        } else {
+            commandBean.setDatabaseStatus(-1);
         }
         commandBean.setDesc(commandResultBean.getReason());
+        if (commandBean.getDatabaseStatus() == 2) {
+			//指令执行成功后，解析数据，并保存
+        	CommandBean temp = commandService.getCommandBeanByCommandId(commandBean);
+        	String commandStr = JSON.parseObject(temp.getMethodParams()).getString("value");
+        	
+        	//判断是否为设置配置操作
+        	PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(commandStr));
+        	MeterBase meterBase = PacketCodec.decodeData(packetFrame);
+            
+            //FIXME G11 针对数据上报的其他类型数据，进行解析（后续根据需求对数据进行分类，优化处理逻辑）
+            if (meterBase instanceof MeterConfigWriteCmd) {
+            	MeterConfig meterConfig = (MeterConfig)PacketCodec.decodeData(packetFrame);
+                MeterConfigBean configBean = MeterConfigBean.fromMeterConfig(meterConfig);
+            	DeviceBean deviceBean = new DeviceBean();
+            	deviceBean.setDeviceId(commandBean.getDeviceId());
+            	deviceBean = DeviceBean.fromWmDevice(deviceService.getDeviceByDeviceId(deviceBean));
+            	
+            	deviceBean.setMeterConfig(MeterConfigBean.toJsonString(configBean));
+            	deviceService.modifyDevice(deviceBean);
+			} else if (meterBase instanceof MeterConfigReadCmd) {
+				
+			}
+		}
         commandService.updateByDeviceCommand(commandBean);
 
         return ResponseEntity.ok(JsonResult.success(JsonResult.SUCCESS,data).toString());

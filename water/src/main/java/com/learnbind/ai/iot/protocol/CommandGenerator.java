@@ -6,6 +6,7 @@ import com.learnbind.ai.iot.protocol.bean.MeterBase;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigReadCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
+import com.learnbind.ai.iot.protocol.bean.MeterReadWaterCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdCmd;
 
@@ -115,6 +116,22 @@ public class CommandGenerator {
     private static String setThresholdSample() {
     	MeterVolumeThresholdCmd command = new MeterVolumeThresholdCmd();
     	command.setThreshold((short) 50);
+    	
+    	byte meterType = Protocol.METER_TYPE_10H;
+    	String meterAddress = "1505900569";
+    	String meterFactoryCode = "7833";
+    	byte sequence = 0x01;
+    	
+    	return generateCmd(meterType, meterAddress, meterFactoryCode, sequence, command);
+    }
+    
+    
+    /**
+     * 生成“读取月冻结”指令Sample
+     * @return
+     */
+    private static String setReadMonthSample() {
+    	MeterReadWaterCmd command = new MeterReadWaterCmd();
     	
     	byte meterType = Protocol.METER_TYPE_10H;
     	String meterAddress = "1505900569";

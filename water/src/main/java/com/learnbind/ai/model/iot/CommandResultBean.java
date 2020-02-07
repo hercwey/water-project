@@ -87,7 +87,7 @@ public class CommandResultBean {
         try {
             ObjectMapper mapper = new ObjectMapper();
             commandResultBean = mapper.readValue(data, CommandResultBean.class);
-            if (commandResultBean.getResult() != null) {
+            if (commandResultBean.getResult() != null && commandResultBean.getResult().containsKey("resultCode")) {
                 commandResultBean.setResultCode(commandResultBean.getResult().getString("resultCode"));
                 commandResultBean.setResultDetail(commandResultBean.getResult().getJSONObject("resultDetail"));
                 if (commandResultBean.getResultDetail() != null) {
