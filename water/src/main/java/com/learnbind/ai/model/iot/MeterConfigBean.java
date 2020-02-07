@@ -198,5 +198,9 @@ public class MeterConfigBean {
 		MeterConfig meterConfig = (MeterConfig)PacketCodec.decodeData(packetFrame);
         MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
         System.out.println(MeterConfigBean.toJsonString(meterConfigBean));
+        
+        MeterConfigBean meterConfig2 = MeterConfigBean.fromJson(MeterConfigBean.toJsonString(meterConfigBean));
+
+        System.out.println(MeterConfigBean.toJsonString(meterConfig2));
 	}
 }

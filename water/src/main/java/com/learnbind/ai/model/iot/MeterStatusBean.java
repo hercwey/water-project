@@ -1,11 +1,8 @@
 package com.learnbind.ai.model.iot;
 
-import org.apache.tools.ant.Main;
-
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.learnbind.ai.iot.protocol.Protocol;
-import com.learnbind.ai.iot.protocol.util.ByteUtil;
 
 public class MeterStatusBean {
 	/* 表状态字 */
@@ -89,7 +86,15 @@ public class MeterStatusBean {
 	public void setSampleLineCut(int sampleLineCut) {
 		this.sampleLineCut = sampleLineCut;
 	}
-
+	
+	public static String toJsonString(MeterStatusBean meterStatusBean) {
+		return JSON.toJSONString(meterStatusBean);
+	}
+	
+	public static MeterStatusBean fromJson(String json) {
+		return JSON.parseObject(json, MeterStatusBean.class);
+	}
+	
 	public static MeterStatusBean fromStatusFlag(short flag) {
     	MeterStatusBean statusBean = new MeterStatusBean();
     	
