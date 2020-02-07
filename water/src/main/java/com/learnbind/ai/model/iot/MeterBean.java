@@ -229,28 +229,10 @@ public class MeterBean {
             meterBean.setChecksum(Integer.valueOf(packetFrame.getChecksum()));
             
             MeterReport meterReport = (MeterReport)PacketCodec.decodeData(packetFrame);
-            MeterDataBean meterDataBean = new MeterDataBean();
-            
-            if (meterReport != null) {
-            	meterDataBean.setMeterNumber(meterReport.getMeterNumber());
-                meterDataBean.setMeterTime(meterReport.getMeterTime());
-                meterDataBean.setTotalVolume(meterReport.getTotalVolume());
-                meterDataBean.setSampleUnit(meterReport.getSampleUnit()+"");
-                meterDataBean.setBatteryVoltage(meterReport.getBatteryVoltage());
-                meterDataBean.setMeterStatus(meterReport.getMeterStatus()+"");
-                meterDataBean.setSignal(meterReport.getSignal());
-                meterDataBean.setPressure(meterReport.getPressure()+"");
-			}
+            MeterDataBean meterDataBean = MeterDataBean.fromMeterReport(meterReport);
             meterBean.setData(MeterDataBean.toJsonString(meterDataBean));
         }
 
         return meterBean;
-    }
-	
-	
-	public static void main(String[] args) {
-		String data = "{\"notifyType\":\"deviceDatasChanged\",\"requestId\":null,\"deviceId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"gatewayId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"services\":[{\"serviceId\":\"JRprotocol\",\"serviceType\":\"JRprotocol\",\"data\":{\"JRprotocolXY\":\"681054360745404358811d1f903054360745404347580805010220222222220305358108210000003d16\"},\"eventTime\":\"20200205T085850Z\"}]}";
-		MeterBean meterBean = MeterBean.fromUploadDataJson(data);
-		System.out.println(JSON.toJSON(meterBean));
 	}
 }
