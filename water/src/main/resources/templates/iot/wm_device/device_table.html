@@ -60,7 +60,14 @@
 				<!-- 表地址 -->
 				<td th:text="${item.meterAddress}">表地址</td>
 				<!-- 水表类型 -->
-				<td th:text="${item.meterType}">水表类型</td>
+				<td>
+					<!-- 水表类型：0x10=冷水表;0x11=生活热水表;0x12=直饮水水表;0x13=中水水表; -->
+					<span th:if="${item.meterType!=10 && item.meterType!=11 && item.meterType!=12 && item.meterType!=13}" th:remove="tag">其他</span>
+					<span th:if="${item.meterType==10}" th:remove="tag">冷水表</span>
+					<span th:if="${item.meterType==11}" th:remove="tag">生活热水表</span>
+					<span th:if="${item.meterType==12}" th:remove="tag">直饮水水表</span>
+					<span th:if="${item.meterType==13}" th:remove="tag">中水水表</span>
+				</td>
 				<!-- 水表厂商 -->
 				<td th:text="${item.meterFactoryCode}">水表厂商</td>
 				<!-- 操作列 -->
@@ -92,6 +99,22 @@
 									<i class="fa fa-info" aria-hidden="true"> <span>注册设备</span></i>
 								</a>
 							</span>
+							
+							<div class="dropdown-divider" style="border-top: 0.8px solid blue;"></div>
+							
+							<!-- 发送读月冻结指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-read-month-freeze"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}, data-meter-number=${item.meterNumber}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送读月冻结指令</span></i>
+							</a>
+							<!-- 发送读表配置指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-read-meter-config"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}, data-meter-number=${item.meterNumber}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送读表配置指令</span></i>
+							</a>
+							
+							<div class="dropdown-divider" style="border-top: 0.8px solid blue;"></div>
+							
 							<!-- 发送水表配置指令 -->
 							<a class="dropdown-item btn-sm btn-send-cmd-meter-config"
 								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}, data-meter-number=${item.meterNumber}">
@@ -285,6 +308,56 @@
 			
 		});
 		
+		//----------------生成读操作指令通用函数----------------------------------------------------------------------------------------------------
+		/**
+		 * 	生成读操作指令通用函数
+		 */
+		function generatorReadMeterOperatorCommandFn(id, cmdType, cmdAction){
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+			//cmdAction 指令动作;
+			console.log("----------生成读表操作指令："+id+":"+cmdAction);
+			var url = BASE_CONTEXT_PATH + "/wm-device/cmd-generator";
+			var parms = new Object();
+			parms.id = id;
+			parms.cmdType = cmdType;
+			parms.cmdAction = cmdAction;
+			
+			var command = null;
+			$.ajax({
+				type: "post",
+				url: url,
+				data: parms,
+				async: false, 
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					//var result = $.parseJSON(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							console.log("----------返回生成的水表配置指令："+res.command);
+							command = res.command;
+						}
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+			    }
+			});
+			
+			/* $.post(url, parms, function(res){
+				console.log("----------"+JSON.stringify(res));
+				//var result = $.parseJSON(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						console.log("----------返回生成的指令："+res.command);
+						return res.command;
+					}
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"warning");
+				}
+				
+			}); */
+			return command;
+		}
+		
 		//-----------------page loaded ready------------------
 		$(function() {
 			
@@ -305,7 +378,70 @@
 				
 			});
 			
-			//--------生成指令并发送指令---------
+			//--------生成指令并发送指令-------------------------------------------------------------------------------------------------------
+			//--------------读操作---------------------------------------------------------------------------------------------------------
+			/**
+			 * 	发送读月冻结指令到设备（给水表发送指令）
+			 */
+			$(".btn-send-cmd-read-month-freeze").on("click", function(){
+				var itemId = $(this).attr("bind-id"); //条目ID
+				var iotDeviceId = $(this).attr("data-iot-device-id");
+				var meterNumber = $(this).attr("data-meter-number");
+				setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+				setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+				setSendCmdMeterNumberFn(meterNumber);//设置发送指令的表号，与设备（水表）编号不同
+				console.log("发送读月冻结指令到设备（给水表发送指令）");
+				
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+				var command = generatorReadMeterOperatorCommandFn(deviceId, 4, null);//生成读操作指令通用函数
+				console.log("----------发送读月冻结指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+				
+				//DialogUtil.openDialogFn(G_METER_CONFIG_COMMAND_DIALOG_ID);//打开发送水表配置指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			});
+			/**
+			 * 	发送读表配置指令到设备（给水表发送指令）
+			 */
+			$(".btn-send-cmd-read-meter-config").on("click", function(){
+				var itemId = $(this).attr("bind-id"); //条目ID
+				var iotDeviceId = $(this).attr("data-iot-device-id");
+				var meterNumber = $(this).attr("data-meter-number");
+				setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+				setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+				setSendCmdMeterNumberFn(meterNumber);//设置发送指令的表号，与设备（水表）编号不同
+				console.log("发送读表配置指令到设备（给水表发送指令）");
+				
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+				var command = generatorReadMeterOperatorCommandFn(deviceId, 5, null);//生成读操作指令通用函数
+				console.log("----------发送读表配置指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+				
+				//DialogUtil.openDialogFn(G_METER_CONFIG_COMMAND_DIALOG_ID);//打开发送水表配置指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			});
+			
+			//--------------写操作---------------------------------------------------------------------------------------------------------
 			/**
 			 * 	发送水表配置指令到设备（给水表发送指令）
 			 */

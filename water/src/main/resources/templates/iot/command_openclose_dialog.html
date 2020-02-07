@@ -59,7 +59,7 @@
 		 * 	生成开/关阀指令通用函数
 		 */
 		function generatorOpenCloseCommandFn(id, cmdAction){
-			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
 			//cmdAction 1=关阀;2=开阀;3=打开50%;4=打开25%;5=打开12.5%;
 			console.log("----------生成开/关阀指令："+id+":"+cmdAction);
 			var url = BASE_CONTEXT_PATH + "/wm-device/cmd-generator";

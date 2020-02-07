@@ -97,9 +97,15 @@
 													<div class="form-group form-inline">
 														<label for="test-device-meter-type" class="col-sm-4 control-label">水表类型</label>
 														<span class="input-group-sm col-sm-8">
-															<input type="text" class="form-control"
+															<!-- <input type="text" class="form-control"
 																th:value="${currItem==null ? '' : currItem.meterType}" 
-																id="test-device-meter-type" name="meterType" placeholder="水表类型"/>
+																id="test-device-meter-type" name="meterType" placeholder="水表类型"/> -->
+															<select class="form-control" id="test-device-meter-type" name="meterType">
+																<option value="10">冷水表</option>
+																<option value="11">生活热水表</option>
+																<option value="12">直饮水水表</option>
+																<option value="13">中水水表</option>
+															</select>
 														</span>
 													</div>          
  												</td>

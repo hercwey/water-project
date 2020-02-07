@@ -22,6 +22,7 @@ import com.github.pagehelper.PageInfo;
 import com.learnbind.ai.common.RequestResultUtil;
 import com.learnbind.ai.iot.protocol.CommandGenerator;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
+import com.learnbind.ai.iot.protocol.bean.MeterConfigReadCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdCmd;
@@ -196,7 +197,7 @@ public class WmDeviceController {
 	 * @Title: cmdGenerator
 	 * @Description: 生成指令
 	 * @param id
-	 * @param cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；
+	 * @param cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
 	 * @param cmdAction	
 	 * @return
 	 */
@@ -219,7 +220,9 @@ public class WmDeviceController {
 	    	}
 	    	//----------
 			
-			if(StringUtils.isBlank(cmdAction) || meterType==null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) || sequence==null) {
+	    	//TODO cmdAction是否需要值，待确认
+			//if(StringUtils.isBlank(cmdAction) || meterType==null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) || sequence==null) {
+	    	if(meterType==null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) || sequence==null) {
 				return RequestResultUtil.getResultFail("参数错误！");
 			}
 			
@@ -227,16 +230,27 @@ public class WmDeviceController {
 			
 			//生成开/关阀指令
 			String command = null;
-			//指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
 			if(cmdType==1) {//1=水表配置指令；
+				System.out.println("----------生成水表配置指令");
 				//生成水表配置指令
 				command = this.generatorMeterConfigCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue(), cmdAction);
 			}else if(cmdType==2) {//2=开/关阀指令；
+				System.out.println("----------生成开/关阀指令");
 				//生成开/关阀指令
 				command = this.generatorOpenCloseCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction));
 			}else if(cmdType==3) {//3=水量阀值指令；
+				System.out.println("----------生成水量阀值指令");
 				//生成水量阀值指令
 				command = this.generatorWaterAmountCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction));
+			}else if(cmdType==4) {//4=读月冻结指令；
+				System.out.println("----------生成读月冻结指令");
+				//生成读月冻结指令
+				command = this.generatorReadMonthFreezeCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue());
+			}else if(cmdType==5) {//5=读表配置指令
+				System.out.println("----------生成读表配置指令");
+				//生成读表配置指令
+				command = this.generatorReadMeterConfigCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue());
 			}
 			
 	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
@@ -359,6 +373,48 @@ public class WmDeviceController {
 		
 		MeterVolumeThresholdCmd cmd = new MeterVolumeThresholdCmd();
     	cmd.setThreshold(cmdAction.shortValue());
+
+//    	byte meterType = meterTypeI.byteValue();
+//    	byte sequence = sequenceI.byteValue();
+    	
+    	String command = CommandGenerator.generateCmd(meterType, meterAddress, meterFactoryCode, sequence, cmd);
+    	return command;
+	}
+	
+	/**
+	 * @Title: generatorReadMonthFreezeCommand
+	 * @Description: 生成读月冻结指令
+	 * @param meterType
+	 * @param meterAddress
+	 * @param meterFactoryCode
+	 * @param sequence
+	 * @return 
+	 */
+	private String generatorReadMonthFreezeCommand(byte meterType, String meterAddress, String meterFactoryCode, byte sequence) {
+		
+		//TODO 
+		MeterVolumeThresholdCmd cmd = new MeterVolumeThresholdCmd();
+    	//cmd.setThreshold(cmdAction.shortValue());
+
+//    	byte meterType = meterTypeI.byteValue();
+//    	byte sequence = sequenceI.byteValue();
+    	
+    	String command = CommandGenerator.generateCmd(meterType, meterAddress, meterFactoryCode, sequence, cmd);
+    	return command;
+	}
+	
+	/**
+	 * @Title: generatorReadMeterConfigCommand
+	 * @Description: 生成读表配置指令
+	 * @param meterType
+	 * @param meterAddress
+	 * @param meterFactoryCode
+	 * @param sequence
+	 * @return 
+	 */
+	private String generatorReadMeterConfigCommand(byte meterType, String meterAddress, String meterFactoryCode, byte sequence) {
+		
+		MeterConfigReadCmd cmd = new MeterConfigReadCmd();
 
 //    	byte meterType = meterTypeI.byteValue();
 //    	byte sequence = sequenceI.byteValue();

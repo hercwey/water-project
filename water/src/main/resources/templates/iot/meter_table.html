@@ -5,52 +5,78 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<!-- 列表 -->
-	<table class="table table-bordered table-sm table-hovers" id="meter-table">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>事件时间</th>
-				<th>表类型</th>
-				<th>表地址</th>
-				<th>表厂商代码</th>
-				<th>控制码</th>
-				<th>数据标识</th>
-				<th>序列号</th>
-				<th>数据字节</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="item,iterStat: ${meterList}">
-				
-				<!-- ID -->
-				<td th:text="${item.id}">ID</td>
-				<!-- 事件时间 -->
-				<td th:text="${item.eventTime}">事件时间</td>
-				<!-- 表类型 -->
-				<td th:text="${item.meterType}">表类型</td>
-				<!-- 表地址 -->
-				<td th:text="${item.meterAddr}">表地址</td>
-				<!-- 表厂商代码 -->
-				<td th:text="${item.factoryCode}">表厂商代码</td>
-				<!-- 控制码 -->
-				<td th:text="${item.ctrlCode}">控制码</td>
-				<!-- 数据标识 -->
-				<td th:text="${item.dataDi}">数据标识</td>
-				<!-- 序列号 -->
-				<td th:text="${item.meterSequence}">序列号</td>
-				<!-- 数据字节 -->
-				<td th:text="${item.meterData}">数据字节</td>
-
-			</tr>
-		</tbody>
-	</table>
-
+	<div class="table-responsive">
+		<!-- 列表 -->
+		<table class="table table-bordered table-sm table-hovers" id="meter-table" style="width:1500px;">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>表地址</th>
+					<th>表号</th>
+					<th>表当前时间</th>
+					<th>累计使用量</th>
+					<th>采样参数</th>
+					<th>电池电压</th>
+					<th>表状态</th>
+					<th>信号强度</th>
+					<th>压力值</th>
+					<th>事件时间</th>
+					<th>表类型</th>
+					<th>表厂商代码</th>
+					<th>控制码</th>
+					<th>数据标识</th>
+					<th>序列号</th>
+					<th>数据字节</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- String meterNumber = "";//表号: 6字节数字型字符串
+				String meterTime = "";//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
+				Integer totalVolume = null;//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
+				String sampleUnit = "";//采样参数：单位M3
+				Integer batteryVoltage = null;//电池电压：单位V
+				String meterStatus = "";//表状态字：2字节
+				String signal = "";//信号强度
+				String pressure = "";//压力值：xx.yyyy -->
+				<tr th:each="item,iterStat: ${meterList}">
+					
+					<!-- ID -->
+					<td th:text="${item.id}">ID</td>
+					<!-- 表地址 -->
+					<td th:text="${item.meterAddr}">表地址</td>
+					<td th:text="${item.meterNumber}">表号</td>
+					<td th:text="${item.meterTime}">表当前时间</td>
+					<td th:text="${item.totalVolume}">累计使用量</td>
+					<td th:text="${item.sampleUnit}">采样参数</td>
+					<td th:text="${item.batteryVoltage}">电池电压</td>
+					<td th:text="${item.meterStatus}">表状态</td>
+					<td th:text="${item.signal}">信号强度</td>
+					<td th:text="${item.pressure}">压力值</td>
+					<!-- 事件时间 -->
+					<td th:text="${item.eventTime}">事件时间</td>
+					<!-- 表类型 -->
+					<td th:text="${item.meterType}">表类型</td>
+					<!-- 表厂商代码 -->
+					<td th:text="${item.factoryCode}">表厂商代码</td>
+					<!-- 控制码 -->
+					<td th:text="${item.ctrlCode}">控制码</td>
+					<!-- 数据标识 -->
+					<td th:text="${item.dataDi}">数据标识</td>
+					<!-- 序列号 -->
+					<td th:text="${item.meterSequence}">序列号</td>
+					<!-- 数据字节 -->
+					<td th:text="${item.meterData}">数据字节</td>
+	
+				</tr>
+			</tbody>
+		</table>
+	</div>
 	<!-- <hr style="height: 1px; border: none; border-top: 1px solid blue;"> -->
 
 	<!-- 加入分页 -->
 	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
 		style="float: right; margin-right: 10px;"></div>	
+	
 	<!-- 分页组件JS -->
 	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
 
