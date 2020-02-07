@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.learnbind.ai.iot.protocol.PacketCodec;
 import com.learnbind.ai.iot.protocol.PacketFrame;
+import com.learnbind.ai.iot.protocol.bean.MeterBase;
 import com.learnbind.ai.iot.protocol.bean.MeterReport;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 
@@ -213,8 +214,11 @@ public class MeterBean {
                 serviceBean = ServiceBean.parseJson(services.getJSONObject(0).toJSONString());
             }
         }
-        if (serviceBean != null) {
-            PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(serviceBean.getData().getJRprotocolXY()));
+
+        String dataDecoded = "{}";
+        
+        try {
+        	PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(serviceBean.getData().getJRprotocolXY()));
             meterBean.setServiceId(serviceBean.getServiceId());
             meterBean.setServiceType(serviceBean.getServiceType());
             meterBean.setEventTime(serviceBean.getEventTime());
@@ -228,11 +232,28 @@ public class MeterBean {
             //meterBean.setData(HexStringUtils.bytesToHexString(packetFrame.getData()));
             meterBean.setChecksum(Integer.valueOf(packetFrame.getChecksum()));
             
-            MeterReport meterReport = (MeterReport)PacketCodec.decodeData(packetFrame);
-            MeterDataBean meterDataBean = MeterDataBean.fromMeterReport(meterReport);
-            meterBean.setData(MeterDataBean.toJsonString(meterDataBean));
-        }
-
+            MeterBase meterBase = PacketCodec.decodeData(packetFrame);
+            
+            //FIXME G11 针对数据上报的其他类型数据，进行解析（后续根据需求对数据进行分类，优化处理逻辑）
+            if (meterBase instanceof MeterReport) {
+                MeterReport meterReport = (MeterReport)PacketCodec.decodeData(packetFrame);
+                MeterDataBean meterDataBean = MeterDataBean.fromMeterReport(meterReport);
+                dataDecoded = MeterDataBean.toJsonString(meterDataBean);
+			} else {
+				dataDecoded = JSON.toJSONString(meterBase);
+			}
+		} catch (Exception e) {
+			if (serviceBean != null && serviceBean.getData() != null) {
+				dataDecoded = serviceBean.getData().getJRprotocolXY();
+			}
+		}
+        meterBean.setData(dataDecoded);
         return meterBean;
+    }	
+	
+	public static void main(String[] args) {
+		String data = "{\"notifyType\":\"deviceDatasChanged\",\"requestId\":null,\"deviceId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"gatewayId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"services\":[{\"serviceId\":\"JRprotocol\",\"serviceType\":\"JRprotocol\",\"data\":{\"JRprotocolXY\":\"123\"},\"eventTime\":\"20200206T050809Z\"}]}";
+		MeterBean meterBean = MeterBean.fromUploadDataJson(data);
+		System.out.println(JSON.toJSON(meterBean.getData()));
 	}
 }
