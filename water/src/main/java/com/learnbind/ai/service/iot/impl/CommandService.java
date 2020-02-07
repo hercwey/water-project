@@ -75,5 +75,11 @@ public class CommandService implements ICommandService {
 	public List<Map<String, Object>> searchList() {
 		return wmCommandMapper.searchList();
 	}
+
+	@Override
+	public CommandBean getCommandBeanByCommandId(CommandBean commandBean) {
+		// TODO Auto-generated method stub
+		return wmCommandMapper.selectByCommandId(commandBean);
+	}
     
 }

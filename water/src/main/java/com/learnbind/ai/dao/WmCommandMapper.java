@@ -15,6 +15,8 @@ public interface WmCommandMapper extends Mapper<WmCommand> {
     CommandBean selectById(Long id);
     int modify(CommandBean commandBean);
     int updateByDeviceCommand(CommandBean commandBean);
+
+    CommandBean selectByCommandId(CommandBean commandBean);
     
     public List<Map<String, Object>> searchList();
     

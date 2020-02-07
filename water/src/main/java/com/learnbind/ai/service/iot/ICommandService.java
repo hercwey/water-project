@@ -13,5 +13,7 @@ public interface ICommandService {
     public JsonResult update(CommandBean commandBean);
     public JsonResult updateByDeviceCommand(CommandBean commandBean);
     
+    public CommandBean getCommandBeanByCommandId(CommandBean commandBean);
+    
     public List<Map<String, Object>> searchList();
 }

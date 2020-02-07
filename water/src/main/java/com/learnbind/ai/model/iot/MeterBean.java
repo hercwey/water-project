@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.learnbind.ai.iot.protocol.PacketCodec;
 import com.learnbind.ai.iot.protocol.PacketFrame;
 import com.learnbind.ai.iot.protocol.bean.MeterBase;
+import com.learnbind.ai.iot.protocol.bean.MeterConfig;
 import com.learnbind.ai.iot.protocol.bean.MeterReport;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.iot.util.StringUtil;
@@ -240,6 +241,10 @@ public class MeterBean {
                 MeterReport meterReport = (MeterReport)PacketCodec.decodeData(packetFrame);
                 MeterDataBean meterDataBean = MeterDataBean.fromMeterReport(meterReport);
                 dataDecoded = MeterDataBean.toJsonString(meterDataBean);
+			}else if (meterBase instanceof MeterConfig) {
+                MeterConfig meterConfig = (MeterConfig)PacketCodec.decodeData(packetFrame);
+                MeterConfigBean meterDataBean = MeterConfigBean.fromMeterConfig(meterConfig);
+                dataDecoded = MeterConfigBean.toJsonString(meterDataBean);
 			} else {
 				dataDecoded = JSON.toJSONString(meterBase);
 			}

@@ -22,13 +22,15 @@
     <result column="METER_SEQUENCE" jdbcType="INTEGER" property="meterSequence" />
     
     <result column="METER_NUMBER" jdbcType="VARCHAR" property="meterNumber" />
+    
+    <result column="METER_CONFIG" jdbcType="VARCHAR" property="meterConfig" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--
       WARNING - @mbg.generated
     -->
     ID, DEVICE_ID, VERIFY_CODE, MANUFACTURER_ID, MANUFACTURER_NAME, DEVICE_TYPE, MODEL, 
-    PROTOCOL_TYPE, CREATE_TIME, UPATE_TIME, METER_TYPE, METER_ADDRESS, METER_FACTORY_CODE, METER_SEQUENCE, METER_NUMBER 
+    PROTOCOL_TYPE, CREATE_TIME, UPATE_TIME, METER_TYPE, METER_ADDRESS, METER_FACTORY_CODE, METER_SEQUENCE, METER_NUMBER, METER_CONFIG 
   </sql>
   
   <insert id="save" parameterType="com.learnbind.ai.model.iot.DeviceBean">
@@ -82,7 +84,8 @@
 			METER_TYPE = #{ meterType, jdbcType = INTEGER },
 			METER_ADDRESS = #{ meterAddress, jdbcType = VARCHAR },
 			METER_FACTORY_CODE = #{ meterFactoryCode, jdbcType = VARCHAR },
-			METER_SEQUENCE = #{ meterSequence, jdbcType = INTEGER } 
+			METER_SEQUENCE = #{ meterSequence, jdbcType = INTEGER }, 
+			METER_CONFIG = #{ meterConfig, jdbcType = VARCHAR } 
 		WHERE
 			ID = #{ id, jdbcType = BIGINT}
   </update>
@@ -102,7 +105,8 @@
 			METER_TYPE = #{ meterType, jdbcType = INTEGER },
 			METER_ADDRESS = #{ meterAddress, jdbcType = VARCHAR },
 			METER_FACTORY_CODE = #{ meterFactoryCode, jdbcType = VARCHAR },
-			METER_SEQUENCE = #{ meterSequence, jdbcType = INTEGER } 
+			METER_SEQUENCE = #{ meterSequence, jdbcType = INTEGER }, 
+			METER_CONFIG = #{ meterConfig, jdbcType = VARCHAR }  
 		WHERE
 			DEVICE_ID = #{ deviceId, jdbcType = BIGINT}
   </update>
