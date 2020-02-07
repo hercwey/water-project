@@ -4,7 +4,11 @@ import org.apache.tomcat.util.buf.HexUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.learnbind.ai.iot.protocol.PacketCodec;
+import com.learnbind.ai.iot.protocol.PacketFrame;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
+import com.learnbind.ai.iot.protocol.util.ByteUtil;
+import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 
 public class MeterConfigBean {
 
@@ -40,8 +44,8 @@ public class MeterConfigBean {
     @JsonProperty("meterTime")
     private String meterTime;        // 表当前时间：14字节数字字符串格式为yyyymmddHHMMSS (7字节，年、月、星期、日、时、分、秒，BCD格式；)
 
-    @JsonProperty("meterStatusFlag")
-    private short meterStatusFlag;       // 表状态字：2字节，HEX格式
+    @JsonProperty("meterStatus")
+    private MeterStatusBean meterStatus;       // 表状态字：由meterStatusFlag转换
 
     @JsonProperty("serverIp")
     private String serverIp;         // 服务器IP：AAA.BBB.CCC.DDD格式
@@ -129,14 +133,6 @@ public class MeterConfigBean {
 		this.meterTime = meterTime;
 	}
 
-	public short getMeterStatusFlag() {
-		return meterStatusFlag;
-	}
-
-	public void setMeterStatusFlag(short meterStatusFlag) {
-		this.meterStatusFlag = meterStatusFlag;
-	}
-
 	public String getServerIp() {
 		return serverIp;
 	}
@@ -151,6 +147,14 @@ public class MeterConfigBean {
 
 	public void setServerPort(short serverPort) {
 		this.serverPort = serverPort;
+	}
+
+	public MeterStatusBean getMeterStatus() {
+		return meterStatus;
+	}
+
+	public void setMeterStatus(MeterStatusBean meterStatus) {
+		this.meterStatus = meterStatus;
 	}
 
 	public static String toJsonString(MeterConfigBean meterConfigBean) {
@@ -172,9 +176,10 @@ public class MeterConfigBean {
 			meterConfigBean.setSampleUnit(meterConfig.getSampleUnit());
 			meterConfigBean.setMeterNumber(meterConfig.getMeterNumber());
 			meterConfigBean.setMeterTime(meterConfig.getMeterTime());
-			meterConfigBean.setMeterStatusFlag(meterConfig.getMeterStatusFlag());
+			meterConfigBean.setMeterStatus(MeterStatusBean.fromStatusFlag(meterConfig.getMeterStatusFlag()));
 			meterConfigBean.setServerIp(meterConfig.getServerIp());
 			meterConfigBean.setServerPort(meterConfig.getServerPort());
+			
 		}
 		return meterConfigBean;
 	}
@@ -184,5 +189,14 @@ public class MeterConfigBean {
 		
 		MeterConfig meterConfig = new MeterConfig(bytes);
 		return fromMeterConfig(meterConfig);
+	}
+	
+	public static void main(String[] args) {
+		String tempString = "681054360745404358812621810101000105000c070100aaaaaaaa0154360745404307080506010220290089633c753316dc16";
+		
+		PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(tempString));
+		MeterConfig meterConfig = (MeterConfig)PacketCodec.decodeData(packetFrame);
+        MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
+        System.out.println(MeterConfigBean.toJsonString(meterConfigBean));
 	}
 }
