@@ -16,6 +16,8 @@ import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.service.iot.IDeviceService;
 
+import tk.mybatis.mapper.entity.Example;
+
 @Service
 public class DeviceService implements IDeviceService {
 
@@ -46,9 +48,14 @@ public class DeviceService implements IDeviceService {
 
         if (jsonResult != null && jsonResult.getData().contains("deviceId")) {
             DeviceRegisterRspBean registerRspBean = DeviceRegisterRspBean.parseJson(jsonResult.getData());
-            deviceBean.setDeviceId(registerRspBean.getDeviceId());
-
-            wmDeviceMapper.save(deviceBean);
+            //deviceBean.setDeviceId(registerRspBean.getDeviceId());
+            
+            //根据verifyCode(水表编号)更新IOT平台设备ID
+            Example example = new Example(WmDevice.class);
+            example.createCriteria().andEqualTo("verifyCode", deviceBean.getVerifyCode());
+            WmDevice record = new WmDevice();
+            record.setDeviceId(registerRspBean.getDeviceId());
+            wmDeviceMapper.updateByExampleSelective(record, example);
         }
         return jsonResult;
     }

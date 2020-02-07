@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+
+
+<script type="text/javascript">
+
+
+</script>
+
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-test-device-edit-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span id="dialog-title">增加</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal" role="form" id="edit-test-device-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="test-device-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<!-- 配置费规则部分 -->
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 水表编号 -->
+													<div class="form-group form-inline">
+														<label for="test-device-verify-code" class="col-sm-4 control-label">水表编号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																th:value="${currItem==null ? '' : currItem.verifyCode}" 
+																class="form-control" 
+																id="test-device-verify-code" name="verifyCode" placeholder="水表编号"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 表号 -->
+													<div class="form-group form-inline">
+														<label for="test-device-meter-number" class="col-sm-4 control-label">表号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																th:value="${currItem==null ? '' : currItem.meterNumber}" 
+																class="form-control" 
+																id="test-device-meter-number" name="meterNumber" placeholder="表号"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 表地址 -->
+													<div class="form-group form-inline">
+														<label for="test-device-meter-address" class="col-sm-4 control-label">表地址</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.meterAddress}" 
+																id="test-device-meter-address" name="meterAddress" placeholder="表地址"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 水表类型 -->
+													<div class="form-group form-inline">
+														<label for="test-device-meter-type" class="col-sm-4 control-label">水表类型</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.meterType}" 
+																id="test-device-meter-type" name="meterType" placeholder="水表类型"/>
+														</span>
+													</div>          
+ 												</td>
+											</tr>
+											<tr>	
+												<td>
+													<!-- 水表厂商 -->
+													<div class="form-group form-inline">
+														<label for="test-device-meter-factory-code" class="col-sm-4 control-label">水表厂商</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																th:value="${currItem==null ? '' : currItem.meterFactoryCode}" 
+																id="test-device-meter-factory-code" name="meterFactoryCode" placeholder="水表厂商"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm" id="btn-bill-modify-and-back">保存</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modifyTestDeviceItem(closeDialogFlag) {
+			//需要提交的url	
+			var urlStr = BASE_CONTEXT_PATH + "/wm-device/insert";
+			
+			var customersId= $("#test-device-id").val();
+			if(customersId!=null && customersId!=""){
+				urlStr = BASE_CONTEXT_PATH + "/wm-device/update";
+			}
+			var formData = new FormData($("#edit-test-device-form")[0]);
+			$.ajax({
+				type: "POST", // 提交方式 get/post
+				url: urlStr,
+				processData: false,
+         		contentType: false,
+				data: formData,
+				success: function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							clickPagerReloadTable();//重新刷新当前页面
+							DialogUtil.closeDialogFn(EDIT_TEST_DEVICE_DIALOG_ID);//关闭编辑对话框
+							util.message(res.result_msg,null,"success");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		 }
+		
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-bill-modify-and-back').on('click',function() {
+				var verifyCode = $("#test-device-verify-code").val();//水表编号
+				var meterAddress = $("#test-device-meter-address").val();//表地址
+				var meterType = $("#test-device-meter-type").val();//水表类型
+				var meterFactoryCode = $("#test-device-meter-factory-code").val();//水表厂商
+				if(verifyCode==null || verifyCode=="" || meterAddress==null || meterAddress=="" || meterType==null || meterType=="" || meterFactoryCode==null || meterFactoryCode==""){
+					util.message("水表编号、表地址、水表类型、水表厂商都不允许为空！");
+					return false;
+				}
+				modifyTestDeviceItem(true);				
+			});
+
+		});
+	</script>
+	
+	
+
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

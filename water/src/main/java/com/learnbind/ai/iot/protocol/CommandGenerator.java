@@ -123,4 +123,12 @@ public class CommandGenerator {
     	
     	return generateCmd(meterType, meterAddress, meterFactoryCode, sequence, command);
     }
+    
+    public static void main(String[] args) {
+    	//readConfigSample();//生成“读取设备配置”指令Sample
+    	//writeConfigSample();//生成“设置设备配置”指令Sample
+    	//controlSample();//生成“开关阀门控制”指令Sample
+    	//setThresholdSample();//生成“配置阈值”指令Sample
+	}
+    
 }

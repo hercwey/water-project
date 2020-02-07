@@ -31,20 +31,129 @@
 
 							<!-- 主体(用于展示表单) -->
 							<div class="modal-body">
-								<div class="row clearfix">
-									<div class="col-md-12 column mx-auto">
-										<button type="button" class="btn btn-warning btn-sm" id="btn-send-command-close" data-command="99H">关阀</button>
-										<button type="button" class="btn btn-success btn-sm" id="btn-send-command-open" data-command="55H">开阀</button> 
-										<button type="button" class="btn btn-info btn-sm" id="btn-send-command-open-50" data-command="A1H">打开50%</button>
-										<button type="button" class="btn btn-info btn-sm" id="btn-send-command-open-25" data-command="A2H">打开25%</button>
-										<button type="button" class="btn btn-info btn-sm" id="btn-send-command-open-125" data-command="A3H">打开12.5%</button>
-									</div>
-								</div>
+								<form class="form-horizontal" role="form" id="meter-config-form">
+									<table class="table-layout table">
+										<tbody>
+											<tr>
+												<td>
+													<!-- 定时上传周期 -->
+													<div class="form-group form-inline">
+														<label for="config-report-period" class="col-sm-4 control-label">定时上传周期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" id="config-report-period" name="" value="" placeholder="定时上传周期" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 定时上传周期单位 -->
+													<div class="form-group form-inline">
+														<label for="config-report-period-unit" class="col-sm-4 control-label">定时上传周期单位</label>
+														<span class="input-group-sm col-sm-8">
+															<!-- <input type="text" class="form-control" id="config-report-period-unit" name="" value="" placeholder="定时上传周期单位" /> -->
+															<select class="form-control" id="config-report-period-unit">
+																<option value="0">分钟</option>
+																<option value="1">小时</option>
+																<option value="2">天</option>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 定量上传值 -->
+													<div class="form-group form-inline">
+														<label for="config-report-ration" class="col-sm-4 control-label">定量上传值</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" id="config-report-ration" name="" value="" placeholder="定量上传值" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 用户临时开阀用水限定时间 -->
+													<div class="form-group form-inline">
+														<label for="config-temporary-time" class="col-sm-4 control-label">用户临时开阀用水限定时间</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" id="config-temporary-time" name="" value="" placeholder="用户临时开阀用水限定时间" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 阀门行程时间 -->
+													<div class="form-group form-inline">
+														<label for="config-valve-run-time" class="col-sm-4 control-label">阀门行程时间</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" id="config-valve-run-time" name="" value="" placeholder="阀门行程时间" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 阀门维护周期 -->
+													<div class="form-group form-inline">
+														<label for="config-valve-maintain-period" class="col-sm-4 control-label">阀门维护周期</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" id="config-valve-maintain-period" name="" value="" placeholder="阀门维护周期" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 表底数 -->
+													<div class="form-group form-inline">
+														<label for="config-meter-basic-value" class="col-sm-4 control-label">表底数</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" id="config-meter-basic-value" name="" value="" placeholder="表底数" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 采样参数单位 -->
+													<div class="form-group form-inline">
+														<label for="config-sample-unit" class="col-sm-4 control-label">采样参数单位</label>
+														<span class="input-group-sm col-sm-8">
+															<!-- <input type="text" class="form-control" id="config-sample-unit" name="" value="" placeholder="采样参数单位" /> -->
+															<select class="form-control" id="config-sample-unit">
+																<option value="1">1立方</option>
+																<option value="0.1">0.1立方</option>
+																<option value="0.01">0.01立方</option>
+																<option value="0.001">1升</option>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 表当前时间 -->
+													<div class="form-group form-inline">
+														<label for="config-meter-time" class="col-sm-4 control-label">表当前时间</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control" id="config-meter-time" name="" value="" placeholder="表当前时间" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+										</tbody>
+									</table>
+								</form>
 							</div>
 
 							<!-- 尾部 -->
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm" id="btn-send-cmd-meter-config">发送指令</button>
 							</div>
 						</div>
 
@@ -59,72 +168,152 @@
 	<script type="text/javascript">
 	
 		/**
-		 * 	发送开/关阀指令通用函数
+		 * 	获取发送水表配置指令动作参数
 		 */
-		function sendCommandOpenCloseFn(cmd){
-			alert("发送指令："+cmd);
+		function getSendMeterConfigCmdActionParmsFn(){
+			
+			var reportPeriod = $("#modal-container-command-meter-config #config-report-period").val();//定时上传周期
+			if(reportPeriod==null || reportPeriod==""){
+				//dialog type: success warning info error,默认为info
+				util.message("定时上传周期不允许为空！",null,"warning");
+				return false;
+			}
+			var reportPeriodUnit = $("#modal-container-command-meter-config #config-report-period-unit").val();//定时上传周期单位
+			if(reportPeriodUnit==null || reportPeriodUnit==""){
+				//dialog type: success warning info error,默认为info
+				util.message("定时上传周期单位不允许为空！",null,"warning");
+				return false;
+			}
+			var reportRation = $("#modal-container-command-meter-config #config-report-ration").val();//定量上传值
+			if(reportRation==null || reportRation==""){
+				//dialog type: success warning info error,默认为info
+				util.message("定量上传值不允许为空！",null,"warning");
+				return false;
+			}
+			var temporaryTime = $("#modal-container-command-meter-config #config-temporary-time").val();//用户临时开阀用水限定时间
+			if(temporaryTime==null || temporaryTime==""){
+				//dialog type: success warning info error,默认为info
+				util.message("用户临时开阀用水限定时间不允许为空！",null,"warning");
+				return false;
+			}
+			var valveRunTime = $("#modal-container-command-meter-config #config-valve-run-time").val();//阀门行程时间
+			if(valveRunTime==null || valveRunTime==""){
+				//dialog type: success warning info error,默认为info
+				util.message("阀门行程时间不允许为空！",null,"warning");
+				return false;
+			}
+			var valveMaintainPeriod = $("#modal-container-command-meter-config #config-valve-maintain-period").val();//阀门维护周期
+			if(valveMaintainPeriod==null || valveMaintainPeriod==""){
+				//dialog type: success warning info error,默认为info
+				util.message("阀门维护周期不允许为空！",null,"warning");
+				return false;
+			}
+			var meterBasicValue = $("#modal-container-command-meter-config #config-meter-basic-value").val();//表底数
+			if(meterBasicValue==null || meterBasicValue==""){
+				//dialog type: success warning info error,默认为info
+				util.message("表底数不允许为空！",null,"warning");
+				return false;
+			}
+			var sampleUnit = $("#modal-container-command-meter-config #config-sample-unit").val();//采样参数单位
+			if(sampleUnit==null || sampleUnit==""){
+				//dialog type: success warning info error,默认为info
+				util.message("采样参数单位不允许为空！",null,"warning");
+				return false;
+			}
+			var meterTime = $("#modal-container-command-meter-config #config-meter-time").val();//表当前时间
+			if(meterTime==null || meterTime==""){
+				//dialog type: success warning info error,默认为info
+				util.message("表当前时间不允许为空！",null,"warning");
+				return false;
+			}
+			
+			var meterNumber = getSendCmdMeterNumberFn();//获取发送指令的表号，与设备（水表）编号不同
+			
+			var parms = new Object();
+			parms.meterNumber = meterNumber;//表号
+			parms.reportPeriod = reportPeriod;//定时上传周期
+			parms.reportPeriodUnit = reportPeriodUnit;//定时上传周期单位
+			parms.reportRation = reportRation;//定量上传值
+			parms.temporaryTime = temporaryTime;//用户临时开阀用水限定时间
+			parms.valveRunTime = valveRunTime;//阀门行程时间
+			parms.valveMaintainPeriod = valveMaintainPeriod;//阀门维护周期
+			parms.meterBasicValue = meterBasicValue;//表底数
+			parms.sampleUnit = sampleUnit;//采样参数单位
+			parms.meterTime = meterTime;//表当前时间
+			
+			var actionJson = JSON.stringify(parms);//转为JSON字符串
+			return actionJson;
+		}
+		/**
+		 * 	生成水表配置指令通用函数
+		 */
+		function generatorMeterConfigCommandFn(id, cmdAction){
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；
+			//cmdAction 水量阀值（数字）;
+			console.log("----------生成水表配置指令："+id+":"+cmdAction);
+			var url = BASE_CONTEXT_PATH + "/wm-device/cmd-generator";
+			var parms = new Object();
+			parms.id = id;
+			parms.cmdType = 1;
+			parms.cmdAction = cmdAction;
+			
+			var command = null;
+			$.ajax({
+				type: "post",
+				url: url,
+				data: parms,
+				async: false, 
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					//var result = $.parseJSON(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							console.log("----------返回生成的水表配置指令："+res.command);
+							command = res.command;
+						}
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+			    }
+			});
+			
+			/* $.post(url, parms, function(res){
+				console.log("----------"+JSON.stringify(res));
+				//var result = $.parseJSON(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						console.log("----------返回生成的指令："+res.command);
+						return res.command;
+					}
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"warning");
+				}
+				
+			}); */
+			return command;
 		}
 		
 		$(function(){
 			/**
-			 * 	绑定关阀按钮的click事件
+			 * 	绑定对话框中发送指令按钮的click事件
 			 */
-			 $("#modal-container-command-meter-config #btn-send-command-close").on("click", function(){
-				var cmd = $(this).attr("data-command");
-				if(cmd==null || cmd==""){
-					alert("指令为空，请重新初始化对话框！");
+			 $("#modal-container-command-meter-config #btn-send-cmd-meter-config").on("click", function(){
+				
+				var actionJson = getSendMeterConfigCmdActionParmsFn();//获取发送水表配置指令动作参数
+				if(!actionJson){
 					return false;
 				}
 				
-				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
-			});
-			/**
-			 * 	绑定开阀按钮的click事件
-			 */
-			 $("#modal-container-command-meter-config #btn-send-command-open").on("click", function(){
-				var cmd = $(this).attr("data-command");
-				if(cmd==null || cmd==""){
-					alert("指令为空，请重新初始化对话框！");
-					return false;
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
 				}
 				
-				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
-			});
-			/**
-			 * 	绑定打开50%按钮的click事件
-			 */
-			$("#modal-container-command-meter-config #btn-send-command-open-50").on("click", function(){
-				var cmd = $(this).attr("data-command");
-				if(cmd==null || cmd==""){
-					alert("指令为空，请重新初始化对话框！");
-					return false;
+				var command = generatorMeterConfigCommandFn(deviceId, actionJson);//生成水量阀值指令通用函数
+				console.log("----------发送水表配置指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
 				}
-				
-				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
-			});
-			/**
-			 * 	绑定打开25%按钮的click事件
-			 */
-			 $("#modal-container-command-meter-config #btn-send-command-open-25").on("click", function(){
-				var cmd = $(this).attr("data-command");
-				if(cmd==null || cmd==""){
-					alert("指令为空，请重新初始化对话框！");
-					return false;
-				}
-				
-				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
-			});
-			/**
-			 * 	绑定打开125%按钮的click事件
-			 */
-			 $("#modal-container-command-meter-config #btn-send-command-open-125").on("click", function(){
-				var cmd = $(this).attr("data-command");
-				if(cmd==null || cmd==""){
-					alert("指令为空，请重新初始化对话框！");
-					return false;
-				}
-				
-				sendCommandOpenCloseFn(cmd);//发送开/关阀指令
 			});
 		});
 	

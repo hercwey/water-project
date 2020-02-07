@@ -27,7 +27,7 @@
 		color: #fff
 		
 	}
-	table tbody tr:hover{
+	.table-hovers tbody tr:hover{
 		cursor: default;
 		background: #8FBC8F;
 		color: #fff
@@ -36,18 +36,24 @@
 </head>
 <body>
 	
-	<!-- 发送水表配置指令对话框 -->
-	<div id="command-meter-config-dialog" th:include="iot/command_meter_config_dialog::dialog"></div>
-	<!-- 发送开关阀指令对话框 -->
-	<div id="command-openclose-dialog" th:include="iot/command_openclose_dialog::dialog"></div>
-	<!-- 发送水量阀值指令对话框 -->
-	<div id="command-water-amount-dialog" th:include="iot/command_water_amount_dialog::dialog"></div>
-
 	<!-- 批次管理主页 -->
 	<!-- <div class="container-fluid"> -->
 	<br />
 	<div class="container-fluid">
 		<div class="card">
+			<h5 class="card-header">
+				测试设备列表部分
+			</h5>
+			<div class="card-body">
+				<div class="row clearfix">
+					<div class="col-md-12 column load-device-item-div">
+						<!-- 此处显示测试设备列表 -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <br /> -->
+		<div class="card d-none">
 			<h5 class="card-header">
 				订阅按钮部分
 			</h5>
@@ -67,7 +73,7 @@
 				</div>
 			</div>
 		</div>
-		<br />
+		<!-- <br />
 		<div class="card">
 			<h5 class="card-header">
 				注册设备部分
@@ -76,7 +82,7 @@
 				<div class="row clearfix">
 					<div class="col-md-3 column">
 						<input type="number" class="form-control btn-sm" id="verify-code" name="" value="" placeholder="verifyCode" />
-					</div>				
+					</div>
 					<div class="col-md-9 column">
 						<button type="button" class="btn btn-info btn-sm" id="btn-register-device">
 							<i class="fa fa-info" aria-hidden="true"> <span>注册设备</span></i>
@@ -84,17 +90,17 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<br />
 		<div class="card">
 			<h5 class="card-header">
-				查询设备列表部分
+				查询已注册设备列表部分
 			</h5>
 			<div class="card-body">
 				<div class="row clearfix">
 					<div class="col-md-3 column">
 						<button type="button" class="btn btn-info btn-sm" id="btn-query-device">
-							<i class="fa fa-search" aria-hidden="true"> <span>查询设备列表</span></i>
+							<i class="fa fa-search" aria-hidden="true"> <span>查询已注册设备列表</span></i>
 						</button>
 					</div>
 					<div class="col-md-3 column">
@@ -105,7 +111,7 @@
 							<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送命令</span></i>
 						</button>
 						
-						<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-meter-config">
+						<!-- <button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-meter-config">
 							<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水表配置指令</span></i>
 						</button>
 						<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-open-close">
@@ -113,7 +119,7 @@
 						</button>
 						<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-water-amount">
 							<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水量阈值指令</span></i>
-						</button>
+						</button> -->
 					</div>
 				</div>
 				<br />
@@ -130,7 +136,7 @@
 								Card footer
 							</div>
 						</div> -->
-						<table class="table table-bordered table-sm device-item-table">
+						<table class="table table-bordered table-sm table-hovers device-item-table">
 							<thead>
 								<tr>
 									<th>序号</th>
@@ -208,15 +214,12 @@
 
 	<script type="text/javascript">
 	
-		var G_OPEN_CLOSE_COMMAND_DIALOG_ID = "modal-container-command-openclose";//开关阀指令发送对话框ID
-		var G_METER_CONFIG_COMMAND_DIALOG_ID = "modal-container-command-meter-config";//水表配置指令发送对话框ID
-		var G_WATER_AMOUNT_COMMAND_DIALOG_ID = "modal-container-command-water-amount";//水量阀值指令发送对话框ID
 		var SELECTED_DEVICE_ID = null;//用户已选择的设备
 	
 		$(function() {
 			
 			//------------------初始化-----------------------------------------------------------------------------
-			
+			loadTestDeviceList();//加载测试设备列表（本地数据库）
 			//------------------订阅部分----------------------------------------------------------------------------
 			/**
 			 * 	获取Token并自动订阅
@@ -272,7 +275,7 @@
 			/**
 			 * 	注册设备
 			 */
-			$("#btn-register-device").on("click", function(){
+			/* $("#btn-register-device").on("click", function(){
 				
 				var verifyCode = $("#verify-code").val();
 				if(verifyCode==null || verifyCode==""){
@@ -281,44 +284,15 @@
 					return false;
 				}
 				
-				//var data = '{"verifyCode":"VERIFY_CODE","manufacturerId":"JR0912X","manufacturerName":"JRIWA","model":"JR0912Y","protocolType":"CoAP","deviceType":"JRNBWaterMeter"}';
-				var dataObj = new Object();
-				dataObj.verifyCode = verifyCode;
-				dataObj.manufacturerId = "JR0912X";
-				dataObj.manufacturerName = "JRIWA";
-				dataObj.model = "JR0912Y";
-				dataObj.protocolType = "CoAP";
-				dataObj.deviceType = "JRNBWaterMeter";
-				
-				var dataJson = JSON.stringify(dataObj);
-				
-				console.log("----------请求数据："+dataJson);
-				
-				var urlStr = BASE_CONTEXT_PATH + "/device/register";
-				$.ajax({
-					type: "post",
-					url: urlStr,
-					dataType : "json",
-					contentType : "application/json",      //网上很多介绍加上此参数的，后来我发现不加入这个参数才会请求成功。
-					data: dataJson,
-					success: function(res){
-						console.log("----------"+JSON.stringify(res));
-						var result = res;//$.parseJSON(res);
-						/* if(result.status==200){
-						
-						} */
-						//dialog type: success warning info error,默认为info
-						util.message(result.status+":"+result.message,null,"warning");
-				    }
-				});
+				registerDeviceFn(verifyCode);//注册设备
 				
 				/* var parms = {"data": data};
 				$.post(url, parms, function(res){
 					console.log("----------"+res);
 					//dialog type: success warning info error,默认为info
 					util.message(res,null,"warning");
-				}); */
-			});
+				}); *
+			}); */
 			
 			//------------------查询设备列表部分----------------------------------------------------------------------------
 			/**
@@ -355,7 +329,7 @@
 			/**
 			 * 	发送水表配置指令到设备（给水表发送指令）
 			 */
-			$("#btn-send-cmd-meter-config").on("click", function(){
+			/* $("#btn-send-cmd-meter-config").on("click", function(){
 				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
 				if(deviceId==null || deviceId==""){
 					//dialog type: success warning info error,默认为info
@@ -368,11 +342,11 @@
 				//注: 回调函数需要采用引号引起来
 				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
 				
-			});
+			}); */
 			/**
 			 * 	发送开关阀指令到设备（给水表发送指令）
 			 */
-			$("#btn-send-cmd-open-close").on("click", function(){
+			/* $("#btn-send-cmd-open-close").on("click", function(){
 				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
 				if(deviceId==null || deviceId==""){
 					//dialog type: success warning info error,默认为info
@@ -385,11 +359,11 @@
 				//注: 回调函数需要采用引号引起来
 				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
 				
-			});
+			}); */
 			/**
 			 * 	发送水量阀值指令到设备（给水表发送指令）
 			 */
-			$("#btn-send-cmd-water-amount").on("click", function(){
+			/* $("#btn-send-cmd-water-amount").on("click", function(){
 				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
 				if(deviceId==null || deviceId==""){
 					//dialog type: success warning info error,默认为info
@@ -402,7 +376,7 @@
 				//注: 回调函数需要采用引号引起来
 				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
 				
-			});
+			}); */
 			
 			//------------------查询设备上传数据部分----------------------------------------------------------------------------
 			/**
@@ -421,6 +395,57 @@
 			});
 			
 		});
+		
+		//------------------加载测试设备（本地数据库）列表部分----------------------------------------------------------------------------
+		/**
+		 * 	加载测试设备列表
+		 */
+		function loadTestDeviceList(){
+			
+			var url = BASE_CONTEXT_PATH + "/wm-device/main";
+			
+			$(".load-device-item-div").load(url, null, function(){
+				console.log("----------加载测试设备main页面完成");
+				windowResize();//初始化windows窗口滚动条
+			});
+		}
+		
+		//------------------注册设备部分----------------------------------------------------------------------------
+		/**
+		 * 	注册设备
+		 */
+		function registerDeviceFn(verifyCode){
+			//var data = '{"verifyCode":"VERIFY_CODE","manufacturerId":"JR0912X","manufacturerName":"JRIWA","model":"JR0912Y","protocolType":"CoAP","deviceType":"JRNBWaterMeter"}';
+			var dataObj = new Object();
+			dataObj.verifyCode = verifyCode;
+			dataObj.manufacturerId = "JR0912X";
+			dataObj.manufacturerName = "JRIWA";
+			dataObj.model = "JR0912Y";
+			dataObj.protocolType = "CoAP";
+			dataObj.deviceType = "JRNBWaterMeter";
+			
+			var dataJson = JSON.stringify(dataObj);
+			
+			console.log("----------请求数据："+dataJson);
+			
+			var urlStr = BASE_CONTEXT_PATH + "/device/register";
+			$.ajax({
+				type: "post",
+				url: urlStr,
+				dataType : "json",
+				contentType : "application/json",      //网上很多介绍加上此参数的，后来我发现不加入这个参数才会请求成功。
+				data: dataJson,
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					var result = res;//$.parseJSON(res);
+					if(result.status==200){
+						clickPagerReloadTable();//重新刷新当前页面
+					}
+					//dialog type: success warning info error,默认为info
+					util.message(result.status+":"+result.message,null,"warning");
+			    }
+			});
+		}
 		
 		//------------------查询设备-初始化设备列表部分----------------------------------------------------------------------------
 		/**
@@ -609,36 +634,24 @@
 			});
 		}
 		
-		//------------------向设备发送命令部分----------------------------------------------------------------------------
+		//------------------向设备发送指令部分----------------------------------------------------------------------------
 		/**
-		 * 	向设备（水表）发送命令
+		 * 	向设备（水表）发送指令
 		 */
-		function sendCommandAjaxRequest(){
-			var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
-			if(deviceId==null || deviceId==""){
-				//dialog type: success warning info error,默认为info
-				util.message("请选择需要发送命令的设备！",null,"warning");
-				return false;
-			}
+		function sendCommandAjaxRequest(cmdVal){
 			
-			var cmdVal = $("#command-value").val();//命令值
-			if(cmdVal==null || cmdVal==""){
-				//dialog type: success warning info error,默认为info
-				util.message("请输入需要发送的命令值！",null,"warning");
-				return false;
-			}
-			
-			console.log("----------向设备【"+deviceId+"】发送命令【"+cmdVal+"】");
+			var iotDeviceId = getSendCmdIotDeviceIdFn();//获取发送指令的IOT设备ID
+			console.log("----------向设备【"+iotDeviceId+"】发送命令【"+cmdVal+"】");
 			
 			//var data = '{"deviceId":"替换设备DeviceId","serviceId":"JRprotocol","method":"JRprotocolXY","paras":{"value":"12"}}';
 			var paras = new Object();
-			paras.value = cmdVal;//命令值
+			paras.value = cmdVal;//指令值
 			var parasJson = JSON.stringify(paras);
 			
 			var dataObj = new Object();
 			//dataObj.deviceId = "e793e8a7-ddc7-4873-aca3-7d594f0a801a";//离线
 			//dataObj.deviceId = "dadb87c6-c2c4-4e27-b112-f660d2457519";//在线
-			dataObj.deviceId = deviceId;
+			dataObj.deviceId = iotDeviceId;
 			dataObj.serviceId = "JRprotocol";
 			dataObj.method = "JRprotocolXY";
 			dataObj.paras = paras;
@@ -657,19 +670,21 @@
 				success: function(res){
 					console.log("----------"+JSON.stringify(res));
 					var result = res;//$.parseJSON(res);
-					/* if(result.status==200){
-					
-					} */
+					if(result.message=="success"){
+						DialogUtil.closeDialogFn(G_METER_CONFIG_COMMAND_DIALOG_ID);//关闭发送水表配置指令对话框
+						DialogUtil.closeDialogFn(G_OPEN_CLOSE_COMMAND_DIALOG_ID);//关闭发送开关阀指令对话框
+						DialogUtil.closeDialogFn(G_WATER_AMOUNT_COMMAND_DIALOG_ID);//关闭发送水量阀值指令对话框
+					}
 					//dialog type: success warning info error,默认为info
 					util.message(result.status+":"+result.message,null,"warning");
 			    }
 			});
 		}
 		/**
-		 * 	取消向设备（水表）发送命令
+		 * 	取消向设备（水表）发送指令
 		 */
 		function cancelSendCommandAjaxRequest(){
-			console.log("----------取消发送命令");
+			console.log("----------取消发送指令");
 		}
 		
 		//------------------查询设备上传数据（水表上传数据列表）部分----------------------------------------------------------------------------

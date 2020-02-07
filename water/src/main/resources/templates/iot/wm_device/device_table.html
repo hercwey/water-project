@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+
+	<!-- 保存发送指令的设备ID（水表ID） -->
+	<input type="hidden" id="send-cmd-device-id" data-iot-device-id="" data-meter-number="" value="" />
+	<!-- 发送水表配置指令对话框 -->
+	<div id="command-meter-config-dialog" th:include="iot/command_meter_config_dialog::dialog"></div>
+	<!-- 发送开关阀指令对话框 -->
+	<div id="command-openclose-dialog" th:include="iot/command_openclose_dialog::dialog"></div>
+	<!-- 发送水量阀值指令对话框 -->
+	<div id="command-water-amount-dialog" th:include="iot/command_water_amount_dialog::dialog"></div>
+	
+	<!-- 批次列表 -->
+	<table class="table table-bordered table-sm table-hovers">
+		<thead>
+			<tr>
+				<!-- <th>
+					<!-- <input type="checkbox" class="select-all-toggle"> --
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input"
+							id="select-all-toggle" name="example1"> <label
+							class="custom-control-label" for="select-all-toggle"></label>
+					</div>
+				</th> -->
+				<th>ID</th>
+				<th>IOT平台设备ID</th>
+				<th>水表编号</th>
+				<th>表号</th>
+				<th>表地址</th>
+				<th>水表类型</th>
+				<th>水表厂商</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item,iterStat: ${deviceList}">
+			
+				<!-- 条目选择器 -->
+				<!-- <td>
+					<div class="custom-control custom-checkbox"
+						style="margin-bottom: -1px !important;">
+						<input type="checkbox" class="custom-control-input item-selector" name="example1" th:attr="id='item-selector'+'-'+${item.id},data-bind=${item.id}">
+						<label class="custom-control-label"	th:attr="for='item-selector'+'-'+${item.id}"></label>
+					</div> 
+				</td> -->
+				
+				<!-- ID-->
+				<td th:text="${item.id}">ID</td>
+				<!-- IOT平台设备ID-->
+				<td th:text="${item.deviceId}">IOT平台设备ID</td>
+				<!-- 水表编号 -->
+				<td th:text="${item.verifyCode}">水表编号</td>
+				<!-- 表号 -->
+				<td th:text="${item.meterNumber}">表号</td>
+				<!-- 表地址 -->
+				<td th:text="${item.meterAddress}">表地址</td>
+				<!-- 水表类型 -->
+				<td th:text="${item.meterType}">水表类型</td>
+				<!-- 水表厂商 -->
+				<td th:text="${item.meterFactoryCode}">水表厂商</td>
+				<!-- 操作列 -->
+				<td>
+					<div class="dropdown">
+					    <button type="button" class="btn btn-outline-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+					      	操作
+					    </button>
+					    <div class="dropdown-menu">
+					    	
+							<!-- 修改 -->
+							<a class="dropdown-item btn-sm bill-modi-single" title="编辑"
+								th:attr="bind-id=${item.id}">
+								<i class="fa fa-pencil-square-o fa-1x" aria-hidden="true"> <span>编辑</span></i>
+							</a> 
+							<!-- 删除 -->
+							<a class="dropdown-item btn-sm bill-del-single" title="删除"
+								th:attr="bind-id=${item.id}">
+								<i class="fa fa-times fa-1x" aria-hidden="true"> <span>删除</span></i>
+							</a>
+							
+							<div class="dropdown-divider" style="border-top: 0.8px solid blue;"></div>
+							
+							<!-- 如果IOT平台设备ID为空时说明设备未注册显示注册设备按钮 -->
+							<span th:if="${item.deviceId==null || item.deviceId==''}">
+								<!-- 注册设备 -->
+								<a class="dropdown-item btn-sm btn-register-device" title="注册设备"
+									th:attr="data-verify-code=${item.verifyCode}">
+									<i class="fa fa-info" aria-hidden="true"> <span>注册设备</span></i>
+								</a>
+							</span>
+							<!-- 发送水表配置指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-meter-config"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}, data-meter-number=${item.meterNumber}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水表配置指令</span></i>
+							</a>
+							<!-- 发送开关阀指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-open-close"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送开关阀指令</span></i>
+							</a>
+							<!-- 发送水量阈值指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-water-amount"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水量阈值指令</span></i>
+							</a>
+					    </div>
+					</div>
+				</td>
+
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- <hr style="height: 1px; border: none; border-top: 1px solid blue;"> -->
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('test-device-item-pager')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+	
+		//-------------全局常量--------------------------------------------------------------------------------
+		var G_OPEN_CLOSE_COMMAND_DIALOG_ID = "modal-container-command-openclose";//开关阀指令发送对话框ID
+		var G_METER_CONFIG_COMMAND_DIALOG_ID = "modal-container-command-meter-config";//水表配置指令发送对话框ID
+		var G_WATER_AMOUNT_COMMAND_DIALOG_ID = "modal-container-command-water-amount";//水量阀值指令发送对话框ID
+		
+		//------------获取/设置发送指令的设备ID------------------------------------------------------------------
+		/**
+		 * 	获取发送指令的设备ID
+		 */
+		function getSendCmdDeviceIdFn(){
+			return $("#send-cmd-device-id").val();
+		}
+		/**
+		 * 	设置发送指令的设备ID
+		 */
+		function setSendCmdDeviceIdFn(id){
+			$("#send-cmd-device-id").val(id);
+		}
+		
+		/**
+		 * 	获取发送指令的IOT设备ID
+		 */
+		function getSendCmdIotDeviceIdFn(){
+			return $("#send-cmd-device-id").attr("data-iot-device-id");
+		}
+		/**
+		 * 	设置发送指令的IOT设备ID
+		 */
+		function setSendCmdIotDeviceIdFn(iotDeviceId){
+			console.log("----------设置发送指令的IOT设备ID:"+iotDeviceId);
+			$("#send-cmd-device-id").attr("data-iot-device-id", iotDeviceId);
+		}
+		
+		/**
+		 * 	获取发送指令的表号，与设备（水表）编号不同
+		 */
+		function getSendCmdMeterNumberFn(){
+			return $("#send-cmd-device-id").attr("data-meter-number");
+		}
+		/**
+		 * 	设置发送指令的表号，与设备（水表）编号不同
+		 */
+		function setSendCmdMeterNumberFn(meterNumber){
+			console.log("----------设置发送指令的表号，与设备（水表）编号不同:"+meterNumber);
+			$("#send-cmd-device-id").attr("data-meter-number", meterNumber);
+		}
+		//-----------------------------------------------------------------------------------
+		
+		/*
+			功能说明:
+				删除所选条目(通用删除函数)
+			参数说明:
+				ids:所要删除的条目ID数组,(可使函数更具通用性.)
+		*/
+		function deleteBatchAjaxRequestFn(ids) {
+			var urlStr = BASE_CONTEXT_PATH+"/wm-device/delete"; // 需要提交的url
+			
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				contentType : "application/json", // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", //	表示返回值类型，不必须,如果返回的是面页，则必须
+				data : JSON.stringify(ids),
+				success : function(res) { // res 保存提交后返回的数据，一般为 json对象(与后台相关.)
+					//console.log(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							clickPagerReloadTable();
+							util.message(res.result_msg,null,"success");
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			});
+		}
+	
+		//--------------批量删除-----------------
+		
+		/*
+			批量删除确认
+		*/
+		function deleteBillConfirm(){			
+			//注: 回调函数需要采用引号引起来
+			util.confirm("删除所选择的记录? ", "xxx", "ok_callback_test_device", "cancel_callback_name")			
+		}
+		
+		/*
+			批量删除确认:确认(回调)
+		*/
+		function ok_callback_test_device(id){
+			var ids=getSelectedIds();  //此函数定义于_table.html中
+			deleteBatchAjaxRequestFn(ids);
+		}
+		
+		/*
+			批量删除确认:取消(回调)  桩函数
+		*/
+		function cancel_callback_name(){
+			console.log('cancel!');
+		}
+		
+		/**
+			返回所选条目的 id(每行对应一个唯一的ID)
+			@returns   
+		 */
+		function getSelectedIds(){
+			var idArr = new Array();
+	
+			// 扫描用户所选择条目ID
+			$(".item-selector").each(function(index, elem) {
+				if (this.checked) { // 对于己选条目
+					var id = $(this).attr("data-bind"); //
+					idArr.push(id);
+				}
+			}); // end of item-selector
+			return idArr;
+		}
+		
+		//------------------单个删除------------------
+		
+		/* 
+			单个删除 
+		*/
+		$('.bill-del-single').on('click', function() {
+			var itemId = $(this).attr("bind-id"); //分录ID
+			util.delConfirm("确认删除此条目?", itemId, "deleteSingleBill");
+		})
+		
+		//单个删除-确认回调函数
+		function deleteSingleBill(itemId){
+			var idsArr=new Array();
+			idsArr.push(itemId);		
+			deleteBatchAjaxRequestFn(idsArr);
+		}
+				
+		
+		//--------单个修改---------
+		/* 
+			加载修改对话框 
+		*/
+		$('.bill-modi-single').on('click',function() {
+			var itemId = $(this).attr("bind-id"); //条目ID		
+			loadEditDialog(itemId);//加载(Load): 增加/编辑对话框
+			
+		});
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+			//--------注册设备---------
+			/**
+			 * 	注册设备
+			 */
+			$(".btn-register-device").on("click", function(){
+				
+				var verifyCode = $(this).attr("data-verify-code");
+				if(verifyCode==null || verifyCode==""){
+					//dialog type: success warning info error,默认为info
+					util.message("此水表设备编号为空，不允许注册！",null,"warning");
+					return false;
+				}
+				
+				registerDeviceFn(verifyCode);//注册设备
+				
+			});
+			
+			//--------生成指令并发送指令---------
+			/**
+			 * 	发送水表配置指令到设备（给水表发送指令）
+			 */
+			$(".btn-send-cmd-meter-config").on("click", function(){
+				var itemId = $(this).attr("bind-id"); //条目ID
+				var iotDeviceId = $(this).attr("data-iot-device-id");
+				var meterNumber = $(this).attr("data-meter-number");
+				setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+				setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+				setSendCmdMeterNumberFn(meterNumber);//设置发送指令的表号，与设备（水表）编号不同
+				DialogUtil.openDialogFn(G_METER_CONFIG_COMMAND_DIALOG_ID);//打开发送水表配置指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			});
+			/**
+			 * 	发送开关阀指令到设备（给水表发送指令）
+			 */
+			$(".btn-send-cmd-open-close").on("click", function(){
+				var itemId = $(this).attr("bind-id"); //条目ID
+				var iotDeviceId = $(this).attr("data-iot-device-id");
+				setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+				setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+				DialogUtil.openDialogFn(G_OPEN_CLOSE_COMMAND_DIALOG_ID);//打开发送开关阀指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			});
+			/**
+			 * 	发送水量阀值指令到设备（给水表发送指令）
+			 */
+			$(".btn-send-cmd-water-amount").on("click", function(){
+				var itemId = $(this).attr("bind-id"); //条目ID
+				var iotDeviceId = $(this).attr("data-iot-device-id");
+				setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+				setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+				DialogUtil.openDialogFn(G_WATER_AMOUNT_COMMAND_DIALOG_ID);//打开发送水量阀值指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			});
+			
+			//-------------------选择/全选事件----------------------------------------------------------------------------------------------
+			/*
+				选择/取消选择  当前页记录
+				select all  or  deselect all			 	
+			*/
+			$("#select-all-toggle").on('click', function(e) {
+				var prefix = "item-selector-";
+		
+				if (this.checked) {					
+					//查询列表中的项目
+					$(".item-selector").each(function(index, elem) {
+						this.checked = true;
+						var surfix = $(this).attr("data-bind");  //item'id
+						var rowId = prefix + surfix; 
+						$('#' + rowId).addClass("selected");
+					});
+				} 
+				else{
+					$(".item-selector").each(function(index, elem) {
+						this.checked = false;
+						var surfix = $(this).attr("data-bind");
+						var rowId = prefix + surfix;
+						$('#' + rowId).removeClass("selected");
+					});
+				} // end of else
+			});
+
+		});
+		
+		//创建分页组件实例
+		var pager=new Pager("test-device-item-pager");
+		$(function(){			
+			pager.init(clickPagerReloadTable,curr_searchCond);			
+		});
+	</script>
+</body>
+</html>
