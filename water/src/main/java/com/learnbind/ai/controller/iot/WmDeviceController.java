@@ -267,29 +267,46 @@ public class WmDeviceController {
 			
 	    	log.debug("----------继续生成指令类型："+cmdType+"，指令动作："+cmdAction);
 			
+//	    	<option value="10">冷水表</option>
+//			<option value="11">生活热水表</option>
+//			<option value="12">直饮水水表</option>
+//			<option value="13">中水水表</option>
+	    	byte meterTypeB = 0x00;
+	    	if(meterType==10) {
+	    		meterTypeB = Protocol.METER_TYPE_10H;
+	    	}else if(meterType==11) {
+	    		meterTypeB = Protocol.METER_TYPE_11H;
+	    	}else if(meterType==12) {
+	    		meterTypeB = Protocol.METER_TYPE_12H;
+	    	}else if(meterType==13) {
+	    		meterTypeB = Protocol.METER_TYPE_13H;
+	    	}
+	    	
+	    	byte sequenceB = 0x00;
+	    	
 			//生成开/关阀指令
 			String command = null;
 			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
 			if(cmdType==1) {//1=水表配置指令；
 				System.out.println("----------生成水表配置指令");
 				//生成水表配置指令
-				command = this.generatorMeterConfigCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue(), cmdAction);
+				command = this.generatorMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), cmdAction);
 			}else if(cmdType==2) {//2=开/关阀指令；
 				System.out.println("----------生成开/关阀指令");
 				//生成开/关阀指令
-				command = this.generatorOpenCloseCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction));
+				command = this.generatorOpenCloseCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction));
 			}else if(cmdType==3) {//3=水量阀值指令；
 				System.out.println("----------生成水量阀值指令");
 				//生成水量阀值指令
-				command = this.generatorWaterAmountCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction));
+				command = this.generatorWaterAmountCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction));
 			}else if(cmdType==4) {//4=读月冻结指令；
 				System.out.println("----------生成读月冻结指令");
 				//生成读月冻结指令
-				command = this.generatorReadMonthFreezeCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue());
+				command = this.generatorReadMonthFreezeCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue());
 			}else if(cmdType==5) {//5=读表配置指令
 				System.out.println("----------生成读表配置指令");
 				//生成读表配置指令
-				command = this.generatorReadMeterConfigCommand(meterType.byteValue(), meterAddress, meterFactoryCode, sequence.byteValue());
+				command = this.generatorReadMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue());
 			}
 			
 	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");

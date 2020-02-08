@@ -11,6 +11,7 @@
 			<thead>
 				<tr>
 					<th>ID</th>
+					<th>数据类型</th>
 					<th>表地址</th>
 					<th>表号</th>
 					<th>表当前时间</th>
@@ -42,6 +43,27 @@
 					
 					<!-- ID -->
 					<td th:text="${item.id}">ID</td>
+					<!-- 
+						数据类型 
+						public static final int METER_DATA_TYPE_UNKNOWN = 0;//未知类型数据
+						public static final int METER_DATA_TYPE_REPORT = 1;//设备上报数据
+						public static final int METER_DATA_TYPE_CONFIG = 2;//设备配置信息数据
+						public static final int METER_DATA_TYPE_MONTH_FREEZE = 3;//设备月冻结数据
+					-->
+					<td th:text="${item.meterAddr}">
+						<span th:if="${item.type==0}" th:remove="tag">
+							未知类型数据
+						</span>
+						<span th:if="${item.type==1}" th:remove="tag">
+							设备上报数据
+						</span>
+						<span th:if="${item.type==2}" th:remove="tag">
+							设备配置信息数据
+						</span>
+						<span th:if="${item.type==3}" th:remove="tag">
+							设备月冻结数据
+						</span>
+					</td>
 					<!-- 表地址 -->
 					<td th:text="${item.meterAddr}">表地址</td>
 					<td th:text="${item.meterNumber}">表号</td>
