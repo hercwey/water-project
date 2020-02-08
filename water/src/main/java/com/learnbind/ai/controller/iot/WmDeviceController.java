@@ -21,6 +21,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.learnbind.ai.common.RequestResultUtil;
 import com.learnbind.ai.iot.protocol.CommandGenerator;
+import com.learnbind.ai.iot.protocol.Protocol;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigReadCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
@@ -325,6 +326,12 @@ public class WmDeviceController {
 		String meterNumber = action.getString("meterNumber");//表号
 		String meterTime = action.getString("meterTime");//表当前时间
 		
+		Integer meterStatusPeriod = action.getInteger("meterStatusPeriod");//表状态字-定时上传功能开关 (1开 / 0关)
+		Integer meterStatusMaxReport = action.getInteger("meterStatusMaxReport");//表状态字-定量上传功能开关 (1开 / 0关)
+		Integer meterStatusMagnetic = action.getInteger("meterStatusMagnetic");//表状态字-磁干扰关阀功能开关 (1开 / 0关)
+		
+		short meterStatusFlog = this.getMeterStatus(meterStatusPeriod, meterStatusMaxReport, meterStatusMagnetic);//获取表状态字
+		
 		MeterConfig meterConfig = new MeterConfig();
         meterConfig.setReportPeriod(reportPeriod);//定时上传周期
         meterConfig.setReportPeriodUnit(reportPeriodUnit);//定时上传周期单位
@@ -336,12 +343,13 @@ public class WmDeviceController {
         meterConfig.setSampleUnit(sampleUnit);//采样参数单位
         meterConfig.setMeterNumber(meterNumber);//表号
         meterConfig.setMeterTime(meterTime);//表当前时间 格式：20200101235959
+        meterConfig.setMeterStatusFlag(meterStatusFlog);//表状态字：2字节，HEX格式
         meterConfig.setServerIp("10.88.192.11"); // 服务器IP地址
         meterConfig.setServerPort((short) 6538); // 服务器端口
 
         MeterConfigWriteCmd cmd = new MeterConfigWriteCmd();
         cmd.setConfigFlag((short)(MeterConfig.FLAG_PERIOD |
-                MeterConfig.FLAG_PERIOD |
+                //MeterConfig.FLAG_PERIOD |
                 MeterConfig.FLAG_PERIOD_UNIT |
                 MeterConfig.FLAG_MAX_REPORT |
                 MeterConfig.FLAG_EMERG_TIME |
@@ -351,6 +359,7 @@ public class WmDeviceController {
                 MeterConfig.FLAG_SAMPLE_UNIT |
                 MeterConfig.FLAG_METER_NUM |
                 MeterConfig.FLAG_METER_TIME |
+                MeterConfig.FLAG_METER_STATUS |
                 MeterConfig.FLAG_SERVER_IP |
                 MeterConfig.FLAG_SERVER_PORT));
         cmd.setConfig(meterConfig);
@@ -360,6 +369,31 @@ public class WmDeviceController {
     	
     	String command = CommandGenerator.generateCmd(meterType, meterAddress, meterFactoryCode, sequence, cmd);
     	return command;
+	}
+	/**
+	 * @Title: getMeterStatus
+	 * @Description: 获取表状态字
+	 * @param meterStatusPeriod
+	 * @param meterStatusMaxReport
+	 * @param meterStatusMagnetic
+	 * @return 
+	 */
+	private short getMeterStatus(Integer meterStatusPeriod, Integer meterStatusMaxReport, Integer meterStatusMagnetic) {
+		final int ON = 1;
+		final int OFF = 0;
+		short meterStatusFlag = 0;
+		if(meterStatusPeriod==ON && meterStatusMaxReport==ON && meterStatusMagnetic==ON) {//表状态字-定时上传功能开,定量上传功能开,磁干扰关阀功能开
+			meterStatusFlag = (short)(Protocol.METER_STATUS_PERIOD_ON | Protocol.METER_STATUS_MAX_REPORT_ON | Protocol.METER_STATUS_MAGNETIC_ON);
+		}else if(meterStatusPeriod==ON && meterStatusMaxReport==OFF && meterStatusMagnetic==OFF) {//表状态字-定时上传功能开,定量上传功能关,磁干扰关阀功能关
+			meterStatusFlag = (short)(Protocol.METER_STATUS_PERIOD_ON | ~Protocol.METER_STATUS_MAX_REPORT_ON | ~Protocol.METER_STATUS_MAGNETIC_ON);
+		}else if(meterStatusPeriod==ON && meterStatusMaxReport==ON && meterStatusMagnetic==OFF) {//表状态字-定时上传功能开,定量上传功能开,磁干扰关阀功能关
+			meterStatusFlag = (short)(Protocol.METER_STATUS_PERIOD_ON | Protocol.METER_STATUS_MAX_REPORT_ON | ~Protocol.METER_STATUS_MAGNETIC_ON);
+		}else if(meterStatusPeriod==OFF && meterStatusMaxReport==ON && meterStatusMagnetic==ON) {//表状态字-定时上传功能关,定量上传功能开,磁干扰关阀功能开
+			meterStatusFlag = (short)(~Protocol.METER_STATUS_PERIOD_ON | Protocol.METER_STATUS_MAX_REPORT_ON | Protocol.METER_STATUS_MAGNETIC_ON);
+		}else if(meterStatusPeriod==OFF && meterStatusMaxReport==OFF && meterStatusMagnetic==ON) {//表状态字-定时上传功能关,定量上传功能关,磁干扰关阀功能开
+			meterStatusFlag = (short)(~Protocol.METER_STATUS_PERIOD_ON | ~Protocol.METER_STATUS_MAX_REPORT_ON | Protocol.METER_STATUS_MAGNETIC_ON);
+		}
+		return meterStatusFlag;
 	}
 	
 	/**

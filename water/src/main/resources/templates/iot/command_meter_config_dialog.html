@@ -153,9 +153,55 @@
 													<div class="form-group form-inline">
 														<label for="config-meter-time" class="col-sm-4 control-label">表当前时间</label>
 														<span class="input-group-sm col-sm-8">
-															<input type="text" class="form-control" id="config-meter-time" name="" 
+															<input type="text" class="form-control Wdate" id="config-meter-time" name="" 
 															th:value="${meterConfigBean==null ? '' : meterConfigBean.meterTime}" 
+															onClick="WdatePicker({dateFmt:'yyyyMMddHHmmss'});"
 															placeholder="表当前时间" />
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 表状态字-定时上传功能开关 (1开 / 0关) -->
+													<div class="form-group form-inline">
+														<label for="config-meter-time" class="col-sm-4 control-label">定时上传功能</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="config-meter-status-period">
+																<!-- <option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==0 ? 'true' : 'false'}">分钟</option> -->
+																<option value="1">开</option>
+																<option value="0">关</option>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 表状态字-定量上传功能开关 (1开 / 0关) -->
+													<div class="form-group form-inline">
+														<label for="config-meter-time" class="col-sm-4 control-label">定量上传功能</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="config-meter-status-max-report">
+																<!-- <option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==0 ? 'true' : 'false'}">分钟</option> -->
+																<option value="1">开</option>
+																<option value="0">关</option>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 表状态字-磁干扰关阀功能开关 (1开 / 0关) -->
+													<div class="form-group form-inline">
+														<label for="config-meter-time" class="col-sm-4 control-label">磁干扰关阀功能</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="config-meter-status-magnetic">
+																<!-- <option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==0 ? 'true' : 'false'}">分钟</option> -->
+																<option value="1">开</option>
+																<option value="0">关</option>
+															</select>
 														</span>
 													</div>
 												</td>
@@ -243,6 +289,10 @@
 				return false;
 			}
 			
+			var meterStatusPeriod = $("#modal-container-command-meter-config #config-meter-status-period").val();//表状态字-定时上传功能开关 (1开 / 0关)
+			var meterStatusMaxReport = $("#modal-container-command-meter-config #config-meter-status-max-report").val();//表状态字-定量上传功能开关 (1开 / 0关)
+			var meterStatusMagnetic = $("#modal-container-command-meter-config #config-meter-status-magnetic").val();//表状态字-磁干扰关阀功能开关 (1开 / 0关)
+			
 			var meterNumber = getSendCmdMeterNumberFn();//获取发送指令的表号，与设备（水表）编号不同
 			
 			var parms = new Object();
@@ -256,6 +306,10 @@
 			parms.meterBasicValue = meterBasicValue;//表底数
 			parms.sampleUnit = sampleUnit;//采样参数单位
 			parms.meterTime = meterTime;//表当前时间
+			
+			parms.meterStatusPeriod = meterStatusPeriod;//表状态字-定时上传功能开关 (1开 / 0关)
+			parms.meterStatusMaxReport = meterStatusMaxReport;//表状态字-定量上传功能开关 (1开 / 0关)
+			parms.meterStatusMagnetic = meterStatusMagnetic;//表状态字-磁干扰关阀功能开关 (1开 / 0关)
 			
 			var actionJson = JSON.stringify(parms);//转为JSON字符串
 			return actionJson;
