@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 import com.learnbind.ai.iot.protocol.bean.MeterReport;
 
-public class MeterDataBean {
+public class MeterReportBean {
 
     private static final long serialVersionUID = 1L;
 
@@ -78,30 +78,30 @@ public class MeterDataBean {
 		this.pressure = pressure;
 	}
     
-	public static String toJsonString(MeterDataBean meterDataBean) {
+	public static String toJsonString(MeterReportBean meterDataBean) {
 		return JSON.toJSONString(meterDataBean);
 	}
 	
-	public static MeterDataBean fromJson(String json) {
-		return JSON.parseObject(json, MeterDataBean.class);
+	public static MeterReportBean fromJson(String json) {
+		return JSON.parseObject(json, MeterReportBean.class);
 	}
 	
-	public static MeterDataBean fromMeterReport(MeterReport meterReport) {
-        MeterDataBean meterDataBean = new MeterDataBean();
+	public static MeterReportBean fromMeterReport(MeterReport meterReport) {
+        MeterReportBean meterReportBean = new MeterReportBean();
 		if (meterReport != null) {
-        	meterDataBean.setMeterNumber(meterReport.getMeterNumber());
-            meterDataBean.setMeterTime(meterReport.getMeterTime());
-            meterDataBean.setTotalVolume(meterReport.getTotalVolume());
-            meterDataBean.setSampleUnit(meterReport.getSampleUnit()+"");
-            meterDataBean.setBatteryVoltage(meterReport.getBatteryVoltage());
-            meterDataBean.setMeterStatus(meterReport.getMeterStatus()+"");
-            meterDataBean.setSignal(meterReport.getSignal());
-            meterDataBean.setPressure(meterReport.getPressure()+"");
+			meterReportBean.setMeterNumber(meterReport.getMeterNumber());
+			meterReportBean.setMeterTime(meterReport.getMeterTime());
+			meterReportBean.setTotalVolume(meterReport.getTotalVolume());
+			meterReportBean.setSampleUnit(meterReport.getSampleUnit()+"");
+			meterReportBean.setBatteryVoltage(meterReport.getBatteryVoltage());
+			meterReportBean.setMeterStatus(meterReport.getMeterStatus()+"");
+			meterReportBean.setSignal(meterReport.getSignal());
+			meterReportBean.setPressure(meterReport.getPressure()+"");
 		}
-		return meterDataBean;
+		return meterReportBean;
 	}
 	
-	public static MeterDataBean fromHexData(String data) {
+	public static MeterReportBean fromHexData(String data) {
 		byte[] bytes = HexUtils.fromHexString(data);
 		
 		MeterReport meterReport = new MeterReport(bytes);

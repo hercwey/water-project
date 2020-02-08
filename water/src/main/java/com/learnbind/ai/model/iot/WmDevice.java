@@ -58,6 +58,9 @@ public class WmDevice {
     
     @Column(name = "METER_CONFIG")
     private String meterConfig;
+    
+    @Column(name = "METER_FREEZE")
+    private String meterFreeze;
 
     /**
      * @return ID
@@ -269,6 +272,14 @@ public class WmDevice {
 		this.meterConfig = meterConfig;
 	}
 
+	public String getMeterFreeze() {
+		return meterFreeze;
+	}
+
+	public void setMeterFreeze(String meterFreeze) {
+		this.meterFreeze = meterFreeze;
+	}
+
 	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -291,6 +302,7 @@ public class WmDevice {
         sb.append(", meterSequence=").append(meterSequence);
         sb.append(", meterNumber=").append(meterNumber);
         sb.append(", meterConfig=").append(meterConfig);
+        sb.append(", meterFreeze=").append(meterFreeze);
         sb.append("]");
         return sb.toString();
     }

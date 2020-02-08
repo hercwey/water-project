@@ -9,6 +9,7 @@ import com.learnbind.ai.iot.protocol.PacketCodec;
 import com.learnbind.ai.iot.protocol.PacketFrame;
 import com.learnbind.ai.iot.protocol.bean.MeterBase;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
+import com.learnbind.ai.iot.protocol.bean.MeterReadWaterResp;
 import com.learnbind.ai.iot.protocol.bean.MeterReport;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.iot.util.StringUtil;
@@ -215,8 +216,8 @@ public class MeterBean {
             }
         }
 
-        String dataDecoded = "{}";
-        
+    	MeterDataBaseBean dataBean = new MeterDataBaseBean();
+    	
         try {
         	PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(serviceBean.getData().getJRprotocolXY()));
             meterBean.setServiceId(serviceBean.getServiceId());
@@ -236,22 +237,37 @@ public class MeterBean {
             
             //FIXME G11 针对数据上报的其他类型数据，进行解析（后续根据需求对数据进行分类，优化处理逻辑）
             if (meterBase instanceof MeterReport) {
-                MeterReport meterReport = (MeterReport)PacketCodec.decodeData(packetFrame);
-                MeterDataBean meterDataBean = MeterDataBean.fromMeterReport(meterReport);
-                dataDecoded = MeterDataBean.toJsonString(meterDataBean);
-			}else if (meterBase instanceof MeterConfig) {
-                MeterConfig meterConfig = (MeterConfig)PacketCodec.decodeData(packetFrame);
+            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_REPORT);
+            	
+                MeterReport meterReport = (MeterReport) meterBase;
+                MeterReportBean meterDataBean = MeterReportBean.fromMeterReport(meterReport);
+                dataBean.setData(MeterReportBean.toJsonString(meterDataBean));
+                
+			} else if (meterBase instanceof MeterConfig) {
+            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_CONFIG);
+            	
+                MeterConfig meterConfig = (MeterConfig) meterBase;
                 MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
-                dataDecoded = MeterConfigBean.toJsonString(meterConfigBean);
+                dataBean.setData(MeterConfigBean.toJsonString(meterConfigBean));
+                
+			} else if (meterBase instanceof MeterReadWaterResp) {
+            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE);
+            	
+				MeterReadWaterResp meterReadWaterResp = (MeterReadWaterResp) meterBase;
+				MeterMonthFreezeBean meterMonthFreezeBean = MeterMonthFreezeBean.fromMeterTeadWaterResp(meterReadWaterResp);
+				dataBean.setData(MeterMonthFreezeBean.toJsonString(meterMonthFreezeBean));
+				
 			} else {
-				dataDecoded = JSON.toJSONString(meterBase);
+            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
+            	dataBean.setData(JSON.toJSONString(meterBase));
 			}
 		} catch (Exception e) {
 			if (serviceBean != null && serviceBean.getData() != null) {
-				dataDecoded = serviceBean.getData().getJRprotocolXY();
+            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
+            	dataBean.setData(serviceBean.getData().getJRprotocolXY());
 			}
 		}
-        meterBean.setData(dataDecoded);
+        meterBean.setData(MeterDataBaseBean.toJsonString(dataBean));
         return meterBean;
     }	
 	

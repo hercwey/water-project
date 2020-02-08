@@ -21,7 +21,8 @@ import com.learnbind.ai.constant.PagerConstant;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterBean;
-import com.learnbind.ai.model.iot.MeterDataBean;
+import com.learnbind.ai.model.iot.MeterDataBaseBean;
+import com.learnbind.ai.model.iot.MeterReportBean;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.IDeviceService;
 import com.learnbind.ai.service.iot.IMeterService;
@@ -44,13 +45,28 @@ public class MeterController {
         //TODO 水表数据保存
         JsonResult jsonResult = meterService.save(meterBean);
         
-        //如果是水表配置信息，则更新数据库device表内容（待优化）
-        if (meterBean.getData().contains("serverIp")) {
+        MeterDataBaseBean meterDataBaseBean = new MeterDataBaseBean();
+        try {
+			meterDataBaseBean = MeterDataBaseBean.fromJson(meterBean.getData());
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+        
+        if (meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_CONFIG) {
+            //水表配置信息，更新数据库device表meter_config内容
         	DeviceBean deviceBean = new DeviceBean();
         	deviceBean.setDeviceId(meterBean.getDeviceId());
         	deviceBean = DeviceBean.fromWmDevice(deviceService.getDeviceByDeviceId(deviceBean));
         	
-        	deviceBean.setMeterConfig(meterBean.getData());
+        	deviceBean.setMeterConfig(meterDataBaseBean.getData());
+        	deviceService.modifyDevice(deviceBean);
+		} else if (meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE) {
+            //水表月冻结信息，更新数据库device表meter_freeze内容
+			DeviceBean deviceBean = new DeviceBean();
+        	deviceBean.setDeviceId(meterBean.getDeviceId());
+        	deviceBean = DeviceBean.fromWmDevice(deviceService.getDeviceByDeviceId(deviceBean));
+        	
+        	deviceBean.setMeterFreeze(meterDataBaseBean.getData());
         	deviceService.modifyDevice(deviceBean);
 		}
         /**
@@ -91,16 +107,20 @@ public class MeterController {
 			Map<String, Object> meterMap = EntityUtils.entityToMap(meter);//实体转MAP
 			
 			String meterData = meter.getMeterData();
-			MeterDataBean meterDataBean = null;
+			MeterReportBean meterReportBean = null;
 			if(StringUtils.isNotBlank(meterData)) {
 				if(meterData.startsWith("{") && meterData.endsWith("}")) {
-					meterDataBean = MeterDataBean.fromJson(meterData);
+					//TODO G11 meter_data字段,增加多种类型数据，根据type判断数据类型
+					MeterDataBaseBean meterDataBaseBean = MeterDataBaseBean.fromJson(meterData);
+					if (meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_CONFIG) {
+						meterReportBean = MeterReportBean.fromJson(meterDataBaseBean.getData());
+					}
 				}else {
 					try {
-						meterDataBean = MeterDataBean.fromHexData(meterData);
+						meterReportBean = MeterReportBean.fromHexData(meterData);
 					} catch (Exception e) {
 						e.printStackTrace();
-						meterDataBean = null;
+						meterReportBean = null;
 						System.out.println("----------解析16进制数据异常（MeterDataBean.fromHexData），原16进制数据："+meterData);
 					}
 				}
@@ -114,15 +134,15 @@ public class MeterController {
 			String meterStatus = "";//表状态字：2字节
 			String signal = "";//信号强度
 			String pressure = "";//压力值：xx.yyyy
-			if(meterDataBean!=null) {
-				meterNumber = meterDataBean.getMeterNumber();//表号: 6字节数字型字符串
-				meterTime = meterDataBean.getMeterTime();//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
-				totalVolume = meterDataBean.getTotalVolume();//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
-				sampleUnit = meterDataBean.getSampleUnit();//采样参数：单位M3
-				batteryVoltage = meterDataBean.getBatteryVoltage();//电池电压：单位V
-				meterStatus = meterDataBean.getMeterStatus();//表状态字：2字节
-				signal = meterDataBean.getSignal();//信号强度
-				pressure = meterDataBean.getPressure();//压力值：xx.yyyy
+			if(meterReportBean!=null) {
+				meterNumber = meterReportBean.getMeterNumber();//表号: 6字节数字型字符串
+				meterTime = meterReportBean.getMeterTime();//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
+				totalVolume = meterReportBean.getTotalVolume();//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
+				sampleUnit = meterReportBean.getSampleUnit();//采样参数：单位M3
+				batteryVoltage = meterReportBean.getBatteryVoltage();//电池电压：单位V
+				meterStatus = meterReportBean.getMeterStatus();//表状态字：2字节
+				signal = meterReportBean.getSignal();//信号强度
+				pressure = meterReportBean.getPressure();//压力值：xx.yyyy
 			}
 			
 			meterMap.put("meterNumber", meterNumber);//表号: 6字节数字型字符串
