@@ -168,9 +168,8 @@
 														<label for="config-meter-time" class="col-sm-4 control-label">定时上传功能</label>
 														<span class="input-group-sm col-sm-8">
 															<select class="form-control" id="config-meter-status-period">
-																<!-- <option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==0 ? 'true' : 'false'}">分钟</option> -->
-																<option value="1">开</option>
-																<option value="0">关</option>
+																<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.periodOn==1 ? 'true' : 'false'}">开</option>
+																<option value="0" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.periodOn==0 ? 'true' : 'false'}">关</option>
 															</select>
 														</span>
 													</div>
@@ -183,9 +182,8 @@
 														<label for="config-meter-time" class="col-sm-4 control-label">定量上传功能</label>
 														<span class="input-group-sm col-sm-8">
 															<select class="form-control" id="config-meter-status-max-report">
-																<!-- <option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==0 ? 'true' : 'false'}">分钟</option> -->
-																<option value="1">开</option>
-																<option value="0">关</option>
+																<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.maxReportOn==1 ? 'true' : 'false'}">开</option>
+																<option value="0" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.maxReportOn==0 ? 'true' : 'false'}">关</option>
 															</select>
 														</span>
 													</div>
@@ -198,9 +196,8 @@
 														<label for="config-meter-time" class="col-sm-4 control-label">磁干扰关阀功能</label>
 														<span class="input-group-sm col-sm-8">
 															<select class="form-control" id="config-meter-status-magnetic">
-																<!-- <option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==0 ? 'true' : 'false'}">分钟</option> -->
-																<option value="1">开</option>
-																<option value="0">关</option>
+																<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.magneticOn==1 ? 'true' : 'false'}">开</option>
+																<option value="0" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.magneticOn==0 ? 'true' : 'false'}">关</option>
 															</select>
 														</span>
 													</div>
