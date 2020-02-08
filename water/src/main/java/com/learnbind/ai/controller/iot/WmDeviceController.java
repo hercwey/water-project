@@ -27,6 +27,7 @@ import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterReadWaterCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdCmd;
+import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.MeterConfigBean;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.service.iot.WmDeviceService;
@@ -242,6 +243,15 @@ public class WmDeviceController {
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
+			
+			//TODO G11 需要每次+1，范围1到255，循环，sequence+1然后保存到数据库中
+	        if (sequence<255) {
+				sequence = sequence + 1;
+			} else {
+				sequence = 1;
+			}
+	        device.setMeterSequence(sequence);
+	        wmDeviceService.updateByPrimaryKeySelective(device);
 			
 			//----------测试时使用，正常使用时需要注释----------
 	    	if(StringUtils.isBlank(meterAddress)) {
