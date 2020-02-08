@@ -23,6 +23,7 @@ import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterBean;
 import com.learnbind.ai.model.iot.MeterDataBaseBean;
 import com.learnbind.ai.model.iot.MeterReportBean;
+import com.learnbind.ai.model.iot.MeterStatusBean;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.IDeviceService;
 import com.learnbind.ai.service.iot.IMeterService;
@@ -140,7 +141,7 @@ public class MeterController {
 				totalVolume = meterReportBean.getTotalVolume();//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
 				sampleUnit = meterReportBean.getSampleUnit();//采样参数：单位M3
 				batteryVoltage = meterReportBean.getBatteryVoltage();//电池电压：单位V
-				meterStatus = meterReportBean.getMeterStatus();//表状态字：2字节
+				meterStatus = MeterStatusBean.toJsonString(meterReportBean.getMeterStatus());//表状态字：2字节
 				signal = meterReportBean.getSignal();//信号强度
 				pressure = meterReportBean.getPressure();//压力值：xx.yyyy
 			}

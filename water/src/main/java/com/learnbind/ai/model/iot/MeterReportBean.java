@@ -23,7 +23,7 @@ public class MeterReportBean {
     @JsonProperty("batteryVoltage")
     private int batteryVoltage;    // 电池电压：单位V
     @JsonProperty("meterStatus")
-    private String meterStatus;     // 表状态字：2字节
+    private MeterStatusBean meterStatus;       // 表状态字：由meterStatusFlag转换
     @JsonProperty("signal")
     private String signal;         // 信号强度
     @JsonProperty("pressure")
@@ -59,10 +59,10 @@ public class MeterReportBean {
 	public void setBatteryVoltage(int batteryVoltage) {
 		this.batteryVoltage = batteryVoltage;
 	}
-	public String getMeterStatus() {
+	public MeterStatusBean getMeterStatus() {
 		return meterStatus;
 	}
-	public void setMeterStatus(String meterStatus) {
+	public void setMeterStatus(MeterStatusBean meterStatus) {
 		this.meterStatus = meterStatus;
 	}
 	public String getSignal() {
@@ -94,7 +94,7 @@ public class MeterReportBean {
 			meterReportBean.setTotalVolume(meterReport.getTotalVolume());
 			meterReportBean.setSampleUnit(meterReport.getSampleUnit()+"");
 			meterReportBean.setBatteryVoltage(meterReport.getBatteryVoltage());
-			meterReportBean.setMeterStatus(meterReport.getMeterStatus()+"");
+			meterReportBean.setMeterStatus(MeterStatusBean.fromStatusFlag(meterReport.getMeterStatus()));
 			meterReportBean.setSignal(meterReport.getSignal());
 			meterReportBean.setPressure(meterReport.getPressure()+"");
 		}
