@@ -106,8 +106,10 @@ public class DeviceBean {
     @JsonProperty("meterSequence")
     private Integer meterSequence=1;
     
-    @JsonProperty("deviceConfig")
+    @JsonProperty("meterConfig")
     private String meterConfig="";
+    @JsonProperty("meterFreeze")
+    private String meterFreeze="";
 
     public Long getId() {
         return id;
@@ -229,6 +231,14 @@ public class DeviceBean {
 		this.meterConfig = meterConfig;
 	}
 
+	public String getMeterFreeze() {
+		return meterFreeze;
+	}
+
+	public void setMeterFreeze(String meterFreeze) {
+		this.meterFreeze = meterFreeze;
+	}
+
 	public static DeviceBean parseJson(String data) {
         DeviceBean deviceBean = new DeviceBean();
 
@@ -259,6 +269,7 @@ public class DeviceBean {
 		deviceBean.setMeterFactoryCode(wmDevice.getMeterFactoryCode());
 		deviceBean.setMeterSequence(wmDevice.getMeterSequence());
 		deviceBean.setMeterConfig(wmDevice.getMeterConfig());
+		deviceBean.setMeterFreeze(wmDevice.getMeterFreeze());
 		return deviceBean;
 	}
 }

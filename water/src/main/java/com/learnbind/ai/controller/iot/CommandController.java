@@ -30,7 +30,7 @@ import com.learnbind.ai.model.iot.CommandResultBean;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterConfigBean;
-import com.learnbind.ai.model.iot.MeterDataBean;
+import com.learnbind.ai.model.iot.MeterReportBean;
 import com.learnbind.ai.service.iot.ICommandService;
 import com.learnbind.ai.service.iot.IDeviceService;
 
