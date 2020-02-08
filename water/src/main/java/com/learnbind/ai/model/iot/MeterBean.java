@@ -2,8 +2,6 @@ package com.learnbind.ai.model.iot;
 
 import java.util.Date;
 
-import org.apache.http.util.Args;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -243,8 +241,8 @@ public class MeterBean {
                 dataDecoded = MeterDataBean.toJsonString(meterDataBean);
 			}else if (meterBase instanceof MeterConfig) {
                 MeterConfig meterConfig = (MeterConfig)PacketCodec.decodeData(packetFrame);
-                MeterConfigBean meterDataBean = MeterConfigBean.fromMeterConfig(meterConfig);
-                dataDecoded = MeterConfigBean.toJsonString(meterDataBean);
+                MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
+                dataDecoded = MeterConfigBean.toJsonString(meterConfigBean);
 			} else {
 				dataDecoded = JSON.toJSONString(meterBase);
 			}
