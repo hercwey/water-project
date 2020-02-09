@@ -104,9 +104,9 @@
 			MODEL = #{ model, jdbcType = VARCHAR },
 			PROTOCOL_TYPE = #{ protocolType, jdbcType = VARCHAR },
 			UPATE_TIME = SYSDATE,
-			METER_TYPE = #{ meterType, jdbcType = INTEGER },
+			<!-- METER_TYPE = #{ meterType, jdbcType = INTEGER },
 			METER_ADDRESS = #{ meterAddress, jdbcType = VARCHAR },
-			METER_FACTORY_CODE = #{ meterFactoryCode, jdbcType = VARCHAR },
+			METER_FACTORY_CODE = #{ meterFactoryCode, jdbcType = VARCHAR }, -->
 			METER_SEQUENCE = #{ meterSequence, jdbcType = INTEGER }, 
 			METER_CONFIG = #{ meterConfig, jdbcType = VARCHAR }, 
 			METER_FREEZE = #{ meterFreeze, jdbcType = VARCHAR }    

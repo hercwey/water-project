@@ -42,16 +42,20 @@ public class WmDevice {
     private Date upateTime;
 
     @Column(name = "METER_TYPE")
-    private Integer meterType=0;
+    //private Integer meterType=0;
+    private Integer meterType;
 
     @Column(name = "METER_ADDRESS")
-    private String meterAddress="";
+    //private String meterAddress="";
+    private String meterAddress;
 
     @Column(name = "METER_FACTORY_CODE")
-    private String meterFactoryCode="";
+    //private String meterFactoryCode="";
+    private String meterFactoryCode;
 
     @Column(name = "METER_SEQUENCE")
-    private Integer meterSequence=1;
+    //private Integer meterSequence=1;
+    private Integer meterSequence;
 
     @Column(name = "METER_NUMBER")
     private String meterNumber;

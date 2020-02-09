@@ -30,6 +30,8 @@ import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdCmd;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.MeterConfigBean;
+import com.learnbind.ai.model.iot.MeterDataBaseBean;
+import com.learnbind.ai.model.iot.MeterReportBean;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.service.iot.WmDeviceService;
 
@@ -210,7 +212,9 @@ public class WmDeviceController {
 			WmDevice device = wmDeviceService.selectByPrimaryKey(itemId);
 			MeterConfigBean meterConfigBean = null;
 			if(device!=null) {
-				String meterConfig = device.getMeterConfig();
+				
+				String meterConfig = device.getMeterConfig();//表配置信息
+				//String meterFreeze = device.getMeterFreeze();//表月冻结数据
 				meterConfigBean = MeterConfigBean.fromJson(meterConfig);
 			}
 			model.addAttribute("meterConfigBean", meterConfigBean);
