@@ -26,6 +26,7 @@ import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterReport;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.model.iot.CommandBean;
+import com.learnbind.ai.model.iot.CommandCallbackBean;
 import com.learnbind.ai.model.iot.CommandResultBean;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
@@ -66,9 +67,12 @@ public class CommandController {
         commandBean.setIssuedTimes(resultBean.getIssuedTimes());
         commandBean.setPlatformIssuedTime(resultBean.getPlatformIssuedTime());
         commandBean.setStatus(resultBean.getStatus());
-        if (commandBean.getStatus() != null && commandBean.getStatus().equalsIgnoreCase("sent")) {
+      //FIXME G11 判断指令执行结果，逻辑待优化
+        if (data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_DELIVERED) || data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SENT) || data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SUCCESS)) {
+        	commandBean.setDatabaseStatus(2);
+		} else {
             commandBean.setDatabaseStatus(1);
-        }
+		}
 
         if (resultBean.getParas() != null) {
             commandBean.setMethodParams(resultBean.getParas().toJSONString());
@@ -90,11 +94,14 @@ public class CommandController {
         CommandBean commandBean = new CommandBean();
         commandBean.setDeviceId(commandResultBean.getDeviceId());
         commandBean.setCommandId(commandResultBean.getCommandId());
-        if (commandResultBean.getResultCode()!=null && commandResultBean.getResultCode().equalsIgnoreCase("SUCCESS")) {
-            commandBean.setDatabaseStatus(2);
-        } else {
+        
+        //FIXME G11 判断指令执行结果，逻辑待优化
+        if (data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_DELIVERED) || data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SENT) || data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SUCCESS)) {
+        	commandBean.setDatabaseStatus(2);
+		} else {
             commandBean.setDatabaseStatus(-1);
-        }
+		}
+        
         commandBean.setDesc(commandResultBean.getReason());
         if (commandBean.getDatabaseStatus() == 2) {
 			//指令执行成功后，解析数据，并保存

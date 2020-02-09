@@ -73,8 +73,6 @@ public class DeviceService implements IDeviceService {
         paramModifyDeviceInfo.put("protocolType", deviceBean.getProtocolType());
 
         try {
-            HttpsUtil httpsUtil = new HttpsUtil();
-            httpsUtil.initSSLConfigForTwoWay();
             jsonResult = IoTRequestUtil.doPutJsonGetStatusLine(urlModifyDeviceInfo, paramModifyDeviceInfo);
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,8 +91,6 @@ public class DeviceService implements IDeviceService {
         paramQueryDevices.put("pageSize", size);
 
         try {
-            HttpsUtil httpsUtil = new HttpsUtil();
-            httpsUtil.initSSLConfigForTwoWay();
             jsonResult = IoTRequestUtil.doGetWithParasGetStatusLine(urlQueryDevices, paramQueryDevices);
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,5 +105,29 @@ public class DeviceService implements IDeviceService {
 		return wmDeviceMapper.getDeviceByDeviceId(deviceBean);
 	}
 
+	@Override
+	public JsonResult deleteFromIoT(String deviceId) {
+        JsonResult jsonResult=JsonResult.fail(0,"Unknown Error");
+        String urlDelete = Constants.DELETE_DEVICE + "/" +deviceId;
 
+        try {
+            jsonResult = IoTRequestUtil.doDeleteGetStatusLine(urlDelete);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        //FIXME G11 本地数据库操作，暂定清空deviceID
+        if (jsonResult.getCode() == JsonResult.SUCCESS) {
+        	DeviceBean deviceBean = new DeviceBean();
+        	deviceBean.setDeviceId(deviceId);
+			WmDevice device = wmDeviceMapper.getDeviceByDeviceId(deviceBean);
+			if (device != null) {
+				deviceBean = DeviceBean.fromWmDevice(device);
+				deviceBean.setDeviceId("");
+				wmDeviceMapper.updateById(deviceBean);
+			}
+		}
+        
+        return jsonResult;
+	}
 }

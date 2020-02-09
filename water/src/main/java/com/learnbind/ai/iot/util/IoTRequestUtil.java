@@ -94,6 +94,24 @@ public class IoTRequestUtil {
         JsonResult jsonResult = getJsonResult(response,httpsUtil);
         return jsonResult;
     }
+    public static JsonResult doDeleteGetStatusLine(String url) throws Exception {
+        HttpsUtil httpsUtil = new HttpsUtil();
+        httpsUtil.initSSLConfigForTwoWay();
+
+        String accessToken = Constants.accessToken;
+        String appId = Constants.APP_ID;
+
+        Map<String, String> header = new HashMap<>();
+        header.put(Constants.HEADER_APP_KEY, appId);
+        header.put(Constants.HEADER_APP_AUTH, "Bearer" + " " + accessToken);
+
+        HttpResponse response = httpsUtil.doDelete(url, header);
+        if (null == response) {
+            System.out.println("The response body is null.");
+        }
+        JsonResult jsonResult = getJsonResult(response,httpsUtil);
+        return jsonResult;
+    }
 
     private static JsonResult getJsonResult(HttpResponse response,HttpsUtil httpsUtil) {
         JsonResult jsonResult = JsonResult.fail(0,"Unknown Error");
@@ -164,4 +182,5 @@ public class IoTRequestUtil {
         System.out.println("----------------------------------------\n");
         return jsonResult;
     }
+
 }
