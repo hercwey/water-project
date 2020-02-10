@@ -47,6 +47,9 @@ public class CommandBean {
     private JSONObject command;
     @JsonProperty("creationTime")
     private String creationTime;
+    
+    @JsonProperty("commandType")
+    private Integer commandType;
 
     public Long getId() {
         return id;
@@ -200,7 +203,15 @@ public class CommandBean {
         this.creationTime = creationTime;
     }
 
-    public static CommandBean parseJson(String data) {
+    public Integer getCommandType() {
+		return commandType;
+	}
+
+	public void setCommandType(Integer commandType) {
+		this.commandType = commandType;
+	}
+
+	public static CommandBean parseJson(String data) {
         CommandBean commandBean = new CommandBean();
 
         try {

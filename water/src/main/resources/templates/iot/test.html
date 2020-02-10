@@ -188,14 +188,14 @@
 				查询发送指令记录部分
 			</h5>
 			<div class="card-body">
-				<div class="row clearfix">
+				<!-- <div class="row clearfix">
 					<div class="col-md-12 column">
 						<button type="button" class="btn btn-info btn-sm" id="btn-search-send-cmd-record">
 							<i class="fa fa-search" aria-hidden="true"> <span>查询发送指令记录</span></i>
 						</button>
 					</div>
 				</div>
-				<br />
+				<br /> -->
 				<div class="row clearfix">
 					<div class="col-md-12 column send-cmd-record-item">
 						<!-- 此处显示发送指令记录列表 -->
@@ -221,6 +221,7 @@
 			//------------------初始化-----------------------------------------------------------------------------
 			loadTestDeviceList();//加载测试设备列表（本地数据库）
 			loadDeviceUpDataMain();//加载设备上报数据主页面
+			loadSendCmdRecordMain();//加载发送指令记录主页面
 			//------------------订阅部分----------------------------------------------------------------------------
 			/**
 			 * 	获取Token并自动订阅
@@ -391,9 +392,10 @@
 			/**
 			 * 	查询发送指令记录
 			 */
-			$("#btn-search-send-cmd-record").on("click", function(){
+			/* $("#btn-search-send-cmd-record").on("click", function(){
 				defaultSearchSendCmdRecord();//默认查询发送指令记录（默认查询第1页，每页2条数据）
-			});
+				loadSendCmdRecordMain();//加载发送指令记录主页面
+			}); */
 			
 		});
 		
@@ -670,6 +672,7 @@
 		function sendCommandAjaxRequest(cmdVal){
 			
 			var iotDeviceId = getSendCmdIotDeviceIdFn();//获取发送指令的IOT设备ID
+			var commandType = getSendCommandTypeFn();//获取发送指令的类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
 			console.log("----------向设备【"+iotDeviceId+"】发送命令【"+cmdVal+"】");
 			
 			//var data = '{"deviceId":"替换设备DeviceId","serviceId":"JRprotocol","method":"JRprotocolXY","paras":{"value":"12"}}';
@@ -678,6 +681,7 @@
 			var parasJson = JSON.stringify(paras);
 			
 			var dataObj = new Object();
+			dataObj.commandType = commandType;
 			//dataObj.deviceId = "e793e8a7-ddc7-4873-aca3-7d594f0a801a";//离线
 			//dataObj.deviceId = "dadb87c6-c2c4-4e27-b112-f660d2457519";//在线
 			dataObj.deviceId = iotDeviceId;
@@ -741,39 +745,17 @@
 			});
 		} */
 		
-		//------------------查询发送指令记录部分----------------------------------------------------------------------------
+		//------------------加载发送指令记录主页面部分----------------------------------------------------------------------------
 		
 		/**
-		 * 	默认查询发送指令记录（默认查询第1页，每页2条数据）
+		 * 	加载发送指令记录主页面
 		 */
-		function defaultSearchSendCmdRecord(){
-			var searchCond = null;
-			var pageNum = 1;
-			var pageSize = 5;
-			clickSendCmdRecordListPager(searchCond, pageNum, pageSize);
-		}
-		/**
-		 * 	通用查询发送指令记录
-		 */
-		function searchSendCmdRecord(parms){
-			
-			var url = BASE_CONTEXT_PATH + "/cmd/search-send-cmd-records";
-			
-			$(".send-cmd-record-item").load(url, parms, function(){
-				console.log("----------查询发送指令记录列表完成");
+		function loadSendCmdRecordMain(){
+			var url = BASE_CONTEXT_PATH + "/cmd/load-main";
+			$(".send-cmd-record-item").load(url, null, function(){
+				console.log("----------加载发送指令记录主页面完成");
 				windowResize();//初始化windows窗口滚动条
 			});
-		}
-		/*
-		 * 	分页查询
-		 */
-		function clickSendCmdRecordListPager(searchCond, pageNum, pageSize) {
-			var parms = new Object();
-			parms.searchCond=searchCond;
-			parms.pageNum=pageNum;
-			parms.pageSize=pageSize;
-	
-			searchSendCmdRecord(parms);
 		}
 		
 		//------------------初始化滚动条部分----------------------------------------------------------------------------

@@ -19,6 +19,7 @@
     <result column="PLATFORM_ISSUED_TIME" jdbcType="VARCHAR" property="platformIssuedTime" />
     <result column="ISSUED_TIMES" jdbcType="DECIMAL" property="issuedTimes" />
     <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="COMMAND_TYPE" jdbcType="DECIMAL" property="commandType" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--
@@ -96,6 +97,9 @@
       <if test="createTime != null">
         CREATE_TIME,
       </if>
+      <if test="commandType != null">
+        COMMAND_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="commandId != null">
@@ -136,6 +140,9 @@
       </if>
       <if test="createTime != null">
         SYSDATE,
+      </if>
+      <if test="commandType != null">
+        #{commandType,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -200,19 +207,31 @@
   <select id="searchList" resultType="map">
   	SELECT
 		C.ID,
+		C.COMMAND_TYPE, 
+		D.VERIFY_CODE, 
 		C.COMMAND_ID,
 		C.APP_ID,
 		C.DEVICE_ID,
 		C.SERVICE_ID,
 		C.METHOD_PARAMS,
-		C.STATUS,
+		C.STATUS, 
+		C.CREATE_TIME, 
 		C.PLATFORM_ISSUED_TIME,
-		D.DEVICE_ID AS DEVICE_IDS,
+		D.DEVICE_ID AS IOT_DEVICE_ID,
 		S.SERVICE_NAME 
 	FROM
 		WM_COMMAND C
 		LEFT JOIN WM_DEVICE D ON C.DEVICE_ID = D.ID
-		LEFT JOIN WM_SERVICE S ON C.SERVICE_ID = S.ID 
+		LEFT JOIN WM_SERVICE S ON C.SERVICE_ID = S.ID
+	<where>
+		1=1
+		<if test="searchCommandType!=null">
+			AND C.COMMAND_TYPE = #{searchCommandType}
+		</if>
+		<if test="searchCond!=null and searchCond!=''">
+			AND D.VERIFY_CODE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+		</if>
+	</where>
 	ORDER BY
 		ID DESC
   	<!-- SELECT

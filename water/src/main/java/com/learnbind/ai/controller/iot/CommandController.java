@@ -32,6 +32,7 @@ import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterConfigBean;
 import com.learnbind.ai.model.iot.MeterReportBean;
+import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.service.iot.ICommandService;
 import com.learnbind.ai.service.iot.IDeviceService;
 
@@ -131,18 +132,25 @@ public class CommandController {
         return ResponseEntity.ok(JsonResult.success(JsonResult.SUCCESS,data).toString());
     }
     
+    //----------------加载发送指令记录主页面部分----------------------------------------------------------------------------------
+  	@RequestMapping(value = "/load-main")
+  	public String loadMain(Model model) {
+  		return "iot/wm_command/command_main";
+  	}
+  	
+  	//------------------查询发送指令记录----------------------------------------------------------------------------------------------
     @RequestMapping(value = "/search-send-cmd-records")
-    public String searchSendCmdRecords(Model model, Integer pageNum, Integer pageSize) {
+    public String searchSendCmdRecords(Model model, Integer pageNum, Integer pageSize, Integer searchCommandType, String searchCond) {
     	
     	// 判定页码有效性
 		if (pageNum == null || pageNum == 0) {
 			pageNum = 1;
-			pageSize = PagerConstant.DEFAULT_PAGE_SIZE;
+			pageSize = 5;//PagerConstant.DEFAULT_PAGE_SIZE;
 		}
 
 		// 查询并分页
 		PageHelper.startPage(pageNum, pageSize); // PageHelper
-		List<Map<String, Object>> commandMapList = commandService.searchList();
+		List<Map<String, Object>> commandMapList = commandService.searchList(searchCommandType, searchCond);
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(commandMapList);// (使用了拦截器或是AOP进行查询的再次处理)
 
 		// 传递如下数据至前台页面
@@ -153,7 +161,7 @@ public class CommandController {
 		model.addAttribute("pageNum", pageNum);
 		model.addAttribute("pageSize", pageSize);
 		
-		return "iot/command_table";
+		return "iot/wm_command/command_table";
     	
     }
 

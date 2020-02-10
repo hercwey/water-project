@@ -17,23 +17,18 @@
 
 			<!-- 操作面板 -->
 			<div class="" style="display: inline-block">
-				<ul class="extra-l" style="list-style: none;" id="search-up-data-from">
+				<ul class="extra-l" style="list-style: none;" id="search-send-command-records-from">
 				
-					<!-- 面板:增加 -->
+					<!-- 面板 -->
 					<li>
-						<!-- 0=未知类型数据
-						1=设备上报数据
-						2=设备配置信息数据
-						3=设备月冻结数据
-						4=设备开始与电信平台建立连接
-						5=设备即将断开连接 -->
-						<select class="form-control btn-sm" id="search-data-type" style="height:30.8px;">
-							<option value="">——数据类型——</option>
-							<option value="1">设备主动上报数据</option>
-							<option value="2">设备配置信息数据</option>
-							<option value="3">设备月冻结数据</option>
-							<option value="4">设备与电信平台建立连接数据</option>
-							<option value="5">设备与电信平台断开连接数据</option>
+						<!-- 指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令； -->
+						<select class="form-control btn-sm" id="search-command-type" style="height:30.8px;">
+							<option value="">——指令类型——</option>
+							<option value="1">表配置指令</option>
+							<option value="2">开/关阀指令</option>
+							<option value="3">设置水量阀值指令</option>
+							<option value="4">读月冻结指令</option>
+							<option value="5">读表配置指令</option>
 						</select>
 					</li>
 
@@ -56,7 +51,7 @@
 
 			<div class="">
 				<!-- 容器:字典列表 -->
-				<div class="container-device-up-data-table table-container"></div>
+				<div class="container-send-command-records-table table-container"></div>
 			</div>
 
 		</div>
@@ -76,28 +71,28 @@
 		/*	
 			公共查询函数
 			
-			查询核对类型列表
+			查询列表
 		*/
-		function searchWmMeter(parms) {
+		function searchWmCommand(parms) {
 			//加载字典列表页面
-			var url = BASE_CONTEXT_PATH + "/meter/search-meters"
-			$(".container-device-up-data-table").load(url, parms, windowResizeFuncxx);
+			var url = BASE_CONTEXT_PATH + "/cmd/search-send-cmd-records"
+			$(".container-send-command-records-table").load(url, parms, windowResizeFuncxxx);
 		}
 		
-		function windowResizeFuncxx(){
+		function windowResizeFuncxxx(){
 			console.log("call back........");
 			var myEvent = new Event('resize');
 	        window.dispatchEvent(myEvent);
 		}
 		
-		function getSearchWmMeterParams(){
+		function getSearchWmCommandParams(){
 			
-			var searchDataType = $("#search-up-data-from #search-data-type").val();
-			var searchCond = $("#search-up-data-from #search-cond").val();
+			var searchCommandType = $("#search-send-command-records-from #search-command-type").val();
+			var searchCond = $("#search-send-command-records-from #search-cond").val();
 			
 			//初始化请求参数
 			var parms = new Object();
-			parms.searchDataType=searchDataType;
+			parms.searchCommandType=searchCommandType;
 			parms.searchCond=searchCond;
 			return parms;
 		}
@@ -108,44 +103,45 @@
 			默认查询
 			Retrieve(default)查询(加载默认列表)
 		*/
-		function defaultSearchWmMeter() {
+		function defaultSearchWmCommand() {
 			var pageNum = 0;
 			var pageSize = 0;
 			
 			//获取参数
 			var parms = null;
-			parms = getSearchWmMeterParams();//获取普通查询参数（不包括分页信息）
+			parms = getSearchWmCommandParams();//获取普通查询参数（不包括分页信息）
 			
 			parms.pageNum=pageNum;
 			parms.pageSize=pageSize;
 
-			searchWmMeter(parms);
+			searchWmCommand(parms);
 		}
 		
 		/*
 			查询按钮点击时调用
 			采用用户所输入的查询条件进行查询.
 		*/
-		function btnSearchWmMeterClick() {
+		function btnSearchWmCommandClick() {
 			var pageNum = 0;
 			var pageSize = 0;
 			
-			var parms = getSearchWmMeterParams();//获取查询参数（不包括分页信息）
+			var parms = getSearchWmCommandParams();//获取查询参数（不包括分页信息）
 			parms.pageNum=pageNum;
 			parms.pageSize=pageSize;
 
-			searchWmMeter(parms);
+			searchWmCommand(parms);
 		}
 
 		/*
 			分页查询(采用所保存的状态)
 		*/
-		function clickPagerReloadWmMeterTable(searchCond, pageNum, pageSize) {
-			var parms = getSearchWmMeterParams();//获取查询参数（不包括分页信息）
+		function clickPagerReloadWmCommandTable(searchCond, pageNum, pageSize) {
+			
+			var parms = getSearchWmCommandParams();//获取查询参数（不包括分页信息）
 			parms.pageNum=pageNum;
 			parms.pageSize=pageSize;
 
-			searchWmMeter(parms);
+			searchWmCommand(parms);
 		}
 
 		//-------------------PAGE LOADED READY--------------------
@@ -153,37 +149,37 @@
 		$(function() {
 			//------------init-------------
 			//主页:默认查询(加载默认列表)
-			//defaultSearchWmMeter();
+			defaultSearchWmCommand();
 
 			//---------事件绑定--------------
 			/**
 			 * 	绑定数据类型按钮的change事件
 			 */
-			$("#search-up-data-from #search-data-type").on('change', function(){
-				btnSearchWmMeterClick();
+			$("#search-send-command-records-from #search-command-type").on('change', function(){
+				btnSearchWmCommandClick();
 			});
 			/*
 				查询按钮CLICK
 			*/
-			$('#search-up-data-from #btn-search').on('click', function() {
-				btnSearchWmMeterClick();
+			$('#search-send-command-records-from #btn-search').on('click', function() {
+				btnSearchWmCommandClick();
 			});
 			
 			/*
 				查询条件复位按钮CLICK
 			*/
-			$('#search-up-data-from #btn-search-reset').on('click', function() {
-				$("#search-up-data-from #search-data-type").val("");//重置数据类型为空
-				$("#search-up-data-from #search-cond").val("");
-				$("#search-up-data-from #search-cond").focus();  //	获得焦点
+			$('#search-send-command-records-from #btn-search-reset').on('click', function() {
+				$("#search-send-command-records-from #search-command-type").val("");//重置数据类型为空
+				$("#search-send-command-records-from #search-cond").val("");
+				$("#search-send-command-records-from #search-cond").focus();  //	获得焦点
 			});
 			
 			/*
 				查询条件输入框 KEYUP
 			*/
-			$('#search-up-data-from #search-cond').on('keyup', function(event) {
+			$('#search-send-command-records-from #search-cond').on('keyup', function(event) {
 				if(event.keyCode == 13){
-					$('#search-up-data-from #btn-search').trigger("click");	                
+					$('#search-send-command-records-from #btn-search').trigger("click");	                
 	            }	
 			});
 			

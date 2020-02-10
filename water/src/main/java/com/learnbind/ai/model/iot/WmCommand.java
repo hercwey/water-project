@@ -48,6 +48,9 @@ public class WmCommand {
 
     @Column(name = "CREATE_TIME")
     private Date createTime;
+    
+    @Column(name = "COMMAND_TYPE")
+    private Integer commandType;
 
     /**
      * @return ID
@@ -245,7 +248,15 @@ public class WmCommand {
         this.createTime = createTime;
     }
 
-    @Override
+    public Integer getCommandType() {
+		return commandType;
+	}
+
+	public void setCommandType(Integer commandType) {
+		this.commandType = commandType;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
@@ -265,6 +276,7 @@ public class WmCommand {
         sb.append(", platformIssuedTime=").append(platformIssuedTime);
         sb.append(", issuedTimes=").append(issuedTimes);
         sb.append(", createTime=").append(createTime);
+        sb.append(", commandType=").append(commandType);
         sb.append("]");
         return sb.toString();
     }

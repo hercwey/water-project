@@ -72,8 +72,8 @@ public class CommandService implements ICommandService {
     }
 
 	@Override
-	public List<Map<String, Object>> searchList() {
-		return wmCommandMapper.searchList();
+	public List<Map<String, Object>> searchList(Integer searchCommandType, String searchCond) {
+		return wmCommandMapper.searchList(searchCommandType, searchCond);
 	}
 
 	@Override

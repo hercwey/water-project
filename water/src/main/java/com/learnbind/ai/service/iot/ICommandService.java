@@ -15,5 +15,5 @@ public interface ICommandService {
     
     public CommandBean getCommandBeanByCommandId(CommandBean commandBean);
     
-    public List<Map<String, Object>> searchList();
+    public List<Map<String, Object>> searchList(Integer searchCommandType, String searchCond);
 }
