@@ -21,9 +21,11 @@ import com.learnbind.ai.constant.PagerConstant;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterBean;
+import com.learnbind.ai.model.iot.MeterConfigBean;
 import com.learnbind.ai.model.iot.MeterDataBaseBean;
 import com.learnbind.ai.model.iot.MeterReportBean;
 import com.learnbind.ai.model.iot.MeterStatusBean;
+import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.IDeviceService;
 import com.learnbind.ai.service.iot.IMeterService;
@@ -69,22 +71,31 @@ public class MeterController {
         	
         	deviceBean.setMeterFreeze(meterDataBaseBean.getData());
         	deviceService.modifyDevice(deviceBean);
+		} else if (meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_REPORT) {
+			//TODO 水表数据封装信息保存（更新MeterConfig信息）
+	        DeviceBean deviceBean = new DeviceBean();
+	        deviceBean.setDeviceId(meterBean.getDeviceId());
+	        WmDevice wmDevice = deviceService.getDeviceByDeviceId(deviceBean);
+	        if (wmDevice == null) {
+				wmDevice = new WmDevice();
+			}
+	        deviceBean = DeviceBean.fromWmDevice(wmDevice);
+	        MeterReportBean reportBean= MeterReportBean.fromJson(meterDataBaseBean.getData());
+	        	
+	        MeterConfigBean configBean = MeterConfigBean.fromJson(deviceBean.getMeterConfig());
+	        configBean.setMeterNumber(reportBean.getMeterNumber());
+	        configBean.setMeterTime(reportBean.getMeterTime());
+	        configBean.setMeterStatus(reportBean.getMeterStatus());
+	        try {
+		        configBean.setSampleUnit(Float.valueOf(reportBean.getSampleUnit()));
+			} catch (Exception e) {
+				configBean.setSampleUnit(0);
+			} finally {
+				deviceBean.setMeterConfig(MeterConfigBean.toJsonString(configBean));
+		        deviceService.modifyDevice(deviceBean);
+			}
 		}
-        /**
-        //TODO 水表数据封装信息保存（表类型、表地址、表厂商）
-        DeviceBean deviceBean = new DeviceBean();
-        deviceBean.setDeviceId(meterBean.getDeviceId());
-        WmDevice wmDevice = deviceService.getDeviceByDeviceId(deviceBean);
-        if (wmDevice != null) {
-        	deviceBean = DeviceBean.fromWmDevice(wmDevice);
-            deviceBean.setMeterType(meterBean.getMeterType());
-            deviceBean.setMeterAddress(meterBean.getMeterAddr());
-            deviceBean.setMeterFactoryCode(meterBean.getFactoryCode());
-            
-            deviceService.modifyDevice(deviceBean);
-            
-		}
-        */
+        
         jsonResult.setData(data);
         return ResponseEntity.ok(jsonResult.toString());
     }

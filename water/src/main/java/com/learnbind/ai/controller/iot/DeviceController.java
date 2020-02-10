@@ -44,8 +44,15 @@ public class DeviceController {
     public ResponseEntity<String> modify(@RequestBody String data) {
         //TODO 修改设备
         DeviceBean deviceBean = DeviceBean.parseJson(data);
-        //TODO 调用IoT平台，注册设备接口
+        //TODO 调用IoT平台，修改设备接口
         JsonResult jsonResult = deviceService.modifyDevice(deviceBean);
+        return ResponseEntity.ok(jsonResult.toString());
+    }
+    
+    @RequestMapping(value = "/delete/{deviceId}", method = RequestMethod.GET)
+    public ResponseEntity<String> delete(@PathVariable String deviceId) {
+        //TODO 调用IoT平台，删除设备接口
+        JsonResult jsonResult = deviceService.deleteFromIoT(deviceId);
         return ResponseEntity.ok(jsonResult.toString());
     }
 
