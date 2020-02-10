@@ -41,13 +41,13 @@ public class WmMeter {
     private String ctrlCode;
 
     @Column(name = "DATA_DI")
-    private Long dataDi;
+    private String dataDi;
 
     @Column(name = "METER_SEQUENCE")
     private Long meterSequence;
 
     @Column(name = "METER_DATA_TYPE")
-    private String meterDataType;
+    private int meterDataType;
     
     @Column(name = "METER_DATA")
     private String meterData;
@@ -224,14 +224,14 @@ public class WmMeter {
     /**
      * @return DATA_DI
      */
-    public Long getDataDi() {
+    public String getDataDi() {
         return dataDi;
     }
 
     /**
      * @param dataDi
      */
-    public void setDataDi(Long dataDi) {
+    public void setDataDi(String dataDi) {
         this.dataDi = dataDi;
     }
 
@@ -319,11 +319,11 @@ public class WmMeter {
         this.updateTime = updateTime;
     }
 
-    public String getMeterDataType() {
+    public int getMeterDataType() {
 		return meterDataType;
 	}
 
-	public void setMeterDataType(String meterDataType) {
+	public void setMeterDataType(int meterDataType) {
 		this.meterDataType = meterDataType;
 	}
 

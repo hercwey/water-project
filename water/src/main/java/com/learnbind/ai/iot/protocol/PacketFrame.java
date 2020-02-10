@@ -3,8 +3,10 @@ package com.learnbind.ai.iot.protocol;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 import com.learnbind.ai.iot.protocol.util.BCDUtil;
 import com.learnbind.ai.iot.protocol.util.ByteUtil;
+import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.iot.protocol.util.ProtoUtil;
 import static com.learnbind.ai.iot.protocol.Protocol.*;
 
@@ -20,6 +22,7 @@ public class PacketFrame {
     private String factoryCode;     // 表厂商代码
     private byte ctrlCode;          // 控制码
     private short dataDI;           // 数据标识
+    private String dataDIStr;           // 数据标识Str
     private int sequence;           // 序列号
     private byte[] data;            // 数据字节
     private byte checksum;          // 校验和
@@ -79,6 +82,7 @@ public class PacketFrame {
             
         } else {
             dataDI = ByteUtil.getShort(di);
+            dataDIStr = HexStringUtils.bytesToHexString(di);
         }
 
         checksum = ByteUtil.getByte(chk);
@@ -177,9 +181,18 @@ public class PacketFrame {
     public void setCtrlCode(byte ctrlCode) {
         this.ctrlCode = ctrlCode;
     }
+    
+    public String getCtrlCodeStr() {
+    	int i = ctrlCode;	
+    	i = i&0xff;
+    	return Integer.toHexString(i);
+    }
 
     public short getDataDI() {
         return dataDI;
+    }
+    public String getDataDiStr() {
+    	return dataDIStr;
     }
 
     public void setDataDI(short dataDI) {

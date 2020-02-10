@@ -39,9 +39,9 @@ public class MeterBean {
     @JsonProperty("factoryCode")
     private String factoryCode;
     @JsonProperty("ctrlCode")
-    private Integer ctrlCode;
+    private String ctrlCode;
     @JsonProperty("dataDI")
-    private Short dataDI;
+    private String dataDI;
     @JsonProperty("sequence")
     private Integer sequence;
     @JsonProperty("dataType")
@@ -139,19 +139,19 @@ public class MeterBean {
         this.factoryCode = factoryCode;
     }
 
-    public Integer getCtrlCode() {
+    public String getCtrlCode() {
         return ctrlCode;
     }
 
-    public void setCtrlCode(Integer ctrlCode) {
+    public void setCtrlCode(String ctrlCode) {
         this.ctrlCode = ctrlCode;
     }
 
-    public Short getDataDI() {
+    public String getDataDI() {
         return dataDI;
     }
 
-    public void setDataDI(Short dataDI) {
+    public void setDataDI(String dataDI) {
         this.dataDI = dataDI;
     }
 
@@ -259,8 +259,8 @@ public class MeterBean {
 	            meterBean.setMeterType(packetFrame.getMeterType());
 	            meterBean.setMeterAddr(packetFrame.getMeterAddr());
 	            meterBean.setFactoryCode(packetFrame.getFactoryCode());
-	            meterBean.setCtrlCode(packetFrame.getCtrlCode());
-	            meterBean.setDataDI((short)packetFrame.getDataDI());
+	            meterBean.setCtrlCode(packetFrame.getCtrlCodeStr());
+	            meterBean.setDataDI(packetFrame.getDataDiStr());
 	            meterBean.setSequence(packetFrame.getSequence());
 	            //meterBean.setData(HexStringUtils.bytesToHexString(packetFrame.getData()));
 	            meterBean.setChecksum(Integer.valueOf(packetFrame.getChecksum()));
@@ -309,8 +309,9 @@ public class MeterBean {
     }	
 	
 	public static void main(String[] args) {
-		String data = "{\"notifyType\":\"deviceDatasChanged\",\"requestId\":null,\"deviceId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"gatewayId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"services\":[{\"serviceId\":\"JRprotocol\",\"serviceType\":\"JRprotocol\",\"data\":{\"JRprotocolXY\":\"123\"},\"eventTime\":\"20200206T050809Z\"}]}";
+		String data = "{\"notifyType\":\"deviceDatasChanged\",\"requestId\":null,\"deviceId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"gatewayId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"services\":[{\"serviceId\":\"JRprotocol\",\"serviceType\":\"JRprotocol\",\"data\":{\"JRprotocolXY\":\"681002390745404358811d1f90a702390745404350172309010220a6090000024836090015000000db16\"},\"eventTime\":\"20200206T050809Z\"}]}";
 		MeterBean meterBean = MeterBean.fromUploadDataJson(data);
 		System.out.println(JSON.toJSON(meterBean.getData()));
+		System.out.println(JSON.toJSON(meterBean));
 	}
 }

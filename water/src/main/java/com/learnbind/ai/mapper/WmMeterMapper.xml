@@ -16,9 +16,9 @@
     <result column="METER_ADDR" jdbcType="VARCHAR" property="meterAddr" />
     <result column="FACTORY_CODE" jdbcType="VARCHAR" property="factoryCode" />
     <result column="CTRL_CODE" jdbcType="VARCHAR" property="ctrlCode" />
-    <result column="DATA_DI" jdbcType="DECIMAL" property="dataDi" />
+    <result column="DATA_DI" jdbcType="VARCHAR" property="dataDi" />
     <result column="METER_SEQUENCE" jdbcType="DECIMAL" property="meterSequence" />
-    <result column="METER_DATA_TYPE" jdbcType="VARCHAR" property="meterDataType" />
+    <result column="METER_DATA_TYPE" jdbcType="INTEGER" property="meterDataType" />
     <result column="METER_DATA" jdbcType="VARCHAR" property="meterData" />
     <result column="METER_DATA_BASIC" jdbcType="VARCHAR" property="meterDataBasic" />
     <result column="METER_CHECKSUM" jdbcType="DECIMAL" property="meterChecksum" />
@@ -76,9 +76,9 @@
 				#{meterAddr,jdbcType=VARCHAR},
 				#{factoryCode,jdbcType=VARCHAR},
 				#{ctrlCode,jdbcType=BIGINT},
-				#{dataDI,jdbcType=BIGINT},
+				#{dataDI,jdbcType=VARCHAR},
 				#{sequence,jdbcType=BIGINT},
-				#{dataType,jdbcType=VARCHAR},
+				#{dataType,jdbcType=BIGINT},
 				#{data,jdbcType=VARCHAR},
 				#{dataBasic,jdbcType=VARCHAR},
 				#{checksum,jdbcType=BIGINT},
@@ -103,9 +103,9 @@
             METER_ADDR = #{meterAddr,jdbcType=VARCHAR},
             FACTORY_CODE = #{factoryCode,jdbcType=VARCHAR},
             CTRL_CODE = #{ctrlCode,jdbcType=BIGINT},
-            DATA_DI = #{dataDI,jdbcType=BIGINT},
+            DATA_DI = #{dataDI,jdbcType=VARCHAR},
             METER_SEQUENCE = #{sequence,jdbcType=BIGINT},
-            METER_DATA_TYPE = #{dataType,jdbcType=VARCHAR},
+            METER_DATA_TYPE = #{dataType,jdbcType=BIGINT},
             METER_DATA = #{data,jdbcType=VARCHAR},
             METER_DATA_BASIC = #{dataBasic,jdbcType=VARCHAR},
             METER_CHECKSUM = #{checksum,jdbcType=BIGINT},
