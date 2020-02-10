@@ -114,11 +114,11 @@ public class PacketCodec {
 
     /**
      * 打包数据
-     * @param meterType
-     * @param meterAddress
-     * @param meterFactoryCode
-     * @param ser
-     * @param data
+     * @param meterType         使用Protocol.METER_TYPE_* 类型
+     * @param meterAddress      长度为10的数字型字符串
+     * @param meterFactoryCode  长度为4的数字型字符串
+     * @param ser               序列号, 主站发送的序号SER，在每次通讯前，按模256加1运算后产生
+     * @param data              bean下的对象
      * @return
      */
     public static byte[] encodeData(byte meterType, String meterAddress, String meterFactoryCode, byte ser, MeterBase data){
@@ -135,7 +135,7 @@ public class PacketCodec {
 
         packetFrame.setSequence(ser);
 
-        // 设置数据
+        // 设置数据, 根据对象实例填充 控制码
         if (data instanceof MeterConfigReadCmd) {
             packetFrame.setCtrlCode(METER_CTR_0);
             packetFrame.setDataDI(DATA_DI_METER_CONFIG_READ);
@@ -182,6 +182,7 @@ public class PacketCodec {
             packetFrame.setData(data.encodeBytes());
         }
 
+        // 打包生成字节缓冲区
         return packetFrame.encodeBytes();
     }
 

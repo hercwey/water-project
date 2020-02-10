@@ -73,9 +73,9 @@ public class PacketFrame {
         pos += ByteUtil.arrayCopy(msgBytes, pos, eoi);
 
         // 根据字节数组解析为成员
-        meterType = ByteUtil.getByte(type);
-        meterAddr = BCDUtil.bcd2String(addr);
-        factoryCode = BCDUtil.bcd2String(factory);
+        meterType = ProtoUtil.parseMeterType(type);
+        meterAddr = ProtoUtil.parseMeterAddr(addr);
+        factoryCode = ProtoUtil.parseFactoryCode(factory);
 
         sequence = ByteUtil.getInt(seq);
         if ((METER_CTR_2 == ctrlCode) || (METER_CTR_5 == ctrlCode)) {
@@ -105,14 +105,16 @@ public class PacketFrame {
         byte[] chk  = new byte[1];      // 校验码  校验码（CS）为一个字节，从帧起始符开始到校验码之前的所有各字节进行二进制算术累加，不计超过 FFH 的溢出值
         byte[] eoi  = new byte[1];      // 帧结束符 1字节 16H
         
-        soi[0] = 0x68;
-        ByteUtil.setBytes(type, (byte)meterType);
-        addr = BCDUtil.string2Bcd(meterAddr);
-        factory = BCDUtil.string2Bcd(factoryCode);
-        ByteUtil.setBytes(cmd, (byte)ctrlCode);
-        
+        soi[0] = 0x68;                                      // 设置帧头
+        ProtoUtil.packMeterType(type, meterType);           // 设置表类型
+        ProtoUtil.packMeterAddr(addr, meterAddr);           // 设置表地址
+        ProtoUtil.packFactoryCode(factory, factoryCode);    // 设置厂商代码
+        ByteUtil.setBytes(cmd, (byte)ctrlCode);             // 设置控制码
+
+        // 拼接帧前半部
         byte[] dataBytes0 = ByteUtil.concatAll(soi, type, addr, factory, cmd);
-        
+
+        // 设置报文体
         int dataLen = 0;
         if ((METER_CTR_2 == ctrlCode) || (METER_CTR_5 == ctrlCode)) {
             ByteUtil.setBytes(seq, (byte)sequence);

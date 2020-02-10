@@ -43,8 +43,18 @@ public class ProtoUtil {
      * @param value 数字型字符串, 长度为12
      */
     public static void packMeterNumber(byte[] dataBytes, String value){
-        if ((value.length() != 12 ) || (dataBytes.length != 6)){
+        // 为空时不填充任何数据, dataBytes数组中默认填0
+        if ((null == value) || (value.equals(""))){
+            return;
+        }
+
+        if ((value.length() > 12 ) || (dataBytes.length != 6)){
             throw new RuntimeException("[表号]封装: 长度错误");
+        }
+
+        // 长度不足, 向前补0
+        if (value.length() < 12){
+            value = String.format("%012d", Integer.parseInt(value));
         }
 
         BCDUtil.setBcdBytes(dataBytes, value);
@@ -69,8 +79,18 @@ public class ProtoUtil {
      * @param value 7字节数字字符串(YYMMWWDDhhmmss)
      */
     public static void packMeterTime(byte[] dataBytes, String value){
-        if ((value.length() != 14 ) || (dataBytes.length != 7)){
+        // 为空时不填充任何数据, dataBytes数组中默认填0
+        if ((null == value) || (value.equals(""))){
+            return;
+        }
+
+        if ((value.length() > 14 ) || (dataBytes.length != 7)){
             throw new RuntimeException("[表时间]封装: 长度错误");
+        }
+
+        // 长度不足, 向前补0
+        if (value.length() < 14){
+            value = String.format("%014d", Integer.parseInt(value));
         }
 
         BCDUtil.setBcdBytes(dataBytes, value);
@@ -148,6 +168,11 @@ public class ProtoUtil {
      * @return
      */
     public static void packSignal(byte[] dataBytes, String value){
+        // 为空时不填充任何数据, dataBytes数组中默认填0
+        if ((null == value) || (value.equals(""))){
+            return;
+        }
+
         if (dataBytes.length != 1){
             throw new RuntimeException("[信号强度]封装: 长度错误");
         }
@@ -408,8 +433,6 @@ public class ProtoUtil {
             bValue = 2;
         } else if (0.001f == value){
             bValue = 3;
-        }else {
-            throw new RuntimeException("[采样参数]封装: 采样参数值错误");
         }
 
         ByteUtil.setBytes(dataBytes, bValue);
@@ -439,6 +462,10 @@ public class ProtoUtil {
     }
 
     public static void packServerIP(byte[] dataBytes, String value){
+        // 为空时不填充任何数据, dataBytes数组中默认填0
+        if ((null == value) || (value.equals(""))){
+            return;
+        }
         if (dataBytes.length != 4){
             throw new RuntimeException("[服务器IP]封装: 长度错误");
         }
@@ -460,4 +487,66 @@ public class ProtoUtil {
 
         ByteUtil.setBytes(dataBytes, value);
     }
+
+    /**
+     * 表类型解析
+     * @param dataBytes 长度1字节
+     * @return
+     */
+    public static byte parseMeterType(byte[] dataBytes){
+        if (dataBytes.length != 1){
+            throw new RuntimeException("[表类型]解析: 长度错误");
+        }
+
+        return ByteUtil.getByte(dataBytes);
+    }
+
+    public static void packMeterType(byte[] dataBytes, byte value){
+        ByteUtil.setBytes(dataBytes, value);
+    }
+
+    public static String parseMeterAddr(byte[] dataBytes){
+        return BCDUtil.bcd2String(dataBytes);
+    }
+
+    /**
+     * 填充表地址
+     * @param dataBytes 长度为5个字节的BCD格式
+     * @param value 长度为10的数字型字符串
+     */
+    public static void packMeterAddr(byte[] dataBytes, String value){
+        // 为空时不填充任何数据, dataBytes数组中默认填0
+        if ((null == value) || (value.equals(""))){
+            return;
+        }
+
+        if (value.length() != 10){
+            throw new RuntimeException("[表地址]封装: 长度错误");
+        }
+
+        BCDUtil.setBcdBytes(dataBytes, value);
+    }
+
+    public static String parseFactoryCode(byte[] dataBytes){
+        return BCDUtil.bcd2String(dataBytes);
+    }
+
+    /**
+     * 填充厂商代码
+     * @param dataBytes 长度为2个字节的BCD格式
+     * @param value 长度为4的数字型字符串
+     */
+    public static void packFactoryCode(byte[] dataBytes, String value){
+        // 为空时不填充任何数据, dataBytes数组中默认填0
+        if ((null == value) || (value.equals(""))){
+            return;
+        }
+
+        if (value.length() != 4){
+            throw new RuntimeException("[厂商代码]封装: 长度错误");
+        }
+
+        BCDUtil.setBcdBytes(dataBytes, value);
+    }
+
 }
