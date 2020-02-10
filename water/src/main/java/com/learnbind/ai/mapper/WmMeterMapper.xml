@@ -11,14 +11,16 @@
     <result column="REQUEST_ID" jdbcType="VARCHAR" property="requestId" />
     <result column="SERVICE_ID" jdbcType="VARCHAR" property="serviceId" />
     <result column="SERVICE_TYPE" jdbcType="VARCHAR" property="serviceType" />
-    <result column="EVENT_TIME" jdbcType="VARCHAR" property="eventTime" />
+    <result column="EVENT_TIME" jdbcType="TIMESTAMP" property="eventTime" />
     <result column="METER_TYPE" jdbcType="DECIMAL" property="meterType" />
     <result column="METER_ADDR" jdbcType="VARCHAR" property="meterAddr" />
     <result column="FACTORY_CODE" jdbcType="VARCHAR" property="factoryCode" />
     <result column="CTRL_CODE" jdbcType="VARCHAR" property="ctrlCode" />
-    <result column="DATA_DI" jdbcType="DECIMAL" property="dataDi" />
+    <result column="DATA_DI" jdbcType="VARCHAR" property="dataDi" />
     <result column="METER_SEQUENCE" jdbcType="DECIMAL" property="meterSequence" />
+    <result column="METER_DATA_TYPE" jdbcType="INTEGER" property="meterDataType" />
     <result column="METER_DATA" jdbcType="VARCHAR" property="meterData" />
+    <result column="METER_DATA_BASIC" jdbcType="VARCHAR" property="meterDataBasic" />
     <result column="METER_CHECKSUM" jdbcType="DECIMAL" property="meterChecksum" />
     <result column="JSON_DATA" jdbcType="VARCHAR" property="jsonData" />
     <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
@@ -29,7 +31,7 @@
       WARNING - @mbg.generated
     -->
     ID, DEVICE_ID, GATEWAY_ID, REQUEST_ID, SERVICE_ID, SERVICE_TYPE, EVENT_TIME, METER_TYPE, 
-    METER_ADDR, FACTORY_CODE, CTRL_CODE, DATA_DI, METER_SEQUENCE, METER_DATA, METER_CHECKSUM, 
+    METER_ADDR, FACTORY_CODE, CTRL_CODE, DATA_DI, METER_SEQUENCE, METER_DATA_TYPE, METER_DATA, METER_DATA_BASIC, METER_CHECKSUM, 
     JSON_DATA, CREATE_TIME, UPDATE_TIME
   </sql>
   
@@ -47,7 +49,9 @@
 			CTRL_CODE,
 			DATA_DI,
 			METER_SEQUENCE,
+			METER_DATA_TYPE,
 			METER_DATA,
+			METER_DATA_BASIC,
 			METER_CHECKSUM,
 			JSON_DATA,
 			CREATE_TIME,
@@ -67,14 +71,16 @@
 				#{requestId,jdbcType=VARCHAR},
 				#{serviceId,jdbcType=VARCHAR},
 				#{serviceType,jdbcType=VARCHAR},
-				#{eventTime,jdbcType=VARCHAR},
+				#{eventTime,jdbcType=TIMESTAMP},
 				#{meterType,jdbcType=BIGINT},
 				#{meterAddr,jdbcType=VARCHAR},
 				#{factoryCode,jdbcType=VARCHAR},
 				#{ctrlCode,jdbcType=BIGINT},
-				#{dataDI,jdbcType=BIGINT},
+				#{dataDI,jdbcType=VARCHAR},
 				#{sequence,jdbcType=BIGINT},
+				#{dataType,jdbcType=BIGINT},
 				#{data,jdbcType=VARCHAR},
+				#{dataBasic,jdbcType=VARCHAR},
 				#{checksum,jdbcType=BIGINT},
 				#{jsonData,jdbcType=VARCHAR},
 				SYSDATE,
@@ -92,14 +98,16 @@
             REQUEST_ID = #{requestId,jdbcType=VARCHAR},
             SERVICE_ID = #{serviceId,jdbcType=VARCHAR},
             SERVICE_TYPE = #{serviceType,jdbcType=VARCHAR},
-            EVENT_TIME = #{eventTime,jdbcType=VARCHAR},
+            EVENT_TIME = #{eventTime,jdbcType=TIMESTAMP},
             METER_TYPE = #{meterType,jdbcType=BIGINT},
             METER_ADDR = #{meterAddr,jdbcType=VARCHAR},
             FACTORY_CODE = #{factoryCode,jdbcType=VARCHAR},
             CTRL_CODE = #{ctrlCode,jdbcType=BIGINT},
-            DATA_DI = #{dataDI,jdbcType=BIGINT},
+            DATA_DI = #{dataDI,jdbcType=VARCHAR},
             METER_SEQUENCE = #{sequence,jdbcType=BIGINT},
+            METER_DATA_TYPE = #{dataType,jdbcType=BIGINT},
             METER_DATA = #{data,jdbcType=VARCHAR},
+            METER_DATA_BASIC = #{dataBasic,jdbcType=VARCHAR},
             METER_CHECKSUM = #{checksum,jdbcType=BIGINT},
             JSON_DATA = #{jsonData,jdbcType=VARCHAR},
             UPDATE_TIME = SYSDATE

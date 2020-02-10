@@ -9,11 +9,15 @@ public class MeterDataBaseBean {
 	public static final int METER_DATA_TYPE_REPORT = 1;//设备上报数据
 	public static final int METER_DATA_TYPE_CONFIG = 2;//设备配置信息数据
 	public static final int METER_DATA_TYPE_MONTH_FREEZE = 3;//设备月冻结数据
+	public static final int METER_DATA_TYPE_START_CONNECT = 4;//设备开始与电信平台建立连接
+	public static final int METER_DATA_TYPE_START_DISCONNECT = 5;//设备即将断开连接
 	
 	@JsonProperty("type")
 	private int type = METER_DATA_TYPE_UNKNOWN;//表计数据类型：0=未知类型数据；1=设备上报数据；2=设备配置信息数据；3=设备月冻结数据；
 	@JsonProperty("data")
 	private String data = "";
+	@JsonProperty("dataBasic")
+	private String dataBasic = "";
 	public int getType() {
 		return type;
 	}
@@ -27,6 +31,12 @@ public class MeterDataBaseBean {
 		this.data = data;
 	}
 	
+	public String getDataBasic() {
+		return dataBasic;
+	}
+	public void setDataBasic(String dataBasic) {
+		this.dataBasic = dataBasic;
+	}
 	public static String toJsonString(MeterDataBaseBean bean) {
 		return JSON.toJSONString(bean);
 	}

@@ -3,8 +3,10 @@ package com.learnbind.ai.iot.protocol;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 import com.learnbind.ai.iot.protocol.util.BCDUtil;
 import com.learnbind.ai.iot.protocol.util.ByteUtil;
+import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.iot.protocol.util.ProtoUtil;
 import static com.learnbind.ai.iot.protocol.Protocol.*;
 
@@ -20,6 +22,7 @@ public class PacketFrame {
     private String factoryCode;     // 表厂商代码
     private byte ctrlCode;          // 控制码
     private short dataDI;           // 数据标识
+    private String dataDIStr;           // 数据标识Str
     private int sequence;           // 序列号
     private byte[] data;            // 数据字节
     private byte checksum;          // 校验和
@@ -70,15 +73,16 @@ public class PacketFrame {
         pos += ByteUtil.arrayCopy(msgBytes, pos, eoi);
 
         // 根据字节数组解析为成员
-        meterType = ByteUtil.getByte(type);
-        meterAddr = BCDUtil.bcd2String(addr);
-        factoryCode = BCDUtil.bcd2String(factory);
+        meterType = ProtoUtil.parseMeterType(type);
+        meterAddr = ProtoUtil.parseMeterAddr(addr);
+        factoryCode = ProtoUtil.parseFactoryCode(factory);
 
         sequence = ByteUtil.getInt(seq);
         if ((METER_CTR_2 == ctrlCode) || (METER_CTR_5 == ctrlCode)) {
             
         } else {
             dataDI = ByteUtil.getShort(di);
+            dataDIStr = HexStringUtils.bytesToHexString(di);
         }
 
         checksum = ByteUtil.getByte(chk);
@@ -101,14 +105,16 @@ public class PacketFrame {
         byte[] chk  = new byte[1];      // 校验码  校验码（CS）为一个字节，从帧起始符开始到校验码之前的所有各字节进行二进制算术累加，不计超过 FFH 的溢出值
         byte[] eoi  = new byte[1];      // 帧结束符 1字节 16H
         
-        soi[0] = 0x68;
-        ByteUtil.setBytes(type, (byte)meterType);
-        addr = BCDUtil.string2Bcd(meterAddr);
-        factory = BCDUtil.string2Bcd(factoryCode);
-        ByteUtil.setBytes(cmd, (byte)ctrlCode);
-        
+        soi[0] = 0x68;                                      // 设置帧头
+        ProtoUtil.packMeterType(type, meterType);           // 设置表类型
+        ProtoUtil.packMeterAddr(addr, meterAddr);           // 设置表地址
+        ProtoUtil.packFactoryCode(factory, factoryCode);    // 设置厂商代码
+        ByteUtil.setBytes(cmd, (byte)ctrlCode);             // 设置控制码
+
+        // 拼接帧前半部
         byte[] dataBytes0 = ByteUtil.concatAll(soi, type, addr, factory, cmd);
-        
+
+        // 设置报文体
         int dataLen = 0;
         if ((METER_CTR_2 == ctrlCode) || (METER_CTR_5 == ctrlCode)) {
             ByteUtil.setBytes(seq, (byte)sequence);
@@ -177,9 +183,18 @@ public class PacketFrame {
     public void setCtrlCode(byte ctrlCode) {
         this.ctrlCode = ctrlCode;
     }
+    
+    public String getCtrlCodeStr() {
+    	int i = ctrlCode;	
+    	i = i&0xff;
+    	return Integer.toHexString(i);
+    }
 
     public short getDataDI() {
         return dataDI;
+    }
+    public String getDataDiStr() {
+    	return dataDIStr;
     }
 
     public void setDataDI(short dataDI) {

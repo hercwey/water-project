@@ -1,7 +1,9 @@
 package com.learnbind.ai.controller.iot;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +33,6 @@ import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.IDeviceService;
 import com.learnbind.ai.service.iot.IMeterService;
 import com.learnbind.ai.service.iot.WmDeviceService;
-
-import tk.mybatis.mapper.entity.Example;
 
 @Controller
 @RequestMapping("/meter")
@@ -128,6 +128,8 @@ public class MeterController {
     @RequestMapping(value = "/search-meters")
     public String searchMeters(Model model, Integer pageNum, Integer pageSize, Integer searchDataType, String searchCond) {
     	
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	
     	// 判定页码有效性
 		if (pageNum == null || pageNum == 0) {
 			pageNum = 1;
@@ -180,8 +182,10 @@ public class MeterController {
 			String pressure = "";//压力值：xx.yyyy
 			if(meterReportBean!=null) {
 				meterNumber = meterReportBean.getMeterNumber();//表号: 6字节数字型字符串
-				meterTime = meterReportBean.getMeterTime();//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
+				Date meterTimeD = meterReportBean.getMeterTime();//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
 				int totalVolume = meterReportBean.getTotalVolume();//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
+				meterTime = sdf.format(meterTimeD);//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
+				totalVolume = meterReportBean.getTotalVolume();//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
 				sampleUnit = meterReportBean.getSampleUnit();//采样参数：单位M3
 				batteryVoltage = meterReportBean.getBatteryVoltage();//电池电压：单位V
 				//meterStatus = MeterStatusBean.toJsonString(meterReportBean.getMeterStatus());//表状态字：2字节

@@ -35,8 +35,8 @@ public class Tester {
 
         // [主站] 封装为字节消息
         byte[] packetBytes = encodeData(Protocol.METER_TYPE_10H,
-                "1505900569",
-                "7833",
+                "1234567890",
+                "1234",
                 (byte)0x01,
                 valveCmd);
 
@@ -176,22 +176,30 @@ public class Tester {
         System.out.println("测试下发写配置");
 
         /////////////////////////////////////////////////////////////////////////
-        // [主站] 申请命令对象
+        // [主站] 【1】 申请命令对象
         MeterConfig meterConfig = new MeterConfig();
-        meterConfig.setReportPeriod((short)60);// 定时上传周期
-        meterConfig.setReportPeriodUnit(MeterConfig.PERIOD_UNIT_MIN);// 定时上传周期单位
-        meterConfig.setReportRation((short)100);// 定量上传值
-        meterConfig.setTemporaryTime((byte)2);// 用户临时开阀用水限定时间
-        meterConfig.setValveRunTime((byte)3);// 阀门行程时间
-        meterConfig.setValveMaintainPeriod((short) 30);// 阀门维护周期
-        meterConfig.setMeterBasicValue(3000);// 表底数 TODO 数据类型
-        meterConfig.setSampleUnit(Protocol.SAMPLE_UNIT_1M); // 采样参数单位
-        meterConfig.setMeterNumber("123456123456"); // 表号
-        meterConfig.setMeterTime("20200101235959"); // 表当前时间
-        meterConfig.setServerIp("10.88.192.11");
-        meterConfig.setServerPort((short) 6538);
+        meterConfig.setReportPeriod((short)60);                         // 定时上传周期
+        meterConfig.setReportPeriodUnit(MeterConfig.PERIOD_UNIT_MIN);   // 定时上传周期单位
+        meterConfig.setReportRation((short)100);                        // 定量上传值
+        meterConfig.setTemporaryTime((byte)2);                          // 用户临时开阀用水限定时间
+        meterConfig.setValveRunTime((byte)3);                           // 阀门行程时间
+        meterConfig.setValveMaintainPeriod((short) 30);                 // 阀门维护周期
+        meterConfig.setMeterBasicValue(3000);                           // 表底数
+        meterConfig.setSampleUnit(Protocol.SAMPLE_UNIT_1M);             // 采样参数单位
+        meterConfig.setMeterNumber("123456123456");                     // 表号
+        meterConfig.setMeterTime("20200101235959");                     // 表当前时间
+        meterConfig.setServerIp("10.88.192.11");                        // 设置IP地址
+        meterConfig.setServerPort((short) 6538);                        // 设置端口号
 
+        //设置表状态字
+        meterConfig.setMeterStatusFlag((short)(Protocol.METER_STATUS_MAGNETIC_ON |
+                ~Protocol.METER_STATUS_VALVE_OPEN |
+                ~Protocol.METER_STATUS_PERIOD_ON));
+
+        // [主站] 【2】 申请写表配置数据对象
         MeterConfigWriteCmd command = new MeterConfigWriteCmd();
+
+        // 设置 参数修改标识(修改了哪些参数，就设置哪些flag)
         command.setConfigFlag((short)(MeterConfig.FLAG_PERIOD |
                 MeterConfig.FLAG_PERIOD |
                 MeterConfig.FLAG_PERIOD_UNIT |
@@ -203,11 +211,12 @@ public class Tester {
                 MeterConfig.FLAG_SAMPLE_UNIT |
                 MeterConfig.FLAG_METER_NUM |
                 MeterConfig.FLAG_METER_TIME |
+                MeterConfig.FLAG_METER_STATUS |
                 MeterConfig.FLAG_SERVER_IP |
                 MeterConfig.FLAG_SERVER_PORT));
         command.setConfig(meterConfig);
 
-        // [主站] 封装为字节消息
+        // [主站] 【3】 封装为字节消息
         byte[] packetBytes = encodeData(Protocol.METER_TYPE_10H,
                 "1505900569",
                 "7833",
@@ -335,7 +344,10 @@ public class Tester {
     public static void ST_ReceiveByteBuffer(){
 
         /* ========== begin of 报文数据 ============ */
-        String msg = "681091002809191100811d1f90009100280919110000002806121906000000023236595d130000002f16";
+        //String msg = "681091002809191100811d1f90009100280919110000002806121906000000023236595d130000002f16";
+        //String msg = "681091002809191100811d1f900054360745404352240905010220222222220303358108230000002f16";
+        //String msg =   "681091002801000105000c070100aaaaaaaa0154360745404307080506010220290089633c7533162f16";
+        String msg = "6810543607454043580404906001557716";
         byte[] recvBytes = ByteUtil.hexStrToByteArray(msg);
         /* ========== end of 报文数据 ============ */
 
@@ -389,6 +401,50 @@ public class Tester {
     }
 
 
+    private static void UT_WriteConfig() {
+        System.out.println("========== 测试下发写配置 配置不写时，默认填充0 ============");
+
+        /////////////////////////////////////////////////////////////////////////
+        // [主站] 【1】 申请命令对象
+        MeterConfig meterConfig = new MeterConfig();
+        meterConfig.setReportPeriod((short)60);                         // 定时上传周期
+//        meterConfig.setReportPeriodUnit(MeterConfig.PERIOD_UNIT_MIN);   // 定时上传周期单位
+        meterConfig.setReportRation((short)100);                        // 定量上传值
+//        meterConfig.setTemporaryTime((byte)2);                          // 用户临时开阀用水限定时间
+//        meterConfig.setValveRunTime((byte)3);                           // 阀门行程时间
+//        meterConfig.setValveMaintainPeriod((short) 30);                 // 阀门维护周期
+//        meterConfig.setMeterBasicValue(3000);                           // 表底数
+//        meterConfig.setSampleUnit(Protocol.SAMPLE_UNIT_1M);             // 采样参数单位
+        meterConfig.setMeterNumber("123456123456");                     // 表号
+//        meterConfig.setMeterTime("20200101235959");                     // 表当前时间
+//        meterConfig.setServerIp("10.88.192.11");                        // 设置IP地址
+//        meterConfig.setServerPort((short) 6538);                        // 设置端口号
+
+        //设置表状态字
+        meterConfig.setMeterStatusFlag((short)(Protocol.METER_STATUS_MAGNETIC_ON |
+                Protocol.METER_STATUS_VALVE_OPEN |
+                ~Protocol.METER_STATUS_PERIOD_ON));
+
+        // [主站] 【2】 申请写表配置数据对象
+        MeterConfigWriteCmd command = new MeterConfigWriteCmd();
+
+        // 设置 参数修改标识(修改了哪些参数，就设置哪些flag)
+        command.setConfigFlag((short)(MeterConfig.FLAG_PERIOD));
+        command.setConfig(meterConfig);
+
+        // [主站] 【3】 封装为字节消息
+        byte[] packetBytes = encodeData(Protocol.METER_TYPE_10H,
+                "1505900569",
+                "7833",
+                (byte)0x02,
+                command);
+
+        // [主站] 发送 ...
+        System.out.println("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
+
+    }
+
+
     // 单元测试
     public static void main(String[] args) {
         unitTestReport();
@@ -397,6 +453,9 @@ public class Tester {
         unitTestReadWaterVolume();
         unitTestValveControl();
 
+        UT_WriteConfig();       // 测试写配置命令, 配置不设置时，填写默认值
         ST_ReceiveByteBuffer();
+
+
     }
 }

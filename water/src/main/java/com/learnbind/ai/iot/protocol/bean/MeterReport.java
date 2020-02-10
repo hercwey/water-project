@@ -11,7 +11,7 @@ public class MeterReport extends MeterBase {
     private String meterTime;      // 表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
     private int totalVolume;       // 累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
     private float sampleUnit;      // 采样参数：单位M3
-    private int batteryVoltage;    // 电池电压：单位V
+    private int batteryVoltage;    // 电池电压：单位mV
     private short meterStatus;     // 表状态字：2字节
     private String signal;         // 信号强度
     private float pressure;        // 压力值：xx.yyyy

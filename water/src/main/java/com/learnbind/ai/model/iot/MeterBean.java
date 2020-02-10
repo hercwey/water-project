@@ -30,7 +30,7 @@ public class MeterBean {
     @JsonProperty("serviceType")
     private String serviceType;
     @JsonProperty("eventTime")
-    private String eventTime;
+    private Date eventTime;
 
     @JsonProperty("meterType")
     private Integer meterType;
@@ -39,13 +39,17 @@ public class MeterBean {
     @JsonProperty("factoryCode")
     private String factoryCode;
     @JsonProperty("ctrlCode")
-    private Integer ctrlCode;
+    private String ctrlCode;
     @JsonProperty("dataDI")
-    private Short dataDI;
+    private String dataDI;
     @JsonProperty("sequence")
     private Integer sequence;
+    @JsonProperty("dataType")
+    private String dataType;
     @JsonProperty("data")
     private String data;
+    @JsonProperty("dataBasic")
+    private String dataBasic;
     @JsonProperty("checksum")
     private Integer checksum;
     @JsonProperty("jsonData")
@@ -103,11 +107,11 @@ public class MeterBean {
         this.serviceType = serviceType;
     }
 
-    public String getEventTime() {
+    public Date getEventTime() {
         return eventTime;
     }
 
-    public void setEventTime(String eventTime) {
+    public void setEventTime(Date eventTime) {
         this.eventTime = eventTime;
     }
 
@@ -135,19 +139,19 @@ public class MeterBean {
         this.factoryCode = factoryCode;
     }
 
-    public Integer getCtrlCode() {
+    public String getCtrlCode() {
         return ctrlCode;
     }
 
-    public void setCtrlCode(Integer ctrlCode) {
+    public void setCtrlCode(String ctrlCode) {
         this.ctrlCode = ctrlCode;
     }
 
-    public Short getDataDI() {
+    public String getDataDI() {
         return dataDI;
     }
 
-    public void setDataDI(Short dataDI) {
+    public void setDataDI(String dataDI) {
         this.dataDI = dataDI;
     }
 
@@ -199,6 +203,22 @@ public class MeterBean {
         this.updatetime = updatetime;
     }
 
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+
+	public String getDataBasic() {
+		return dataBasic;
+	}
+
+	public void setDataBasic(String dataBasic) {
+		this.dataBasic = dataBasic;
+	}
+
 	public static MeterBean fromUploadDataJson(String data) {
         MeterBean meterBean = new MeterBean();
         UploadMessageBean uploadMessageBean = UploadMessageBean.parseJson(data);
@@ -216,64 +236,82 @@ public class MeterBean {
             }
         }
 
+        meterBean.setServiceId(serviceBean.getServiceId());
+        meterBean.setServiceType(serviceBean.getServiceType());
+        meterBean.setEventTime(StringUtil.timeZoneTrans(serviceBean.getEventTime()));
+        
     	MeterDataBaseBean dataBean = new MeterDataBaseBean();
-    	
-        try {
-        	PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(serviceBean.getData().getJRprotocolXY()));
-            meterBean.setServiceId(serviceBean.getServiceId());
-            meterBean.setServiceType(serviceBean.getServiceType());
-            meterBean.setEventTime(StringUtil.timeZoneTrans(serviceBean.getEventTime()));
+        
+    	if (serviceBean.getData().getJRprotocolXY().equalsIgnoreCase("9912364557")) {
+			//TODO G11 设备开始与电信平台建立连接
+        	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_START_CONNECT);
+        	dataBean.setData(serviceBean.getData().getJRprotocolXY());
+        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
+		} else if (serviceBean.getData().getJRprotocolXY().equalsIgnoreCase("aa1234bb")) {
+			//TODO G11 设备即将断开与电信平台的连接
+        	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_START_DISCONNECT);
+        	dataBean.setData(serviceBean.getData().getJRprotocolXY());
+        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
+		} else {
+			try {
+	        	PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(serviceBean.getData().getJRprotocolXY()));
 
-            meterBean.setMeterType(packetFrame.getMeterType());
-            meterBean.setMeterAddr(packetFrame.getMeterAddr());
-            meterBean.setFactoryCode(packetFrame.getFactoryCode());
-            meterBean.setCtrlCode(packetFrame.getCtrlCode());
-            meterBean.setDataDI((short)packetFrame.getDataDI());
-            meterBean.setSequence(packetFrame.getSequence());
-            //meterBean.setData(HexStringUtils.bytesToHexString(packetFrame.getData()));
-            meterBean.setChecksum(Integer.valueOf(packetFrame.getChecksum()));
-            
-            MeterBase meterBase = PacketCodec.decodeData(packetFrame);
-            
-            //FIXME G11 针对数据上报的其他类型数据，进行解析（后续根据需求对数据进行分类，优化处理逻辑）
-            if (meterBase instanceof MeterReport) {
-            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_REPORT);
-            	
-                MeterReport meterReport = (MeterReport) meterBase;
-                MeterReportBean meterDataBean = MeterReportBean.fromMeterReport(meterReport);
-                dataBean.setData(MeterReportBean.toJsonString(meterDataBean));
-                
-			} else if (meterBase instanceof MeterConfig) {
-            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_CONFIG);
-            	
-                MeterConfig meterConfig = (MeterConfig) meterBase;
-                MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
-                dataBean.setData(MeterConfigBean.toJsonString(meterConfigBean));
-                
-			} else if (meterBase instanceof MeterReadWaterResp) {
-            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE);
-            	
-				MeterReadWaterResp meterReadWaterResp = (MeterReadWaterResp) meterBase;
-				MeterMonthFreezeBean meterMonthFreezeBean = MeterMonthFreezeBean.fromMeterTeadWaterResp(meterReadWaterResp);
-				dataBean.setData(MeterMonthFreezeBean.toJsonString(meterMonthFreezeBean));
-				
-			} else {
-            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
-            	dataBean.setData(JSON.toJSONString(meterBase));
-			}
-		} catch (Exception e) {
-			if (serviceBean != null && serviceBean.getData() != null) {
-            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
-            	dataBean.setData(serviceBean.getData().getJRprotocolXY());
+	            meterBean.setMeterType(packetFrame.getMeterType());
+	            meterBean.setMeterAddr(packetFrame.getMeterAddr());
+	            meterBean.setFactoryCode(packetFrame.getFactoryCode());
+	            meterBean.setCtrlCode(packetFrame.getCtrlCodeStr());
+	            meterBean.setDataDI(packetFrame.getDataDiStr());
+	            meterBean.setSequence(packetFrame.getSequence());
+	            //meterBean.setData(HexStringUtils.bytesToHexString(packetFrame.getData()));
+	            meterBean.setChecksum(Integer.valueOf(packetFrame.getChecksum()));
+	            
+	            MeterBase meterBase = PacketCodec.decodeData(packetFrame);
+	            dataBean.setDataBasic(HexStringUtils.bytesToHexString(packetFrame.getData()));
+	            
+	            //FIXME G11 针对数据上报的其他类型数据，进行解析（后续根据需求对数据进行分类，优化处理逻辑）
+	            if (meterBase instanceof MeterReport) {
+	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_REPORT);
+	            	
+	                MeterReport meterReport = (MeterReport) meterBase;
+	                MeterReportBean meterDataBean = MeterReportBean.fromMeterReport(meterReport);
+	                dataBean.setData(MeterReportBean.toJsonString(meterDataBean));
+	                
+				} else if (meterBase instanceof MeterConfig) {
+	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_CONFIG);
+	            	
+	                MeterConfig meterConfig = (MeterConfig) meterBase;
+	                MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
+	                dataBean.setData(MeterConfigBean.toJsonString(meterConfigBean));
+	                
+				} else if (meterBase instanceof MeterReadWaterResp) {
+	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE);
+	            	
+					MeterReadWaterResp meterReadWaterResp = (MeterReadWaterResp) meterBase;
+					MeterMonthFreezeBean meterMonthFreezeBean = MeterMonthFreezeBean.fromMeterTeadWaterResp(meterReadWaterResp);
+					dataBean.setData(MeterMonthFreezeBean.toJsonString(meterMonthFreezeBean));
+					
+				} else {
+	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
+	            	dataBean.setData(JSON.toJSONString(meterBase));
+				}
+			} catch (Exception e) {
+				if (serviceBean != null && serviceBean.getData() != null) {
+	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
+	            	dataBean.setData(serviceBean.getData().getJRprotocolXY());
+				}
 			}
 		}
-        meterBean.setData(MeterDataBaseBean.toJsonString(dataBean));
+    	
+        meterBean.setDataType(dataBean.getType() + "");
+        meterBean.setData(dataBean.getData());
+        meterBean.setDataBasic(dataBean.getDataBasic());
         return meterBean;
     }	
 	
 	public static void main(String[] args) {
-		String data = "{\"notifyType\":\"deviceDatasChanged\",\"requestId\":null,\"deviceId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"gatewayId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"services\":[{\"serviceId\":\"JRprotocol\",\"serviceType\":\"JRprotocol\",\"data\":{\"JRprotocolXY\":\"123\"},\"eventTime\":\"20200206T050809Z\"}]}";
+		String data = "{\"notifyType\":\"deviceDatasChanged\",\"requestId\":null,\"deviceId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"gatewayId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"services\":[{\"serviceId\":\"JRprotocol\",\"serviceType\":\"JRprotocol\",\"data\":{\"JRprotocolXY\":\"681002390745404358811d1f90a702390745404350172309010220a6090000024836090015000000db16\"},\"eventTime\":\"20200206T050809Z\"}]}";
 		MeterBean meterBean = MeterBean.fromUploadDataJson(data);
 		System.out.println(JSON.toJSON(meterBean.getData()));
+		System.out.println(JSON.toJSON(meterBean));
 	}
 }

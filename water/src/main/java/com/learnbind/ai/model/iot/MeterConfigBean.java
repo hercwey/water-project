@@ -1,5 +1,7 @@
 package com.learnbind.ai.model.iot;
 
+import java.util.Date;
+
 import org.apache.tomcat.util.buf.HexUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -9,6 +11,7 @@ import com.learnbind.ai.iot.protocol.PacketFrame;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
 import com.learnbind.ai.iot.protocol.util.ByteUtil;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
+import com.learnbind.ai.iot.util.StringUtil;
 
 public class MeterConfigBean {
 
@@ -42,7 +45,7 @@ public class MeterConfigBean {
     private String meterNumber;      // 表号：12字节数字字符串(6字节水表资产编号，BCD格式；)
 
     @JsonProperty("meterTime")
-    private String meterTime;        // 表当前时间：14字节数字字符串格式为yyyymmddHHMMSS (7字节，年、月、星期、日、时、分、秒，BCD格式；)
+    private Date meterTime;        // 表当前时间：14字节数字字符串格式为yyyymmddHHMMSS (7字节，年、月、星期、日、时、分、秒，BCD格式；)
 
     @JsonProperty("meterStatus")
     private MeterStatusBean meterStatus;       // 表状态字：由meterStatusFlag转换
@@ -125,11 +128,11 @@ public class MeterConfigBean {
 		this.meterNumber = meterNumber;
 	}
 
-	public String getMeterTime() {
+	public Date getMeterTime() {
 		return meterTime;
 	}
 
-	public void setMeterTime(String meterTime) {
+	public void setMeterTime(Date meterTime) {
 		this.meterTime = meterTime;
 	}
 
@@ -175,7 +178,7 @@ public class MeterConfigBean {
 			meterConfigBean.setMeterBasicValue(meterConfig.getMeterBasicValue());
 			meterConfigBean.setSampleUnit(meterConfig.getSampleUnit());
 			meterConfigBean.setMeterNumber(meterConfig.getMeterNumber());
-			meterConfigBean.setMeterTime(meterConfig.getMeterTime());
+			meterConfigBean.setMeterTime(StringUtil.meterTimeTrans(meterConfig.getMeterTime()));
 			meterConfigBean.setMeterStatus(MeterStatusBean.fromStatusFlag(meterConfig.getMeterStatusFlag()));
 			meterConfigBean.setServerIp(meterConfig.getServerIp());
 			meterConfigBean.setServerPort(meterConfig.getServerPort());
