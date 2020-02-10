@@ -12,6 +12,7 @@
 				<tr>
 					<th>ID</th>
 					<th>数据类型</th>
+					<th>水表编号</th>
 					<th>表地址</th>
 					<th>表号</th>
 					<th>表当前时间</th>
@@ -50,7 +51,7 @@
 							未知类型数据
 						</span>
 						<span th:if="${item.dataType==1}" th:remove="tag">
-							设备上报数据
+							设备主动上报数据
 						</span>
 						<span th:if="${item.dataType==2}" th:remove="tag">
 							设备配置信息数据
@@ -59,11 +60,12 @@
 							设备月冻结数据
 						</span>
 					</td>
+					<td th:text="${item.verifyCode}">水表编号</td>
 					<!-- 表地址 -->
 					<td th:text="${item.meterAddr}">表地址</td>
 					<td th:text="${item.meterNumber}">表号</td>
 					<td th:text="${item.meterTime}">表当前时间</td>
-					<td th:text="${item.totalVolume}">累计使用量</td>
+					<td th:text="${item.totalVolumeBd}">累计使用量</td>
 					<td th:text="${item.sampleUnit}">采样参数</td>
 					<td th:text="${item.batteryVoltage}">电池电压</td>
 					<td>
@@ -117,7 +119,7 @@
 	<!-- <hr style="height: 1px; border: none; border-top: 1px solid blue;"> -->
 
 	<!-- 加入分页 -->
-	<div th:include="common/common_pager_pagesize::pager('pager1')" class="pagerx"
+	<div th:include="common/common_pager_pagesize::pager('wm-meter-pager')" class="pagerx"
 		style="float: right; margin-right: 10px;"></div>	
 	
 	<!-- 分页组件JS -->
@@ -142,9 +144,9 @@
 		});
 		
 		//创建分页组件实例
-		var pager=new Pager("pager1");
+		var pager=new Pager("wm-meter-pager");
 		$(function(){			
-			pager.init(clickMeterListPager, null);			
+			pager.init(clickPagerReloadWmMeterTable, null);			
 		});
 	</script>
 </body>

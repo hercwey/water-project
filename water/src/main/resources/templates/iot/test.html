@@ -166,14 +166,14 @@
 				查询设备上报数据部分
 			</h5>
 			<div class="card-body">
-				<div class="row clearfix">
+				<!-- <div class="row clearfix">
 					<div class="col-md-12 column">
 						<button type="button" class="btn btn-info btn-sm" id="btn-search-device-up-data">
 							<i class="fa fa-search" aria-hidden="true"> <span>查询设备上报数据</span></i>
 						</button>
 					</div>
 				</div>
-				<br />
+				<br /> -->
 				<div class="row clearfix">
 					<div class="col-md-12 column device-up-data-item">
 						<!-- 此处显示设备上报数据列表 -->
@@ -220,6 +220,7 @@
 			
 			//------------------初始化-----------------------------------------------------------------------------
 			loadTestDeviceList();//加载测试设备列表（本地数据库）
+			loadDeviceUpDataMain();//加载设备上报数据主页面
 			//------------------订阅部分----------------------------------------------------------------------------
 			/**
 			 * 	获取Token并自动订阅
@@ -382,9 +383,9 @@
 			/**
 			 * 	查询设备上传数据
 			 */
-			$("#btn-search-device-up-data").on("click", function(){
-				defaultSearchDeviceUpData();//默认查询设备上报数据（默认查询第1页，每页2条数据）
-			});
+			/* $("#btn-search-device-up-data").on("click", function(){
+				loadDeviceUpDataMain();//加载设备上报数据主页面
+			}); */
 			
 			//------------------查询发送指令记录部分----------------------------------------------------------------------------
 			/**
@@ -616,6 +617,31 @@
 			return html;
 		}
 		
+		//------------------查询设备上传数据（水表上传数据列表）部分----------------------------------------------------------------------------
+		
+		/**
+		 * 	加载设备上报数据主页面
+		 */
+		function loadDeviceUpDataMain(){
+			
+			var url = BASE_CONTEXT_PATH + "/meter/main";
+			
+			$(".device-up-data-item").load(url, null, function(){
+				console.log("----------查询设备上报数据列表完成");
+				windowResize();//初始化windows窗口滚动条
+			});
+		}
+		/**
+		 * 	分页查询
+		 */
+		/*function clickMeterListPager(searchCond, pageNum, pageSize) {
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+	
+			searchDeviceUpData(parms);
+		} */
 		//------------------查询设备上传数据（水表上传数据列表）部分，初始化完成后绑定click事件----------------------------------------------------------------------------
 		/**
 		 * 	初始化绑定设备列表tr的click事件
@@ -696,35 +722,24 @@
 		/**
 		 * 	默认查询设备上报数据（默认查询第1页，每页2条数据）
 		 */
-		function defaultSearchDeviceUpData(){
+		/* function defaultSearchDeviceUpData(){
 			var searchCond = null;
 			var pageNum = 1;
 			var pageSize = 5;
 			clickMeterListPager(searchCond, pageNum, pageSize);
-		}
+		} */
 		/**
 		 * 	通用查询设备上报数据
 		 */
-		function searchDeviceUpData(parms){
+		/* function searchDeviceUpData(parms){
 			
-			var url = BASE_CONTEXT_PATH + "/meter/search-meters";
+			var url = BASE_CONTEXT_PATH + "/meter/main";
 			
 			$(".device-up-data-item").load(url, parms, function(){
-				console.log("----------查询设备上报数据列表完成");
+				console.log("----------加载设备上报数据主页面完成！");
 				windowResize();//初始化windows窗口滚动条
 			});
-		}
-		/*
-		 * 	分页查询
-		 */
-		function clickMeterListPager(searchCond, pageNum, pageSize) {
-			var parms = new Object();
-			parms.searchCond=searchCond;
-			parms.pageNum=pageNum;
-			parms.pageSize=pageSize;
-	
-			searchDeviceUpData(parms);
-		}
+		} */
 		
 		//------------------查询发送指令记录部分----------------------------------------------------------------------------
 		

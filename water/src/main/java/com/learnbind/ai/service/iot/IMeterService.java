@@ -10,6 +10,6 @@ public interface IMeterService {
 
     public JsonResult save(MeterBean meterBean);
     
-    public List<WmMeter> searchList();
+    public List<WmMeter> searchList(Integer searchDataType, String searchCond);
     
 }

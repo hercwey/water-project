@@ -25,8 +25,8 @@ public class MeterService implements IMeterService {
     }
 
 	@Override
-	public List<WmMeter> searchList() {
-		return wmMeterMapper.searchList();
+	public List<WmMeter> searchList(Integer searchDataType, String searchCond) {
+		return wmMeterMapper.searchList(searchDataType, searchCond);
 	}
     
 }

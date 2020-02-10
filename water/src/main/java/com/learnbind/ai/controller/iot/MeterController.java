@@ -1,5 +1,6 @@
 package com.learnbind.ai.controller.iot;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.learnbind.ai.common.util.BigDecimalUtils;
 import com.learnbind.ai.common.util.EntityUtils;
-import com.learnbind.ai.constant.PagerConstant;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterBean;
@@ -29,6 +30,9 @@ import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.IDeviceService;
 import com.learnbind.ai.service.iot.IMeterService;
+import com.learnbind.ai.service.iot.WmDeviceService;
+
+import tk.mybatis.mapper.entity.Example;
 
 @Controller
 @RequestMapping("/meter")
@@ -38,6 +42,8 @@ public class MeterController {
     IMeterService meterService;
     @Autowired
     IDeviceService deviceService;
+    @Autowired
+    private WmDeviceService wmDeviceService;
 
     @RequestMapping(value = "/uploadDeviceData", method = RequestMethod.POST)
     @ResponseBody
@@ -100,23 +106,47 @@ public class MeterController {
         return ResponseEntity.ok(jsonResult.toString());
     }
     
+    /**
+	 * @Title: main
+	 * @Description: 主页面
+	 * @param model
+	 * @return 
+	 */
+	@RequestMapping(value = "/main")
+	public String main(Model model) {
+		return "iot/wm_meter/meter_main";
+	}
+    
+    /**
+     * @Title: searchMeters
+     * @Description: 查询上报数据列表
+     * @param model
+     * @param pageNum
+     * @param pageSize
+     * @return 
+     */
     @RequestMapping(value = "/search-meters")
-    public String searchMeters(Model model, Integer pageNum, Integer pageSize) {
+    public String searchMeters(Model model, Integer pageNum, Integer pageSize, Integer searchDataType, String searchCond) {
     	
     	// 判定页码有效性
 		if (pageNum == null || pageNum == 0) {
 			pageNum = 1;
-			pageSize = PagerConstant.DEFAULT_PAGE_SIZE;
+			pageSize = 5;//PagerConstant.DEFAULT_PAGE_SIZE;
 		}
 
 		// 查询并分页
 		PageHelper.startPage(pageNum, pageSize); // PageHelper
-		List<WmMeter> meterList = meterService.searchList();
+		List<WmMeter> meterList = meterService.searchList(searchDataType, searchCond);
 		PageInfo<WmMeter> pageInfo = new PageInfo<>(meterList);// (使用了拦截器或是AOP进行查询的再次处理)
 
 		List<Map<String, Object>> meterMapList = new ArrayList<>();
 		for(WmMeter meter : meterList) {
 			Map<String, Object> meterMap = EntityUtils.entityToMap(meter);//实体转MAP
+			
+			Long deviceId = meter.getDeviceId();//设备（水表）表主键ID
+			
+			WmDevice device = wmDeviceService.selectByPrimaryKey(deviceId);//查询水表信息
+			meterMap.put("verifyCode", device.getVerifyCode());
 			
 			String meterData = meter.getMeterData();
 			MeterReportBean meterReportBean = null;
@@ -142,7 +172,7 @@ public class MeterController {
 			
 			String meterNumber = "";//表号: 6字节数字型字符串
 			String meterTime = "";//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
-			Integer totalVolume = null;//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
+			BigDecimal totalVolumeBd = null;//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
 			String sampleUnit = "";//采样参数：单位M3
 			Integer batteryVoltage = null;//电池电压：单位V
 			MeterStatusBean meterStatus = null;//表状态字：2字节
@@ -151,19 +181,20 @@ public class MeterController {
 			if(meterReportBean!=null) {
 				meterNumber = meterReportBean.getMeterNumber();//表号: 6字节数字型字符串
 				meterTime = meterReportBean.getMeterTime();//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
-				totalVolume = meterReportBean.getTotalVolume();//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
+				int totalVolume = meterReportBean.getTotalVolume();//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
 				sampleUnit = meterReportBean.getSampleUnit();//采样参数：单位M3
 				batteryVoltage = meterReportBean.getBatteryVoltage();//电池电压：单位V
 				//meterStatus = MeterStatusBean.toJsonString(meterReportBean.getMeterStatus());//表状态字：2字节
 				meterStatus = meterReportBean.getMeterStatus();//表状态字：2字节
 				signal = meterReportBean.getSignal();//信号强度
 				pressure = meterReportBean.getPressure();//压力值：xx.yyyy
+				totalVolumeBd = BigDecimalUtils.multiply(new BigDecimal(totalVolume), new BigDecimal(sampleUnit));//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
 			}
 			
 			meterMap.put("dataType", dataType);
 			meterMap.put("meterNumber", meterNumber);//表号: 6字节数字型字符串
 			meterMap.put("meterTime", meterTime);//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
-			meterMap.put("totalVolume", totalVolume);//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
+			meterMap.put("totalVolumeBd", totalVolumeBd);//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
 			meterMap.put("sampleUnit", sampleUnit);//采样参数：单位M3
 			meterMap.put("batteryVoltage", batteryVoltage);//电池电压：单位V
 			meterMap.put("meterStatus", meterStatus);//表状态字：2字节
@@ -182,7 +213,7 @@ public class MeterController {
 		model.addAttribute("pageNum", pageNum);
 		model.addAttribute("pageSize", pageSize);
 		
-		return "iot/meter_table";
+		return "iot/wm_meter/meter_table";
     	
     }
 }
