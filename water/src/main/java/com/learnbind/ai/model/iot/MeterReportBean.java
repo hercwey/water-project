@@ -1,5 +1,7 @@
 package com.learnbind.ai.model.iot;
 
+import java.util.Date;
+
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.security.crypto.encrypt.BytesEncryptor;
 
@@ -7,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 import com.learnbind.ai.iot.protocol.bean.MeterReport;
+import com.learnbind.ai.iot.util.StringUtil;
 
 public class MeterReportBean {
 
@@ -15,7 +18,7 @@ public class MeterReportBean {
     @JsonProperty("meterNumber")
     private String meterNumber;    // 表号: 6字节数字型字符串
     @JsonProperty("meterTime")
-    private String meterTime;      // 表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
+    private Date meterTime;      // 表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
     @JsonProperty("totalVolume")
     private int totalVolume;       // 累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
     @JsonProperty("sampleUnit")
@@ -35,10 +38,10 @@ public class MeterReportBean {
 	public void setMeterNumber(String meterNumber) {
 		this.meterNumber = meterNumber;
 	}
-	public String getMeterTime() {
+	public Date getMeterTime() {
 		return meterTime;
 	}
-	public void setMeterTime(String meterTime) {
+	public void setMeterTime(Date meterTime) {
 		this.meterTime = meterTime;
 	}
 	public int getTotalVolume() {
@@ -90,7 +93,7 @@ public class MeterReportBean {
         MeterReportBean meterReportBean = new MeterReportBean();
 		if (meterReport != null) {
 			meterReportBean.setMeterNumber(meterReport.getMeterNumber());
-			meterReportBean.setMeterTime(meterReport.getMeterTime());
+			meterReportBean.setMeterTime(StringUtil.meterTimeTrans(meterReport.getMeterTime()));
 			meterReportBean.setTotalVolume(meterReport.getTotalVolume());
 			meterReportBean.setSampleUnit(meterReport.getSampleUnit()+"");
 			meterReportBean.setBatteryVoltage(meterReport.getBatteryVoltage());

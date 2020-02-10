@@ -26,7 +26,7 @@ public class WmMeter {
     private String serviceType;
 
     @Column(name = "EVENT_TIME")
-    private String eventTime;
+    private Date eventTime;
 
     @Column(name = "METER_TYPE")
     private Long meterType;
@@ -46,8 +46,14 @@ public class WmMeter {
     @Column(name = "METER_SEQUENCE")
     private Long meterSequence;
 
+    @Column(name = "METER_DATA_TYPE")
+    private String meterDataType;
+    
     @Column(name = "METER_DATA")
     private String meterData;
+    
+    @Column(name = "METER_DATA_BASIC")
+    private String meterDataBasic;
 
     @Column(name = "METER_CHECKSUM")
     private Long meterChecksum;
@@ -148,15 +154,15 @@ public class WmMeter {
     /**
      * @return EVENT_TIME
      */
-    public String getEventTime() {
+    public Date getEventTime() {
         return eventTime;
     }
 
     /**
      * @param eventTime
      */
-    public void setEventTime(String eventTime) {
-        this.eventTime = eventTime == null ? null : eventTime.trim();
+    public void setEventTime(Date eventTime) {
+        this.eventTime = eventTime;
     }
 
     /**
@@ -313,7 +319,23 @@ public class WmMeter {
         this.updateTime = updateTime;
     }
 
-    @Override
+    public String getMeterDataType() {
+		return meterDataType;
+	}
+
+	public void setMeterDataType(String meterDataType) {
+		this.meterDataType = meterDataType;
+	}
+
+	public String getMeterDataBasic() {
+		return meterDataBasic;
+	}
+
+	public void setMeterDataBasic(String meterDataBasic) {
+		this.meterDataBasic = meterDataBasic;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
@@ -325,14 +347,16 @@ public class WmMeter {
         sb.append(", requestId=").append(requestId);
         sb.append(", serviceId=").append(serviceId);
         sb.append(", serviceType=").append(serviceType);
-        sb.append(", eventTime=").append(eventTime);
+        sb.append(", eventTime=").append(eventTime.getTime());
         sb.append(", meterType=").append(meterType);
         sb.append(", meterAddr=").append(meterAddr);
         sb.append(", factoryCode=").append(factoryCode);
         sb.append(", ctrlCode=").append(ctrlCode);
         sb.append(", dataDi=").append(dataDi);
         sb.append(", meterSequence=").append(meterSequence);
+        sb.append(", meterDataType=").append(meterDataType);
         sb.append(", meterData=").append(meterData);
+        sb.append(", meterDataBasic=").append(meterDataBasic);
         sb.append(", meterChecksum=").append(meterChecksum);
         sb.append(", jsonData=").append(jsonData);
         sb.append(", createTime=").append(createTime);

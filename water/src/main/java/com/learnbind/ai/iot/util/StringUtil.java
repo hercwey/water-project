@@ -5,27 +5,57 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
+
 public class StringUtil {
 
     public static boolean strIsNullOrEmpty(String s) {
         return (null == s || s.trim().length() < 1);
     }
     
-    public static String timeZoneTrans(String date) {
-    	String time = date;
+    public static Date timeZoneTrans(String date) {
     	date = date.replace("T", "");
     	date = date.replace("Z", "");
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
     	sdf.setTimeZone(TimeZone.getTimeZone("GMT+0:00"));
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMddHHmmss");
+		sdf2.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
     	try {
 			Date dateTemp = sdf.parse(date);
-			SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMddHHmmss");
-			sdf2.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
-			time = sdf2.format(dateTemp);
+			date = sdf2.format(dateTemp);
+			return sdf2.parse(date);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	return time;
+    	return new Date(0);
+    }
+    
+    public static Date meterTimeTrans(String meterTime) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+    	sdf.setTimeZone(TimeZone.getTimeZone("GMT+0:00"));
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMddHHmmss");
+		sdf2.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+    	
+    	meterTime = "20" + meterTime;
+    	String tempFront = meterTime.substring(0, 6);
+    	String tempBack = meterTime.substring(8);
+    	meterTime = tempFront + tempBack;
+    	
+    	try {
+    		Date dateTemp = sdf.parse(meterTime);
+    		meterTime = sdf2.format(dateTemp);
+			return sdf2.parse(meterTime);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return new Date(0);
+    	
+    }
+    
+    public static void main(String[] args) {
+    	String date = meterTimeTrans("20020110090426").toString();
+    	System.out.println(date);
     }
 }
