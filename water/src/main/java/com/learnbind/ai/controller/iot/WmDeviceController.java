@@ -199,6 +199,23 @@ public class WmDeviceController {
 
 	}
 	
+	//----------------加载水表配置对话框部分----------------------------------------------------------------------------------
+	@RequestMapping(value = "/load-meter-config-detail-dialog")
+	public String loadMeterConfigDetailDialog(Model model, Long itemId) {
+		
+		WmDevice device = wmDeviceService.selectByPrimaryKey(itemId);
+		MeterConfigBean meterConfigBean = null;
+		if(device!=null) {
+			
+			String meterConfig = device.getMeterConfig();//表配置信息
+			//String meterFreeze = device.getMeterFreeze();//表月冻结数据
+			meterConfigBean = MeterConfigBean.fromJson(meterConfig);
+		}
+		model.addAttribute("meterConfigBean", meterConfigBean);
+		
+		return TEMPLATE_PATH + "meter_config_detail_dialog";
+	}
+	
 	//----------------加载发送指令对话框部分----------------------------------------------------------------------------------
 	@RequestMapping(value = "/load-send-cmd-dialog")
 	public String loadSendCmdDialog(Model model, Long itemId, Integer cmdType) {

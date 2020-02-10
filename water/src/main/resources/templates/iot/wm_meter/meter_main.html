@@ -20,15 +20,22 @@
 				<ul class="extra-l" style="list-style: none;" id="search-up-data-from">
 				
 					<!-- 面板:增加 -->
-					<!-- <li>
-						<button type="button" class="btn btn-primary btn-sm"
-							id="btn-add">
-							<i class="fa fa-plus" aria-hidden="true"> 
-								<span style="color:black">增加</span>
-								<span>增加</span>
-							</i>
-						</button>
-					</li> -->
+					<li>
+						<!-- 0=未知类型数据
+						1=设备上报数据
+						2=设备配置信息数据
+						3=设备月冻结数据
+						4=设备开始与电信平台建立连接
+						5=设备即将断开连接 -->
+						<select class="form-control btn-sm" id="search-data-type" style="height:30.8px;">
+							<option value="">——数据类型——</option>
+							<option value="1">设备主动上报数据</option>
+							<option value="2">设备配置信息数据</option>
+							<option value="3">设备月冻结数据</option>
+							<option value="4">设备与电信平台建立连接数据</option>
+							<option value="5">设备与电信平台断开连接数据</option>
+						</select>
+					</li>
 
 					<!-- 面板:查询 -->
 					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入水表编号">
@@ -84,9 +91,13 @@
 		}
 		
 		function getSearchWmMeterParams(){
+			
+			var searchDataType = $("#search-up-data-from #search-data-type").val();
+			var searchCond = $("#search-up-data-from #search-cond").val();
+			
 			//初始化请求参数
 			var parms = new Object();
-			var searchCond = $("#search-up-data-from #search-cond").val();
+			parms.searchDataType=searchDataType;
 			parms.searchCond=searchCond;
 			return parms;
 		}
@@ -145,7 +156,12 @@
 			defaultSearchWmMeter();
 
 			//---------事件绑定--------------
-			
+			/**
+			 * 	绑定数据类型按钮的change事件
+			 */
+			$("#search-up-data-from #search-data-type").on('change', function(){
+				btnSearchWmMeterClick();
+			});
 			/*
 				查询按钮CLICK
 			*/
@@ -157,6 +173,7 @@
 				查询条件复位按钮CLICK
 			*/
 			$('#search-up-data-from #btn-search-reset').on('click', function() {
+				$("#search-up-data-from #search-data-type").val("");//重置数据类型为空
 				$("#search-up-data-from #search-cond").val("");
 				$("#search-up-data-from #search-cond").focus();  //	获得焦点
 			});

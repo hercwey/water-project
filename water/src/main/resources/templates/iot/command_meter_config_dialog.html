@@ -179,12 +179,16 @@
 											<tr>
 												<td>采样参数单位</td>
 												<td>
-													<select class="form-control btn-sm" id="config-sample-unit">
+													<select class="form-control btn-sm" id="config-sample-unit" th:value="${meterConfigBean!=null ? meterConfigBean.sampleUnit : '1'}">
 														<!-- 采样参数：1字节(0-255)十进制，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样； -->
-														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==1 ? 'true' : 'false'}">1立方</option>
+														<!-- <option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==1 ? 'true' : 'false'}">1立方</option>
 														<option value="0.1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==0 ? 'true' : 'false'}">0.1立方</option>
 														<option value="0.01" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==2 ? 'true' : 'false'}">0.01立方</option>
-														<option value="0.001" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==3 ? 'true' : 'false'}">1升</option>
+														<option value="0.001" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==3 ? 'true' : 'false'}">1升</option> -->
+														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='1' ? 'true' : 'false'}">1立方</option>
+														<option value="0.1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.1' ? 'true' : 'false'}">0.1立方</option>
+														<option value="0.01" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.01' ? 'true' : 'false'}">0.01立方</option>
+														<option value="0.001" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.001' ? 'true' : 'false'}">1升</option>
 													</select>
 												</td>
 												<td>
@@ -199,7 +203,7 @@
 												<td>表当前时间</td>
 												<td>
 													<input type="text" class="form-control btn-sm Wdate" id="config-meter-time" name="" 
-															th:value="${meterConfigBean==null ? '' : meterConfigBean.meterTime}" 
+															th:value="${meterConfigBean==null ? '' : #dates.format(meterConfigBean.meterTime, 'yyyyMMddHHmmss')}" 
 															onClick="WdatePicker({dateFmt:'yyyyMMddHHmmss'});"
 															placeholder="表当前时间" />
 												</td>
