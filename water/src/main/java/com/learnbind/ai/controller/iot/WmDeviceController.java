@@ -346,17 +346,37 @@ public class WmDeviceController {
 	private String generatorMeterConfigCommand(byte meterType, String meterAddress, String meterFactoryCode, byte sequence, String cmdAction) {
 		
 		JSONObject action = JSON.parseObject(cmdAction);
-		short reportPeriod = action.getInteger("reportPeriod").shortValue();//定时上传周期
-		byte reportPeriodUnit = action.getInteger("reportPeriodUnit").byteValue();//定时上传周期单位
-		short reportRation = action.getInteger("reportRation").shortValue();//定量上传值
-		byte temporaryTime = action.getInteger("temporaryTime").byteValue();//用户临时开阀用水限定时间
-		byte valveRunTime = action.getInteger("valveRunTime").byteValue();//阀门行程时间
-		short valveMaintainPeriod = action.getInteger("valveMaintainPeriod").shortValue();//阀门维护周期
-		Integer basicValue = action.getInteger("meterBasicValue");//表底数
-		Float sampleUnit = action.getFloat("sampleUnit");//采样参数单位
+		
 		String meterNumber = action.getString("meterNumber");//表号
+		
+		Boolean checkboxReportPeriod = action.getBoolean("checkboxReportPeriod");//是否配置定时上传周期
+		Integer reportPeriod = action.getInteger("reportPeriod");//定时上传周期
+		
+		Boolean checkboxReportPeriodUnit = action.getBoolean("checkboxReportPeriodUnit");//是否配置定时上传周期单位
+		Integer reportPeriodUnit = action.getInteger("reportPeriodUnit");//定时上传周期单位
+		
+		Boolean checkboxReportRation = action.getBoolean("checkboxReportRation");//是否配置定量上传值
+		Integer reportRation = action.getInteger("reportRation");//定量上传值
+		
+		Boolean checkboxTemporaryTime = action.getBoolean("checkboxTemporaryTime");//是否配置用户临时开阀用水限定时间
+		Integer temporaryTime = action.getInteger("temporaryTime");//用户临时开阀用水限定时间
+		
+		Boolean checkboxValveRunTime = action.getBoolean("checkboxValveRunTime");//是否配置阀门行程时间
+		Integer valveRunTime = action.getInteger("valveRunTime");//阀门行程时间
+		
+		Boolean checkboxValveMaintainPeriod = action.getBoolean("checkboxValveMaintainPeriod");//是否配置阀门维护周期
+		Integer valveMaintainPeriod = action.getInteger("valveMaintainPeriod");//阀门维护周期
+		
+		Boolean checkboxMeterBasicValue = action.getBoolean("checkboxMeterBasicValue");//是否配置表底数
+		Integer basicValue = action.getInteger("meterBasicValue");//表底数
+		
+		Boolean checkboxSampleUnit = action.getBoolean("checkboxSampleUnit");//是否配置采样参数单位
+		Float sampleUnit = action.getFloat("sampleUnit");//采样参数单位
+		
+		Boolean checkboxMeterTime = action.getBoolean("checkboxMeterTime");//是否配置表当前时间
 		String meterTime = action.getString("meterTime");//表当前时间
 		
+		Boolean checkboxMeterStatus = action.getBoolean("checkboxMeterStatus");//是否配置表状态字
 		Integer meterStatusPeriod = action.getInteger("meterStatusPeriod");//表状态字-定时上传功能开关 (1开 / 0关)
 		Integer meterStatusMaxReport = action.getInteger("meterStatusMaxReport");//表状态字-定量上传功能开关 (1开 / 0关)
 		Integer meterStatusMagnetic = action.getInteger("meterStatusMagnetic");//表状态字-磁干扰关阀功能开关 (1开 / 0关)
@@ -364,35 +384,76 @@ public class WmDeviceController {
 		short meterStatusFlog = this.getMeterStatus(meterStatusPeriod, meterStatusMaxReport, meterStatusMagnetic);//获取表状态字
 		
 		MeterConfig meterConfig = new MeterConfig();
-        meterConfig.setReportPeriod(reportPeriod);//定时上传周期
-        meterConfig.setReportPeriodUnit(reportPeriodUnit);//定时上传周期单位
-        meterConfig.setReportRation(reportRation);//定量上传值
-        meterConfig.setTemporaryTime(temporaryTime);//用户临时开阀用水限定时间
-        meterConfig.setValveRunTime(valveRunTime);//阀门行程时间
-        meterConfig.setValveMaintainPeriod(valveMaintainPeriod);//阀门维护周期
-        meterConfig.setMeterBasicValue(basicValue);// 表底数 TODO 数据类型
-        meterConfig.setSampleUnit(sampleUnit);//采样参数单位
-        meterConfig.setMeterNumber(meterNumber);//表号
-        meterConfig.setMeterTime(meterTime);//表当前时间 格式：20200101235959
-        meterConfig.setMeterStatusFlag(meterStatusFlog);//表状态字：2字节，HEX格式
+		
+		
+		short FLAG_DEFAULT = 0x0000;//默认值
+		//参数修改标识
+		short configFlag = (short)(FLAG_DEFAULT |
+                MeterConfig.FLAG_METER_NUM |
+                MeterConfig.FLAG_SERVER_IP |
+                MeterConfig.FLAG_SERVER_PORT);
+		meterConfig.setMeterNumber(meterNumber);//表号
+		
+		if(checkboxReportPeriod) {//是否配置定时上传周期
+			meterConfig.setReportPeriod(reportPeriod.shortValue());//定时上传周期
+			configFlag = (short)(configFlag | MeterConfig.FLAG_PERIOD);
+		}
+		if(checkboxReportPeriodUnit) {//是否配置定时上传周期单位
+			meterConfig.setReportPeriodUnit(reportPeriodUnit.byteValue());//定时上传周期单位
+			configFlag = (short)(configFlag | MeterConfig.FLAG_PERIOD_UNIT);
+		}
+		if(checkboxReportRation) {//是否配置定量上传值
+			meterConfig.setReportRation(reportRation.shortValue());//定量上传值
+			configFlag = (short)(configFlag | MeterConfig.FLAG_MAX_REPORT);
+		}
+		if(checkboxTemporaryTime) {//是否配置用户临时开阀用水限定时间
+			meterConfig.setTemporaryTime(temporaryTime.byteValue());//用户临时开阀用水限定时间
+			configFlag = (short)(configFlag | MeterConfig.FLAG_EMERG_TIME);
+		}
+		if(checkboxValveRunTime) {//是否配置阀门行程时间
+			meterConfig.setValveRunTime(valveRunTime.byteValue());//阀门行程时间
+			configFlag = (short)(configFlag | MeterConfig.FLAG_VALVE_TIME);
+		}
+		if(checkboxValveMaintainPeriod) {//是否配置阀门维护周期
+			meterConfig.setValveMaintainPeriod(valveMaintainPeriod.shortValue());//阀门维护周期
+			configFlag = (short)(configFlag | MeterConfig.FLAG_VALVE_MAINTAIN_TIME);
+		}
+		if(checkboxMeterBasicValue) {//是否配置表底数
+			meterConfig.setMeterBasicValue(basicValue);// 表底数 TODO 数据类型
+			configFlag = (short)(configFlag | MeterConfig.FLAG_WATER_VLOUME);
+		}
+		if(checkboxSampleUnit) {//是否配置采样参数单位
+			meterConfig.setSampleUnit(sampleUnit);//采样参数单位
+			configFlag = (short)(configFlag | MeterConfig.FLAG_SAMPLE_UNIT);
+		}
+		if(checkboxMeterTime) {//是否配置表当前时间
+			meterConfig.setMeterTime(meterTime);//表当前时间 格式：20200101235959
+			configFlag = (short)(configFlag | MeterConfig.FLAG_METER_TIME);
+		}
+		if(checkboxMeterStatus) {//是否配置表状态字
+			meterConfig.setMeterStatusFlag(meterStatusFlog);//表状态字：2字节，HEX格式
+			configFlag = (short)(configFlag | MeterConfig.FLAG_METER_STATUS);
+		}
         meterConfig.setServerIp("10.88.192.11"); // 服务器IP地址
         meterConfig.setServerPort((short) 6538); // 服务器端口
 
         MeterConfigWriteCmd cmd = new MeterConfigWriteCmd();
-        cmd.setConfigFlag((short)(MeterConfig.FLAG_PERIOD |
-                //MeterConfig.FLAG_PERIOD |
-                MeterConfig.FLAG_PERIOD_UNIT |
-                MeterConfig.FLAG_MAX_REPORT |
-                MeterConfig.FLAG_EMERG_TIME |
-                MeterConfig.FLAG_VALVE_TIME |
-                MeterConfig.FLAG_VALVE_MAINTAIN_TIME |
-                MeterConfig.FLAG_WATER_VLOUME |
-                MeterConfig.FLAG_SAMPLE_UNIT |
-                MeterConfig.FLAG_METER_NUM |
-                MeterConfig.FLAG_METER_TIME |
-                MeterConfig.FLAG_METER_STATUS |
-                MeterConfig.FLAG_SERVER_IP |
-                MeterConfig.FLAG_SERVER_PORT));
+        //参数修改标识
+//        cmd.setConfigFlag((short)(MeterConfig.FLAG_PERIOD |
+//                //MeterConfig.FLAG_PERIOD |
+//                MeterConfig.FLAG_PERIOD_UNIT |
+//                MeterConfig.FLAG_MAX_REPORT |
+//                MeterConfig.FLAG_EMERG_TIME |
+//                MeterConfig.FLAG_VALVE_TIME |
+//                MeterConfig.FLAG_VALVE_MAINTAIN_TIME |
+//                MeterConfig.FLAG_WATER_VLOUME |
+//                MeterConfig.FLAG_SAMPLE_UNIT |
+//                MeterConfig.FLAG_METER_NUM |
+//                MeterConfig.FLAG_METER_TIME |
+//                MeterConfig.FLAG_METER_STATUS |
+//                MeterConfig.FLAG_SERVER_IP |
+//                MeterConfig.FLAG_SERVER_PORT));
+        cmd.setConfigFlag(configFlag);
         cmd.setConfig(meterConfig);
 
 //    	byte meterType = meterTypeI.byteValue();

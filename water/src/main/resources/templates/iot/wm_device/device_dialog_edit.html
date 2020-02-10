@@ -52,6 +52,20 @@
 										<tbody>
 											<tr>
 												<td>
+													<!-- 水表名称 -->
+													<div class="form-group form-inline">
+														<label for="test-device-meter-name" class="col-sm-4 control-label">水表名称</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text"
+																th:value="${currItem==null ? '' : currItem.meterName}" 
+																class="form-control" 
+																id="test-device-meter-name" name="meterName" placeholder="水表名称"/>
+														</span>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
 													<!-- 水表编号 -->
 													<div class="form-group form-inline">
 														<label for="test-device-verify-code" class="col-sm-4 control-label">水表编号</label>
@@ -165,6 +179,9 @@
 			if(customersId!=null && customersId!=""){
 				urlStr = BASE_CONTEXT_PATH + "/wm-device/update";
 			}
+			
+			var verifyCode = $("#test-device-verify-code").val();//水表编号
+			
 			var formData = new FormData($("#edit-test-device-form")[0]);
 			$.ajax({
 				type: "POST", // 提交方式 get/post
@@ -178,7 +195,8 @@
 						if (res.result_code == "success") {
 							clickPagerReloadTable();//重新刷新当前页面
 							DialogUtil.closeDialogFn(EDIT_TEST_DEVICE_DIALOG_ID);//关闭编辑对话框
-							util.message(res.result_msg,null,"success");
+							//util.message(res.result_msg,null,"success");
+							registerDeviceFn(verifyCode);//注册设备
 						} else {
 							util.message(res.result_msg,null,"warning");
 						}
@@ -200,12 +218,13 @@
 				保存所修改的条目
 			*/
 			$('#btn-bill-modify-and-back').on('click',function() {
+				var meterName = $("#test-device-meter-name").val();//水表名称
 				var verifyCode = $("#test-device-verify-code").val();//水表编号
 				var meterAddress = $("#test-device-meter-address").val();//表地址
 				var meterType = $("#test-device-meter-type").val();//水表类型
 				var meterFactoryCode = $("#test-device-meter-factory-code").val();//水表厂商
-				if(verifyCode==null || verifyCode=="" || meterAddress==null || meterAddress=="" || meterType==null || meterType=="" || meterFactoryCode==null || meterFactoryCode==""){
-					util.message("水表编号、表地址、水表类型、水表厂商都不允许为空！");
+				if(meterName==null || meterName=="" || verifyCode==null || verifyCode=="" || meterAddress==null || meterAddress=="" || meterType==null || meterType=="" || meterFactoryCode==null || meterFactoryCode==""){
+					util.message("水表名称、水表编号、表地址、水表类型、水表厂商都不允许为空！");
 					return false;
 				}
 				modifyTestDeviceItem(true);				

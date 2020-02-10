@@ -94,13 +94,13 @@
 		<br />
 		<div class="card">
 			<h5 class="card-header">
-				查询已注册设备列表部分
+				刷新已注册设备列表部分
 			</h5>
 			<div class="card-body">
 				<div class="row clearfix">
 					<div class="col-md-3 column">
 						<button type="button" class="btn btn-info btn-sm" id="btn-query-device">
-							<i class="fa fa-search" aria-hidden="true"> <span>查询已注册设备列表</span></i>
+							<i class="fa fa-search" aria-hidden="true"> <span>刷新已注册设备列表</span></i>
 						</button>
 					</div>
 					<div class="col-md-3 column d-none">
@@ -440,9 +440,12 @@
 					var result = res;//$.parseJSON(res);
 					if(result.status==200){
 						clickPagerReloadTable();//重新刷新当前页面
+					}else{
+						//dialog type: success warning info error,默认为info
+						util.message(result.status+":"+result.message+"，注册失败，请手动注册！",null,"warning");
 					}
 					//dialog type: success warning info error,默认为info
-					util.message(result.status+":"+result.message,null,"warning");
+					//util.message(result.status+":"+result.message,null,"warning");
 			    }
 			});
 		}

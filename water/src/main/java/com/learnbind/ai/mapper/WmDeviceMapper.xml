@@ -25,13 +25,15 @@
     
     <result column="METER_CONFIG" jdbcType="VARCHAR" property="meterConfig" />
     <result column="METER_FREEZE" jdbcType="VARCHAR" property="meterFreeze" />
+    
+    <result column="METER_NAME" jdbcType="VARCHAR" property="meterName" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--
       WARNING - @mbg.generated
     -->
     ID, DEVICE_ID, VERIFY_CODE, MANUFACTURER_ID, MANUFACTURER_NAME, DEVICE_TYPE, MODEL, 
-    PROTOCOL_TYPE, CREATE_TIME, UPATE_TIME, METER_TYPE, METER_ADDRESS, METER_FACTORY_CODE, METER_SEQUENCE, METER_NUMBER, METER_CONFIG, METER_FREEZE 
+    PROTOCOL_TYPE, CREATE_TIME, UPATE_TIME, METER_TYPE, METER_ADDRESS, METER_FACTORY_CODE, METER_SEQUENCE, METER_NUMBER, METER_CONFIG, METER_FREEZE, METER_NAME 
   </sql>
   
   <insert id="save" parameterType="com.learnbind.ai.model.iot.DeviceBean">

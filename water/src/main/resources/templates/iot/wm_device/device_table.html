@@ -27,13 +27,15 @@
 							class="custom-control-label" for="select-all-toggle"></label>
 					</div>
 				</th> -->
-				<th>ID</th>
-				<th>IOT平台设备ID</th>
+				<!-- <th>ID</th> -->
+				<!-- <th>IOT平台设备ID</th> -->
+				<th>水表名称</th>
 				<th>水表编号</th>
 				<th>表号</th>
 				<th>表地址</th>
 				<th>水表类型</th>
 				<th>水表厂商</th>
+				<th>注册状态</th>
 				<th>操作</th>
 			</tr>
 		</thead>
@@ -50,9 +52,11 @@
 				</td> -->
 				
 				<!-- ID-->
-				<td th:text="${item.id}">ID</td>
+				<!-- <td th:text="${item.id}">ID</td> -->
 				<!-- IOT平台设备ID-->
-				<td th:text="${item.deviceId}">IOT平台设备ID</td>
+				<!-- <td th:text="${item.deviceId}">IOT平台设备ID</td> -->
+				<!-- 设备名称 -->
+				<td th:text="${item.meterName}">设备名称</td>
 				<!-- 水表编号 -->
 				<td th:text="${item.verifyCode}">水表编号</td>
 				<!-- 表号 -->
@@ -70,6 +74,15 @@
 				</td>
 				<!-- 水表厂商 -->
 				<td th:text="${item.meterFactoryCode}">水表厂商</td>
+				<td>
+					<!-- 注册状态：水表编号为空时未注册，水表编号不为空时已注册; -->
+					<span th:if="${item.deviceId==null || item.deviceId==''}" th:remove="tag">
+						<span class="badge badge-warning">未注册</span>
+					</span>
+					<span th:if="${item.deviceId!=null && item.deviceId!=''}" th:remove="tag">
+						<span class="badge badge-success">已注册</span>
+					</span>
+				</td>
 				<!-- 操作列 -->
 				<td>
 					<div class="dropdown">
