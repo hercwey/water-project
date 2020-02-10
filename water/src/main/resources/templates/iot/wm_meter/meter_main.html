@@ -20,15 +20,15 @@
 				<ul class="extra-l" style="list-style: none;" id="search-up-data-from">
 				
 					<!-- 面板:增加 -->
-					<li>
+					<!-- <li>
 						<button type="button" class="btn btn-primary btn-sm"
 							id="btn-add">
 							<i class="fa fa-plus" aria-hidden="true"> 
-								<!-- <span style="color:black">增加</span> -->
+								<span style="color:black">增加</span>
 								<span>增加</span>
 							</i>
 						</button>
-					</li>
+					</li> -->
 
 					<!-- 面板:查询 -->
 					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入水表编号">
@@ -145,13 +145,6 @@
 			defaultSearchWmMeter();
 
 			//---------事件绑定--------------
-			
-			/*
-				增加核对类型按钮CLICK
-			*/
-			$('#search-up-data-from #btn-add').on('click', function() {
-				loadEditDialog(null);//加载(Load): 增加/编辑对话框
-			}); 
 			
 			/*
 				查询按钮CLICK

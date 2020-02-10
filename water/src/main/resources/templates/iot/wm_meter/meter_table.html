@@ -7,7 +7,7 @@
 <body>
 	<div class="table-responsive">
 		<!-- 列表 -->
-		<table class="table table-bordered table-sm table-hovers" id="meter-table" style="width:1500px;">
+		<table class="table table-bordered table-sm table-hovers" id="meter-table" style="width:2000px;">
 			<thead>
 				<tr>
 					<th>ID</th>
@@ -16,19 +16,19 @@
 					<th>表地址</th>
 					<th>表号</th>
 					<th>表当前时间</th>
-					<th>累计使用量</th>
-					<th>采样参数</th>
-					<th>电池电压</th>
+					<th>累计使用量（t）</th>
+					<th>采样参数（M3）</th>
+					<th>电池电压（mV）</th>
 					<th>表状态字</th>
-					<th>信号强度</th>
-					<th>压力值</th>
+					<th>信号强度（dBm）</th>
+					<th>压力值（MPa）</th>
 					<th>事件时间</th>
 					<th>表类型</th>
 					<th>表厂商代码</th>
 					<th>控制码</th>
 					<th>数据标识</th>
 					<th>序列号</th>
-					<!-- <th style="width: 100px;">数据字节</th> -->
+					<th>原始数据</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -58,6 +58,12 @@
 						</span>
 						<span th:if="${item.dataType==3}" th:remove="tag">
 							设备月冻结数据
+						</span>
+						<span th:if="${item.dataType==4}" th:remove="tag">
+							设备与电信平台建立连接
+						</span>
+						<span th:if="${item.dataType==5}" th:remove="tag">
+							设备与电信平台断开连接
 						</span>
 					</td>
 					<td th:text="${item.verifyCode}">水表编号</td>
@@ -109,8 +115,8 @@
 					<td th:text="${item.dataDi}">数据标识</td>
 					<!-- 序列号 -->
 					<td th:text="${item.meterSequence}">序列号</td>
-					<!-- 数据字节 -->
-					<!-- <td th:text="${item.meterData}" style="width: 100px;">数据字节</td> -->
+					<!-- 原始数据 -->
+					<td th:text="${item.meterDataBasic}">原始数据</td>
 	
 				</tr>
 			</tbody>
