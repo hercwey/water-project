@@ -245,17 +245,18 @@ public class MeterBean {
         meterBean.setEventTime(StringUtil.timeZoneTrans(serviceBean.getEventTime()));
         
     	MeterDataBaseBean dataBean = new MeterDataBaseBean();
-        
+    	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
+    	
     	if (serviceBean.getData().getJRprotocolXY().equalsIgnoreCase("9912364557")) {
 			//TODO G11 设备开始与电信平台建立连接
         	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_START_CONNECT);
         	dataBean.setData(serviceBean.getData().getJRprotocolXY());
-        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
+//        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
 		} else if (serviceBean.getData().getJRprotocolXY().equalsIgnoreCase("aa1234bb")) {
 			//TODO G11 设备即将断开与电信平台的连接
         	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_START_DISCONNECT);
         	dataBean.setData(serviceBean.getData().getJRprotocolXY());
-        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
+//        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
 		} else {
 			try {
 	        	PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(serviceBean.getData().getJRprotocolXY()));
@@ -270,7 +271,7 @@ public class MeterBean {
 	            meterBean.setChecksum(Integer.valueOf(packetFrame.getChecksum()));
 	            
 	            MeterBase meterBase = PacketCodec.decodeData(packetFrame);
-	            dataBean.setDataBasic(HexStringUtils.bytesToHexString(packetFrame.getData()));
+//	            dataBean.setDataBasic(HexStringUtils.bytesToHexString(packetFrame.getData()));
 	            
 	            //FIXME G11 针对数据上报的其他类型数据，进行解析（后续根据需求对数据进行分类，优化处理逻辑）
 	            if (meterBase instanceof MeterReport) {

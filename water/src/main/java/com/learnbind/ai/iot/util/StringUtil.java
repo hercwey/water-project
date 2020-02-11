@@ -55,7 +55,7 @@ public class StringUtil {
     }
     
     public static void main(String[] args) {
-    	String date = meterTimeTrans("20020110090426").toString();
+    	String date = timeZoneTrans("20200211T000441Z").toString();
     	System.out.println(date);
     }
 }
