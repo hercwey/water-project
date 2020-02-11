@@ -181,24 +181,25 @@ public class MeterController {
 			String meterData = meter.getMeterData();
 			MeterReportBean meterReportBean = null;
 			Integer dataType = null;
+
+			MeterDataBaseBean meterDataBaseBean = new MeterDataBaseBean();//MeterDataBaseBean.fromJson(meterData);
+			try {
+				meterDataBaseBean = new MeterDataBaseBean();
+				meterDataBaseBean.setType(meter.getMeterDataType());
+				dataType = meterDataBaseBean.getType();//赋值表计数据类型：0=未知类型数据；1=设备上报数据；2=设备配置信息数据；3=设备月冻结数据；
+				meterDataBaseBean.setData(meter.getMeterData());
+				meterDataBaseBean.setDataBasic(meter.getMeterDataBasic());
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
 			if(StringUtils.isNotBlank(meterData)) {
 				if(meterData.startsWith("{") && meterData.endsWith("}")) {
 					//TODO G11 meter_data字段,增加多种类型数据，根据type判断数据类型
-					MeterDataBaseBean meterDataBaseBean = new MeterDataBaseBean();//MeterDataBaseBean.fromJson(meterData);
-					try {
-						meterDataBaseBean = new MeterDataBaseBean();
-						meterDataBaseBean.setType(meter.getMeterDataType());
-						meterDataBaseBean.setData(meter.getMeterData());
-						meterDataBaseBean.setDataBasic(meter.getMeterDataBasic());
-					} catch (Exception e) {
-						// TODO: handle exception
-					}
-					
-					dataType = meterDataBaseBean.getType();//赋值表计数据类型：0=未知类型数据；1=设备上报数据；2=设备配置信息数据；3=设备月冻结数据；
 					if (meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_REPORT || meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_CONFIG) {
 						meterReportBean = MeterReportBean.fromJson(meterDataBaseBean.getData());
 					}
-				}else {
+				} else {
 					try {
 						meterReportBean = MeterReportBean.fromHexData(meterData);
 					} catch (Exception e) {
