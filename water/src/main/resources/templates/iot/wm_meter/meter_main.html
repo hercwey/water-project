@@ -72,6 +72,15 @@
 
 	<script>
 	
+		/**
+		 * 	定时查询上报数据列表，1分钟刷新一次
+		 */
+		function timeountSearchWmMeterFn(){
+			console.log("----------定时查询上报数据");
+			defaultSearchWmMeter();//查询
+			setTimeout(timeountSearchWmMeterFn,1*60*1000);
+		}
+	
 		//--------------------公共查询函数--------------------------
 		/*	
 			公共查询函数
@@ -153,7 +162,8 @@
 		$(function() {
 			//------------init-------------
 			//主页:默认查询(加载默认列表)
-			defaultSearchWmMeter();
+			//defaultSearchWmMeter();
+			timeountSearchWmMeterFn();//定时查询上报数据列表，1分钟刷新一次
 
 			//---------事件绑定--------------
 			/**

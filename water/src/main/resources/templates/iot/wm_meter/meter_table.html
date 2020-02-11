@@ -7,11 +7,12 @@
 <body>
 	<div class="table-responsive">
 		<!-- 列表 -->
-		<table class="table table-bordered table-sm table-hovers" id="meter-table" style="width:2000px;">
+		<table class="table table-bordered table-sm table-hovers" id="meter-table" style="width:2500px;">
 			<thead>
 				<tr>
 					<th>ID</th>
 					<th>数据类型</th>
+					<th>设备上报时间</th>
 					<th>水表编号</th>
 					<th>表地址</th>
 					<th>表号</th>
@@ -22,7 +23,6 @@
 					<th>表状态字</th>
 					<th>信号强度（dBm）</th>
 					<th>压力值（MPa）</th>
-					<th>事件时间</th>
 					<th>表类型</th>
 					<th>表厂商代码</th>
 					<th>控制码</th>
@@ -66,6 +66,8 @@
 							设备与电信平台断开连接
 						</span>
 					</td>
+					<!-- 上报到电信平台的时间 -->
+					<td th:text="${item.eventTime==null ? '' : #dates.format(item.eventTime, 'yyyy-MM-dd HH:mm:ss')}">上报到电信平台的时间</td>
 					<td th:text="${item.verifyCode}">水表编号</td>
 					<!-- 表地址 -->
 					<td th:text="${item.meterAddr}">表地址</td>
@@ -103,8 +105,6 @@
 					</td>
 					<td th:text="${item.signal}">信号强度</td>
 					<td th:text="${item.pressure}">压力值</td>
-					<!-- 事件时间 -->
-					<td th:text="${item.eventTime==null ? '' : #dates.format(item.eventTime, 'yyyy-MM-dd HH:mm:ss')}">事件时间</td>
 					<!-- 表类型 -->
 					<td th:text="${item.meterType}">表类型</td>
 					<!-- 表厂商代码 -->

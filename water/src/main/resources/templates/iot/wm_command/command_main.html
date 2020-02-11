@@ -67,6 +67,15 @@
 
 	<script>
 	
+		/**
+		 * 	定时查询下发指令数据列表，1分钟刷新一次
+		 */
+		function timeountSearchWmCommandFn(){
+			console.log("----------定时查询下发指令数据");
+			defaultSearchWmCommand();//查询
+			setTimeout(timeountSearchWmCommandFn,1*60*1000);
+		}
+		
 		//--------------------公共查询函数--------------------------
 		/*	
 			公共查询函数
@@ -149,7 +158,8 @@
 		$(function() {
 			//------------init-------------
 			//主页:默认查询(加载默认列表)
-			defaultSearchWmCommand();
+			//defaultSearchWmCommand();
+			timeountSearchWmCommandFn();//定时查询下发指令数据列表，1分钟刷新一次
 
 			//---------事件绑定--------------
 			/**
