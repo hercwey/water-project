@@ -31,7 +31,6 @@ import com.learnbind.ai.model.iot.MeterConfigBean;
 import com.learnbind.ai.model.iot.MeterDataBaseBean;
 import com.learnbind.ai.model.iot.MeterReportBean;
 import com.learnbind.ai.model.iot.MeterStatusBean;
-import com.learnbind.ai.model.iot.WmCommand;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.ICommandService;
@@ -60,7 +59,7 @@ public class MeterController {
         //TODO 水表数据解析
         MeterBean meterBean = MeterBean.fromUploadDataJson(data);
         //TODO 水表数据保存
-        JsonResult jsonResult = JsonResult.success(JsonResult.SUCCESS, data);//meterService.save(meterBean);
+        JsonResult jsonResult = meterService.save(meterBean);//JsonResult.success(JsonResult.SUCCESS, data);
         
         MeterDataBaseBean meterDataBaseBean = new MeterDataBaseBean();
         try {
