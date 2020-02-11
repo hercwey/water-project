@@ -11,7 +11,7 @@
     <result column="REQUEST_ID" jdbcType="VARCHAR" property="requestId" />
     <result column="SERVICE_ID" jdbcType="VARCHAR" property="serviceId" />
     <result column="SERVICE_TYPE" jdbcType="VARCHAR" property="serviceType" />
-    <result column="EVENT_DATE" jdbcType="TIMESTAMP" property="eventTime" />
+    <result column="EVENT_TIME" jdbcType="TIMESTAMP" property="eventTime" />
     <result column="METER_TYPE" jdbcType="DECIMAL" property="meterType" />
     <result column="METER_ADDR" jdbcType="VARCHAR" property="meterAddr" />
     <result column="FACTORY_CODE" jdbcType="VARCHAR" property="factoryCode" />
@@ -42,7 +42,7 @@
 			REQUEST_ID,
 			SERVICE_ID,
 			SERVICE_TYPE,
-			EVENT_DATE,
+			EVENT_TIME,
 			METER_TYPE,
 			METER_ADDR,
 			FACTORY_CODE,

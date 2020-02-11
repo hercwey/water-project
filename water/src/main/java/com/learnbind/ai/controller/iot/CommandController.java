@@ -1,11 +1,12 @@
 package com.learnbind.ai.controller.iot;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,7 @@ import com.learnbind.ai.iot.protocol.bean.MeterConfig;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigReadCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
+import com.learnbind.ai.iot.util.StringUtil;
 import com.learnbind.ai.model.iot.CommandBean;
 import com.learnbind.ai.model.iot.CommandCallbackBean;
 import com.learnbind.ai.model.iot.CommandResultBean;
@@ -114,6 +116,8 @@ public class CommandController {
     @RequestMapping(value = "/search-send-cmd-records")
     public String searchSendCmdRecords(Model model, Integer pageNum, Integer pageSize, Integer searchCommandType, String searchCond) {
     	
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	
     	// 判定页码有效性
 		if (pageNum == null || pageNum == 0) {
 			pageNum = 1;
@@ -125,6 +129,15 @@ public class CommandController {
 		List<Map<String, Object>> commandMapList = commandService.searchList(searchCommandType, searchCond);
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(commandMapList);// (使用了拦截器或是AOP进行查询的再次处理)
 
+		for(Map<String, Object> commandMap : commandMapList) {
+			Object platformIssuedTime = commandMap.get("PLATFORM_ISSUED_TIME");
+			String platformIssuedTimeSdf = "";
+			if(platformIssuedTime!=null) {
+				Date platformIssuedTimeD = StringUtil.timeZoneTrans((String)platformIssuedTime);
+				platformIssuedTimeSdf = sdf.format(platformIssuedTimeD);
+			}
+			commandMap.put("PLATFORM_ISSUED_TIME_STR", platformIssuedTimeSdf);
+		}
 		// 传递如下数据至前台页面
 		model.addAttribute("commandMapList", commandMapList); // 列表数据
 		

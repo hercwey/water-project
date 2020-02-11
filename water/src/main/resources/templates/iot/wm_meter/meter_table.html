@@ -104,7 +104,7 @@
 					<td th:text="${item.signal}">信号强度</td>
 					<td th:text="${item.pressure}">压力值</td>
 					<!-- 事件时间 -->
-					<td th:text="${item.eventTime}">事件时间</td>
+					<td th:text="${item.eventTime==null ? '' : #dates.format(item.eventTime, 'yyyy-MM-dd HH:mm:ss')}">事件时间</td>
 					<!-- 表类型 -->
 					<td th:text="${item.meterType}">表类型</td>
 					<!-- 表厂商代码 -->
