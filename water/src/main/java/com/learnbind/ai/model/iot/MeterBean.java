@@ -156,7 +156,7 @@ public class MeterBean {
 
     public void setDataDI(short dataDI) {
         this.dataDI = dataDI;
-        setDataDIStr(HexStringUtils.bytesToHexString(ByteUtil.getBytes(dataDI)));
+        //setDataDIStr(HexStringUtils.bytesToHexString(ByteUtil.getBytes(dataDI)));
     }
 
     public Integer getSequence() {
