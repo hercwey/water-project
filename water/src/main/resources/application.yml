@@ -46,12 +46,12 @@ spring:
      #水司生产数据库连接
      #url: jdbc:oracle:thin:@192.168.55.39:1521:ORCL   
      #阿里云
-     url: jdbc:oracle:thin:@39.107.230.168:1521:ORCL
+     url: 
      #url: jdbc:oracle:thin:@127.0.0.1:1521:ORCL     
      
      #阿里云  && 本地
-     username: wsd
-     password: wsd
+     username: 
+     password: 
      
      filters: stat
      initial-size: 1
