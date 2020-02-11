@@ -14,6 +14,8 @@ import com.learnbind.ai.iot.protocol.bean.MeterReport;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.iot.util.StringUtil;
 
+import javassist.expr.NewArray;
+
 public class MeterBean {
 
     private static final long serialVersionUID = 1L;
@@ -45,7 +47,7 @@ public class MeterBean {
     @JsonProperty("sequence")
     private Integer sequence;
     @JsonProperty("dataType")
-    private String dataType;
+    private Integer dataType;
     @JsonProperty("data")
     private String data;
     @JsonProperty("dataBasic")
@@ -203,11 +205,11 @@ public class MeterBean {
         this.updatetime = updatetime;
     }
 
-	public String getDataType() {
+	public Integer getDataType() {
 		return dataType;
 	}
 
-	public void setDataType(String dataType) {
+	public void setDataType(Integer dataType) {
 		this.dataType = dataType;
 	}
 
@@ -302,7 +304,7 @@ public class MeterBean {
 			}
 		}
     	
-        meterBean.setDataType(dataBean.getType() + "");
+        meterBean.setDataType(dataBean.getType());
         meterBean.setData(dataBean.getData());
         meterBean.setDataBasic(dataBean.getDataBasic());
         return meterBean;
@@ -313,5 +315,8 @@ public class MeterBean {
 		MeterBean meterBean = MeterBean.fromUploadDataJson(data);
 		System.out.println(JSON.toJSON(meterBean.getData()));
 		System.out.println(JSON.toJSON(meterBean));
+		
+		System.out.println(meterBean.getEventTime().toString());
+		System.out.println(MeterReportBean.fromJson(meterBean.getData()).getMeterTime().toString());
 	}
 }

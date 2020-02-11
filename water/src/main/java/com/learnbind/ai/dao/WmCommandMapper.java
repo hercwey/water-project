@@ -21,5 +21,5 @@ public interface WmCommandMapper extends Mapper<WmCommand> {
     CommandBean selectByCommandId(CommandBean commandBean);
     
     public List<Map<String, Object>> searchList(@Param("searchCommandType") Integer searchCommandType, @Param("searchCond") String searchCond);
-    
+    public List<Map<String, Object>> searchByDeviceId(String deviceId);
 }

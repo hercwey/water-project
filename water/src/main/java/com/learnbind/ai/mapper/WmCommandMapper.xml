@@ -242,4 +242,29 @@
 		ID DESC -->
   </select>
   
+  <!-- 查询指定设备发送命令记录 -->
+  <select id="searchByDeviceId" resultType="map">
+  	SELECT
+		C.ID,
+		C.COMMAND_ID,
+		C.APP_ID,
+		C.DEVICE_ID,
+		C.SERVICE_ID,
+		C.METHOD_PARAMS,
+		C.STATUS,
+		C.PLATFORM_ISSUED_TIME,
+		D.DEVICE_ID AS DEVICE_IDS,
+		S.SERVICE_NAME 
+	FROM
+		WM_COMMAND C
+		LEFT JOIN WM_DEVICE D ON C.DEVICE_ID = D.ID
+		LEFT JOIN WM_SERVICE S ON C.SERVICE_ID = S.ID 
+		 
+	<where>
+		1=1 AND D.DEVICE_ID = #{deviceId}
+	</where>
+	ORDER BY
+		C.ID DESC
+  </select>
+  
 </mapper>

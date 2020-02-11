@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.learnbind.ai.common.util.BigDecimalUtils;
 import com.learnbind.ai.common.util.EntityUtils;
+import com.learnbind.ai.model.iot.CommandBean;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterBean;
@@ -28,14 +31,17 @@ import com.learnbind.ai.model.iot.MeterConfigBean;
 import com.learnbind.ai.model.iot.MeterDataBaseBean;
 import com.learnbind.ai.model.iot.MeterReportBean;
 import com.learnbind.ai.model.iot.MeterStatusBean;
+import com.learnbind.ai.model.iot.WmCommand;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iot.WmMeter;
+import com.learnbind.ai.service.iot.ICommandService;
 import com.learnbind.ai.service.iot.IDeviceService;
 import com.learnbind.ai.service.iot.IMeterService;
 import com.learnbind.ai.service.iot.WmDeviceService;
 
 @Controller
 @RequestMapping("/meter")
+@EnableAsync
 public class MeterController {
 
     @Autowired
@@ -44,6 +50,8 @@ public class MeterController {
     IDeviceService deviceService;
     @Autowired
     private WmDeviceService wmDeviceService;
+    @Autowired
+    ICommandService commandService;
 
     @RequestMapping(value = "/uploadDeviceData", method = RequestMethod.POST)
     @ResponseBody
@@ -52,11 +60,14 @@ public class MeterController {
         //TODO 水表数据解析
         MeterBean meterBean = MeterBean.fromUploadDataJson(data);
         //TODO 水表数据保存
-        JsonResult jsonResult = meterService.save(meterBean);
+        JsonResult jsonResult = JsonResult.success(JsonResult.SUCCESS, data);//meterService.save(meterBean);
         
         MeterDataBaseBean meterDataBaseBean = new MeterDataBaseBean();
         try {
-			meterDataBaseBean = MeterDataBaseBean.fromJson(meterBean.getData());
+			meterDataBaseBean = new MeterDataBaseBean();
+			meterDataBaseBean.setType(meterBean.getDataType());
+			meterDataBaseBean.setData(meterBean.getData());
+			meterDataBaseBean.setDataBasic(meterBean.getDataBasic());
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -100,6 +111,22 @@ public class MeterController {
 				deviceBean.setMeterConfig(MeterConfigBean.toJsonString(configBean));
 		        deviceService.modifyDevice(deviceBean);
 			}
+		}
+        
+        int type = meterDataBaseBean.getType();
+        if (type == MeterDataBaseBean.METER_DATA_TYPE_REPORT || type == MeterDataBaseBean.METER_DATA_TYPE_CONFIG || type == MeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE) {
+        	//TODO G11 查询待下发指令逻辑
+            List<CommandBean> unSentList = checkUnSentCommands(meterBean.getDeviceId());
+            //TODO G11 逐条发送指令（异步发送）,并将状态设置为PENDING
+            for (CommandBean commandBean : unSentList) {
+            	//发送指令
+            	commandService.postAsynCommand(commandBean);
+            	//更新状态位PENDING
+            	commandBean.setDatabaseStatus(1);
+            	commandService.update(commandBean);
+			}
+            //TODO 根据请求结果，更新指令状态，不管什么状态，不再重新发送
+            
 		}
         
         jsonResult.setData(data);
@@ -219,5 +246,36 @@ public class MeterController {
 		
 		return "iot/wm_meter/meter_table";
     	
+    }
+    public List<CommandBean> checkUnSentCommands(String deviceId) {
+    	//1、查询根据deviceId查询数据库，查询该设备未下发指令，即status=0的指令，然后逐条下发到电信平台，如果电信平台有回复，不管成功与否，记录结果，不再下发，如果未下发成功，下次再次下发
+        //2、status0,未下发，负数为发送失败，1，正在发送到电信平台，2已发送到电信平台，>=3电信平台执行结果，（另需计时并记录是否超时）
+        //3、
+//    	List<WmCommand> commandList = commandService.searchByDeviceId(deviceId);
+    	List<Map<String, Object>> commandMapList = commandService.searchByDeviceId(deviceId);
+    	List<CommandBean> unSentList = new ArrayList<>();
+    	System.out.println("---------------------------");
+    	System.out.println("| 待下发指令      设备ID:" + deviceId);
+    	if (commandMapList != null) {
+			for (Map<String, Object> wmCommand : commandMapList) {
+				CommandBean commandBean = new CommandBean();
+				commandBean.setId(((BigDecimal) wmCommand.get("ID")).longValue());
+				commandBean.setDeviceId((String) wmCommand.get("DEVICE_IDS"));
+				commandBean.setServiceId((String) wmCommand.get("SERVICE_NAME"));
+				commandBean.setMethod("JRprotocolYX");
+				commandBean.setParas(JSON.parseObject((String)wmCommand.get("METHOD_PARAMS")));
+                commandBean.setMethodParams(commandBean.getParas().toJSONString());
+                commandBean.setDatabaseStatus(((BigDecimal) wmCommand.get("STATUS")).intValue());
+				
+				if (commandBean.getDatabaseStatus() == 0) {
+					unSentList.add(commandBean);
+					System.out.println("| "+commandBean.getCommandId());
+				}
+			}
+		}
+
+    	System.out.println("| 总计："+unSentList.size());
+    	System.out.println("---------------------------");
+        return unSentList;
     }
 }

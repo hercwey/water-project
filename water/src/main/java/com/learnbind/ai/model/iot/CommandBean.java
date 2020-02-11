@@ -3,7 +3,11 @@ package com.learnbind.ai.model.iot;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
+import com.learnbind.ai.iot.Constants;
+
 import java.io.IOException;
+import java.util.Date;
 
 public class CommandBean {
     private static final long serialVersionUID = 1L;
@@ -33,13 +37,13 @@ public class CommandBean {
     @JsonProperty("desc")
     private String desc;
     @JsonProperty("expireTime")
-    private int expireTime;
+    private Long expireTime;
     @JsonProperty("platformIssuedTime")
     private String platformIssuedTime;
     @JsonProperty("issuedTimes")
     private int issuedTimes;
     @JsonProperty("createTime")
-    private int createTime;
+    private Date createTime;
 
     @JsonProperty("callbackUrl")
     private String callbackUrl;
@@ -147,11 +151,11 @@ public class CommandBean {
         this.desc = desc;
     }
 
-    public int getExpireTime() {
+    public Long getExpireTime() {
         return expireTime;
     }
 
-    public void setExpireTime(int expireTime) {
+    public void setExpireTime(Long expireTime) {
         this.expireTime = expireTime;
     }
 
@@ -171,11 +175,11 @@ public class CommandBean {
         this.issuedTimes = issuedTimes;
     }
 
-    public int getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(int createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,17 +14,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.learnbind.ai.constant.PagerConstant;
 import com.learnbind.ai.iot.protocol.PacketCodec;
 import com.learnbind.ai.iot.protocol.PacketFrame;
 import com.learnbind.ai.iot.protocol.bean.MeterBase;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigReadCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
-import com.learnbind.ai.iot.protocol.bean.MeterReport;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.model.iot.CommandBean;
 import com.learnbind.ai.model.iot.CommandCallbackBean;
@@ -31,8 +29,6 @@ import com.learnbind.ai.model.iot.CommandResultBean;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterConfigBean;
-import com.learnbind.ai.model.iot.MeterReportBean;
-import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.service.iot.ICommandService;
 import com.learnbind.ai.service.iot.IDeviceService;
 
@@ -55,32 +51,8 @@ public class CommandController {
         commandBean.setDatabaseStatus(0);
 
         commandService.save(commandBean);
-        JsonResult jsonResult = commandService.postAsynCommand(commandBean);
 
-        String result = jsonResult.getData();
-        System.out.println("控制指令发送到IoT平台："+commandBean.getDeviceId()+"=="+commandBean.getServiceId()+"=="+commandBean.getMethod());
-
-        //TODO 补充完整数据库中指令信息，status设置为1（指令已下发）
-        CommandBean resultBean = CommandBean.parseJson(result);
-        commandBean.setCommandId(resultBean.getCommandId());
-        commandBean.setAppId(resultBean.getAppId());
-        commandBean.setExpireTime(resultBean.getExpireTime());
-        commandBean.setIssuedTimes(resultBean.getIssuedTimes());
-        commandBean.setPlatformIssuedTime(resultBean.getPlatformIssuedTime());
-        commandBean.setStatus(resultBean.getStatus());
-      //FIXME G11 判断指令执行结果，逻辑待优化
-        if (data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_DELIVERED) || data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SENT) || data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SUCCESS)) {
-        	commandBean.setDatabaseStatus(2);
-		} else {
-            commandBean.setDatabaseStatus(1);
-		}
-
-        if (resultBean.getParas() != null) {
-            commandBean.setMethodParams(resultBean.getParas().toJSONString());
-        }
-        commandService.update(commandBean);
-
-        return ResponseEntity.ok(jsonResult.toString());
+        return ResponseEntity.ok(JsonResult.success(JsonResult.SUCCESS, JsonResult.STATUS_SUCCESS).toString());
     }
 
     @RequestMapping(value = "/callback", method = RequestMethod.POST)
