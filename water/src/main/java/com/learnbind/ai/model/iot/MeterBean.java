@@ -11,6 +11,7 @@ import com.learnbind.ai.iot.protocol.bean.MeterBase;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
 import com.learnbind.ai.iot.protocol.bean.MeterReadWaterResp;
 import com.learnbind.ai.iot.protocol.bean.MeterReport;
+import com.learnbind.ai.iot.protocol.util.ByteUtil;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.iot.util.StringUtil;
 
@@ -43,7 +44,7 @@ public class MeterBean {
     @JsonProperty("ctrlCode")
     private String ctrlCode;
     @JsonProperty("dataDI")
-    private String dataDI;
+    private short dataDI;
     @JsonProperty("sequence")
     private Integer sequence;
     @JsonProperty("dataType")
@@ -149,12 +150,13 @@ public class MeterBean {
         this.ctrlCode = ctrlCode;
     }
 
-    public String getDataDI() {
+    public short getDataDI() {
         return dataDI;
     }
 
-    public void setDataDI(String dataDI) {
+    public void setDataDI(short dataDI) {
         this.dataDI = dataDI;
+        setDataDIStr(HexStringUtils.bytesToHexString(ByteUtil.getBytes(dataDI)));
     }
 
     public Integer getSequence() {
@@ -262,7 +264,7 @@ public class MeterBean {
 	            meterBean.setMeterAddr(packetFrame.getMeterAddr());
 	            meterBean.setFactoryCode(packetFrame.getFactoryCode());
 	            meterBean.setCtrlCode(packetFrame.getCtrlCodeStr());
-	            meterBean.setDataDI(packetFrame.getDataDiStr());
+	            meterBean.setDataDI(packetFrame.getDataDI());	            
 	            meterBean.setSequence(packetFrame.getSequence());
 	            //meterBean.setData(HexStringUtils.bytesToHexString(packetFrame.getData()));
 	            meterBean.setChecksum(Integer.valueOf(packetFrame.getChecksum()));

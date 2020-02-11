@@ -23,6 +23,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.learnbind.ai.common.util.BigDecimalUtils;
 import com.learnbind.ai.common.util.EntityUtils;
+import com.learnbind.ai.iot.protocol.util.ByteUtil;
+import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.model.iot.CommandBean;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
@@ -230,6 +232,14 @@ public class MeterController {
 			meterMap.put("meterStatus", meterStatus);//表状态字：2字节
 			meterMap.put("signal", signal);//信号强度
 			meterMap.put("pressure", pressure);//压力值：xx.yyyy
+			
+			//TODO G11  数据标识由short转为hexString，方便显示
+			try {
+				String dataDiHex = HexStringUtils.bytesToHexString(ByteUtil.getBytes(Short.parseShort(meter.getDataDi())));
+				meterMap.put("dataDi",dataDiHex);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 			
 			meterMapList.add(meterMap);
 		}

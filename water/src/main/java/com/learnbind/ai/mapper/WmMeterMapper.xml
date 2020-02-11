@@ -16,7 +16,7 @@
     <result column="METER_ADDR" jdbcType="VARCHAR" property="meterAddr" />
     <result column="FACTORY_CODE" jdbcType="VARCHAR" property="factoryCode" />
     <result column="CTRL_CODE" jdbcType="VARCHAR" property="ctrlCode" />
-    <result column="DATA_DI" jdbcType="VARCHAR" property="dataDi" />
+    <result column="DATA_DI" jdbcType="INTEGER" property="dataDi" />
     <result column="METER_SEQUENCE" jdbcType="DECIMAL" property="meterSequence" />
     <result column="METER_DATA_TYPE" jdbcType="INTEGER" property="meterDataType" />
     <result column="METER_DATA" jdbcType="VARCHAR" property="meterData" />
@@ -42,7 +42,7 @@
 			REQUEST_ID,
 			SERVICE_ID,
 			SERVICE_TYPE,
-			EVENT_TIME,
+			EVENT_DATE,
 			METER_TYPE,
 			METER_ADDR,
 			FACTORY_CODE,
@@ -76,7 +76,7 @@
 				#{meterAddr,jdbcType=VARCHAR},
 				#{factoryCode,jdbcType=VARCHAR},
 				#{ctrlCode,jdbcType=BIGINT},
-				#{dataDI,jdbcType=VARCHAR},
+				#{dataDI,jdbcType=INTEGER},
 				#{sequence,jdbcType=BIGINT},
 				#{dataType,jdbcType=BIGINT},
 				#{data,jdbcType=VARCHAR},
@@ -98,7 +98,7 @@
             REQUEST_ID = #{requestId,jdbcType=VARCHAR},
             SERVICE_ID = #{serviceId,jdbcType=VARCHAR},
             SERVICE_TYPE = #{serviceType,jdbcType=VARCHAR},
-            EVENT_TIME = #{eventTime,jdbcType=TIMESTAMP},
+            EVENT_DATE = #{eventTime,jdbcType=TIMESTAMP},
             METER_TYPE = #{meterType,jdbcType=BIGINT},
             METER_ADDR = #{meterAddr,jdbcType=VARCHAR},
             FACTORY_CODE = #{factoryCode,jdbcType=VARCHAR},
