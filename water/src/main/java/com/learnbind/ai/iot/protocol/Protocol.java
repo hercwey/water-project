@@ -30,7 +30,7 @@ public class Protocol {
     public static final float SAMPLE_UNIT_001M = 0.01f;  // 0.01立方
     public static final float SAMPLE_UNIT_1L = 0.001f;   // 1 升
 
-    /* 表状态字 */
+    /* 表状态字  , (位操作, 该系列值都为有效位, 若设置其无效，可以使用按位取反, 如： 取反运算(~METER_STATUS_VALVE_OPEN) 表示关**/
     public static final short METER_STATUS_VALVE_OPEN       = 0x0001;    // 阀门状态开 (开1 / 关0)
     public static final short METER_STATUS_VALVE_ABNORMAL   = 0x0002;    // 阀门故障 (1有效 / 0无效)
     public static final short METER_STATUS_BATTERY_LOW      = 0x0004;    // 电池电压低 (1有效 / 0无效)
@@ -38,6 +38,7 @@ public class Protocol {
     public static final short METER_STATUS_MAX_REPORT_ON    = 0x0010;    // 定量上传功能开关 (1开 / 0关)
     public static final short METER_STATUS_MAGNETIC_ON      = 0x0020;    // 磁干扰关阀功能开关 (1开 / 0关)
     public static final short METER_STATUS_SMAPLE_LINE_CUT  = 0x0040;    // 采样线断线报警状态 (1有效 / 0无效)
+    public static final short METER_STATUS_MAGNETIC_ALARM_ON    = 0x0080;    // 磁干扰报警 (1有效 / 0无效)
 
     public Protocol(){}
 

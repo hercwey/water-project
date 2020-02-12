@@ -23,6 +23,7 @@ public class MeterConfig extends MeterBase {
     public static final short FLAG_METER_STATUS       = 0x0400;  // 表状态字
     public static final short FLAG_SERVER_IP          = 0x0800;  // 服务器IP
     public static final short FLAG_SERVER_PORT        = 0x1000;  // 端口号
+    public static final short FLAG_MAGNETIC_ALARM_CLEAR = 0x2000;  // 磁干扰告警清除
 
     /* 定时上传周期单位 */
     public static final byte PERIOD_UNIT_MIN = 0; // 定时上传周期单位，分钟

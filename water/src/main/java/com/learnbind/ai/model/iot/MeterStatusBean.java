@@ -14,6 +14,7 @@ public class MeterStatusBean {
     public static final short METER_STATUS_MAX_REPORT_ON    = 0x0010;    // 定量上传功能开关 (1开 / 0关)
     public static final short METER_STATUS_MAGNETIC_ON      = 0x0020;    // 磁干扰关阀功能开关 (1开 / 0关)
     public static final short METER_STATUS_SMAPLE_LINE_CUT  = 0x0040;    // 采样线断线报警状态 (1有效 / 0无效)
+    public static final short METER_STATUS_MAGNETIC_ALARM_ON    = 0x0080;    // 磁干扰报警 (1有效 / 0无效)
     */
 	
     @JsonProperty("valveOpen")
@@ -30,6 +31,8 @@ public class MeterStatusBean {
     private int magneticOn;
     @JsonProperty("sampleLineCut")
     private int sampleLineCut;
+    @JsonProperty("magneticAlarmOn")
+    private int magneticAlarmOn;
     
     public int getValveOpen() {
 		return valveOpen;
@@ -87,6 +90,14 @@ public class MeterStatusBean {
 		this.sampleLineCut = sampleLineCut;
 	}
 	
+	public int getMagneticAlarmOn() {
+		return magneticAlarmOn;
+	}
+
+	public void setMagneticAlarmOn(int magneticAlarmOn) {
+		this.magneticAlarmOn = magneticAlarmOn;
+	}
+
 	public static String toJsonString(MeterStatusBean meterStatusBean) {
 		return JSON.toJSONString(meterStatusBean);
 	}
@@ -105,6 +116,7 @@ public class MeterStatusBean {
     	statusBean.setMaxReportOn((Protocol.METER_STATUS_MAX_REPORT_ON&flag)>>4);
     	statusBean.setMagneticOn((Protocol.METER_STATUS_MAGNETIC_ON&flag)>>5);
     	statusBean.setSampleLineCut((Protocol.METER_STATUS_SMAPLE_LINE_CUT&flag)>>6);
+    	statusBean.setSampleLineCut((Protocol.METER_STATUS_MAGNETIC_ALARM_ON&flag)>>7);
     	
     	return statusBean;
     }
@@ -116,7 +128,8 @@ public class MeterStatusBean {
                 Protocol.METER_STATUS_PERIOD_ON |
                 Protocol.METER_STATUS_MAX_REPORT_ON |
                 Protocol.METER_STATUS_MAGNETIC_ON |
-                Protocol.METER_STATUS_SMAPLE_LINE_CUT);
+                Protocol.METER_STATUS_SMAPLE_LINE_CUT |
+                Protocol.METER_STATUS_MAGNETIC_ALARM_ON);
 		
 		MeterStatusBean statusBean = MeterStatusBean.fromStatusFlag(flag);
 		System.out.println(JSON.toJSONString(statusBean));
