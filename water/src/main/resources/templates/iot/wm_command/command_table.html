@@ -17,9 +17,11 @@
 					<th>服务名称</th> -->
 					<th>指令类型</th>
 					<th>水表编号</th>
+					<th>表地址</th>
 					<th>状态</th>
-					<th>下发指令</th>
+					<th>指令创建时间</th>
 					<th>下发指令时间</th>
+					<th>下发指令</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -47,6 +49,8 @@
 					</td>
 					<!-- 水表编号 -->
 					<td th:text="${item.VERIFY_CODE}">水表编号</td>
+					<!-- 表地址 -->
+					<td th:text="${item.METER_ADDRESS}">表地址</td>
 					<!-- 状态 -->
 					<!-- 指令执行状态（0:未下发;1:已下发，未执行;2:执行成功;负数:执行失败） -->
 					<td>
@@ -63,10 +67,12 @@
 							<span class="badge badge-warning">指令执行失败</span>
 						</span>
 					</td>
-					<!-- 下发指令 -->
-					<td th:text="${item.METHOD_PARAMS}">下发指令</td>
+					<!-- 下发指令时间 -->
+					<td th:text="${item.CREATE_TIME_STR}">指令创建时间</td>
 					<!-- 下发指令时间 -->
 					<td th:text="${item.PLATFORM_ISSUED_TIME_STR}">下发指令时间</td>
+					<!-- 下发指令 -->
+					<td th:text="${item.METHOD_PARAMS}">下发指令</td>
 	
 				</tr>
 			</tbody>

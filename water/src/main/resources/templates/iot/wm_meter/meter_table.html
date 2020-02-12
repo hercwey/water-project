@@ -15,12 +15,18 @@
 					<th>设备上报时间</th>
 					<th>水表编号</th>
 					<th>表地址</th>
-					<th>表号</th>
+					<!-- <th>表号</th> -->
 					<th>表当前时间</th>
 					<th>累计使用量（t）</th>
 					<th>采样参数（m³）</th>
 					<th>电池电压（mV）</th>
-					<th>表状态字</th>
+					<!-- <th>表状态字</th> -->
+					<th>电池电压状态</th>
+					<th>阀门状态</th>
+					<th>阀门故障</th>
+					<th>采样线断线状态</th>
+					<th>数据上报模式</th>
+					<th>阀门维护</th>
 					<th>信号强度（dBm）</th>
 					<th>压力值（MPa）</th>
 					<th>表类型</th>
@@ -71,37 +77,70 @@
 					<td th:text="${item.verifyCode}">水表编号</td>
 					<!-- 表地址 -->
 					<td th:text="${item.meterAddr}">表地址</td>
-					<td th:text="${item.meterNumber}">表号</td>
+					<!-- <td th:text="${item.meterNumber}">表号</td> -->
 					<td th:text="${item.meterTime}">表当前时间</td>
 					<td th:text="${item.totalVolumeBd}">累计使用量</td>
 					<td th:text="${item.sampleUnit}">采样参数</td>
 					<td th:text="${item.batteryVoltage}">电池电压</td>
-					<td>
+					<!-- <td>
 						<!-- public static final short METER_STATUS_VALVE_OPEN       = 0x0001;    // 阀门状态开 (开1 / 关0)
 						    public static final short METER_STATUS_VALVE_ABNORMAL   = 0x0002;    // 阀门故障 (1有效 / 0无效)
 						    public static final short METER_STATUS_BATTERY_LOW      = 0x0004;    // 电池电压低 (1有效 / 0无效)
 						    public static final short METER_STATUS_PERIOD_ON        = 0x0008;    // 定时上传功能开关 (1开 / 0关)
 						    public static final short METER_STATUS_MAX_REPORT_ON    = 0x0010;    // 定量上传功能开关 (1开 / 0关)
 						    public static final short METER_STATUS_MAGNETIC_ON      = 0x0020;    // 磁干扰关阀功能开关 (1开 / 0关)
-						    public static final short METER_STATUS_SMAPLE_LINE_CUT  = 0x0040;    // 采样线断线报警状态 (1有效 / 0无效) -->
-						<!-- 阀门状态开 (开1 / 关0) -->
+						    public static final short METER_STATUS_SMAPLE_LINE_CUT  = 0x0040;    // 采样线断线报警状态 (1有效 / 0无效) --
+						阀门状态开 (开1 / 关0)
 						<span th:if="${item.meterStatus!=null && item.meterStatus.valveOpen==0}">&nbsp;阀门关</span>
 						<span th:if="${item.meterStatus!=null && item.meterStatus.valveOpen==1}">&nbsp;阀门开</span>
-						<!-- 阀门故障 (1有效 / 0无效) -->
+						阀门故障 (1有效 / 0无效)
 						<span th:if="${item.meterStatus!=null && item.meterStatus.valveAbnormal==1}">&nbsp;阀门故障</span>
-						<!-- 电池电压低 (1有效 / 0无效) -->
+						电池电压低 (1有效 / 0无效)
 						<span th:if="${item.meterStatus!=null && item.meterStatus.batteryLow==1}">&nbsp;电池电压低</span>
-						<!-- 定时上传功能开关 (1开 / 0关) -->
+						定时上传功能开关 (1开 / 0关)
 						<span th:if="${item.meterStatus!=null && item.meterStatus.periodOn==0}">&nbsp;定时上传功能关</span>
 						<span th:if="${item.meterStatus!=null && item.meterStatus.periodOn==1}">&nbsp;定时上传功能开</span>
-						<!-- 定量上传功能开关 (1开 / 0关) -->
+						定量上传功能开关 (1开 / 0关)
 						<span th:if="${item.meterStatus!=null && item.meterStatus.maxReportOn==0}">&nbsp;定量上传功能关</span>
 						<span th:if="${item.meterStatus!=null && item.meterStatus.maxReportOn==1}">&nbsp;定量上传功能开</span>
-						<!-- 磁干扰关阀功能开关 (1开 / 0关) -->
+						磁干扰关阀功能开关 (1开 / 0关)
 						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==0}">&nbsp;磁干扰关阀功能关</span>
 						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==1}">&nbsp;磁干扰关阀功能开</span>
-						<!-- 采样线断线报警状态 (1有效 / 0无效) -->
+						采样线断线报警状态 (1有效 / 0无效)
 						<span th:if="${item.meterStatus!=null && item.meterStatus.sampleLineCut==1}">&nbsp;采样线断线报警</span>
+					</td> -->
+					<td>
+						<!-- 电池电压低 (1有效 / 0无效) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.batteryLow==0}">正常</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.batteryLow==1}">电压低</span>
+					</td>
+					<td>
+						<!-- 阀门状态开 (开1 / 关0) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveOpen==0}">关</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveOpen==1}">开</span>
+					</td>
+					<td>
+						<!-- 阀门故障 (1有效 / 0无效) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveAbnormal==0}">正常</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveAbnormal==1}">故障</span>
+					</td>
+					<td>
+						<!-- 采样线断线报警状态 (1有效 / 0无效) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.sampleLineCut==0}">正常</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.sampleLineCut==1}">采样线断线报警</span>
+					</td>
+					<td>
+						<!-- 定时上传功能开关 (1开 / 0关) -->
+						<!-- <span th:if="${item.meterStatus!=null && item.meterStatus.periodOn==0}">定时上传功能关</span> -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.periodOn==1}">定时上传</span>
+						<!-- 定量上传功能开关 (1开 / 0关) -->
+						<!-- <span th:if="${item.meterStatus!=null && item.meterStatus.maxReportOn==0}">定量上传功能关</span> -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.maxReportOn==1}">定量上传</span>
+					</td>
+					<td>
+						<!-- 阀门维护，磁干扰关阀功能开关 (1开 / 0关) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==0}">关</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==1}">开</span>
 					</td>
 					<td th:text="${item.signal}">信号强度</td>
 					<td th:text="${item.pressure}">压力值</td>

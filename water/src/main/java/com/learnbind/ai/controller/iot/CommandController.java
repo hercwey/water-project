@@ -51,6 +51,7 @@ public class CommandController {
 
         //TODO 将指令写入数据库，status设置为0（指令已创建，未下发成功）
         commandBean.setDatabaseStatus(0);
+        commandBean.setCreateTime(new Date());
 
         commandService.save(commandBean);
 
@@ -130,12 +131,19 @@ public class CommandController {
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(commandMapList);// (使用了拦截器或是AOP进行查询的再次处理)
 
 		for(Map<String, Object> commandMap : commandMapList) {
+			Object createTime = commandMap.get("CREATE_TIME");
 			Object platformIssuedTime = commandMap.get("PLATFORM_ISSUED_TIME");
+			
+			String createTimeStr = "";
+			if(createTime!=null) {
+				createTimeStr = sdf.format((Date)createTime);
+			}
 			String platformIssuedTimeSdf = "";
 			if(platformIssuedTime!=null) {
 				Date platformIssuedTimeD = StringUtil.timeZoneTrans((String)platformIssuedTime);
 				platformIssuedTimeSdf = sdf.format(platformIssuedTimeD);
 			}
+			commandMap.put("CREATE_TIME_STR", createTimeStr);
 			commandMap.put("PLATFORM_ISSUED_TIME_STR", platformIssuedTimeSdf);
 		}
 		// 传递如下数据至前台页面
