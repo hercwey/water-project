@@ -215,6 +215,24 @@
 													</div>
 												</td>
 											</tr>
+											<!-- <tr>
+												<td>磁干扰告警消除</td>
+												<td>
+													<select class="form-control btn-sm" id="config-sample-unit" th:value="${meterConfigBean!=null ? meterConfigBean.sampleUnit : '1'}">
+														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='1' ? 'true' : 'false'}">1立方</option>
+														<option value="0.1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.1' ? 'true' : 'false'}">0.1立方</option>
+														<option value="0.01" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.01' ? 'true' : 'false'}">0.01立方</option>
+														<option value="0.001" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.001' ? 'true' : 'false'}">1升</option>
+													</select>
+												</td>
+												<td>
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-time" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr> -->
 											<tr>
 												<td>上传功能</td>
 												<td>
@@ -267,6 +285,12 @@
 														</label>
 													</div>
 												</td> -->
+											</tr>
+											<tr>
+												<td></td>
+												<td colspan="2" style="color: red; float: left;">
+													注：以上需要录入的信息均为十进制
+												</td>
 											</tr>
 											
 										</tbody>
