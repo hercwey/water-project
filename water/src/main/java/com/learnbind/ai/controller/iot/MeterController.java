@@ -99,18 +99,25 @@ public class MeterController {
 			}
 	        deviceBean = DeviceBean.fromWmDevice(wmDevice);
 	        MeterReportBean reportBean= MeterReportBean.fromJson(meterDataBaseBean.getData());
-	        	
-	        MeterConfigBean configBean = MeterConfigBean.fromJson(deviceBean.getMeterConfig());
-	        configBean.setMeterNumber(reportBean.getMeterNumber());
-	        configBean.setMeterTime(reportBean.getMeterTime());
-	        configBean.setMeterStatus(reportBean.getMeterStatus());
-	        try {
-		        configBean.setSampleUnit(Float.valueOf(reportBean.getSampleUnit()));
-			} catch (Exception e) {
-				configBean.setSampleUnit(0);
-			} finally {
-				deviceBean.setMeterConfig(MeterConfigBean.toJsonString(configBean));
-		        deviceService.modifyDevice(deviceBean);
+	        if (reportBean != null) {
+	        	MeterConfigBean configBean = null;
+	        	if (deviceBean != null && deviceBean.getMeterConfig() != null) {
+	        		configBean = MeterConfigBean.fromJson(deviceBean.getMeterConfig());
+	        	}
+		        if (configBean == null) {
+					configBean = new MeterConfigBean();
+				}
+	        	configBean.setMeterNumber(reportBean.getMeterNumber());
+		        configBean.setMeterTime(reportBean.getMeterTime());
+		        configBean.setMeterStatus(reportBean.getMeterStatus());
+		        try {
+			        configBean.setSampleUnit(Float.valueOf(reportBean.getSampleUnit()));
+				} catch (Exception e) {
+					configBean.setSampleUnit(0);
+				} finally {
+					deviceBean.setMeterConfig(MeterConfigBean.toJsonString(configBean));
+			        deviceService.modifyDevice(deviceBean);
+				}
 			}
 		}
         
