@@ -9,13 +9,14 @@ import com.learnbind.ai.iot.protocol.PacketCodec;
 import com.learnbind.ai.iot.protocol.PacketFrame;
 import com.learnbind.ai.iot.protocol.bean.MeterBase;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
+import com.learnbind.ai.iot.protocol.bean.MeterConfigReadResp;
+import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteResp;
 import com.learnbind.ai.iot.protocol.bean.MeterReadWaterResp;
 import com.learnbind.ai.iot.protocol.bean.MeterReport;
-import com.learnbind.ai.iot.protocol.util.ByteUtil;
+import com.learnbind.ai.iot.protocol.bean.MeterValveControlResp;
+import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdResp;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.iot.util.StringUtil;
-
-import javassist.expr.NewArray;
 
 public class MeterBean {
 
@@ -281,8 +282,8 @@ public class MeterBean {
 	                MeterReportBean meterDataBean = MeterReportBean.fromMeterReport(meterReport);
 	                dataBean.setData(MeterReportBean.toJsonString(meterDataBean));
 	                
-				} else if (meterBase instanceof MeterConfig) {
-	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_CONFIG);
+				} else if (meterBase instanceof MeterConfigReadResp) {
+	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_RSP_READ_CONFIG);
 	            	
 	                MeterConfig meterConfig = (MeterConfig) meterBase;
 	                MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
@@ -295,6 +296,23 @@ public class MeterBean {
 					MeterMonthFreezeBean meterMonthFreezeBean = MeterMonthFreezeBean.fromMeterTeadWaterResp(meterReadWaterResp);
 					dataBean.setData(MeterMonthFreezeBean.toJsonString(meterMonthFreezeBean));
 					
+				} else if (meterBase instanceof MeterConfigWriteResp) {
+
+	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_RSP_WRITE_CONFIG);
+	            	MeterConfig meterConfig = (MeterConfig) meterBase;
+	                MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
+	                dataBean.setData(MeterConfigBean.toJsonString(meterConfigBean));
+	                
+				} else if (meterBase instanceof MeterValveControlResp) {
+
+	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_RSP_SWITCH_VALVE);
+	                dataBean.setData(JSON.toJSONString(meterBase));
+	                
+				} else if (meterBase instanceof MeterVolumeThresholdResp) {
+
+	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_RSP_SET_THRESHOLD);
+	                dataBean.setData(JSON.toJSONString(meterBase));
+	                
 				} else {
 	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
 	            	dataBean.setData(JSON.toJSONString(meterBase));
