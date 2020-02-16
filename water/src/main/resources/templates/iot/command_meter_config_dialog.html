@@ -203,8 +203,8 @@
 												<td>表当前时间</td>
 												<td>
 													<input type="text" class="form-control btn-sm Wdate" id="config-meter-time" name="" 
-															th:value="${meterConfigBean==null ? '' : #dates.format(meterConfigBean.meterTime, 'yyyyMMddHHmmss')}" 
-															onClick="WdatePicker({dateFmt:'yyyyMMddHHmmss'});"
+															th:value="${meterConfigBean==null ? '' : #dates.format(meterConfigBean.meterTime, 'yyyy-MM-dd HH:mm:ss')}" 
+															onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});"
 															placeholder="表当前时间" />
 												</td>
 												<td>
@@ -215,24 +215,22 @@
 													</div>
 												</td>
 											</tr>
-											<!-- <tr>
-												<td>磁干扰告警消除</td>
+											<tr>
+												<td>磁干扰报警消除</td>
 												<td>
-													<select class="form-control btn-sm" id="config-sample-unit" th:value="${meterConfigBean!=null ? meterConfigBean.sampleUnit : '1'}">
-														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='1' ? 'true' : 'false'}">1立方</option>
-														<option value="0.1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.1' ? 'true' : 'false'}">0.1立方</option>
-														<option value="0.01" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.01' ? 'true' : 'false'}">0.01立方</option>
-														<option value="0.001" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.001' ? 'true' : 'false'}">1升</option>
+													<select class="form-control btn-sm" id="config-magnetic-alarm-on" th:value="${meterConfigBean!=null && meterConfigBean.meterStatus!=null ? meterConfigBean.meterStatus.magneticAlarmOn : '0'}">
+														<option value="0" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticAlarmOn=='0' ? 'true' : 'false'}">否</option>
+														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticAlarmOn=='1' ? 'true' : 'false'}">是</option>
 													</select>
 												</td>
 												<td>
 													<div class="form-check">
 														<label class="form-check-label">
-															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-time" value="" style="position: unset;" />
+															<input type="checkbox" class="form-check-input" id="checkbox-config-magnetic-alarm-on" value="" style="position: unset;" />
 														</label>
 													</div>
 												</td>
-											</tr> -->
+											</tr>
 											<tr>
 												<td>上传功能</td>
 												<td>
@@ -384,6 +382,14 @@
 				return false;
 			}
 			
+			var magneticAlarmOn = $("#modal-container-command-meter-config #config-magnetic-alarm-on").val();//磁干扰告警消除
+			var checkboxMagneticAlarmOn = $("#modal-container-command-meter-config #checkbox-config-magnetic-alarm-on").prop("checked");//是否配置磁干扰告警消除
+			if(checkboxMagneticAlarmOn && (magneticAlarmOn==null || magneticAlarmOn=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("请选择磁干扰告警消除状态！",null,"warning");
+				return false;
+			}
+			
 			var meterStatusUploadType = $("#modal-container-command-meter-config #config-meter-status-upload-type").val();//表状态字-上传功能类型：1=定时上传；2=定量上传；
 			//var meterStatusPeriod = $("#modal-container-command-meter-config #config-meter-status-period").val();//表状态字-定时上传功能开关 (1开 / 0关)
 			//var meterStatusMaxReport = $("#modal-container-command-meter-config #config-meter-status-max-report").val();//表状态字-定量上传功能开关 (1开 / 0关)
@@ -402,7 +408,8 @@
 			//如果所有选项都未勾选，表示所有选项都不需要设置，所以不需要下发指令
 			if(!checkboxReportPeriod && !checkboxReportPeriodUnit && !checkboxReportRation 
 					&& !checkboxTemporaryTime && !checkboxValveRunTime && !checkboxValveMaintainPeriod 
-					&& !checkboxMeterBasicValue && !checkboxSampleUnit && !checkboxMeterTime && !checkboxMeterStatus){
+					&& !checkboxMeterBasicValue && !checkboxSampleUnit && !checkboxMeterTime 
+					&& !checkboxMagneticAlarmOn && !checkboxMeterStatus){
 				//dialog type: success warning info error,默认为info
 				util.message("至少选择一个需要下发指令的参数！",null,"warning");
 				return false;
@@ -440,6 +447,9 @@
 			parms.checkboxMeterTime = checkboxMeterTime;//是否配置表当前时间
 			parms.meterTime = meterTime;//表当前时间
 			
+			parms.checkboxMagneticAlarmOn = checkboxMagneticAlarmOn;//是否配置磁干扰告警消除
+			parms.magneticAlarmOn = magneticAlarmOn;//磁干扰告警消除
+			
 			parms.checkboxMeterStatus = checkboxMeterStatus;//是否配置表状态字
 			parms.meterStatusPeriod = meterStatusPeriod;//表状态字-定时上传功能开关 (1开 / 0关)
 			parms.meterStatusMaxReport = meterStatusMaxReport;//表状态字-定量上传功能开关 (1开 / 0关)
@@ -475,9 +485,12 @@
 							console.log("----------返回生成的水表配置指令："+res.command);
 							command = res.command;
 						}
+					}
+					if(command==null || command==""){
 						//dialog type: success warning info error,默认为info
 						util.message(res.result_msg,null,"warning");
 					}
+					
 			    }
 			});
 			

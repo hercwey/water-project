@@ -1,5 +1,6 @@
 package com.learnbind.ai.controller.iot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,10 +29,7 @@ import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterReadWaterCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdCmd;
-import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.MeterConfigBean;
-import com.learnbind.ai.model.iot.MeterDataBaseBean;
-import com.learnbind.ai.model.iot.MeterReportBean;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.service.iot.WmDeviceService;
 
@@ -391,7 +389,10 @@ public class WmDeviceController {
 		Float sampleUnit = action.getFloat("sampleUnit");//采样参数单位
 		
 		Boolean checkboxMeterTime = action.getBoolean("checkboxMeterTime");//是否配置表当前时间
-		String meterTime = action.getString("meterTime");//表当前时间
+		Date meterTime = action.getDate("meterTime");//表当前时间 格式：yyyy-MM-dd HH:mm:ss
+		
+		Boolean checkboxMagneticAlarmOn = action.getBoolean("checkboxMagneticAlarmOn");//是否配置磁干扰告警消除
+		Integer magneticAlarmOn = action.getInteger("magneticAlarmOn");//磁干扰告警消除
 		
 		Boolean checkboxMeterStatus = action.getBoolean("checkboxMeterStatus");//是否配置表状态字
 		Integer meterStatusPeriod = action.getInteger("meterStatusPeriod");//表状态字-定时上传功能开关 (1开 / 0关)
@@ -444,8 +445,15 @@ public class WmDeviceController {
 			configFlag = (short)(configFlag | MeterConfig.FLAG_SAMPLE_UNIT);
 		}
 		if(checkboxMeterTime) {//是否配置表当前时间
-			meterConfig.setMeterTime(meterTime);//表当前时间 格式：20200101235959
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");//时间格式化
+			String meterTimeStr = sdf.format(meterTime);
+			meterConfig.setMeterTime(meterTimeStr);//表当前时间 格式：20200101235959
 			configFlag = (short)(configFlag | MeterConfig.FLAG_METER_TIME);
+		}
+		if(checkboxMagneticAlarmOn) {//是否配置磁干扰告警消除
+			if(magneticAlarmOn==1) {//如果magneticAlarmOn=1时表示磁干扰告警消除有效；magneticAlarmOn=0时表示磁干扰告警消除无效；有效时配置参数修改标识
+				configFlag = (short)(configFlag | MeterConfig.FLAG_MAGNETIC_ALARM_CLEAR);
+			}
 		}
 		if(checkboxMeterStatus) {//是否配置表状态字
 			meterConfig.setMeterStatusFlag(meterStatusFlog);//表状态字：2字节，HEX格式
@@ -491,17 +499,27 @@ public class WmDeviceController {
 		final int ON = 1;
 		final int OFF = 0;
 		short meterStatusFlag = 0;
-		if(meterStatusPeriod==ON && meterStatusMaxReport==ON && meterStatusMagnetic==ON) {//表状态字-定时上传功能开,定量上传功能开,磁干扰关阀功能开
-			meterStatusFlag = (short)(Protocol.METER_STATUS_PERIOD_ON | Protocol.METER_STATUS_MAX_REPORT_ON | Protocol.METER_STATUS_MAGNETIC_ON);
-		}else if(meterStatusPeriod==ON && meterStatusMaxReport==OFF && meterStatusMagnetic==OFF) {//表状态字-定时上传功能开,定量上传功能关,磁干扰关阀功能关
-			meterStatusFlag = (short)(Protocol.METER_STATUS_PERIOD_ON | ~Protocol.METER_STATUS_MAX_REPORT_ON | ~Protocol.METER_STATUS_MAGNETIC_ON);
-		}else if(meterStatusPeriod==ON && meterStatusMaxReport==ON && meterStatusMagnetic==OFF) {//表状态字-定时上传功能开,定量上传功能开,磁干扰关阀功能关
-			meterStatusFlag = (short)(Protocol.METER_STATUS_PERIOD_ON | Protocol.METER_STATUS_MAX_REPORT_ON | ~Protocol.METER_STATUS_MAGNETIC_ON);
-		}else if(meterStatusPeriod==OFF && meterStatusMaxReport==ON && meterStatusMagnetic==ON) {//表状态字-定时上传功能关,定量上传功能开,磁干扰关阀功能开
-			meterStatusFlag = (short)(~Protocol.METER_STATUS_PERIOD_ON | Protocol.METER_STATUS_MAX_REPORT_ON | Protocol.METER_STATUS_MAGNETIC_ON);
-		}else if(meterStatusPeriod==OFF && meterStatusMaxReport==OFF && meterStatusMagnetic==ON) {//表状态字-定时上传功能关,定量上传功能关,磁干扰关阀功能开
-			meterStatusFlag = (short)(~Protocol.METER_STATUS_PERIOD_ON | ~Protocol.METER_STATUS_MAX_REPORT_ON | Protocol.METER_STATUS_MAGNETIC_ON);
+		if(meterStatusPeriod==ON && meterStatusMaxReport==OFF) {
+			meterStatusFlag = Protocol.METER_STATUS_PERIOD_ON;
+		}else if(meterStatusPeriod==OFF && meterStatusMaxReport==ON) {
+			meterStatusFlag = Protocol.METER_STATUS_MAX_REPORT_ON;
 		}
+		
+		if(meterStatusMagnetic==1) {
+			meterStatusFlag = (short)(meterStatusFlag | Protocol.METER_STATUS_MAGNETIC_ON);
+		}
+		
+//		if(meterStatusPeriod==ON && meterStatusMaxReport==ON && meterStatusMagnetic==ON) {//表状态字-定时上传功能开,定量上传功能开,磁干扰关阀功能开
+//			meterStatusFlag = (short)(Protocol.METER_STATUS_PERIOD_ON | Protocol.METER_STATUS_MAX_REPORT_ON | Protocol.METER_STATUS_MAGNETIC_ON);
+//		}else if(meterStatusPeriod==ON && meterStatusMaxReport==OFF && meterStatusMagnetic==OFF) {//表状态字-定时上传功能开,定量上传功能关,磁干扰关阀功能关
+//			meterStatusFlag = (short)(Protocol.METER_STATUS_PERIOD_ON | ~Protocol.METER_STATUS_MAX_REPORT_ON | ~Protocol.METER_STATUS_MAGNETIC_ON);
+//		}else if(meterStatusPeriod==ON && meterStatusMaxReport==ON && meterStatusMagnetic==OFF) {//表状态字-定时上传功能开,定量上传功能开,磁干扰关阀功能关
+//			meterStatusFlag = (short)(Protocol.METER_STATUS_PERIOD_ON | Protocol.METER_STATUS_MAX_REPORT_ON | ~Protocol.METER_STATUS_MAGNETIC_ON);
+//		}else if(meterStatusPeriod==OFF && meterStatusMaxReport==ON && meterStatusMagnetic==ON) {//表状态字-定时上传功能关,定量上传功能开,磁干扰关阀功能开
+//			meterStatusFlag = (short)(~Protocol.METER_STATUS_PERIOD_ON | Protocol.METER_STATUS_MAX_REPORT_ON | Protocol.METER_STATUS_MAGNETIC_ON);
+//		}else if(meterStatusPeriod==OFF && meterStatusMaxReport==OFF && meterStatusMagnetic==ON) {//表状态字-定时上传功能关,定量上传功能关,磁干扰关阀功能开
+//			meterStatusFlag = (short)(~Protocol.METER_STATUS_PERIOD_ON | ~Protocol.METER_STATUS_MAX_REPORT_ON | Protocol.METER_STATUS_MAGNETIC_ON);
+//		}
 		return meterStatusFlag;
 	}
 	

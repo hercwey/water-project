@@ -27,6 +27,7 @@
 					<th>采样线断线状态</th>
 					<th>数据上报模式</th>
 					<th>阀门维护</th>
+					<th>磁干扰报警</th>
 					<th>信号强度（dBm）</th>
 					<th>压力值（MPa）</th>
 					<th>表类型</th>
@@ -159,6 +160,11 @@
 						<!-- 阀门维护，磁干扰关阀功能开关 (1开 / 0关) -->
 						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==0}">关</span>
 						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==1}">开</span>
+					</td>
+					<td>
+						<!-- 磁干扰报警 (1有效 / 0无效) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticAlarmOn==0}">正常</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticAlarmOn==1}">报警</span>
 					</td>
 					<td th:text="${item.signal}">信号强度</td>
 					<td th:text="${item.pressure}">压力值</td>
