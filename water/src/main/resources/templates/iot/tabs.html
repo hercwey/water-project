@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<div th:include="common/common_head::headx('IOT选项卡页面')" th:remove="tag"></div>
+<!-- 页面正在加载js -->
+<script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>
+<!-- 显示/隐藏正在加载阴影 -->
+<script th:src="@{/pivas/js/common/Loading.js}"></script>
+<!-- 引入通用对话框工具 -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 
+	包装页面,也可以不使用此页面,直接使用内容页面.
+	_starter:页面为包装页面,用于加载_search
+	_main:主页面包括:操作面板(增加,删除,查询)+数据列表容器
+	_table:页面:数据列表页面
+	_dialog_add:增加对话框
+	_dialog_modi:修改对话框
+		
+	_starter页面---load---_main页面---load---_table页面
+	 
+-->
+<style type="text/css">
+	/* 列表选中行的颜色 */
+	.selected-color{
+		background: #8FBC8F;
+		color: #fff
+		
+	}
+	.table-hovers tbody tr:hover{
+		cursor: default;
+		background: #8FBC8F;
+		color: #fff
+	}
+</style>
+</head>
+<body>
+	
+	<!-- 批次管理主页 -->
+	<!-- <div class="container-fluid"> -->
+	<br />
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="tabbable" id="tabs-test-device">
+					<ul class="nav nav-tabs">
+						<li class="nav-item">
+							<a class="nav-link active" href="#tab-test-device-main" data-toggle="tab">测试设备列表（本地库）</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#tab-iot-device-main" data-toggle="tab">已注册设备列表（电信平台）</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#tab-device-up-data-main" data-toggle="tab">设备上报数据</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#tab-down-device-data-main" data-toggle="tab">发送指令记录</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#tab-get-token-and-subscribe-main" data-toggle="tab">获取TOKEN并订阅</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane load-device-item-div active" id="tab-test-device-main">
+							<!-- 显示测试设备列表（本地数据库） -->
+						</div>
+						<div class="tab-pane" id="tab-iot-device-main">
+							<!-- 已注册设备列表（电信平台） -->
+							<div class="row clearfix">
+								<div class="col-md-3 column">
+									<button type="button" class="btn btn-info btn-sm" id="btn-query-device">
+										<i class="fa fa-search" aria-hidden="true"> <span>刷新已注册设备列表</span></i>
+									</button>
+								</div>
+								<div class="col-md-3 column d-none">
+									<input type="number" class="form-control btn-sm" id="command-value" name="" value="" placeholder="命令值" />
+								</div>
+								<div class="col-md-6 column d-none">
+									<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-to-device">
+										<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送命令</span></i>
+									</button>
+									
+									<!-- <button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-meter-config">
+										<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水表配置指令</span></i>
+									</button>
+									<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-open-close">
+										<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送开关阀指令</span></i>
+									</button>
+									<button type="button" class="btn btn-info btn-sm" id="btn-send-cmd-water-amount">
+										<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水量阈值指令</span></i>
+									</button> -->
+								</div>
+							</div>
+							<br />
+							<div class="row clearfix">
+								<div class="col-md-12 column">
+									<!-- <div class="card">
+										<h5 class="card-header">
+											设备列表
+										</h5>
+										<div class="card-body">
+											
+										</div>
+										<div class="card-footer">
+											Card footer
+										</div>
+									</div> -->
+									<table class="table table-bordered table-sm table-hovers device-item-table">
+										<thead>
+											<tr>
+												<th>序号</th>
+												<th>状态</th>
+												<th>设备名称</th>
+												<th>设备识别码</th>
+												<th>设备类型</th>
+												<th>厂商名称</th>
+											</tr>
+										</thead>
+										<tbody class="device-item-body">
+											<!-- 此处显示设备列表 -->
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="row clearfix">
+								<div class="col-md-12 column device-item-pager">
+									<!-- 此处显示设备列表的分页 -->
+								</div>				
+							</div>		
+						</div>
+						<div class="tab-pane device-up-data-item" id="tab-device-up-data-main">
+							<!-- 设备上报数据 -->
+						</div>
+						<div class="tab-pane send-cmd-record-item" id="tab-down-device-data-main">
+							<!-- 发送指令记录 -->
+						</div>
+						<div class="tab-pane" id="tab-get-token-and-subscribe-main">
+							<!-- 获取TOKEN并订阅 -->
+							<div class="row clearfix">
+								<div class="col-md-12 column">
+									<button type="button" class="btn btn-primary btn-sm" id="btn-get-token">
+										<i class="fa fa-get-pocket" aria-hidden="true"> <span>获取Token并自动订阅</span></i>
+									</button>
+									<button type="button" class="btn btn-primary btn-sm" id="btn-refresh-token">
+										<i class="fa fa-refresh" aria-hidden="true"> <span>刷新Token并自动订阅</span></i>
+									</button>
+									<button type="button" class="btn btn-primary btn-sm" id="btn-subscribe-device">
+										<i class="fa fa-flag-checkered" aria-hidden="true"> <span>手动订阅</span></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+	
+		var SELECTED_DEVICE_ID = null;//用户已选择的设备
+	
+		$(function() {
+			
+			//------------------初始化-----------------------------------------------------------------------------
+			loadTestDeviceList();//加载测试设备列表（本地数据库）
+			loadDeviceUpDataMain();//加载设备上报数据主页面
+			loadSendCmdRecordMain();//加载发送指令记录主页面
+			//------------------订阅部分----------------------------------------------------------------------------
+			/**
+			 * 	获取Token并自动订阅
+			 */
+			$("#btn-get-token").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/auth/login";
+				$.post(url, function(res){
+					console.log("----------"+res);
+					var result = $.parseJSON(res);
+					/* if(result.status==200){
+						
+					} */
+					//dialog type: success warning info error,默认为info
+					util.message(result.status+":"+result.message,null,"warning");
+				});
+			});
+			/**
+			 * 	刷新Token并自动订阅
+			 */
+			$("#btn-refresh-token").on("click", function(){
+				var url = BASE_CONTEXT_PATH + "/auth/refreshToken";
+				$.post(url, function(res){
+					console.log("----------"+res);
+					var result = $.parseJSON(res);
+					/* if(result.status==200){
+					
+					} */
+					//dialog type: success warning info error,默认为info
+					util.message(result.status+":"+result.message,null,"warning");
+				});
+			});
+			
+			//------------------设备数据变动消息订阅部分----------------------------------------------------------------------------
+			/**
+			 * 	设备数据变动消息订阅
+			 */
+			$("#btn-subscribe-device").on("click", function(){
+				
+				var url = BASE_CONTEXT_PATH + "/subscribe/deviceData";
+				
+				$.post(url, null, function(res){
+					console.log("----------"+res);
+					var result = $.parseJSON(res);
+					/* if(result.status==200){
+					
+					} */
+					//dialog type: success warning info error,默认为info
+					util.message(result.status+":"+result.message,null,"warning");
+				});
+			});
+			
+			//------------------注册设备部分----------------------------------------------------------------------------
+			/**
+			 * 	注册设备
+			 */
+			/* $("#btn-register-device").on("click", function(){
+				
+				var verifyCode = $("#verify-code").val();
+				if(verifyCode==null || verifyCode==""){
+					//dialog type: success warning info error,默认为info
+					util.message("verifyCode不能为空！",null,"warning");
+					return false;
+				}
+				
+				registerDeviceFn(verifyCode);//注册设备
+				
+				/* var parms = {"data": data};
+				$.post(url, parms, function(res){
+					console.log("----------"+res);
+					//dialog type: success warning info error,默认为info
+					util.message(res,null,"warning");
+				}); *
+			}); */
+			
+			//------------------查询设备列表部分----------------------------------------------------------------------------
+			/**
+			 * 	查询设备列表
+			 */
+			$("#btn-query-device").on("click", function(){
+				defaultQueryDeviceList();//默认查询设备列表（默认查询第1页，每页5条数据）
+			});
+			
+			/**
+			 * 	发送命令到设备（给水表发送命令）
+			 */
+			/* $("#btn-send-cmd-to-device").on("click", function(){
+				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
+				if(deviceId==null || deviceId==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要发送命令的设备！",null,"warning");
+					return false;
+				}
+				
+				var cmdVal = $("#command-value").val();//命令值
+				if(cmdVal==null || cmdVal==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请输入需要发送的命令值！",null,"warning");
+					return false;
+				}
+				
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			}); */
+			
+			/**
+			 * 	发送水表配置指令到设备（给水表发送指令）
+			 */
+			/* $("#btn-send-cmd-meter-config").on("click", function(){
+				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
+				if(deviceId==null || deviceId==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要发送命令的设备！",null,"warning");
+					return false;
+				}
+				
+				DialogUtil.openDialogFn(G_METER_CONFIG_COMMAND_DIALOG_ID);//打开发送水表配置指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			}); */
+			/**
+			 * 	发送开关阀指令到设备（给水表发送指令）
+			 */
+			/* $("#btn-send-cmd-open-close").on("click", function(){
+				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
+				if(deviceId==null || deviceId==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要发送命令的设备！",null,"warning");
+					return false;
+				}
+				
+				DialogUtil.openDialogFn(G_OPEN_CLOSE_COMMAND_DIALOG_ID);//打开发送开关阀指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			}); */
+			/**
+			 * 	发送水量阀值指令到设备（给水表发送指令）
+			 */
+			/* $("#btn-send-cmd-water-amount").on("click", function(){
+				var deviceId = SELECTED_DEVICE_ID;//用户已选择的设备
+				if(deviceId==null || deviceId==""){
+					//dialog type: success warning info error,默认为info
+					util.message("请选择需要发送命令的设备！",null,"warning");
+					return false;
+				}
+				
+				DialogUtil.openDialogFn(G_WATER_AMOUNT_COMMAND_DIALOG_ID);//打开发送水量阀值指令对话框
+				//sendCommandAjaxRequest();//给设备（水表）发送命令
+				//注: 回调函数需要采用引号引起来
+				//util.confirm("确认发送命令【"+cmdVal+"】吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				
+			}); */
+			
+			//------------------查询设备上传数据部分----------------------------------------------------------------------------
+			/**
+			 * 	查询设备上传数据
+			 */
+			/* $("#btn-search-device-up-data").on("click", function(){
+				loadDeviceUpDataMain();//加载设备上报数据主页面
+			}); */
+			
+			//------------------查询发送指令记录部分----------------------------------------------------------------------------
+			/**
+			 * 	查询发送指令记录
+			 */
+			/* $("#btn-search-send-cmd-record").on("click", function(){
+				defaultSearchSendCmdRecord();//默认查询发送指令记录（默认查询第1页，每页2条数据）
+				loadSendCmdRecordMain();//加载发送指令记录主页面
+			}); */
+			
+		});
+		
+		//------------------加载测试设备（本地数据库）列表部分----------------------------------------------------------------------------
+		/**
+		 * 	加载测试设备列表
+		 */
+		function loadTestDeviceList(){
+			
+			var url = BASE_CONTEXT_PATH + "/wm-device/main";
+			
+			$(".load-device-item-div").load(url, null, function(){
+				console.log("----------加载测试设备main页面完成");
+				windowResize();//初始化windows窗口滚动条
+			});
+		}
+		
+		//------------------注册设备部分----------------------------------------------------------------------------
+		/**
+		 * 	注册设备
+		 */
+		function registerDeviceFn(verifyCode){
+			//var data = '{"verifyCode":"VERIFY_CODE","manufacturerId":"JR0912X","manufacturerName":"JRIWA","model":"JR0912Y","protocolType":"CoAP","deviceType":"JRNBWaterMeter"}';
+			var dataObj = new Object();
+			dataObj.verifyCode = verifyCode;
+			dataObj.manufacturerId = "JR0912X";
+			dataObj.manufacturerName = "JRIWA";
+			dataObj.model = "JR0912Y";
+			dataObj.protocolType = "CoAP";
+			dataObj.deviceType = "JRNBWaterMeter";
+			
+			var dataJson = JSON.stringify(dataObj);
+			
+			console.log("----------请求数据："+dataJson);
+			
+			var urlStr = BASE_CONTEXT_PATH + "/device/register";
+			$.ajax({
+				type: "post",
+				url: urlStr,
+				dataType : "json",
+				contentType : "application/json",      //网上很多介绍加上此参数的，后来我发现不加入这个参数才会请求成功。
+				data: dataJson,
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					var result = res;//$.parseJSON(res);
+					if(result.status==200){
+						clickPagerReloadTable();//重新刷新当前页面
+					}else{
+						//dialog type: success warning info error,默认为info
+						util.message(result.status+":"+result.message+"，注册失败，请手动注册！",null,"warning");
+					}
+					//dialog type: success warning info error,默认为info
+					//util.message(result.status+":"+result.message,null,"warning");
+			    }
+			});
+		}
+		
+		//------------------查询设备-初始化设备列表部分----------------------------------------------------------------------------
+		/**
+		 * 	默认查询设备列表（默认查询第1页，每页5条数据）
+		 */
+		function defaultQueryDeviceList(){
+			
+			var pageNo = 0;
+			var pageSize = 15;
+			queryDeviceList(pageNo, pageSize);//通用查询设备列表
+		}
+		/**
+		 * 	通用查询设备列表
+		 */
+		function queryDeviceList(pageNo, pageSize){
+			
+			SELECTED_DEVICE_ID = null;//用户已选择的设备，用户重新查询设备或点击分页查询后设置已选择的设备为空
+			
+			var url = BASE_CONTEXT_PATH + "/device/queryDevices/"+pageNo+"/"+pageSize;
+			
+			$.get(url, null, function(res){
+				console.log("----------result:"+res);
+				var result = $.parseJSON(res);
+				var data = result.data;
+				console.log("----------data:"+data);
+				if(data!=null && data!=""){
+					var dataObj = $.parseJSON(data);
+					var totalCount = dataObj.totalCount;
+					var pageNo = dataObj.pageNo;
+					var pageSize = dataObj.pageSize;
+					
+					var devices = dataObj.devices;
+					//var deviceList = $.parseJSON(devices);
+					console.log("----------devices:"+JSON.stringify(devices));
+					initDeviceItemBody(pageNo, pageSize, devices);//初始化设备列表
+					initDeviceItemPager(totalCount, pageNo, pageSize);//初始化设备列表分页
+					//initDeviceListener();//初始化绑定设备列表tr的click事件
+					windowResize();//初始化windows窗口滚动条
+					return false;
+				}
+				//dialog type: success warning info error,默认为info
+				util.message(result.status+":"+result.message,null,"warning");
+			});
+		}
+		/**
+		 * 	初始化设备列表
+		 */
+		function initDeviceItemBody(pageNo, pageSize, devices){
+			
+			console.log("----------设备列表对象:"+JSON.stringify(devices));
+			
+			var count = (pageNo)*pageSize;//当前页默认序号
+			
+			var domObj = $("table.device-item-table tbody.device-item-body");
+			
+			domObj.empty();
+			
+			var html = "";
+			$.each(devices, function(index){
+				var tr = getDeviceBodyTr((count+(index+1)), this);
+				html += tr;
+			});
+			domObj.append(html);
+		}
+		/**
+		 * 	获取设备每行信息HTML
+		 */
+		function getDeviceBodyTr(count, device){
+			console.log("----------设备对象:"+JSON.stringify(device));
+			var deviceId = device.deviceId;
+			var deviceInfo = device.deviceInfo;
+			console.log("----------设备信息对象:"+JSON.stringify(deviceInfo));
+			
+			
+			var status = deviceInfo.status;//状态
+			var nodeId = deviceInfo.nodeId;//设备识别码
+			var deviceType = deviceInfo.deviceType;//设备类型
+			var manufacturerName = deviceInfo.manufacturerName;//厂商名称
+			
+			var statusStr = "";//状态
+			if(status==null || status=="OFFLINE"){
+				statusStr = "<span class='badge badge-secondary'>离线</span>";
+			}else{
+				statusStr = "<span class='badge badge-success'>在线</span>";
+			}
+			
+			var nodeIdStr = "";//设备识别码
+			if(nodeId!=null && nodeId!=""){
+				nodeIdStr = nodeId;
+			}
+			var deviceTypeStr = "";//设备类型
+			if(deviceType!=null && deviceType!=""){
+				deviceTypeStr = deviceType;
+			}
+			var manufacturerNameStr = "";//厂商名称
+			if(manufacturerName!=null && manufacturerName!=""){
+				manufacturerNameStr = manufacturerName;
+			}
+			var html = "<tr data-device-id='"+deviceId+"'>"
+					 + "<td>"+count+"</td>"	//序号
+					 + "<td>"+statusStr+"</td>"	//状态
+					 + "<td></td>"	//设备名称
+					 + "<td>"+nodeIdStr+"</td>"	//设备识别码
+					 + "<td>"+deviceTypeStr+"</td>"	//设备类型
+					 + "<td>"+manufacturerNameStr+"</td>"	//厂商名称
+					 + "</tr>";
+			return html;
+		}
+		
+		//------------------查询设备-初始化设备列表分页部分----------------------------------------------------------------------------
+		/**
+		 * 	初始化设备列表分页
+		 */
+		function initDeviceItemPager(totalCount, pageNo, pageSize){
+			
+			console.log("----------共"+totalCount+"条, 当前"+pageNo+"/"+pageSize+"页");
+			
+			var domObj = $(".device-item-pager");
+			
+			domObj.empty();
+			
+			var html = getDevicePagerHtml(totalCount, pageNo, pageSize);
+			domObj.append(html);
+		}
+		/**
+		 * 	获取设备每行信息HTML
+		 */
+		function getDevicePagerHtml(totalCount, pageNo, pageSize){
+			
+			var totalPage = Math.ceil(totalCount/pageSize);//向上取整,有小数就整数部分加1 
+			
+			var html = '<ul class="pagination" style="float: right;">';
+				html += '<li class="page-item">';
+				html += '<span class="page-link" style="color:black;">';
+				html += 		'<span>';
+				html += 			'共<strong><span>'+totalCount+'</span></strong>条, ';
+				html += 			'<span>当前'+(pageNo+1)+'/'+totalPage+'页</span>';
+				html += 		'</span>';
+				html += '</span>';
+				html += '</li>';
+				if(totalCount>0){
+					//queryDeviceList(pageNo, pageSize);//通用查询设备列表
+					if(pageNo!=0){
+						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList(0, '+pageSize+');">首页</a></li>';
+					}
+					if(pageNo<=0){
+						console.log("----------当前页是第一页，不需要查询上一页！");
+					}else{
+						var prePage = pageNo-1;
+						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList('+prePage+', '+pageSize+');">上一页</a></li>';
+					}
+					if(pageNo>=(totalPage-1)){
+						console.log("----------当前页是最后一页，不需要查询下一页！");
+					}else{
+						var nextPage = pageNo+1;
+						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList('+nextPage+', '+pageSize+');">下一页</a></li>';
+					}
+					if(pageNo!=(totalPage-1)){
+						html += '<li class="page-item"><a class="page-link" href="javascript:void(0);" onclick="queryDeviceList('+(totalPage-1)+', '+pageSize+');">尾页</a></li>';
+					}
+				}else{
+					html += '<li><span class="page-link" style="color:darkblue;"><span>未查询到记录</span></span></li>';
+				}
+				html += '</ul>';
+			return html;
+		}
+		
+		//------------------查询设备上传数据（水表上传数据列表）部分----------------------------------------------------------------------------
+		
+		/**
+		 * 	加载设备上报数据主页面
+		 */
+		function loadDeviceUpDataMain(){
+			
+			var url = BASE_CONTEXT_PATH + "/meter/main";
+			
+			$(".device-up-data-item").load(url, null, function(){
+				console.log("----------查询设备上报数据列表完成");
+				windowResize();//初始化windows窗口滚动条
+			});
+		}
+		/**
+		 * 	分页查询
+		 */
+		/*function clickMeterListPager(searchCond, pageNum, pageSize) {
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+	
+			searchDeviceUpData(parms);
+		} */
+		//------------------查询设备上传数据（水表上传数据列表）部分，初始化完成后绑定click事件----------------------------------------------------------------------------
+		/**
+		 * 	初始化绑定设备列表tr的click事件
+		 */
+		function initDeviceListener(){
+			
+			var domObj = $("table.device-item-table tbody.device-item-body tr");
+			
+			domObj.on("click", function(){
+				
+				domObj.removeClass("selected-color");//清除所有已选中的行
+				
+				var deviceId = $(this).attr("data-device-id");
+				
+				$(this).addClass("selected-color");
+				
+				SELECTED_DEVICE_ID = deviceId;//用户已选择的设备，用户选择设备行后设置已选择的设备的值
+				console.log("----------用户已选择的设备："+deviceId);
+			});
+		}
+		
+		//------------------向设备发送指令部分----------------------------------------------------------------------------
+		/**
+		 * 	向设备（水表）发送指令
+		 */
+		function sendCommandAjaxRequest(cmdVal){
+			
+			var iotDeviceId = getSendCmdIotDeviceIdFn();//获取发送指令的IOT设备ID
+			var commandType = getSendCommandTypeFn();//获取发送指令的类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
+			console.log("----------向设备【"+iotDeviceId+"】发送命令【"+cmdVal+"】");
+			
+			//var data = '{"deviceId":"替换设备DeviceId","serviceId":"JRprotocol","method":"JRprotocolXY","paras":{"value":"12"}}';
+			var paras = new Object();
+			paras.value = cmdVal;//指令值
+			var parasJson = JSON.stringify(paras);
+			
+			var dataObj = new Object();
+			dataObj.commandType = commandType;
+			//dataObj.deviceId = "e793e8a7-ddc7-4873-aca3-7d594f0a801a";//离线
+			//dataObj.deviceId = "dadb87c6-c2c4-4e27-b112-f660d2457519";//在线
+			dataObj.deviceId = iotDeviceId;
+			dataObj.serviceId = "JRprotocol";
+			//dataObj.method = "JRprotocolXY";
+			dataObj.method = "JRprotocolYX";
+			dataObj.paras = paras;
+			
+			var dataJson = JSON.stringify(dataObj);
+			
+			console.log("----------发送命令："+dataJson);
+			
+			var urlStr = BASE_CONTEXT_PATH + "/cmd/send";
+			$.ajax({
+				type: "post",
+				url: urlStr,
+				dataType : "json",
+				contentType : "application/json",      //网上很多介绍加上此参数的，后来我发现不加入这个参数才会请求成功。
+				data: dataJson,
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					var result = res;//$.parseJSON(res);
+					if(result.message=="success"){
+						DialogUtil.closeDialogFn(G_METER_CONFIG_COMMAND_DIALOG_ID);//关闭发送水表配置指令对话框
+						DialogUtil.closeDialogFn(G_OPEN_CLOSE_COMMAND_DIALOG_ID);//关闭发送开关阀指令对话框
+						DialogUtil.closeDialogFn(G_WATER_AMOUNT_COMMAND_DIALOG_ID);//关闭发送水量阀值指令对话框
+					}
+					//dialog type: success warning info error,默认为info
+					util.message(result.status+":"+result.message,null,"warning");
+			    }
+			});
+		}
+		/**
+		 * 	取消向设备（水表）发送指令
+		 */
+		function cancelSendCommandAjaxRequest(){
+			console.log("----------取消发送指令");
+		}
+		
+		//------------------查询设备上传数据（水表上传数据列表）部分----------------------------------------------------------------------------
+		
+		/**
+		 * 	默认查询设备上报数据（默认查询第1页，每页2条数据）
+		 */
+		/* function defaultSearchDeviceUpData(){
+			var searchCond = null;
+			var pageNum = 1;
+			var pageSize = 5;
+			clickMeterListPager(searchCond, pageNum, pageSize);
+		} */
+		/**
+		 * 	通用查询设备上报数据
+		 */
+		/* function searchDeviceUpData(parms){
+			
+			var url = BASE_CONTEXT_PATH + "/meter/main";
+			
+			$(".device-up-data-item").load(url, parms, function(){
+				console.log("----------加载设备上报数据主页面完成！");
+				windowResize();//初始化windows窗口滚动条
+			});
+		} */
+		
+		//------------------加载发送指令记录主页面部分----------------------------------------------------------------------------
+		
+		/**
+		 * 	加载发送指令记录主页面
+		 */
+		function loadSendCmdRecordMain(){
+			var url = BASE_CONTEXT_PATH + "/cmd/load-main";
+			$(".send-cmd-record-item").load(url, null, function(){
+				console.log("----------加载发送指令记录主页面完成");
+				windowResize();//初始化windows窗口滚动条
+			});
+		}
+		
+		//------------------初始化滚动条部分----------------------------------------------------------------------------
+		function windowResize(){
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+	</script>
+
+</body>
+</html>

@@ -23,6 +23,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.learnbind.ai.common.util.BigDecimalUtils;
 import com.learnbind.ai.common.util.EntityUtils;
+import com.learnbind.ai.constant.PagerConstant;
 import com.learnbind.ai.iot.protocol.util.ByteUtil;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.model.iot.CommandBean;
@@ -177,7 +178,7 @@ public class MeterController {
 		// 判定页码有效性
 		if (pageNum == null || pageNum == 0) {
 			pageNum = 1;
-			pageSize = 5;// PagerConstant.DEFAULT_PAGE_SIZE;
+			pageSize = PagerConstant.DEFAULT_PAGE_SIZE;
 		}
 
 		// 查询并分页

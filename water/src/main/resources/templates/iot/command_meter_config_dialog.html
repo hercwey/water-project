@@ -11,11 +11,13 @@
 <style type="text/css">
 	.table-center tr th{
 		vertical-align: middle;
-		text-align: center;
+		/* text-align: center; */
 		border: 0px;
 	}
-	.table-center tr td{
+	.table-middle tr td{
 		vertical-align: middle;
+	}
+	.table-middle tr td.center{
 		text-align: center;
 	}
 	.table-center tr td select{
@@ -51,7 +53,7 @@
 								<form class="form-horizontal" role="form" id="meter-config-form">
 									<!-- <div class="card">
 									</div> -->
-									<table class="table-layout table table-sm table-center">
+									<table class="table-layout table table-sm table-middle">
 										<thead>
 											<tr>
 												<th>参数名称</th>
@@ -74,7 +76,7 @@
 																th:value="${meterConfigBean==null ? '' : meterConfigBean.reportPeriod}"
 																placeholder="定时上传周期" />
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-report-period" value="" style="position: unset;" />
@@ -91,7 +93,7 @@
 														<option value="2" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==2 ? 'true' : 'false'}">天</option>
 													</select>
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-report-period-unit" value="" style="position: unset;" />
@@ -106,7 +108,7 @@
 																th:value="${meterConfigBean==null ? '' : meterConfigBean.reportRation}" 
 																placeholder="定量上传值" />
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-report-ration" value="" style="position: unset;" />
@@ -121,7 +123,7 @@
 																th:value="${meterConfigBean==null ? '' : meterConfigBean.temporaryTime}" 
 																placeholder="用户临时开阀用水限定时间" />
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-temporary-time" value="" style="position: unset;" />
@@ -138,7 +140,7 @@
 																th:value="${meterConfigBean==null ? '' : meterConfigBean.valveRunTime}" 
 																placeholder="阀门行程时间" />
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-valve-run-time" value="" style="position: unset;" />
@@ -153,7 +155,7 @@
 																th:value="${meterConfigBean==null ? '' : meterConfigBean.valveMaintainPeriod}" 
 																placeholder="阀门维护周期" />
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-valve-maintain-period" value="" style="position: unset;" />
@@ -168,7 +170,7 @@
 																th:value="${meterConfigBean==null ? '' : meterConfigBean.meterBasicValue}" 
 																placeholder="表底数" />
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-basic-value" value="" style="position: unset;" />
@@ -191,7 +193,7 @@
 														<option value="0.001" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.001' ? 'true' : 'false'}">1升</option>
 													</select>
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-sample-unit" value="" style="position: unset;" />
@@ -207,7 +209,7 @@
 															onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});"
 															placeholder="表当前时间" />
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-time" value="" style="position: unset;" />
@@ -223,7 +225,7 @@
 														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticAlarmOn=='1' ? 'true' : 'false'}">是</option>
 													</select>
 												</td>
-												<td>
+												<td class="center">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-magnetic-alarm-on" value="" style="position: unset;" />
@@ -242,7 +244,7 @@
 														<option value="2" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.maxReportOn==1 ? 'true' : 'false'}">定量上传</option>
 													</select>
 												</td>
-												<td rowspan="2">
+												<td class="center" rowspan="2">
 													<div class="form-check">
 														<label class="form-check-label">
 															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-status" value="" style="position: unset;" />

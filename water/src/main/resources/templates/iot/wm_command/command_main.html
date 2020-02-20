@@ -40,11 +40,12 @@
 						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
 							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
 						</button>
-						
 						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
 							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
 						</button>
-					
+						<button type="button" class="btn btn-info btn-sm"	id="btn-command-timer">
+							<i class="fa fa-clock-o" aria-hidden="true"> <span id="btn-command-timer-span">定时刷新</span>	</i>
+						</button>
 					</li>
 				</ul>
 			</div>
@@ -67,13 +68,15 @@
 
 	<script>
 	
+		//---------------------------定时刷新-----------------------------------------------------------------------------------------------------------------
+		var g_command_timer = null;//定时刷新启动后会返回一个 ID（数字），此处用于记录这个返回的ID
 		/**
 		 * 	定时查询下发指令数据列表，1分钟刷新一次
 		 */
 		function timeountSearchWmCommandFn(){
 			console.log("----------定时查询下发指令数据");
 			defaultSearchWmCommand();//查询
-			setTimeout(timeountSearchWmCommandFn,1*60*1000);
+			g_command_timer = setTimeout(timeountSearchWmCommandFn,1*60*1000);
 		}
 		
 		//--------------------公共查询函数--------------------------
@@ -158,9 +161,8 @@
 		$(function() {
 			//------------init-------------
 			//主页:默认查询(加载默认列表)
-			//defaultSearchWmCommand();
-			timeountSearchWmCommandFn();//定时查询下发指令数据列表，1分钟刷新一次
-
+			defaultSearchWmCommand();//查询
+			
 			//---------事件绑定--------------
 			/**
 			 * 	绑定数据类型按钮的change事件
@@ -191,6 +193,22 @@
 				if(event.keyCode == 13){
 					$('#search-send-command-records-from #btn-search').trigger("click");	                
 	            }	
+			});
+			
+			/**
+			 * 	定时刷新
+			 */
+			$('#search-send-command-records-from #btn-command-timer').on('click', function(event) {
+				if(g_command_timer==null){
+					console.log("----------启动发送指令记录列表定时刷新");
+					timeountSearchWmCommandFn();//定时查询下发指令数据列表，1分钟刷新一次
+					$('#search-send-command-records-from #btn-command-timer #btn-command-timer-span').text("停止刷新");//设置定时按钮的显示文字
+				}else{
+					console.log("----------停止发送指令记录列表定时刷新");
+					clearTimeout(g_command_timer);//取消由 setTimeout() 方法设置的定时操作。
+					g_command_timer = null;//定时刷新启动后会返回一个 ID（数字），此处用于记录这个返回的ID
+					$('#search-send-command-records-from #btn-command-timer #btn-command-timer-span').text("定时刷新");//设置定时按钮的显示文字
+				}
 			});
 			
 		});

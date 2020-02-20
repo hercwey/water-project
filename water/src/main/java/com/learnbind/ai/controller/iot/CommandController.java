@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.learnbind.ai.constant.PagerConstant;
 import com.learnbind.ai.iot.protocol.PacketCodec;
 import com.learnbind.ai.iot.protocol.PacketFrame;
 import com.learnbind.ai.iot.protocol.bean.MeterBase;
@@ -122,7 +123,7 @@ public class CommandController {
     	// 判定页码有效性
 		if (pageNum == null || pageNum == 0) {
 			pageNum = 1;
-			pageSize = 5;//PagerConstant.DEFAULT_PAGE_SIZE;
+			pageSize = PagerConstant.DEFAULT_PAGE_SIZE;
 		}
 
 		// 查询并分页

@@ -22,7 +22,7 @@ public class IOTTestController {
     
     @RequestMapping(value = "/test")
     public String test() {
-        return "iot/test";
+        return "iot/tabs";
     }
 
 }

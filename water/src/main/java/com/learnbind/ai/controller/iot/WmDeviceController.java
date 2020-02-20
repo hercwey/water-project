@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.learnbind.ai.common.RequestResultUtil;
+import com.learnbind.ai.constant.PagerConstant;
 import com.learnbind.ai.iot.protocol.CommandGenerator;
 import com.learnbind.ai.iot.protocol.Protocol;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
@@ -55,7 +56,6 @@ public class WmDeviceController {
 	
 	private static Log log = LogFactory.getLog(WmDeviceController.class);
 	private static final String TEMPLATE_PATH = "iot/wm_device/"; // 页面目录
-	private static final int PAGE_SIZE = 5;//每页显示记录条数
 	
 	@Autowired
 	private WmDeviceService wmDeviceService;//智慧水务平台测试水表服务
@@ -97,7 +97,7 @@ public class WmDeviceController {
 		// 判定页码有效性
 		if (pageNum == null || pageNum == 0) {
 			pageNum = 1;
-			pageSize = PAGE_SIZE;
+			pageSize = 10;//PagerConstant.DEFAULT_PAGE_SIZE;
 		}
 
 		Example example = new Example(WmDevice.class);
