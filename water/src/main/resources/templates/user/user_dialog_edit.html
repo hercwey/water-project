@@ -210,6 +210,23 @@
 														</span>													
 													</div>
 												</td>	
+												<td>
+													<!-- 网点信息-->
+													<div class="form-group form-inline">
+														<label for="user-sex" class="col-sm-4 control-label">网点信息</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control " id="user-bus-office" name="busOffice" th:value="${item==null ? '' : item.officeName}">
+																<!-- 默认选择第一个 -->
+																<option value="">-请选择-</option>
+																<span th:each="item,iterStat: ${officeList}" th:remove="tag">
+																	<option th:value="${item.officeName}"  th:attr="selected=${item!=null && item.officeName==item.officeName ? 'true':'false'}, data-office-id=${item.id}"
+																			th:text="${item.officeName}">数据字典的值</option>
+																</span>
+																
+															</select>
+														</span>
+													</div>
+												</td>
 											</tr>		
 											
 										</tbody>
@@ -255,7 +272,9 @@
 			if(userId!=null && userId!=""){
 				urlStr = BASE_CONTEXT_PATH + "/user/update";
 			}
+			var officeId = $("#user-bus-office").find("option:selected").attr("data-office-id");
 			var form=new FormData($("#user-dialog-modi-form")[0]);
+			form.append('officeId', officeId)
 			$.ajax({
 				type : "POST", // 提交方式 get/post
 				url : urlStr,

@@ -382,7 +382,18 @@
 														</span>
 													</div>
 												</td>
-												<td></td>
+												<td>
+													<!-- 协议类型 -->
+													<div class="form-group form-inline">
+														<label for="meters-protocol-type" class="col-sm-4 control-label">协议类型</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-protocol-type" name="protocolType" th:value="${currItem==null ? '' : currItem.protocolType}">
+																<!-- 默认选择第一个 -->
+																<option value="CaAP" th:attr="selected=( ${currItem!=null && currItem.protocolType==CaAP} )? 'selcted' ">CaAP</option>	
+															</select>
+														</span>
+													</div>
+												</td>
 											</tr>
 										</tbody>
 									</table>

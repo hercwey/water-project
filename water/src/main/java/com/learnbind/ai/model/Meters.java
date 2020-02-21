@@ -113,6 +113,24 @@ public class Meters {
     
     @Column(name = "SORT_VALUE")
     private Integer sortValue;
+    
+    @Column(name = "DEVICE_ID")
+    private String deviceId;
+    
+    @Column(name = "PROTOCOL_TYPE")
+    private String protocolType;
+    
+    @Column(name = "METER_NUMBER")
+    private String meterNumber;
+    
+    @Column(name = "METER_CONFIG")
+    private String meterConfig;
+    
+    @Column(name = "METER_FREEZE")
+    private String meterFreeze;
+    
+    @Column(name = "METER_NAME")
+    private String meterName;
 
     /**
      * @return ID
@@ -597,45 +615,69 @@ public class Meters {
 	public void setSortValue(Integer sortValue) {
 		this.sortValue = sortValue;
 	}
+	
+	
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getProtocolType() {
+		return protocolType;
+	}
+
+	public void setProtocolType(String protocolType) {
+		this.protocolType = protocolType;
+	}
+
+	public String getMeterNumber() {
+		return meterNumber;
+	}
+
+	public void setMeterNumber(String meterNumber) {
+		this.meterNumber = meterNumber;
+	}
+
+	public String getMeterConfig() {
+		return meterConfig;
+	}
+
+	public void setMeterConfig(String meterConfig) {
+		this.meterConfig = meterConfig;
+	}
+
+	public String getMeterFreeze() {
+		return meterFreeze;
+	}
+
+	public void setMeterFreeze(String meterFreeze) {
+		this.meterFreeze = meterFreeze;
+	}
+
+	public String getMeterName() {
+		return meterName;
+	}
+
+	public void setMeterName(String meterName) {
+		this.meterName = meterName;
+	}
 
 	@Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", caliber=").append(caliber);
-        sb.append(", meterNo=").append(meterNo);
-        sb.append(", place=").append(place);
-        sb.append(", factory=").append(factory);
-        sb.append(", factoryPhone=").append(factoryPhone);
-        sb.append(", certificateNo=").append(certificateNo);
-        sb.append(", checkDate=").append(checkDate);
-        sb.append(", effectiveDate=").append(effectiveDate);
-        sb.append(", pid=").append(pid);
-        sb.append(", steelSealNo=").append(steelSealNo);
-        sb.append(", newMeterBottom=").append(newMeterBottom);
-        sb.append(", changeMeterBottom=").append(changeMeterBottom);
-        sb.append(", meterUse=").append(meterUse);
-        sb.append(", meterType=").append(meterType);
-        sb.append(", upperLimit=").append(upperLimit);
-        sb.append(", meterStatus=").append(meterStatus);
-        sb.append(", meterModel=").append(meterModel);
-        sb.append(", readMode=").append(readMode);
-        sb.append(", deleted=").append(deleted);
-        sb.append(", remark=").append(remark);
-        sb.append(", meterAddress=").append(meterAddress);
-        sb.append(", virtualReal=").append(virtualReal);
-        sb.append(", collectorAddr=").append(collectorAddr);
-        sb.append(", channelNo=").append(channelNo);
-        sb.append(", status=").append(status);
-        sb.append(", cycleStatus=").append(cycleStatus);
-        sb.append(", waterUse=").append(waterUse);
-        sb.append(", priceCode=").append(priceCode);
-        sb.append(", description=").append(description);
-        sb.append(", sortValue=").append(sortValue);
-        sb.append("]");
-        return sb.toString();
-    }
+	public String toString() {
+		return "Meters [id=" + id + ", caliber=" + caliber + ", meterNo=" + meterNo + ", place=" + place + ", factory="
+				+ factory + ", factoryPhone=" + factoryPhone + ", certificateNo=" + certificateNo + ", checkDate="
+				+ checkDate + ", effectiveDate=" + effectiveDate + ", pid=" + pid + ", steelSealNo=" + steelSealNo
+				+ ", newMeterBottom=" + newMeterBottom + ", changeMeterBottom=" + changeMeterBottom + ", meterUse="
+				+ meterUse + ", meterType=" + meterType + ", upperLimit=" + upperLimit + ", meterStatus=" + meterStatus
+				+ ", meterModel=" + meterModel + ", readMode=" + readMode + ", deleted=" + deleted + ", remark="
+				+ remark + ", meterAddress=" + meterAddress + ", virtualReal=" + virtualReal + ", collectorAddr="
+				+ collectorAddr + ", channelNo=" + channelNo + ", status=" + status + ", cycleStatus=" + cycleStatus
+				+ ", waterUse=" + waterUse + ", priceCode=" + priceCode + ", description=" + description
+				+ ", sortValue=" + sortValue + ", deviceId=" + deviceId + ", protocolType=" + protocolType
+				+ ", meterNumber=" + meterNumber + ", meterConfig=" + meterConfig + ", meterFreeze=" + meterFreeze
+				+ ", meterName=" + meterName + "]";
+	}
 }
