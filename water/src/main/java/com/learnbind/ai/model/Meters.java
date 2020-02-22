@@ -131,6 +131,9 @@ public class Meters {
     
     @Column(name = "METER_NAME")
     private String meterName;
+    
+    @Column(name = "SAMPLE_UNIT")
+    private Integer sampleUnit;
 
     /**
      * @return ID
@@ -664,7 +667,18 @@ public class Meters {
 	public void setMeterName(String meterName) {
 		this.meterName = meterName;
 	}
+	
+	
 
+	public Integer getSampleUnit() {
+		return sampleUnit;
+	}
+
+	public void setSampleUnit(Integer sampleUnit) {
+		this.sampleUnit = sampleUnit;
+	}
+
+	
 	@Override
 	public String toString() {
 		return "Meters [id=" + id + ", caliber=" + caliber + ", meterNo=" + meterNo + ", place=" + place + ", factory="
@@ -678,6 +692,6 @@ public class Meters {
 				+ ", waterUse=" + waterUse + ", priceCode=" + priceCode + ", description=" + description
 				+ ", sortValue=" + sortValue + ", deviceId=" + deviceId + ", protocolType=" + protocolType
 				+ ", meterNumber=" + meterNumber + ", meterConfig=" + meterConfig + ", meterFreeze=" + meterFreeze
-				+ ", meterName=" + meterName + "]";
+				+ ", meterName=" + meterName + ", sampleUnit=" + sampleUnit + "]";
 	}
 }

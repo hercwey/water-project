@@ -242,14 +242,14 @@ public class UserController {
 		//获取网点信息
 		List<BusinessOffice> officeList = new ArrayList<>();
 		UsersBusOffice usoffice = userBusOfficeService.getBusOfficeMessage(userId); 
+		BusinessOffice office = new BusinessOffice();
 		if(usoffice != null) {
-			BusinessOffice office = businessOfficeService.selectByPrimaryKey(usoffice.getOfficeId());
-			officeList.add(office);
-		} else {
-			officeList = businessOfficeService.selectAll();
+			office = businessOfficeService.selectByPrimaryKey(usoffice.getOfficeId());
 		}
+		officeList = businessOfficeService.selectAll();
 		
 		model.addAttribute("officeList", officeList);
+		model.addAttribute("office", office);
 		//读取需要编辑的条目
 		SysUsers currItem=usersService.selectByPrimaryKey(userId);
 		model.addAttribute("currItem",currItem);
@@ -272,14 +272,12 @@ public class UserController {
 		
 		usersService.updateByPrimaryKeySelective(user);
 		UsersBusOffice usoffice = userBusOfficeService.getBusOfficeMessage(user.getId()); 
-		if(usoffice != null) {
+		if(officeId != null) {
 			usoffice.setOfficeId(officeId);
+			usoffice.setUserId(user.getId());;
 			userBusOfficeService.updateByPrimaryKeySelective(usoffice);
 		} else {
-			UsersBusOffice temp = new UsersBusOffice();
-			temp.setUserId(user.getId());
-			temp.setOfficeId(officeId);
-			userBusOfficeService.insertSelective(temp);
+			userBusOfficeService.delete(usoffice);
 		}
 		
 		

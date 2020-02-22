@@ -14,26 +14,15 @@ package com.learnbind.ai.common.enumclass;
  * @version V1.0 
  *
  */
-public enum EnumDataDictType {
+public enum EnumUserType {
 
-	METER_READ_MODE("READ_MODE", "抄表方式"),
-	METER_FACTORY("METER_FACTORY", "生产厂家"),
-	METER_MODEL("METER_MODEL", "水表型号"),
-	METER_TYPE("METER_TYPE", "水表类型"),
-	METER_USE("METER_USE", "水表用途"),
-	METER_WATER_CALIBER("WARTER_CALIBER", "水表口径"),
-	
-	WATER_USE("WATER_USE", "用水性质"),
-	WORK_ORDER_TYPE("WORK_ORDER_TYPE", "工单类型"),
-	KNOW_LIBRARY_TYPE("KNOW_LIBRARY_TYPE", "知识库类型"),
-	PROTOCOL_TYPE("PROTOCOL_TYPE", "水表协议类型"),
-	SAMPLE_UNIT("SAMPLE_UNIT", "采样参数单位"),
-	CUSTOMER_TRADE_TYPE("TRADE_TYPE", "行业性质");
+	ADMIN_NO(0, "非管理员"),
+	ADMIN_YES(1, "管理员");
 
 	/**
 	 * @Fields value：值，用于数据库保存
 	 */
-	private String code;
+	private Integer value;
 	/**
 	 * @Fields name：名称，用于页面显示
 	 */
@@ -45,8 +34,8 @@ public enum EnumDataDictType {
 	 * @param value
 	 * @param name
 	 */
-	private EnumDataDictType(String code, String name) {
-		this.code = code;
+	private EnumUserType(Integer value, String name) {
+		this.value = value;
 		this.name = name;
 	}
 	
@@ -55,8 +44,8 @@ public enum EnumDataDictType {
 	 * @Description: 获取异常类型值，用于数据库保存
 	 * @return 
 	 */
-	public String getCode() {
-		return code;
+	public Integer getValue() {
+		return value;
 	}
 	
 	/**
@@ -74,9 +63,9 @@ public enum EnumDataDictType {
 	 * @param value
 	 * @return 
 	 */
-	public static String getName(String code) {
-		for (EnumDataDictType type : EnumDataDictType.values()) {
-			if (type.getCode() == code) {
+	public static String getName(int value) {
+		for (EnumUserType type : EnumUserType.values()) {
+			if (type.getValue() == value) {
 				return type.getName();
 			}
 		}

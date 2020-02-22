@@ -211,15 +211,30 @@
 													</div>
 												</td>	
 												<td>
-													<!-- 网点信息-->
+													<!-- 是否为管理员 -->
 													<div class="form-group form-inline">
+														<label for="user-enabled" class="col-sm-4 control-label">是否为管理员</label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control  " id="user-type" name="userType" th:value="${currItem==null ? 0 : currItem.userType}">
+																<!-- 默认选择第一个 -->
+																<option value="0" th:attr="selected=( ${currItem!=null && currItem.userType==0} )? 'selcted' ">否</option>
+																<option value="1" th:attr="selected=( ${currItem!=null && currItem.userType==1} )? 'selcted' ">是</option>
+															</select>
+														</span>										
+													</div>
+												</td>	
+											</tr>	
+											<tr>
+												<td>
+													<!-- 网点信息-->
+													<div class="form-group form-inline" id="user-office-div">
 														<label for="user-sex" class="col-sm-4 control-label">网点信息</label>
 														<span class="input-group-sm col-sm-8">
 															<select class="form-control " id="user-bus-office" name="busOffice" th:value="${item==null ? '' : item.officeName}">
 																<!-- 默认选择第一个 -->
-																<option value="">-请选择-</option>
+																<option value="0">-请选择-</option>
 																<span th:each="item,iterStat: ${officeList}" th:remove="tag">
-																	<option th:value="${item.officeName}"  th:attr="selected=${item!=null && item.officeName==item.officeName ? 'true':'false'}, data-office-id=${item.id}"
+																	<option th:value="${item.officeName}"  th:attr="selected=${item!=null && item.officeName==office.officeName ? 'true':'false'}, data-office-id=${item==null ? 0 : item.id}"
 																			th:text="${item.officeName}">数据字典的值</option>
 																</span>
 																
@@ -227,7 +242,8 @@
 														</span>
 													</div>
 												</td>
-											</tr>		
+												<td></td>
+											</tr>	
 											
 										</tbody>
 										
@@ -254,6 +270,7 @@
 	<script th:inline="javascript">
 		/*<![CDATA[*/
 			var curr_item=[[${currItem}]];
+			var office=[[${office}]];
 		/*]]>*/
 	</script>
 
@@ -272,9 +289,13 @@
 			if(userId!=null && userId!=""){
 				urlStr = BASE_CONTEXT_PATH + "/user/update";
 			}
+			var busoffice = $("#user-bus-office").val();
 			var officeId = $("#user-bus-office").find("option:selected").attr("data-office-id");
+			console.log(officeId)
 			var form=new FormData($("#user-dialog-modi-form")[0]);
-			form.append('officeId', officeId)
+			if(busoffice != 0){
+				form.append('officeId', officeId)
+			}
 			$.ajax({
 				type : "POST", // 提交方式 get/post
 				url : urlStr,
@@ -307,6 +328,15 @@
 	
 		//--------------------page loaded ready-----------------------
 		$(function() {
+			
+			$("#user-type").on('change',function() {//是否为管理员下拉框改变事件
+				var userType = $(this).find("option:selected").val();
+				if(userType == 0){
+					$("#user-office-div").show();//显示阶梯终值输入框
+				} else {
+					$("#user-office-div").hide();//隐藏阶梯终值输入框
+				}
+			});
 
 			//---------------click event process binding---------------
 

@@ -441,7 +441,11 @@
 														<span class="input-group-sm col-sm-8">
 															<select class="form-control" id="meters-protocol-type" name="protocolType" th:value="${currItem==null ? '' : currItem.protocolType}">
 																<!-- 默认选择第一个 -->
-																<option value="CaAP" th:attr="selected=( ${currItem!=null && currItem.protocolType==CaAP} )? 'selcted' ">CaAP</option>	
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${protocolTypeList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.protocolType ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
 															</select>
 														</span>
 													</div>
