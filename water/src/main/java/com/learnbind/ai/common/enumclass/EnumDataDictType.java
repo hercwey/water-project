@@ -28,6 +28,8 @@ public enum EnumDataDictType {
 	KNOW_LIBRARY_TYPE("KNOW_LIBRARY_TYPE", "知识库类型"),
 	PROTOCOL_TYPE("PROTOCOL_TYPE", "水表协议类型"),
 	SAMPLE_UNIT("SAMPLE_UNIT", "采样参数单位"),
+	METER_USE_TYPE("METER_USE_TYPE", "水表用水类型"),
+	METER_FACTORY_CODE("METER_FACTORY_CODE", "水表厂商代码"),
 	CUSTOMER_TRADE_TYPE("TRADE_TYPE", "行业性质");
 
 	/**

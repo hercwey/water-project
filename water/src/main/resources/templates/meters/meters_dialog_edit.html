@@ -82,7 +82,7 @@
 																<!-- 默认选择第一个 -->
 																<option value="" >-请选择-</option>
 																<span th:each="item,iterStat: ${meterTypeList}" th:remove="tag">
-																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterType ? 'true':'false'}"
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key=='DIRECT_READING_METER' ? 'true':'false'}"
 																			th:text="${item.value}">数据字典的值</option>
 																</span>
 																
@@ -450,6 +450,56 @@
 														</span>
 													</div>
 												</td>
+											</tr>
+											<tr>
+												<td>
+													<!-- 水表用水类型 -->
+													<div class="form-group form-inline">
+														<label for="meters-protocol-type" class="col-sm-4 control-label">水表用水类型 </label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-use-type" name="meterUseType" th:value="${currItem==null ? '' : currItem.meterUseType}">
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${meterUseTypeList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterUseType ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+												<td>
+													<!-- 水表厂商代码 -->
+													<div class="form-group form-inline">
+														<label for="meters-protocol-type" class="col-sm-4 control-label">水表厂商代码  </label>
+														<span class="input-group-sm col-sm-8">
+															<select class="form-control" id="meters-factory-code" name="meterFactoryCode" th:value="${currItem==null ? '' : currItem.meterFactoryCode}">
+																<!-- 默认选择第一个 -->
+																<option value="" >-请选择-</option>
+																<span th:each="item,iterStat: ${meterFactoryCodeList}" th:remove="tag">
+																	<option th:value="${item.key}"  th:attr="selected=${currItem!=null && item.key==currItem.meterFactoryCode ? 'true':'false'}"
+																			th:text="${item.value}">数据字典的值</option>
+																</span>
+															</select>
+														</span>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													<!-- 表号 -->
+													<div class="form-group form-inline">
+														<label for="" class="col-sm-4 control-label">表号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="text" class="form-control"
+																	th:value="${currItem==null ? '' : currItem.meterNumber}" 
+																	id="meters-number" name="meterNumber" 
+																	maxlength=12 title="请输入12位字符" placeholder="表号"/>
+														</span>
+													</div>
+												</td>
+												<td></td>
 											</tr>
 										</tbody>
 									</table>

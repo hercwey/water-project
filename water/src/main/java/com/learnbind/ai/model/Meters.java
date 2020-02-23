@@ -133,7 +133,16 @@ public class Meters {
     private String meterName;
     
     @Column(name = "SAMPLE_UNIT")
-    private Integer sampleUnit;
+    private String sampleUnit;
+    
+    @Column(name = "METER_USE_TYPE")
+    private String meterUseType;
+    
+    @Column(name = "METER_FACTORY_CODE")
+    private String meterFactoryCode;
+    
+    @Column(name = "METER_SEQUENCE")
+    private Long meterSequence;
 
     /**
      * @return ID
@@ -670,15 +679,40 @@ public class Meters {
 	
 	
 
-	public Integer getSampleUnit() {
+	public String getSampleUnit() {
 		return sampleUnit;
 	}
 
-	public void setSampleUnit(Integer sampleUnit) {
+	public void setSampleUnit(String sampleUnit) {
 		this.sampleUnit = sampleUnit;
 	}
-
 	
+	public String getMeterUseType() {
+		return meterUseType;
+	}
+
+	public void setMeterUseType(String meterUseType) {
+		this.meterUseType = meterUseType;
+	}
+
+	public String getMeterFactoryCode() {
+		return meterFactoryCode;
+	}
+
+	public void setMeterFactoryCode(String meterFactoryCode) {
+		this.meterFactoryCode = meterFactoryCode;
+	}
+
+	public Long getMeterSequence() {
+		return meterSequence;
+	}
+
+	public void setMeterSequence(Long meterSequence) {
+		this.meterSequence = meterSequence;
+	}
+	
+	
+
 	@Override
 	public String toString() {
 		return "Meters [id=" + id + ", caliber=" + caliber + ", meterNo=" + meterNo + ", place=" + place + ", factory="
@@ -692,6 +726,7 @@ public class Meters {
 				+ ", waterUse=" + waterUse + ", priceCode=" + priceCode + ", description=" + description
 				+ ", sortValue=" + sortValue + ", deviceId=" + deviceId + ", protocolType=" + protocolType
 				+ ", meterNumber=" + meterNumber + ", meterConfig=" + meterConfig + ", meterFreeze=" + meterFreeze
-				+ ", meterName=" + meterName + ", sampleUnit=" + sampleUnit + "]";
+				+ ", meterName=" + meterName + ", sampleUnit=" + sampleUnit + ", meterUseType=" + meterUseType
+				+ ", meterFactoryCode=" + meterFactoryCode + ", meterSequence=" + meterSequence + "]";
 	}
 }
