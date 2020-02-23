@@ -52,7 +52,7 @@ public class ApplicationReadyEventListener implements  ApplicationListener<Appli
     	log.info("----------	"+event.getClass());
     	
     	//this.setDataToQueue();//查询已上传的批量代扣文件记录，并增加到待处理队列
-    	authService.login();
+    	//authService.login();
     	
     }
     

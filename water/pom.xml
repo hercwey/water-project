@@ -506,11 +506,20 @@
             <artifactId>junrar</artifactId>
             <version>0.7</version>
         </dependency>
-         
-        <dependency> <!-- 引入log4j2依赖 -->  
+        
+        <!-- 引入log4j2依赖 -->
+        <dependency>   
 		    <groupId>org.springframework.boot</groupId>  
 		    <artifactId>spring-boot-starter-log4j2</artifactId>  
 		</dependency>
+		
+		<!--注意： 这里的版本,要和部署在服务器上的版本号一致-->
+		<!-- 引入rocketmq依赖 -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+            <version>4.6.0</version>
+        </dependency>
 		
 	</dependencies>
 

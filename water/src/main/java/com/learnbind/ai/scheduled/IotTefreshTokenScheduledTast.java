@@ -31,7 +31,7 @@ public class IotTefreshTokenScheduledTast {
      * @Description: 定时任务
      * 
      */
-    @Scheduled(cron = "0 0/30 * * * ?")
+    //@Scheduled(cron = "0 0/30 * * * ?")
     public void scheduled(){
     	
     	log.info("----------	【"+sdf.format(new Date())+"】	定时刷新【电信平台】Token【每30分钟执行一次】开始执行。。。	");
