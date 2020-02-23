@@ -13,8 +13,8 @@ import com.learnbind.ai.dao.WmCommandMapper;
 import com.learnbind.ai.iot.Constants;
 import com.learnbind.ai.iot.util.IoTRequestUtil;
 import com.learnbind.ai.iot.util.JsonUtil;
-import com.learnbind.ai.model.iot.CommandBean;
-import com.learnbind.ai.model.iot.CommandCallbackBean;
+import com.learnbind.ai.model.iot.TestCommandBean;
+import com.learnbind.ai.model.iot.TestCommandCallbackBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.WmCommand;
 import com.learnbind.ai.service.iot.ICommandService;
@@ -26,7 +26,7 @@ public class CommandService implements ICommandService {
     private WmCommandMapper wmCommandMapper;
 
     @Override
-    public JsonResult postCommand(CommandBean commandBean) {
+    public JsonResult postCommand(TestCommandBean commandBean) {
 
         JsonResult jsonResult = JsonResult.fail(0,"Unknown Error");
 
@@ -61,7 +61,7 @@ public class CommandService implements ICommandService {
 
     @Async
 	@Override
-	public void postAsynCommand(CommandBean commandBean) {
+	public void postAsynCommand(TestCommandBean commandBean) {
     	JsonResult jsonResult = postCommand(commandBean);
 
         String result = jsonResult.getData();
@@ -69,7 +69,7 @@ public class CommandService implements ICommandService {
         System.out.println("| 控制指令异步发送到IoT平台："+commandBean.getDeviceId()+"=="+commandBean.getCommandId());
 
         //TODO 补充完整数据库中指令信息，status设置为1（指令已下发）
-        CommandBean resultBean = CommandBean.parseJson(result);
+        TestCommandBean resultBean = TestCommandBean.parseJson(result);
         commandBean.setCommandId(resultBean.getCommandId());
         commandBean.setAppId(resultBean.getAppId());
         commandBean.setExpireTime(resultBean.getExpireTime());
@@ -77,7 +77,7 @@ public class CommandService implements ICommandService {
         commandBean.setPlatformIssuedTime(resultBean.getPlatformIssuedTime());
         commandBean.setStatus(resultBean.getStatus());
       //FIXME G11 判断指令执行结果，逻辑待优化
-        if (result.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_DELIVERED) || result.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SENT) || result.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SUCCESS)) {
+        if (result.contains(TestCommandCallbackBean.COMMAND_CALLBACK_STATUS_DELIVERED) || result.contains(TestCommandCallbackBean.COMMAND_CALLBACK_STATUS_SENT) || result.contains(TestCommandCallbackBean.COMMAND_CALLBACK_STATUS_SUCCESS)) {
         	commandBean.setDatabaseStatus(2);
 		} else {
             commandBean.setDatabaseStatus(1);
@@ -93,19 +93,19 @@ public class CommandService implements ICommandService {
 	}
 
     @Override
-    public JsonResult save(CommandBean commandBean) {
+    public JsonResult save(TestCommandBean commandBean) {
         int result = wmCommandMapper.save(commandBean);
         return JsonResult.success(result,result+"");
     }
 
     @Override
-    public JsonResult update(CommandBean commandBean) {
+    public JsonResult update(TestCommandBean commandBean) {
         int result = wmCommandMapper.modify(commandBean);
         return JsonResult.success(result,result+"");
     }
 
     @Override
-    public JsonResult updateByDeviceCommand(CommandBean commandBean) {
+    public JsonResult updateByDeviceCommand(TestCommandBean commandBean) {
         int result = wmCommandMapper.updateByDeviceCommand(commandBean);
         return JsonResult.success(result,result+"");
     }
@@ -116,7 +116,7 @@ public class CommandService implements ICommandService {
 	}
 
 	@Override
-	public CommandBean getCommandBeanByCommandId(CommandBean commandBean) {
+	public TestCommandBean getCommandBeanByCommandId(TestCommandBean commandBean) {
 		// TODO Auto-generated method stub
 		return wmCommandMapper.selectByCommandId(commandBean);
 	}

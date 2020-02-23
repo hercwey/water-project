@@ -5,13 +5,13 @@ import java.io.IOException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class ServiceBean {
+public class TestServiceBean {
     @JsonProperty("serviceId")
     private String serviceId;
     @JsonProperty("serviceType")
     private String serviceType;
     @JsonProperty("data")
-    private UploadDataBean data;
+    private TestUploadDataBean data;
     @JsonProperty("eventTime")
     private String eventTime;
 
@@ -31,11 +31,11 @@ public class ServiceBean {
         this.serviceType = serviceType;
     }
 
-    public UploadDataBean getData() {
+    public TestUploadDataBean getData() {
         return data;
     }
 
-    public void setData(UploadDataBean data) {
+    public void setData(TestUploadDataBean data) {
         this.data = data;
     }
 
@@ -47,12 +47,12 @@ public class ServiceBean {
         this.eventTime = eventTime;
     }
     
-    public static ServiceBean parseJson(String data) {
-        ServiceBean bean = new ServiceBean();
+    public static TestServiceBean parseJson(String data) {
+        TestServiceBean bean = new TestServiceBean();
 
         try {
             ObjectMapper mapper = new ObjectMapper();
-            bean = mapper.readValue(data, ServiceBean.class);
+            bean = mapper.readValue(data, TestServiceBean.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

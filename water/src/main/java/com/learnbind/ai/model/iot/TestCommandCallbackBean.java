@@ -1,6 +1,6 @@
 package com.learnbind.ai.model.iot;
 
-public class CommandCallbackBean {
+public class TestCommandCallbackBean {
 
 	/**
 	 * 当命令状态变化时(执行失败，执行成功，超时，发送，已送达)会通知NA， 平台会以POST方式发送HTTP消息给应用，请求Body为json字符串，

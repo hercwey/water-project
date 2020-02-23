@@ -26,8 +26,8 @@ import com.learnbind.ai.iot.protocol.bean.MeterConfigReadCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
 import com.learnbind.ai.iot.util.StringUtil;
-import com.learnbind.ai.model.iot.CommandBean;
-import com.learnbind.ai.model.iot.CommandCallbackBean;
+import com.learnbind.ai.model.iot.TestCommandBean;
+import com.learnbind.ai.model.iot.TestCommandCallbackBean;
 import com.learnbind.ai.model.iot.CommandResultBean;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
@@ -48,7 +48,7 @@ public class CommandController {
     @ResponseBody
     public ResponseEntity<String> send(@RequestBody String data) {
         //TODO 下发指令
-        CommandBean commandBean = CommandBean.parseJson(data);
+        TestCommandBean commandBean = TestCommandBean.parseJson(data);
 
         //TODO 将指令写入数据库，status设置为0（指令已创建，未下发成功）
         commandBean.setDatabaseStatus(0);
@@ -68,12 +68,12 @@ public class CommandController {
         //TODO 更改status为-1（设备执行失败）或2（设备执行成功）
         CommandResultBean commandResultBean = CommandResultBean.parseJson(data);
 
-        CommandBean commandBean = new CommandBean();
+        TestCommandBean commandBean = new TestCommandBean();
         commandBean.setDeviceId(commandResultBean.getDeviceId());
         commandBean.setCommandId(commandResultBean.getCommandId());
         
         //FIXME G11 判断指令执行结果，逻辑待优化
-        if (data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_DELIVERED) || data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SENT) || data.contains(CommandCallbackBean.COMMAND_CALLBACK_STATUS_SUCCESS)) {
+        if (data.contains(TestCommandCallbackBean.COMMAND_CALLBACK_STATUS_DELIVERED) || data.contains(TestCommandCallbackBean.COMMAND_CALLBACK_STATUS_SENT) || data.contains(TestCommandCallbackBean.COMMAND_CALLBACK_STATUS_SUCCESS)) {
         	commandBean.setDatabaseStatus(2);
 		} else {
             commandBean.setDatabaseStatus(-1);
@@ -82,7 +82,7 @@ public class CommandController {
         commandBean.setDesc(commandResultBean.getReason());
         if (commandBean.getDatabaseStatus() == 2) {
 			//指令执行成功后，解析数据，并保存
-        	CommandBean temp = commandService.getCommandBeanByCommandId(commandBean);
+        	TestCommandBean temp = commandService.getCommandBeanByCommandId(commandBean);
         	String commandStr = JSON.parseObject(temp.getMethodParams()).getString("value");
         	
         	//判断是否为设置配置操作

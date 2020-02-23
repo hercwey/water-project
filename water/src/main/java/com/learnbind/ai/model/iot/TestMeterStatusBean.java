@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.learnbind.ai.iot.protocol.Protocol;
 
-public class MeterStatusBean {
+public class TestMeterStatusBean {
 	/* 表状态字 */
 	/**
     public static final short METER_STATUS_VALVE_OPEN       = 0x0001;    // 阀门状态开 (开1 / 关0)
@@ -98,16 +98,16 @@ public class MeterStatusBean {
 		this.magneticAlarmOn = magneticAlarmOn;
 	}
 
-	public static String toJsonString(MeterStatusBean meterStatusBean) {
+	public static String toJsonString(TestMeterStatusBean meterStatusBean) {
 		return JSON.toJSONString(meterStatusBean);
 	}
 	
-	public static MeterStatusBean fromJson(String json) {
-		return JSON.parseObject(json, MeterStatusBean.class);
+	public static TestMeterStatusBean fromJson(String json) {
+		return JSON.parseObject(json, TestMeterStatusBean.class);
 	}
 	
-	public static MeterStatusBean fromStatusFlag(short flag) {
-    	MeterStatusBean statusBean = new MeterStatusBean();
+	public static TestMeterStatusBean fromStatusFlag(short flag) {
+    	TestMeterStatusBean statusBean = new TestMeterStatusBean();
     	
     	statusBean.setValveOpen((Protocol.METER_STATUS_VALVE_OPEN&flag)>>0);
     	statusBean.setValveAbnormal((Protocol.METER_STATUS_VALVE_ABNORMAL&flag)>>1);
@@ -131,7 +131,7 @@ public class MeterStatusBean {
                 Protocol.METER_STATUS_SMAPLE_LINE_CUT |
                 Protocol.METER_STATUS_MAGNETIC_ALARM_ON);
 		
-		MeterStatusBean statusBean = MeterStatusBean.fromStatusFlag(flag);
+		TestMeterStatusBean statusBean = TestMeterStatusBean.fromStatusFlag(flag);
 		System.out.println(JSON.toJSONString(statusBean));
 	}
 }

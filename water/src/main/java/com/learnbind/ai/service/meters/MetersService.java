@@ -394,4 +394,13 @@ public interface MetersService extends IBaseService<Meters, Long> {
 	 * @return 
 	 */
 	public List<Map<String, Object>> getStockMeterByFactory(Integer meterVirtualReal, Integer cycleStatus);
+	
+	//-----------------------新增加方法------------------------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: getMeterId
+	 * @Description: 根据IOT电信平台设备ID查询表计ID
+	 * @param deviceId	IOT电信平台设备ID
+	 * @return 
+	 */
+	public Long getMeterId(String deviceId);
 }

@@ -721,7 +721,7 @@
 	  				AND METER_ID=#{meterId}
 	  			</if>
 			ORDER BY 
-				PERIOD DESC, ID DESC, CURR_DATE DESC 
+				PERIOD DESC, CURR_DATE DESC, ID DESC 
 		) R 
 	WHERE
 		ROWNUM =1

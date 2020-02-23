@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
-public class UploadMessageBean {
+public class TestUploadMessageBean {
     @JsonProperty("notifyType")
     private String notifyType;
     @JsonProperty("deviceId")
@@ -15,7 +15,7 @@ public class UploadMessageBean {
     @JsonProperty("requestId")
     private String requestId;
     @JsonProperty("service")
-    private ServiceBean service;
+    private TestServiceBean service;
     @JsonProperty("services")
     private JSONArray services;
 
@@ -51,11 +51,11 @@ public class UploadMessageBean {
         this.requestId = requestId;
     }
 
-    public ServiceBean getService() {
+    public TestServiceBean getService() {
         return service;
     }
 
-    public void setService(ServiceBean service) {
+    public void setService(TestServiceBean service) {
         this.service = service;
     }
 
@@ -67,12 +67,12 @@ public class UploadMessageBean {
         this.services = services;
     }
 
-    public static UploadMessageBean parseJson(String data) {
-        UploadMessageBean uploadMessageBean = new UploadMessageBean();
+    public static TestUploadMessageBean parseJson(String data) {
+        TestUploadMessageBean uploadMessageBean = new TestUploadMessageBean();
 
         try {
             ObjectMapper mapper = new ObjectMapper();
-            uploadMessageBean = mapper.readValue(data, UploadMessageBean.class);
+            uploadMessageBean = mapper.readValue(data, TestUploadMessageBean.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

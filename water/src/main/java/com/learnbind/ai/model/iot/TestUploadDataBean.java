@@ -2,7 +2,7 @@ package com.learnbind.ai.model.iot;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class UploadDataBean {
+public class TestUploadDataBean {
     @JsonProperty("JRprotocolXY")
     private String JRprotocolXY;
 

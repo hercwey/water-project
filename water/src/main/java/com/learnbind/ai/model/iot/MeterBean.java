@@ -226,18 +226,18 @@ public class MeterBean {
 
 	public static MeterBean fromUploadDataJson(String data) {
         MeterBean meterBean = new MeterBean();
-        UploadMessageBean uploadMessageBean = UploadMessageBean.parseJson(data);
+        TestUploadMessageBean uploadMessageBean = TestUploadMessageBean.parseJson(data);
 
         meterBean.setDeviceId(uploadMessageBean.getDeviceId());
         meterBean.setGatewayId(uploadMessageBean.getGatewayId());
         meterBean.setRequestId(uploadMessageBean.getRequestId());
         meterBean.setJsonData(data);
 
-        ServiceBean serviceBean = uploadMessageBean.getService();
+        TestServiceBean serviceBean = uploadMessageBean.getService();
         if (serviceBean == null) {
             JSONArray services= uploadMessageBean.getServices();
             if (services.size() > 0) {
-                serviceBean = ServiceBean.parseJson(services.getJSONObject(0).toJSONString());
+                serviceBean = TestServiceBean.parseJson(services.getJSONObject(0).toJSONString());
             }
         }
 
@@ -245,17 +245,17 @@ public class MeterBean {
         meterBean.setServiceType(serviceBean.getServiceType());
         meterBean.setEventTime(StringUtil.timeZoneTrans(serviceBean.getEventTime()));
         
-    	MeterDataBaseBean dataBean = new MeterDataBaseBean();
+    	TestMeterDataBaseBean dataBean = new TestMeterDataBaseBean();
     	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
     	
     	if (serviceBean.getData().getJRprotocolXY().equalsIgnoreCase("9912364557")) {
 			//TODO G11 设备开始与电信平台建立连接
-        	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_START_CONNECT);
+        	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_START_CONNECT);
         	dataBean.setData(serviceBean.getData().getJRprotocolXY());
 //        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
 		} else if (serviceBean.getData().getJRprotocolXY().equalsIgnoreCase("aa1234bb")) {
 			//TODO G11 设备即将断开与电信平台的连接
-        	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_START_DISCONNECT);
+        	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_START_DISCONNECT);
         	dataBean.setData(serviceBean.getData().getJRprotocolXY());
 //        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
 		} else {
@@ -276,21 +276,21 @@ public class MeterBean {
 	            
 	            //FIXME G11 针对数据上报的其他类型数据，进行解析（后续根据需求对数据进行分类，优化处理逻辑）
 	            if (meterBase instanceof MeterReport) {
-	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_REPORT);
+	            	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_REPORT);
 	            	
 	                MeterReport meterReport = (MeterReport) meterBase;
-	                MeterReportBean meterDataBean = MeterReportBean.fromMeterReport(meterReport);
-	                dataBean.setData(MeterReportBean.toJsonString(meterDataBean));
+	                TestMeterReportBean meterDataBean = TestMeterReportBean.fromMeterReport(meterReport);
+	                dataBean.setData(TestMeterReportBean.toJsonString(meterDataBean));
 	                
 				} else if (meterBase instanceof MeterConfigReadResp) {
-	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_RSP_READ_CONFIG);
+	            	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_RSP_READ_CONFIG);
 	            	
 	                MeterConfig meterConfig = (MeterConfig) meterBase;
 	                MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
 	                dataBean.setData(MeterConfigBean.toJsonString(meterConfigBean));
 	                
 				} else if (meterBase instanceof MeterReadWaterResp) {
-	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE);
+	            	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE);
 	            	
 					MeterReadWaterResp meterReadWaterResp = (MeterReadWaterResp) meterBase;
 					MeterMonthFreezeBean meterMonthFreezeBean = MeterMonthFreezeBean.fromMeterTeadWaterResp(meterReadWaterResp);
@@ -298,28 +298,28 @@ public class MeterBean {
 					
 				} else if (meterBase instanceof MeterConfigWriteResp) {
 
-	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_RSP_WRITE_CONFIG);
+	            	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_RSP_WRITE_CONFIG);
 	            	MeterConfig meterConfig = (MeterConfig) meterBase;
 	                MeterConfigBean meterConfigBean = MeterConfigBean.fromMeterConfig(meterConfig);
 	                dataBean.setData(MeterConfigBean.toJsonString(meterConfigBean));
 	                
 				} else if (meterBase instanceof MeterValveControlResp) {
 
-	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_RSP_SWITCH_VALVE);
+	            	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_RSP_SWITCH_VALVE);
 	                dataBean.setData(JSON.toJSONString(meterBase));
 	                
 				} else if (meterBase instanceof MeterVolumeThresholdResp) {
 
-	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_RSP_SET_THRESHOLD);
+	            	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_RSP_SET_THRESHOLD);
 	                dataBean.setData(JSON.toJSONString(meterBase));
 	                
 				} else {
-	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
+	            	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
 	            	dataBean.setData(JSON.toJSONString(meterBase));
 				}
 			} catch (Exception e) {
 				if (serviceBean != null && serviceBean.getData() != null) {
-	            	dataBean.setType(MeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
+	            	dataBean.setType(TestMeterDataBaseBean.METER_DATA_TYPE_UNKNOWN);
 	            	dataBean.setData(serviceBean.getData().getJRprotocolXY());
 				}
 			}
@@ -338,6 +338,6 @@ public class MeterBean {
 		System.out.println(JSON.toJSON(meterBean));
 		
 		System.out.println(meterBean.getEventTime().toString());
-		System.out.println(MeterReportBean.fromJson(meterBean.getData()).getMeterTime().toString());
+		System.out.println(TestMeterReportBean.fromJson(meterBean.getData()).getMeterTime().toString());
 	}
 }

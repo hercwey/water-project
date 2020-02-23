@@ -26,14 +26,14 @@ import com.learnbind.ai.common.util.EntityUtils;
 import com.learnbind.ai.constant.PagerConstant;
 import com.learnbind.ai.iot.protocol.util.ByteUtil;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
-import com.learnbind.ai.model.iot.CommandBean;
+import com.learnbind.ai.model.iot.TestCommandBean;
 import com.learnbind.ai.model.iot.DeviceBean;
 import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.model.iot.MeterBean;
 import com.learnbind.ai.model.iot.MeterConfigBean;
-import com.learnbind.ai.model.iot.MeterDataBaseBean;
-import com.learnbind.ai.model.iot.MeterReportBean;
-import com.learnbind.ai.model.iot.MeterStatusBean;
+import com.learnbind.ai.model.iot.TestMeterDataBaseBean;
+import com.learnbind.ai.model.iot.TestMeterReportBean;
+import com.learnbind.ai.model.iot.TestMeterStatusBean;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.ICommandService;
@@ -64,9 +64,9 @@ public class MeterController {
 		// TODO 水表数据保存
 		JsonResult jsonResult = meterService.save(meterBean);// JsonResult.success(JsonResult.SUCCESS, data);
 
-		MeterDataBaseBean meterDataBaseBean = new MeterDataBaseBean();
+		TestMeterDataBaseBean meterDataBaseBean = new TestMeterDataBaseBean();
 		try {
-			meterDataBaseBean = new MeterDataBaseBean();
+			meterDataBaseBean = new TestMeterDataBaseBean();
 			meterDataBaseBean.setType(meterBean.getDataType());
 			meterDataBaseBean.setData(meterBean.getData());
 			meterDataBaseBean.setDataBasic(meterBean.getDataBasic());
@@ -74,8 +74,8 @@ public class MeterController {
 			// TODO: handle exception
 		}
 
-		if (meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_RSP_READ_CONFIG
-				|| meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_RSP_WRITE_CONFIG) {
+		if (meterDataBaseBean.getType() == TestMeterDataBaseBean.METER_DATA_TYPE_RSP_READ_CONFIG
+				|| meterDataBaseBean.getType() == TestMeterDataBaseBean.METER_DATA_TYPE_RSP_WRITE_CONFIG) {
 			// 水表配置信息，更新数据库device表meter_config内容
 			DeviceBean deviceBean = new DeviceBean();
 			deviceBean.setDeviceId(meterBean.getDeviceId());
@@ -83,7 +83,7 @@ public class MeterController {
 
 			deviceBean.setMeterConfig(meterDataBaseBean.getData());
 			deviceService.modifyDevice(deviceBean);
-		} else if (meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE) {
+		} else if (meterDataBaseBean.getType() == TestMeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE) {
 			// 水表月冻结信息，更新数据库device表meter_freeze内容
 			DeviceBean deviceBean = new DeviceBean();
 			deviceBean.setDeviceId(meterBean.getDeviceId());
@@ -91,7 +91,7 @@ public class MeterController {
 
 			deviceBean.setMeterFreeze(meterDataBaseBean.getData());
 			deviceService.modifyDevice(deviceBean);
-		} else if (meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_REPORT) {
+		} else if (meterDataBaseBean.getType() == TestMeterDataBaseBean.METER_DATA_TYPE_REPORT) {
 			// TODO 水表数据封装信息保存（更新MeterConfig信息）
 			DeviceBean deviceBean = new DeviceBean();
 			deviceBean.setDeviceId(meterBean.getDeviceId());
@@ -100,7 +100,7 @@ public class MeterController {
 				wmDevice = new WmDevice();
 			}
 			deviceBean = DeviceBean.fromWmDevice(wmDevice);
-			MeterReportBean reportBean = MeterReportBean.fromJson(meterDataBaseBean.getData());
+			TestMeterReportBean reportBean = TestMeterReportBean.fromJson(meterDataBaseBean.getData());
 			if (reportBean != null) {
 				MeterConfigBean configBean = null;
 				if (deviceBean != null && deviceBean.getMeterConfig() != null) {
@@ -126,16 +126,16 @@ public class MeterController {
 		}
 
 		int type = meterDataBaseBean.getType();
-		if (type == MeterDataBaseBean.METER_DATA_TYPE_REPORT 
-				|| type == MeterDataBaseBean.METER_DATA_TYPE_RSP_READ_CONFIG
-				|| type == MeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE
-				|| type == MeterDataBaseBean.METER_DATA_TYPE_RSP_WRITE_CONFIG
-				|| type == MeterDataBaseBean.METER_DATA_TYPE_RSP_SWITCH_VALVE
-				|| type == MeterDataBaseBean.METER_DATA_TYPE_RSP_SET_THRESHOLD) {
+		if (type == TestMeterDataBaseBean.METER_DATA_TYPE_REPORT 
+				|| type == TestMeterDataBaseBean.METER_DATA_TYPE_RSP_READ_CONFIG
+				|| type == TestMeterDataBaseBean.METER_DATA_TYPE_MONTH_FREEZE
+				|| type == TestMeterDataBaseBean.METER_DATA_TYPE_RSP_WRITE_CONFIG
+				|| type == TestMeterDataBaseBean.METER_DATA_TYPE_RSP_SWITCH_VALVE
+				|| type == TestMeterDataBaseBean.METER_DATA_TYPE_RSP_SET_THRESHOLD) {
 			// TODO G11 查询待下发指令逻辑
-			List<CommandBean> unSentList = checkUnSentCommands(meterBean.getDeviceId());
+			List<TestCommandBean> unSentList = checkUnSentCommands(meterBean.getDeviceId());
 			// TODO G11 逐条发送指令（异步发送）,并将状态设置为PENDING
-			for (CommandBean commandBean : unSentList) {
+			for (TestCommandBean commandBean : unSentList) {
 				// 发送指令
 				commandService.postAsynCommand(commandBean);
 				// 更新状态位PENDING
@@ -196,12 +196,12 @@ public class MeterController {
 			meterMap.put("verifyCode", device.getVerifyCode());
 
 			String meterData = meter.getMeterData();
-			MeterReportBean meterReportBean = null;
+			TestMeterReportBean meterReportBean = null;
 			Integer dataType = null;
 
-			MeterDataBaseBean meterDataBaseBean = new MeterDataBaseBean();// MeterDataBaseBean.fromJson(meterData);
+			TestMeterDataBaseBean meterDataBaseBean = new TestMeterDataBaseBean();// MeterDataBaseBean.fromJson(meterData);
 			try {
-				meterDataBaseBean = new MeterDataBaseBean();
+				meterDataBaseBean = new TestMeterDataBaseBean();
 				meterDataBaseBean.setType(meter.getMeterDataType());
 				dataType = meterDataBaseBean.getType();// 赋值表计数据类型：0=未知类型数据；1=设备上报数据；2=设备配置信息数据；3=设备月冻结数据；
 				meterDataBaseBean.setData(meter.getMeterData());
@@ -213,14 +213,14 @@ public class MeterController {
 			if (StringUtils.isNotBlank(meterData)) {
 				if (meterData.startsWith("{") && meterData.endsWith("}")) {
 					// TODO G11 meter_data字段,增加多种类型数据，根据type判断数据类型
-					if (meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_REPORT
-							|| meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_RSP_READ_CONFIG
-							|| meterDataBaseBean.getType() == MeterDataBaseBean.METER_DATA_TYPE_RSP_WRITE_CONFIG) {
-						meterReportBean = MeterReportBean.fromJson(meterDataBaseBean.getData());
+					if (meterDataBaseBean.getType() == TestMeterDataBaseBean.METER_DATA_TYPE_REPORT
+							|| meterDataBaseBean.getType() == TestMeterDataBaseBean.METER_DATA_TYPE_RSP_READ_CONFIG
+							|| meterDataBaseBean.getType() == TestMeterDataBaseBean.METER_DATA_TYPE_RSP_WRITE_CONFIG) {
+						meterReportBean = TestMeterReportBean.fromJson(meterDataBaseBean.getData());
 					}
 				} else {
 					try {
-						meterReportBean = MeterReportBean.fromHexData(meterData);
+						meterReportBean = TestMeterReportBean.fromHexData(meterData);
 					} catch (Exception e) {
 						e.printStackTrace();
 						meterReportBean = null;
@@ -234,7 +234,7 @@ public class MeterController {
 			BigDecimal totalVolumeBd = null;// 累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
 			String sampleUnit = "";// 采样参数：单位M3
 			Integer batteryVoltage = null;// 电池电压：单位V
-			MeterStatusBean meterStatus = null;// 表状态字：2字节
+			TestMeterStatusBean meterStatus = null;// 表状态字：2字节
 			String signal = "";// 信号强度
 			String pressure = "";// 压力值：xx.yyyy
 			if (meterReportBean != null) {
@@ -292,18 +292,18 @@ public class MeterController {
 
 	}
 
-	public List<CommandBean> checkUnSentCommands(String deviceId) {
+	public List<TestCommandBean> checkUnSentCommands(String deviceId) {
 		// 1、查询根据deviceId查询数据库，查询该设备未下发指令，即status=0的指令，然后逐条下发到电信平台，如果电信平台有回复，不管成功与否，记录结果，不再下发，如果未下发成功，下次再次下发
 		// 2、status0,未下发，负数为发送失败，1，正在发送到电信平台，2已发送到电信平台，>=3电信平台执行结果，（另需计时并记录是否超时）
 		// 3、
 //    	List<WmCommand> commandList = commandService.searchByDeviceId(deviceId);
 		List<Map<String, Object>> commandMapList = commandService.searchByDeviceId(deviceId);
-		List<CommandBean> unSentList = new ArrayList<>();
+		List<TestCommandBean> unSentList = new ArrayList<>();
 		System.out.println("---------------------------");
 		System.out.println("| 待下发指令      设备ID:" + deviceId);
 		if (commandMapList != null) {
 			for (Map<String, Object> wmCommand : commandMapList) {
-				CommandBean commandBean = new CommandBean();
+				TestCommandBean commandBean = new TestCommandBean();
 				commandBean.setId(((BigDecimal) wmCommand.get("ID")).longValue());
 				commandBean.setDeviceId((String) wmCommand.get("DEVICE_IDS"));
 				commandBean.setServiceId((String) wmCommand.get("SERVICE_NAME"));

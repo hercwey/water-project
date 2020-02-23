@@ -11,7 +11,7 @@ import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 import com.learnbind.ai.iot.protocol.bean.MeterReport;
 import com.learnbind.ai.iot.util.StringUtil;
 
-public class MeterReportBean {
+public class TestMeterReportBean {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,7 +26,7 @@ public class MeterReportBean {
     @JsonProperty("batteryVoltage")
     private int batteryVoltage;    // 电池电压：单位V
     @JsonProperty("meterStatus")
-    private MeterStatusBean meterStatus;       // 表状态字：由meterStatusFlag转换
+    private TestMeterStatusBean meterStatus;       // 表状态字：由meterStatusFlag转换
     @JsonProperty("signal")
     private String signal;         // 信号强度
     @JsonProperty("pressure")
@@ -62,10 +62,10 @@ public class MeterReportBean {
 	public void setBatteryVoltage(int batteryVoltage) {
 		this.batteryVoltage = batteryVoltage;
 	}
-	public MeterStatusBean getMeterStatus() {
+	public TestMeterStatusBean getMeterStatus() {
 		return meterStatus;
 	}
-	public void setMeterStatus(MeterStatusBean meterStatus) {
+	public void setMeterStatus(TestMeterStatusBean meterStatus) {
 		this.meterStatus = meterStatus;
 	}
 	public String getSignal() {
@@ -81,30 +81,30 @@ public class MeterReportBean {
 		this.pressure = pressure;
 	}
     
-	public static String toJsonString(MeterReportBean meterDataBean) {
+	public static String toJsonString(TestMeterReportBean meterDataBean) {
 		return JSON.toJSONString(meterDataBean);
 	}
 	
-	public static MeterReportBean fromJson(String json) {
-		return JSON.parseObject(json, MeterReportBean.class);
+	public static TestMeterReportBean fromJson(String json) {
+		return JSON.parseObject(json, TestMeterReportBean.class);
 	}
 	
-	public static MeterReportBean fromMeterReport(MeterReport meterReport) {
-        MeterReportBean meterReportBean = new MeterReportBean();
+	public static TestMeterReportBean fromMeterReport(MeterReport meterReport) {
+        TestMeterReportBean meterReportBean = new TestMeterReportBean();
 		if (meterReport != null) {
 			meterReportBean.setMeterNumber(meterReport.getMeterNumber());
 			meterReportBean.setMeterTime(StringUtil.meterTimeTrans(meterReport.getMeterTime()));
 			meterReportBean.setTotalVolume(meterReport.getTotalVolume());
 			meterReportBean.setSampleUnit(meterReport.getSampleUnit()+"");
 			meterReportBean.setBatteryVoltage(meterReport.getBatteryVoltage());
-			meterReportBean.setMeterStatus(MeterStatusBean.fromStatusFlag(meterReport.getMeterStatus()));
+			meterReportBean.setMeterStatus(TestMeterStatusBean.fromStatusFlag(meterReport.getMeterStatus()));
 			meterReportBean.setSignal(meterReport.getSignal());
 			meterReportBean.setPressure(meterReport.getPressure()+"");
 		}
 		return meterReportBean;
 	}
 	
-	public static MeterReportBean fromHexData(String data) {
+	public static TestMeterReportBean fromHexData(String data) {
 		byte[] bytes = HexUtils.fromHexString(data);
 		
 		MeterReport meterReport = new MeterReport(bytes);

@@ -48,7 +48,7 @@ public class MeterConfigBean {
     private Date meterTime;        // 表当前时间：14字节数字字符串格式为yyyymmddHHMMSS (7字节，年、月、星期、日、时、分、秒，BCD格式；)
 
     @JsonProperty("meterStatus")
-    private MeterStatusBean meterStatus;       // 表状态字：由meterStatusFlag转换
+    private TestMeterStatusBean meterStatus;       // 表状态字：由meterStatusFlag转换
 
     @JsonProperty("serverIp")
     private String serverIp;         // 服务器IP：AAA.BBB.CCC.DDD格式
@@ -152,11 +152,11 @@ public class MeterConfigBean {
 		this.serverPort = serverPort;
 	}
 
-	public MeterStatusBean getMeterStatus() {
+	public TestMeterStatusBean getMeterStatus() {
 		return meterStatus;
 	}
 
-	public void setMeterStatus(MeterStatusBean meterStatus) {
+	public void setMeterStatus(TestMeterStatusBean meterStatus) {
 		this.meterStatus = meterStatus;
 	}
 
@@ -179,7 +179,7 @@ public class MeterConfigBean {
 			meterConfigBean.setSampleUnit(meterConfig.getSampleUnit());
 			meterConfigBean.setMeterNumber(meterConfig.getMeterNumber());
 			meterConfigBean.setMeterTime(StringUtil.meterTimeTrans(meterConfig.getMeterTime()));
-			meterConfigBean.setMeterStatus(MeterStatusBean.fromStatusFlag(meterConfig.getMeterStatusFlag()));
+			meterConfigBean.setMeterStatus(TestMeterStatusBean.fromStatusFlag(meterConfig.getMeterStatusFlag()));
 			meterConfigBean.setServerIp(meterConfig.getServerIp());
 			meterConfigBean.setServerPort(meterConfig.getServerPort());
 			

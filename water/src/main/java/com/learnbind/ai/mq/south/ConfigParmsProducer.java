@@ -10,6 +10,7 @@ import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
@@ -28,7 +29,8 @@ import com.learnbind.ai.mq.MQConstant;
  * @version V1.0
  *
  */
-@Component
+//@Component
+@AutoConfigureAfter
 public class ConfigParmsProducer {
 
 	/**

@@ -29,7 +29,7 @@
     STATUS, REMARK, EXPIRE_TIME, PLATFORM_ISSUED_TIME, ISSUED_TIMES, CREATE_TIME
   </sql>
   
-  <select id="selectById" resultType="com.learnbind.ai.model.iot.CommandBean">
+  <select id="selectById" resultType="com.learnbind.ai.model.iot.TestCommandBean">
     SELECT
 		* 
 	FROM
@@ -37,7 +37,7 @@
 	WHERE
 		ID = #{id,jdbcType=BIGINT}
   </select>
-  <select id="selectByCommandId" parameterType="com.learnbind.ai.model.iot.CommandBean" resultType="com.learnbind.ai.model.iot.CommandBean">
+  <select id="selectByCommandId" parameterType="com.learnbind.ai.model.iot.TestCommandBean" resultType="com.learnbind.ai.model.iot.TestCommandBean">
     SELECT
 		* 
 	FROM
@@ -52,7 +52,7 @@
 	WHERE
 		ID = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="save" parameterType="com.learnbind.ai.model.iot.CommandBean">
+  <insert id="save" parameterType="com.learnbind.ai.model.iot.TestCommandBean">
   	<selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
 　　		SELECT WM_COMMAND_SEQ_GENERATOR.CURRVAL FROM DUAL
 	</selectKey>
@@ -147,7 +147,7 @@
     </trim>
   </insert>
   
-  <update id="modify" parameterType="com.learnbind.ai.model.iot.CommandBean">
+  <update id="modify" parameterType="com.learnbind.ai.model.iot.TestCommandBean">
     UPDATE WM_COMMAND
     <set>
       <if test="commandId != null">
@@ -189,7 +189,7 @@
     </set>
     where ID = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByDeviceCommand" parameterType="com.learnbind.ai.model.iot.CommandBean">
+  <update id="updateByDeviceCommand" parameterType="com.learnbind.ai.model.iot.TestCommandBean">
     update wm_command
     <set>
       <if test="databaseStatus != null">

@@ -3,7 +3,7 @@ package com.learnbind.ai.model.iot;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MeterDataBaseBean {
+public class TestMeterDataBaseBean {
 	
 	public static final int METER_DATA_TYPE_UNKNOWN = 0;//未知类型数据
 	public static final int METER_DATA_TYPE_REPORT = 1;//设备上报数据
@@ -41,11 +41,11 @@ public class MeterDataBaseBean {
 	public void setDataBasic(String dataBasic) {
 		this.dataBasic = dataBasic;
 	}
-	public static String toJsonString(MeterDataBaseBean bean) {
+	public static String toJsonString(TestMeterDataBaseBean bean) {
 		return JSON.toJSONString(bean);
 	}
 	
-	public static MeterDataBaseBean fromJson(String json) {
-		return JSON.parseObject(json, MeterDataBaseBean.class);
+	public static TestMeterDataBaseBean fromJson(String json) {
+		return JSON.parseObject(json, TestMeterDataBaseBean.class);
 	}
 }

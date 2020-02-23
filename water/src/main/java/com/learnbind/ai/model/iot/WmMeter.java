@@ -7,7 +7,8 @@ import javax.persistence.*;
 public class WmMeter {
     @Id
     @Column(name = "ID")
-    @GeneratedValue(generator = "JDBC")
+    //@GeneratedValue(generator = "JDBC")
+    @GeneratedValue(strategy=GenerationType.IDENTITY, generator="SELECT WM_METER_SEQ_GENERATOR.CURRVAL FROM DUAL")//前提是先创建了oracle序列
     private Long id;
 
     @Column(name = "DEVICE_ID")

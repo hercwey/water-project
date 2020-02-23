@@ -15,6 +15,7 @@ import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
@@ -33,7 +34,8 @@ import com.learnbind.ai.mq.MQConstant;
  * @version V1.0
  *
  */
-@Component
+//@Component
+@AutoConfigureAfter
 public class QueryParmsConsumer {
 
 	/**
@@ -97,6 +99,7 @@ public class QueryParmsConsumer {
 				}
 			});
 			consumer.start();
+			log.debug("----------消费者-监听查询参数返回数据启动成功");
 		} catch (MQClientException e) {
 			e.printStackTrace();
 		}

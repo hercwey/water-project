@@ -9,7 +9,7 @@ import com.learnbind.ai.iot.Constants;
 import java.io.IOException;
 import java.util.Date;
 
-public class CommandBean {
+public class TestCommandBean {
     private static final long serialVersionUID = 1L;
 
     @JsonProperty("id")
@@ -215,12 +215,12 @@ public class CommandBean {
 		this.commandType = commandType;
 	}
 
-	public static CommandBean parseJson(String data) {
-        CommandBean commandBean = new CommandBean();
+	public static TestCommandBean parseJson(String data) {
+        TestCommandBean commandBean = new TestCommandBean();
 
         try {
             ObjectMapper mapper = new ObjectMapper();
-            commandBean = mapper.readValue(data, CommandBean.class);
+            commandBean = mapper.readValue(data, TestCommandBean.class);
             if (commandBean.getParas() != null) {
                 commandBean.setMethodParams(commandBean.getParas().toJSONString());
             }
