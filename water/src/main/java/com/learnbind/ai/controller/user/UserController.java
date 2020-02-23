@@ -19,10 +19,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.learnbind.ai.common.RequestResultUtil;
+import com.learnbind.ai.common.util.EntityUtils;
 import com.learnbind.ai.constant.PagerConstant;
+import com.learnbind.ai.model.BusinessOffice;
+import com.learnbind.ai.model.SysDiscount;
 import com.learnbind.ai.model.SysRoles;
 import com.learnbind.ai.model.SysUsers;
 import com.learnbind.ai.model.SysUsersRoles;
+import com.learnbind.ai.model.UsersBusOffice;
+import com.learnbind.ai.service.busoffice.BusinessOfficeService;
+import com.learnbind.ai.service.busoffice.UserBusOfficeService;
 import com.learnbind.ai.service.role.RolesService;
 import com.learnbind.ai.service.user.UsersService;
 import com.learnbind.ai.service.usersroles.UsersRolesService;
@@ -51,7 +57,10 @@ public class UserController {
 	private RolesService rolesService;  //角色
 	@Autowired
 	private UsersRolesService usersRolesService;  //用户角色
-
+	@Autowired
+	private UserBusOfficeService userBusOfficeService;
+	@Autowired
+	private BusinessOfficeService businessOfficeService;
 	/** 
 	*	@Title: userStarter 
 	*	@Description: 用户起始页面
@@ -125,9 +134,22 @@ public class UserController {
 		PageHelper.startPage(pageNum, pageSize); // PageHelper
 		List<SysUsers> userList = usersService.searchUser(searchCond);
 		PageInfo<List<SysUsers>> pageInfo = new PageInfo(userList);// (使用了拦截器或是AOP进行查询的再次处理)
-
+		List<Map<String, Object>> customerMapList = new ArrayList<>();
+		for(SysUsers temp : userList) {
+			Map<String, Object> tempMap = EntityUtils.entityToMap(temp);
+			//查询营业网点信息
+			UsersBusOffice usoffice = userBusOfficeService.getBusOfficeMessage(temp.getId()); 
+			String officeName = "";
+			if(usoffice != null) {
+				BusinessOffice office = businessOfficeService.selectByPrimaryKey(usoffice.getOfficeId());
+				officeName = office.getOfficeName();
+			}
+			
+			tempMap.put("officeName", officeName);
+			customerMapList.add(tempMap);
+		}
 		// 传递如下数据至前台页面
-		model.addAttribute("userList", userList);  //列表数据
+		model.addAttribute("userList", customerMapList);  //列表数据
 		
 		//分页数据
 		model.addAttribute("pageInfo", pageInfo);
@@ -150,6 +172,9 @@ public class UserController {
 	*/
 	@RequestMapping(value = "/loadadddialog")
 	public String loadAddDialog(Model model) {
+		//获取网点信息
+		List<BusinessOffice> officeList = businessOfficeService.selectAll();
+		model.addAttribute("officeList", officeList);
 		return TEMPLATE_PATH + "user_dialog_edit";
 	}
 	
@@ -163,7 +188,7 @@ public class UserController {
 	*/
 	@RequestMapping(value = "/insert", produces = "application/json")
 	@ResponseBody
-	public Object addUser(SysUsers user) {
+	public Object addUser(SysUsers user, Long officeId) {
 		String password = DigestUtils.md5Hex("123456").toUpperCase();//默认密码123456
 		user.setPassword(password);
 		user.setCreateTime(new Date());
@@ -214,6 +239,17 @@ public class UserController {
 	*/
 	@RequestMapping(value = "/loadmodidialog")
 	public String loadModiDialogxxx(Long userId, Model model) {
+		//获取网点信息
+		List<BusinessOffice> officeList = new ArrayList<>();
+		UsersBusOffice usoffice = userBusOfficeService.getBusOfficeMessage(userId); 
+		BusinessOffice office = new BusinessOffice();
+		if(usoffice != null) {
+			office = businessOfficeService.selectByPrimaryKey(usoffice.getOfficeId());
+		}
+		officeList = businessOfficeService.selectAll();
+		
+		model.addAttribute("officeList", officeList);
+		model.addAttribute("office", office);
 		//读取需要编辑的条目
 		SysUsers currItem=usersService.selectByPrimaryKey(userId);
 		model.addAttribute("currItem",currItem);
@@ -232,8 +268,19 @@ public class UserController {
 	*/
 	@RequestMapping(value = "/update", produces = "application/json")
 	@ResponseBody
-	public Object updateUser(SysUsers user) throws Exception {
+	public Object updateUser(SysUsers user, Long officeId) throws Exception {
+		
 		usersService.updateByPrimaryKeySelective(user);
+		UsersBusOffice usoffice = userBusOfficeService.getBusOfficeMessage(user.getId()); 
+		if(officeId != null) {
+			usoffice.setOfficeId(officeId);
+			usoffice.setUserId(user.getId());;
+			userBusOfficeService.updateByPrimaryKeySelective(usoffice);
+		} else {
+			userBusOfficeService.delete(usoffice);
+		}
+		
+		
 		return RequestResultUtil.getResultUpdateSuccess();
 	}
 

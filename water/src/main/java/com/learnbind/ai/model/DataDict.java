@@ -2,6 +2,7 @@ package com.learnbind.ai.model;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -9,7 +10,7 @@ import javax.persistence.Table;
 public class DataDict {
     @Id
     @Column(name = "ID")
-    @GeneratedValue(generator = "JDBC")
+    @GeneratedValue(strategy=GenerationType.IDENTITY, generator="SELECT DATA_DICT_SEQ_GENERATOR.CURRVAL FROM DUAL")//前提是先创建了oracle序列
     private Long id;
 
     @Column(name = "TYPE_CODE")

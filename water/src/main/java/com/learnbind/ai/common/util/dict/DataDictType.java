@@ -106,6 +106,26 @@ public class DataDictType {
 	public static final String INVOICE_AMOUNT_VERSION_NORMAL = "NORMAL_INVOICE_AMOUNT_VERSION";//普通发票额度版本
 	
 	/**
+	 * @Fields PROTOCOL_TYPE：水表协议类型
+	 */
+	public static final String PROTOCOL_TYPE = "PROTOCOL_TYPE";//水表协议类型
+	
+	/**
+	 * @Fields SAMPLE_UNIT：采样参数单位
+	 */
+	public static final String SAMPLE_UNIT = "SAMPLE_UNIT";//采样参数单位
+	
+	/**
+	 * @Fields METER_USE_TYPE：水表用水类型
+	 */
+	public static final String METER_USE_TYPE = "METER_USE_TYPE";//水表用水类型
+	
+	/**
+	 * @Fields METER_FACTORY_CODE：水表厂商代码
+	 */
+	public static final String METER_FACTORY_CODE = "METER_FACTORY_CODE";//水表厂商代码
+	
+	/**
 	 * @Fields dictTypeList：数据字典类型集合
 	 */
 	private static List<Map<String, String>> dictTypeList = new ArrayList<>();
@@ -212,6 +232,23 @@ public class DataDictType {
 		dictType17.put("code", "CLASSIFY_NODE_TYPE");
 		dictType17.put("name", "统计分类节点类型");
 		dictTypeList.add(dictType17);
+		
+		Map<String, String> dictType18 = new HashMap<>();
+		dictType18.put("code", "PROTOCOL_TYPE");
+		dictType18.put("name", "水表协议类型");
+		dictTypeList.add(dictType18);
+		Map<String, String> dictType19 = new HashMap<>();
+		dictType19.put("code", "SAMPLE_UNIT");
+		dictType19.put("name", "采样参数单位");
+		dictTypeList.add(dictType19);
+		Map<String, String> dictType20 = new HashMap<>();
+		dictType20.put("code", "METER_USE_TYPE");
+		dictType20.put("name", "水表用水类型");
+		dictTypeList.add(dictType20);
+		Map<String, String> dictType21 = new HashMap<>();
+		dictType21.put("code", "METER_FACTORY_CODE");
+		dictType21.put("name", "水表厂商代码");
+		dictTypeList.add(dictType21);
 	}
 
 	/**

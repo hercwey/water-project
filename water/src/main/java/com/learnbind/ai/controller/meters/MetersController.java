@@ -315,6 +315,9 @@ public class MetersController {
 		List<DataDict> readModeList = dataDictService.getListByTypeCode(DataDictType.READ_MODE);
 		List<DataDict> factoryList = dataDictService.getListByTypeCode(DataDictType.METER_FACTORY);
 		List<DataDict> meterModelList = dataDictService.getListByTypeCode(DataDictType.METER_MODEL);
+		List<DataDict> protocolTypeList = dataDictService.getListByTypeCode(DataDictType.PROTOCOL_TYPE);
+		List<DataDict> meterUseTypeList = dataDictService.getListByTypeCode(DataDictType.METER_USE_TYPE);
+		List<DataDict> meterFactoryCodeList = dataDictService.getListByTypeCode(DataDictType.METER_FACTORY_CODE);
 		List<Map<String, Object>> priceTypeMapList = waterPriceService.getPriceTypeList();//获取用水性质
 		
 		model.addAttribute("waterCaliberList", waterCaliberList);
@@ -323,6 +326,9 @@ public class MetersController {
 		model.addAttribute("readModeList", readModeList);
 		model.addAttribute("factoryList", factoryList);
 		model.addAttribute("meterModelList", meterModelList);
+		model.addAttribute("protocolTypeList", protocolTypeList);
+		model.addAttribute("meterUseTypeList", meterUseTypeList);
+		model.addAttribute("meterFactoryCodeList", meterFactoryCodeList);
 		model.addAttribute("priceTypeMapList", priceTypeMapList);
 		
 		if(meterId!=null) {
@@ -363,6 +369,9 @@ public class MetersController {
 		List<DataDict> readModeList = dataDictService.getListByTypeCode(DataDictType.READ_MODE);
 		List<DataDict> factoryList = dataDictService.getListByTypeCode(DataDictType.METER_FACTORY);
 		List<DataDict> meterModelList = dataDictService.getListByTypeCode(DataDictType.METER_MODEL);
+		List<DataDict> protocolTypeList = dataDictService.getListByTypeCode(DataDictType.PROTOCOL_TYPE);
+		List<DataDict> meterUseTypeList = dataDictService.getListByTypeCode(DataDictType.METER_USE_TYPE);
+		List<DataDict> meterFactoryCodeList = dataDictService.getListByTypeCode(DataDictType.METER_FACTORY_CODE);
 		List<Map<String, Object>> priceTypeMapList = waterPriceService.getPriceTypeList();//获取用水性质
 		
 		model.addAttribute("waterCaliberList", waterCaliberList);
@@ -371,6 +380,9 @@ public class MetersController {
 		model.addAttribute("readModeList", readModeList);
 		model.addAttribute("factoryList", factoryList);
 		model.addAttribute("meterModelList", meterModelList);
+		model.addAttribute("protocolTypeList", protocolTypeList);
+		model.addAttribute("meterUseTypeList", meterUseTypeList);
+		model.addAttribute("meterFactoryCodeList", meterFactoryCodeList);
 		model.addAttribute("priceTypeMapList", priceTypeMapList);
 	
 		
@@ -423,6 +435,9 @@ public class MetersController {
 			meterMap.put("meterTypeValue", this.getDataDictValue(EnumDataDictType.METER_TYPE.getCode(), meter.getMeterType()));//水表类型
 			meterMap.put("meterUseValue", this.getDataDictValue(EnumDataDictType.METER_USE.getCode(), meter.getMeterUse()));//水表用途
 			meterMap.put("readModeValue", this.getDataDictValue(EnumDataDictType.METER_READ_MODE.getCode(), meter.getReadMode()));//抄表方式
+			meterMap.put("protocolTypeValue", this.getDataDictValue(EnumDataDictType.PROTOCOL_TYPE.getCode(), meter.getProtocolType()));//水表协议类型
+			meterMap.put("meterUseTypeValue", this.getDataDictValue(EnumDataDictType.METER_USE_TYPE.getCode(), meter.getMeterUseType()));//水表用水类型
+			meterMap.put("meterFactoryCodeValue", this.getDataDictValue(EnumDataDictType.METER_FACTORY_CODE.getCode(), meter.getMeterFactoryCode()));//水表厂家代码
 			meterMap.put("waterUseValue", this.getPriceTypeName(meter.getWaterUse()));//用水性质名称
 			String waterPriceName = "";
 			if(meter.getPriceCode() != null) {

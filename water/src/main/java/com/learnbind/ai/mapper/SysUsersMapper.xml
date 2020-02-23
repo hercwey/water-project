@@ -21,13 +21,14 @@
     <result column="DELETED" jdbcType="DECIMAL" property="deleted" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
     <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="USER_TYPE" jdbcType="DECIMAL" property="userType" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--
       WARNING - @mbg.generated
     -->
     ID, USERNAME, NICKNAME, PASSWORD, REALNAME, SEX, CODE, TEL, MOBILE, EMAIL, MARRIED, 
-    ICON_PATH, ENABLED, DELETED, REMARK, CREATE_TIME
+    ICON_PATH, ENABLED, DELETED, REMARK, CREATE_TIME, USER_TYPE
   </sql>
   
   <!-- 查询名称,返回列表 -->

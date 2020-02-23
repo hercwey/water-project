@@ -59,6 +59,9 @@ public class SysUsers {
 
     @Column(name = "CREATE_TIME")
     private Date createTime;
+    
+    @Column(name = "USER_TYPE")
+    private Integer userType;
 
     /**
      * @return ID
@@ -283,8 +286,18 @@ public class SysUsers {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+    
+    
 
-    @Override
+    public Integer getUserType() {
+		return userType;
+	}
+
+	public void setUserType(Integer userType) {
+		this.userType = userType;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
@@ -306,6 +319,7 @@ public class SysUsers {
         sb.append(", deleted=").append(deleted);
         sb.append(", remark=").append(remark);
         sb.append(", createTime=").append(createTime);
+        sb.append(", userType=").append(userType);
         sb.append("]");
         return sb.toString();
     }

@@ -35,7 +35,17 @@
     <result column="WATER_USE" jdbcType="VARCHAR" property="waterUse" />
     <result column="PRICE_CODE" jdbcType="VARCHAR" property="priceCode" />
     <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
-     <result column="SORT_VALUE" jdbcType="DECIMAL" property="sortValue" />
+    <result column="SORT_VALUE" jdbcType="DECIMAL" property="sortValue" />
+    <result column="DEVICE_ID" jdbcType="VARCHAR" property="deviceId" />
+    <result column="PROTOCOL_TYPE" jdbcType="VARCHAR" property="protocolType" />
+    <result column="METER_NUMBER" jdbcType="VARCHAR" property="meterNumber" />
+    <result column="METER_CONFIG" jdbcType="VARCHAR" property="meterConfig" />
+    <result column="METER_FREEZE" jdbcType="VARCHAR" property="meterFreeze" />
+    <result column="METER_NAME" jdbcType="VARCHAR" property="meterName" />
+    <result column="SAMPLE_UNIT" jdbcType="VARCHAR" property="sampleUnit" />
+    <result column="METER_USE_TYPE" jdbcType="VARCHAR" property="meterUseType" />
+    <result column="METER_FACTORY_CODE" jdbcType="VARCHAR" property="meterFactoryCode" />
+     <result column="METER_SEQUENCE" jdbcType="DECIMAL" property="meterSequence" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--
@@ -44,7 +54,9 @@
     ID, CALIBER, METER_NO, PLACE, FACTORY, FACTORY_PHONE, CERTIFICATE_NO, CHECK_DATE, 
     EFFECTIVE_DATE, PID, STEEL_SEAL_NO, NEW_METER_BOTTOM, CHANGE_METER_BOTTOM, METER_USE, 
     METER_TYPE, UPPER_LIMIT, METER_STATUS, METER_MODEL, READ_MODE, DELETED, REMARK, METER_ADDRESS, 
-    VIRTUAL_REAL, COLLECTOR_ADDR, CHANNEL_NO, STATUS, CYCLE_STATUS, WATER_USE, PRICE_CODE, DESCRIPTION, SORT_VALUE 
+    VIRTUAL_REAL, COLLECTOR_ADDR, CHANNEL_NO, STATUS, CYCLE_STATUS, WATER_USE, PRICE_CODE, DESCRIPTION, SORT_VALUE,
+     DEVICE_ID, PROTOCOL_TYPE, METER_NUMBER, METER_CONFIG, METER_FREEZE, METER_NAME, SAMPLE_UNIT, METER_USE_TYPE,
+     METER_FACTORY_CODE, METER_SEQUENCE
   </sql>
   
   <!-- 根据条件查询,返回列表 -->

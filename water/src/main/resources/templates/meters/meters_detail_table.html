@@ -87,6 +87,18 @@
 				<tr>
 					<td>虚实表：</td>
 					<td th:text="${meter==null ? '' : meter.virtualRealStr}"></td>
+					<td>水表协议类型：</td>
+					<td th:text="${meter==null ? '' : meter.protocolTypeValue}"></td>
+				</tr>
+				<tr>
+					<td>水表用水类型：</td>
+					<td th:text="${meter==null ? '' : meter.meterUseTypeValue}"></td>
+					<td>水表厂商代码：</td>
+					<td th:text="${meter==null ? '' : meter.meterFactoryCodeValue}"></td>
+				</tr>
+				<tr>
+					<td>表号：</td>
+					<td th:text="${meter==null ? '' : meter.meterNumber}"></td>
 					<td></td>
 					<td></td>
 				</tr>
