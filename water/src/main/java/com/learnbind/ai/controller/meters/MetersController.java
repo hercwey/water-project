@@ -19,10 +19,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
@@ -58,6 +60,9 @@ import com.learnbind.ai.model.LocationMeter;
 import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.SysDiscount;
 import com.learnbind.ai.model.SysWaterPrice;
+import com.learnbind.ai.model.iot.DeviceBean;
+import com.learnbind.ai.model.iot.DeviceRegisterRspBean;
+import com.learnbind.ai.model.iot.JsonResult;
 import com.learnbind.ai.service.customers.CustomerAccountItemService;
 import com.learnbind.ai.service.customers.CustomerMeterService;
 import com.learnbind.ai.service.customers.CustomersService;
@@ -589,6 +594,14 @@ public class MetersController {
 		}
 
 		return RequestResultUtil.getResultDeleteSuccess();
+
+	}
+	
+	@RequestMapping(value = "/register", produces = "application/json")
+	@ResponseBody
+	public Object register(Model model) throws Exception {
+
+		return RequestResultUtil.getResultSaveWarn("注册成功！");
 
 	}
 	

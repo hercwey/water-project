@@ -66,7 +66,7 @@
 															<input type="text" class="form-control"
 																	th:value="${currItem==null ? '' : currItem.meterNo}" 
 																	id="meters-meter-no" name="meterNo" 
-																	maxlength=30 title="请输入1-30个字符" placeholder="水表编号" required/>
+																	maxlength=15 minlength=15 title="请输入15个字符" placeholder="水表编号" required/>
 														</span>
 													</div>
 												</td>
@@ -97,7 +97,7 @@
 															<input type="text" class="form-control"
 																	th:value="${currItem==null ? '' : currItem.steelSealNo}" 
 																	id="meters-steel-seal-no" name="steelSealNo" 
-																	maxlength=25 title="请输入1-25个字符" placeholder="水表钢印号 " required/>
+																	maxlength=15 title="请输入15个字符" placeholder="水表钢印号 " required/>
 														</span>
 													</div>	
 												</td>
@@ -123,7 +123,7 @@
 															<input type="text" class="form-control"
 																	th:value="${currItem==null ? '' : currItem.meterAddress}" 
 																	id="meters-meter-address" name="meterAddress" 
-																	maxlength=50 title="请输入1-50个字符" placeholder="表地址" required/>
+																	maxlength=5010 title="请输入10个字符" placeholder="表地址" required/>
 														</span>
 													</div>
 												</td>
@@ -553,6 +553,18 @@
 			$("#meters-new-meter-bottom").val("0");
 			$("#meters-meter-use").val("CHARGE_METER");
 			$("#meters-read-mode").val("REMOTE");
+			
+			/**
+			 * 绑定水表编号输入框的input事件，用户输入时自动填充钢印号、表地址、表号
+			 */
+			$("#meters-meter-no").on("input", function(){
+				var meterNo = $(this).val();//水量
+				var meterNumber = meterNo.substring(3,15);
+				var meterAddress = meterNo.substring(5,15);
+				$("#meters-steel-seal-no").val(meterNo);
+				$("#meters-number").val(meterNumber);
+				$("#meters-meter-address").val(meterAddress);
+			});
 			
 			
 			$("#meter-water-use").on('change',function() {//用水性质下拉框改变事件
