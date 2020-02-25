@@ -252,21 +252,20 @@ public class MeterDeviceController {
 			System.out.println("----------生成读月冻结指令");
 			//生成读月冻结指令
 			String command = this.generatorReadMonthFreezeCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), deviceId);
-			
 			//获取指令对象
-			WmCommand wmCommand = wmCommandService.getWmCommand(meter, EnumCommandType.TYPE_READ_MONTH_FREEZE, command);
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_READ_MONTH_FREEZE.getKey(), command);
 			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
 			if(rows>0) {
 				
 				QueryMonthDataRequest queryMonthData = new QueryMonthDataRequest();
-				queryMonthData.setDeviceId(meter.getDeviceId());
-				queryMonthData.setId(wmCommand.getId());
-				queryMonthData.setMeterAddress(meterAddress);
-				queryMonthData.setMeterFactoryCode(meterFactoryCode);
-				queryMonthData.setMeterType(meterType);
-				queryMonthData.setMethod(method);
-				queryMonthData.setSequence(sequence);
-				queryMonthData.setServiceId(serviceId);
+//				queryMonthData.setDeviceId(meter.getDeviceId());
+//				queryMonthData.setId(wmCommand.getId());
+//				queryMonthData.setMeterAddress(meterAddress);
+//				queryMonthData.setMeterFactoryCode(meterFactoryCode);
+//				queryMonthData.setMeterType(meterType);
+//				queryMonthData.setMethod(method);
+//				queryMonthData.setSequence(sequence);
+//				queryMonthData.setServiceId(serviceId);
 				
 				SendResult sendResult = queryMonthDataProducer.sendMsg(null, queryMonthData.toJsonString(queryMonthData));
 				if(sendResult.getSendStatus()==SendStatus.SEND_OK) {
