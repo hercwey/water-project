@@ -10,7 +10,7 @@ import com.space.water.iot.api.config.MQTags;
 
 @Component
 public class Producer {
-    private String producerGroup = "test_mq_producer";
+    private String producerGroup = "example_group_name";
     private DefaultMQProducer producer;
     
     public Producer(){
