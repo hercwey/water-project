@@ -25,6 +25,7 @@ import com.learnbind.ai.iot.protocol.bean.MeterConfigWriteCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterReadWaterCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdCmd;
+import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.iot.MeterConfigBean;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iotbean.command.BaseCommandRequest;
@@ -157,7 +158,8 @@ public class MeterDeviceController {
 		System.out.println("----------加载水表配置指令对话框");
 		htmlPath = "meters/meter_device/command_meter_config_dialog";//默认为表配置对话框
 		
-		WmDevice device = wmDeviceService.selectByPrimaryKey(itemId);
+		//WmDevice device = wmDeviceService.selectByPrimaryKey(itemId);
+		Meters device = metersService.selectByPrimaryKey(itemId);
 		MeterConfigBean meterConfigBean = null;
 		if(device!=null) {
 			
@@ -183,9 +185,10 @@ public class MeterDeviceController {
 	public Object cmdFreezeGenerator(String deviceId, Integer cmdType, String cmdAction) throws Exception{
 		try {
 			Long id = Long.valueOf(deviceId);
-			WmDevice device = wmDeviceService.selectByPrimaryKey(id);
+			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
+			Meters device = metersService.selectByPrimaryKey(id);
 			
-			Integer meterType = device.getMeterType();//表类型
+			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -197,7 +200,8 @@ public class MeterDeviceController {
 				sequence = 1;
 			}
 	        device.setMeterSequence(sequence);
-	        wmDeviceService.updateByPrimaryKeySelective(device);
+	        metersService.updateByPrimaryKeySelective(device);
+	        //wmDeviceService.updateByPrimaryKeySelective(device);
 			
 			//----------测试时使用，正常使用时需要注释----------
 	    	if(StringUtils.isBlank(meterAddress)) {
@@ -270,9 +274,10 @@ public class MeterDeviceController {
 	public Object cmdReadGenerator(String deviceId, Integer cmdType, String cmdAction) {
 		try {
 			Long id = Long.valueOf(deviceId);
-			WmDevice device = wmDeviceService.selectByPrimaryKey(id);
+			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
+			Meters device = metersService.selectByPrimaryKey(id);
 			
-			Integer meterType = device.getMeterType();//表类型
+			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -284,7 +289,8 @@ public class MeterDeviceController {
 				sequence = 1;
 			}
 	        device.setMeterSequence(sequence);
-	        wmDeviceService.updateByPrimaryKeySelective(device);
+	        metersService.updateByPrimaryKeySelective(device);
+	        //wmDeviceService.updateByPrimaryKeySelective(device);
 			
 			//----------测试时使用，正常使用时需要注释----------
 	    	if(StringUtils.isBlank(meterAddress)) {
@@ -356,8 +362,9 @@ public class MeterDeviceController {
 	public Object cmdWaterAmountGenerator(String deviceId, Integer cmdType, String cmdAction) {
 		try {
 			Long id = Long.valueOf(deviceId);
-			WmDevice device = wmDeviceService.selectByPrimaryKey(id);
-			Integer meterType = device.getMeterType();//表类型
+			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
+			Meters device = metersService.selectByPrimaryKey(id);
+			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -369,7 +376,8 @@ public class MeterDeviceController {
 				sequence = 1;
 			}
 	        device.setMeterSequence(sequence);
-	        wmDeviceService.updateByPrimaryKeySelective(device);
+	        metersService.updateByPrimaryKeySelective(device);
+	        //wmDeviceService.updateByPrimaryKeySelective(device);
 			
 			//----------测试时使用，正常使用时需要注释----------
 	    	if(StringUtils.isBlank(meterAddress)) {
@@ -440,8 +448,9 @@ public class MeterDeviceController {
 	public Object cmdOpenCloseGenerator(String deviceId, Integer cmdType, String cmdAction) {
 		try {
 			Long id = Long.valueOf(deviceId);
-			WmDevice device = wmDeviceService.selectByPrimaryKey(id);
-			Integer meterType = device.getMeterType();//表类型
+			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
+			Meters device = metersService.selectByPrimaryKey(id);
+			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -453,7 +462,8 @@ public class MeterDeviceController {
 				sequence = 1;
 			}
 	        device.setMeterSequence(sequence);
-	        wmDeviceService.updateByPrimaryKeySelective(device);
+	        metersService.updateByPrimaryKeySelective(device);
+	        //wmDeviceService.updateByPrimaryKeySelective(device);
 			
 			//----------测试时使用，正常使用时需要注释----------
 	    	if(StringUtils.isBlank(meterAddress)) {
@@ -524,8 +534,9 @@ public class MeterDeviceController {
 	public Object cmdMeterConfigGenerator(String deviceId, Integer cmdType, String cmdAction) {
 		try {
 			Long id = Long.valueOf(deviceId);
-			WmDevice device = wmDeviceService.selectByPrimaryKey(id);
-			Integer meterType = device.getMeterType();//表类型
+			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
+			Meters device = metersService.selectByPrimaryKey(id);
+			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -537,7 +548,8 @@ public class MeterDeviceController {
 				sequence = 1;
 			}
 	        device.setMeterSequence(sequence);
-	        wmDeviceService.updateByPrimaryKeySelective(device);
+	        metersService.updateByPrimaryKeySelective(device);
+	        //wmDeviceService.updateByPrimaryKeySelective(device);
 			
 			//----------测试时使用，正常使用时需要注释----------
 	    	if(StringUtils.isBlank(meterAddress)) {

@@ -142,7 +142,7 @@ public class Meters {
     private String meterFactoryCode;
     
     @Column(name = "METER_SEQUENCE")
-    private Long meterSequence;
+    private Integer meterSequence;
 
     /**
      * @return ID
@@ -703,11 +703,11 @@ public class Meters {
 		this.meterFactoryCode = meterFactoryCode;
 	}
 
-	public Long getMeterSequence() {
+	public Integer getMeterSequence() {
 		return meterSequence;
 	}
 
-	public void setMeterSequence(Long meterSequence) {
+	public void setMeterSequence(Integer meterSequence) {
 		this.meterSequence = meterSequence;
 	}
 	
