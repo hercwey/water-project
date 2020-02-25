@@ -188,13 +188,13 @@ public class MeterDeviceController {
 	 */
 	@RequestMapping(value = "/cmd-freeze-generator")
 	@ResponseBody
-	public Object cmdFreezeGenerator(String deviceId, Integer cmdType, String cmdAction) throws Exception{
+	public Object cmdFreezeGenerator(Long id, Integer cmdType, String cmdAction) throws Exception{
 		try {
-			Long id = Long.valueOf(deviceId);
+			//Long id = Long.valueOf(deviceId);
 			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
 			
-			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
+			Integer meterType = Integer.valueOf(device.getMeterUseType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -252,7 +252,7 @@ public class MeterDeviceController {
 			//4=读月冻结指令；
 			System.out.println("----------生成读月冻结指令");
 			//生成读月冻结指令
-			String command = this.generatorReadMonthFreezeCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), deviceId);
+			String command = this.generatorReadMonthFreezeCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), device.getDeviceId());
 			//获取指令对象
 			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_READ_MONTH_FREEZE.getKey(), command);
 			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
@@ -296,13 +296,12 @@ public class MeterDeviceController {
 	 */
 	@RequestMapping(value = "/cmd-read-generator")
 	@ResponseBody
-	public Object cmdReadGenerator(String deviceId, Integer cmdType, String cmdAction) {
+	public Object cmdReadGenerator(Long id, Integer cmdType, String cmdAction) {
 		try {
-			Long id = Long.valueOf(deviceId);
 			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
 			
-			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
+			Integer meterType = Integer.valueOf(device.getMeterUseType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -360,14 +359,14 @@ public class MeterDeviceController {
 	    	//5=读表配置指令
 			System.out.println("----------生成读表配置指令");
 			//读表配置指令
-			String command = this.generatorReadMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), deviceId);
+			String command = this.generatorReadMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), device.getDeviceId());
 			//获取指令对象
 			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_READ_METER_CONFIG.getKey(), command);
 			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
 			if(rows>0) {
 				
 				BaseCommandRequest request = new BaseCommandRequest();
-				request.setDeviceId(deviceId);
+				request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);
 				request.setMeterFactoryCode(meterFactoryCode);
 				request.setMeterType(meterType.byteValue());
@@ -400,12 +399,12 @@ public class MeterDeviceController {
 	 */
 	@RequestMapping(value = "/cmd-water-amount-generator")
 	@ResponseBody
-	public Object cmdWaterAmountGenerator(String deviceId, Integer cmdType, String cmdAction) {
+	public Object cmdWaterAmountGenerator( Long id, Integer cmdType, String cmdAction) {
 		try {
-			Long id = Long.valueOf(deviceId);
+			//Long id = Long.valueOf(deviceId);
 			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
-			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
+			Integer meterType = Integer.valueOf(device.getMeterUseType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -462,7 +461,7 @@ public class MeterDeviceController {
 	    	//5=水量阀值指令
 			System.out.println("----------生成水量阀值指令");
 			//水量阀值指令
-			String command = this.generatorWaterAmountCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(),Integer.valueOf(cmdAction), deviceId);
+			String command = this.generatorWaterAmountCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(),Integer.valueOf(cmdAction), device.getDeviceId());
 			//获取指令对象
 			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_WATER_AMOUNT.getKey(), command);
 			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
@@ -470,7 +469,7 @@ public class MeterDeviceController {
 				
 				ConfigThresholdRequest request = new ConfigThresholdRequest();
 				request.setThreshold((Integer.valueOf(cmdAction)).shortValue());
-		    	request.setDeviceId(deviceId);
+		    	request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);
 				request.setMeterFactoryCode(meterFactoryCode);
 				request.setMeterType(meterType.byteValue());
@@ -513,12 +512,11 @@ public class MeterDeviceController {
 	 */
 	@RequestMapping(value = "/cmd-open-close-generator")
 	@ResponseBody
-	public Object cmdOpenCloseGenerator(String deviceId, Integer cmdType, String cmdAction) {
+	public Object cmdOpenCloseGenerator(Long id, Integer cmdType, String cmdAction) {
 		try {
-			Long id = Long.valueOf(deviceId);
 			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
-			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
+			Integer meterType = Integer.valueOf(device.getMeterUseType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -575,7 +573,7 @@ public class MeterDeviceController {
 	    	//5=开/关阀指令
 			System.out.println("----------生成开/关阀指令");
 			//开/关阀指令
-			String command = this.generatorOpenCloseCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(),Integer.valueOf(cmdAction), deviceId);
+			String command = this.generatorOpenCloseCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(),Integer.valueOf(cmdAction), device.getDeviceId());
 			//获取指令对象
 			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_OPEN_CLOSE.getKey(), command);
 			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
@@ -583,7 +581,7 @@ public class MeterDeviceController {
 				
 				ControlValveRequest request = new ControlValveRequest();
 				request.setAction((Integer.valueOf(cmdAction)).byteValue());
-		    	request.setDeviceId(deviceId);
+		    	request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);
 				request.setMeterFactoryCode(meterFactoryCode);
 				request.setMeterType(meterType.byteValue());
@@ -626,12 +624,11 @@ public class MeterDeviceController {
 	 */
 	@RequestMapping(value = "/cmd-meter-config-generator")
 	@ResponseBody
-	public Object cmdMeterConfigGenerator(String deviceId, Integer cmdType, String cmdAction) {
+	public Object cmdMeterConfigGenerator(Long id, Integer cmdType, String cmdAction) {
 		try {
-			Long id = Long.valueOf(deviceId);
 			//WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
-			Integer meterType = Integer.valueOf(device.getMeterType());//表类型
+			Integer meterType = Integer.valueOf(device.getMeterUseType());//表类型
 			String meterAddress = device.getMeterAddress();//表地址
 			String meterFactoryCode = device.getMeterFactoryCode();//表厂商
 			Integer sequence = device.getMeterSequence();//序号
@@ -688,7 +685,7 @@ public class MeterDeviceController {
 	    	//水表配置指令
 			System.out.println("----------生成水表配置指令");
 			//水表配置指令
-			String command = this.generatorMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(),cmdAction, deviceId);
+			String command = this.generatorMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(),cmdAction, device.getDeviceId());
 			//获取指令对象
 			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_METER_CONFIG.getKey(), command);
 			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录

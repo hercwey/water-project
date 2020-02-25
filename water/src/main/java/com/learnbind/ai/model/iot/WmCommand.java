@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class WmCommand {
     @Id
     @Column(name = "ID")
-    @GeneratedValue(generator = "JDBC")
+    @GeneratedValue(strategy=GenerationType.IDENTITY, generator="SELECT WM_COMMAND_SEQ_GENERATOR.CURRVAL FROM DUAL")//前提是先创建了oracle序列
     private Long id;
 
     @Column(name = "COMMAND_ID")
