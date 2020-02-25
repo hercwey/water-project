@@ -1097,7 +1097,7 @@ public class MetersServiceImpl extends AbstractBaseService<Meters, Long> impleme
 	@Override
 	public Long getMeterId(String deviceId) {
 		Meters meter = new Meters();
-		//meter.setDeviceId(deviceId); TODO 字段增加后放开
+		meter.setDeviceId(deviceId);
 		List<Meters> meterList = metersMapper.select(meter);
 		if(meterList!=null && meterList.size()>0) {
 			return meterList.get(0).getId();

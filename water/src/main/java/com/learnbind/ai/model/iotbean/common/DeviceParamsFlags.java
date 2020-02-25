@@ -19,20 +19,20 @@ public class DeviceParamsFlags {
 //    public static final short FLAG_SERVER_PORT        = 0x1000;  
 //    public static final short FLAG_MAGNETIC_ALARM_CLEAR = 0x2000;  
 
-	private Boolean period;// 定时上传周期
-	private Boolean periodUnit;// 定时上传周期单位
-	private Boolean maxReport;// 定量上传值
-	private Boolean emergTime;// 用户临时开阀用水限定时间
-	private Boolean valveTime;// 阀门行程时间
-	private Boolean valveMaintainTime;// 阀门维护周期
-	private Boolean waterVolume;// 累计使用量
-	private Boolean sampleUnit;// 采样参数
-	private Boolean meterNum;// 表号
-	private Boolean meterTime;// 表时间
-	private Boolean meterStatus;// 表状态字
-	private Boolean serverIp;// 服务器IP
-	private Boolean serverPort;// 端口号
-	private Boolean magneticAlarmClear;// 磁干扰告警清除
+	private Boolean period = true;// 定时上传周期
+	private Boolean periodUnit = true;// 定时上传周期单位
+	private Boolean maxReport = true;// 定量上传值
+	private Boolean emergTime = true;// 用户临时开阀用水限定时间
+	private Boolean valveTime = true;// 阀门行程时间
+	private Boolean valveMaintainTime = true;// 阀门维护周期
+	private Boolean waterVolume = true;// 累计使用量
+	private Boolean sampleUnit = true;// 采样参数
+	private Boolean meterNum = true;// 表号
+	private Boolean meterTime = false;// 表时间
+	private Boolean meterStatus = false;// 表状态字
+	private Boolean serverIp = false;// 服务器IP
+	private Boolean serverPort = false;// 端口号
+	private Boolean magneticAlarmClear = false;// 磁干扰告警清除
 
 	public Boolean getPeriod() {
 		return period;

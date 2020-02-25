@@ -144,4 +144,12 @@ public class MeterStatusBean {
 		
 		return status;
 	}
+
+	@Override
+	public String toString() {
+		return "MeterStatusBean [valveOpen=" + valveOpen + ", valveAbnormal=" + valveAbnormal + ", batteryLow="
+				+ batteryLow + ", periodOn=" + periodOn + ", maxReportOn=" + maxReportOn + ", magneticOn=" + magneticOn
+				+ ", sampleLineCut=" + sampleLineCut + ", magneticAlarmOn=" + magneticAlarmOn + "]";
+	}
+	
 }

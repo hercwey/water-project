@@ -1079,4 +1079,52 @@ public class MeterRecordServiceImpl extends AbstractBaseService<MeterRecord, Lon
 		return meterRecordMapper.getExportMeterRecordErrorAmountData(searchCond, readType, traceIds, period, isPartWater, startDate, endDate, currAmount);
 	}
 	
+	//-------------------------------------------------------------------------------------------
+	@Override
+	public MeterRecord saveMeterRecord(MeterRecord record, Long operatorId, String operatorName) {
+		
+		Date sysDate = new Date();//系统日期
+		
+		Date currDate = record.getCurrDate();//本期抄表日期
+		if(currDate==null) {
+			record.setCurrDate(sysDate);//本期抄表日期为null时，设置默认值为系统日期
+		}
+		
+		Long customerId = record.getCustomerId();//客户ID
+//		String period = record.getPeriod();//抄表期间
+		Long meterId = record.getMeterId();//表计ID
+		//查询到的最后一条抄表记录
+		MeterRecord preRecord = this.getLastMeterRecord(customerId, null, meterId);
+		if(preRecord!=null) {//如果有上期抄表记录则设置本期抄表记录中的上期抄表日期和上期抄表读数
+			record.setPreDate(preRecord.getCurrDate());
+			record.setPreRead(preRecord.getCurrRead());
+		}//如果没有上期抄表记录则为空
+			
+		//获取本期水量	本期水量=本期抄表读数-上期抄表读数
+		BigDecimal currAmount = this.getCurrWaterAmount(record.getCurrRead(), record.getPreRead());
+		record.setCurrAmount(currAmount);
+		record.setDeleted(EnumDeletedStatus.DELETE_NO.getValue());
+		record.setOperatorId(operatorId);
+		record.setOperatorName(operatorName);
+		record.setOperationTime(sysDate);
+		
+		String meterUse = this.getMeterUse(meterId);//获取表计用途
+		Long meterTreeId = this.getMeterTreeId(meterId);//获取表计父子关系ID
+		record.setMeterUse(meterUse);//水表用途
+		record.setMeterTreeId(meterTreeId);//表计父子关系ID
+		
+		int rows = meterRecordMapper.insertSelective(record);//增加抄表记录
+		if(rows>0) {
+
+			//增加使用表计规则日志
+			List<MeterPartWaterRule> meterRuleList = meterPartWaterRuleService.getMeterRule(record.getMeterId());
+			if(meterRuleList!=null && meterRuleList.size()>0) {
+				meterPartWaterRuleTraceService.insertTraceList(record.getId(), meterRuleList);
+			}
+			return record;
+		}
+		
+		return null;
+	}
+	
 }

@@ -111,4 +111,12 @@ public class MeterReportBean {
 		MeterReport meterReport = new MeterReport(bytes);
 		return fromMeterReport(meterReport);
 	}
+
+	@Override
+	public String toString() {
+		return "MeterReportBean [meterNumber=" + meterNumber + ", meterTime=" + meterTime + ", totalVolume="
+				+ totalVolume + ", sampleUnit=" + sampleUnit + ", batteryVoltage=" + batteryVoltage + ", meterStatus="
+				+ meterStatus + ", signal=" + signal + ", pressure=" + pressure + "]";
+	}
+	
 }

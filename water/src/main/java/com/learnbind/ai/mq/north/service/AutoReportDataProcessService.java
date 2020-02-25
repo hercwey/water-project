@@ -1,6 +1,7 @@
 package com.learnbind.ai.mq.north.service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.learnbind.ai.common.enumclass.EnumReadMode;
 import com.learnbind.ai.common.enumclass.EnumReadType;
+import com.learnbind.ai.common.util.BigDecimalUtils;
 import com.learnbind.ai.model.CustomerAccountItem;
 import com.learnbind.ai.model.CustomerMeter;
 import com.learnbind.ai.model.MeterRecord;
@@ -91,7 +93,7 @@ public class AutoReportDataProcessService {
 		
 		if(dataType == ReportDataType.METER_DATA_TYPE_REPORT) {// 如果数据类型是 设备主动上报数据 时，自动执行保存抄表记录、生成分水量、生成账单、余额自动销账
 			// 3、保存到抄表记录
-			MeterRecord meterRecord = this.saveMeterRecord(deviceId, reportData.getMonthData());
+			MeterRecord meterRecord = this.saveMeterRecord(deviceId, reportData.getReportData());
 			if(meterRecord!=null) {
 				// 4、生成分水量（生成分水量时会计算水费）
 				List<Long> pwIdList = partitionWaterService.generatorPartitionWater(meterRecord);
@@ -115,6 +117,10 @@ public class AutoReportDataProcessService {
 		
 		//Date sysDate = new Date();//系统日期
 		Long meterId = metersService.getMeterId(deviceId);//获取表计ID		
+		if(meterId==null) {
+			log.debug("未查询到对应的表计信息，设备ID："+deviceId);
+			return null;
+		}
 		CustomerMeter cm = customerMeterService.getCustomerByMeterId(meterId);//查询客户表计关系表
 		Long customerId = cm.getCustomerId();//客户ID
 		//查询最后一次抄表记录
@@ -122,20 +128,26 @@ public class AutoReportDataProcessService {
 		//获取本次表底
 		BigDecimal currReadMeter = meterRecordBusiness.getCurrReadMeter(meterReport);
 		
+	    //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+		Date meterTime = meterReport.getMeterTime();
+		String period = sdf.format(meterTime);
+		
 		//保存抄表记录
 		MeterRecord record = new MeterRecord();
 		record.setCustomerId(customerId);
 		record.setMeterId(meterId);
+		record.setPeriod(period);
 		record.setCurrRead(currReadMeter.toString());
 		record.setReadMode(EnumReadMode.READ_REMOTE.getCode());
 		record.setReadType(EnumReadType.NORMAL_READ.getValue());
-		int rows = meterRecordService.insertMeterRecord(record, null, null);
-		if(rows>0) {
-			//查询最后一次抄表记录
-			MeterRecord lastMeterRecord = meterRecordService.getLastMeterRecord(customerId, null, meterId);
-			return lastMeterRecord;
-		}
-		return null;
+		MeterRecord meterRecord = meterRecordService.saveMeterRecord(record, null, null);
+//		if(rows>0) {
+//			//查询最后一次抄表记录
+//			MeterRecord lastMeterRecord = meterRecordService.getLastMeterRecord(customerId, null, meterId);
+//			return lastMeterRecord;
+//		}
+		return meterRecord;
 	}
 	
 	// --------------------------------保存到抄表记录--------------------------------------------------------------------------------------------------
@@ -153,15 +165,21 @@ public class AutoReportDataProcessService {
 			if(waterFeeBillId!=null) {
 				//查询水费账单
 				CustomerAccountItem waterFeeBill = customerAccountItemService.selectByPrimaryKey(waterFeeBillId);
-				//结算账单
-				int rows = customerAccountItemService.balanceAutoSettlement(waterFeeBill);
-				if(rows>0) {//rows>0时余额自动结算成功
-					
-				}else if(rows==0) {//rows=0时余额自动结算失败
-					log.debug("----------余额自动结算账单异常，请手动操作结算账单");
-				}else {//rows<0时余额不足
-					log.debug("----------余额不足");
+				BigDecimal oweAmount = BigDecimalUtils.subtract(waterFeeBill.getCreditAmount(), waterFeeBill.getDebitAmount());//计算水费账单欠费金额
+				if(BigDecimalUtils.greaterThan(oweAmount, new BigDecimal(0.00))) {//如果水费账单欠费金额>0时，自动结算
+					//结算账单
+					int rows = customerAccountItemService.balanceAutoSettlement(waterFeeBill);
+					if(rows>0) {//rows>0时余额自动结算成功
+						log.debug("----------余额自动结算账单成功");
+					}else if(rows==0) {//rows=0时余额自动结算失败
+						log.debug("----------余额自动结算账单异常，请手动操作结算账单");
+					}else {//rows<0时余额不足
+						log.debug("----------余额不足");
+					}
+				}else {
+					log.debug("当前账单欠费金额<=0，不需要自动结算，账单ID："+waterFeeBillId);
 				}
+				
 			}else {
 				log.debug("----------生成账单异常");
 			}

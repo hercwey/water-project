@@ -2019,6 +2019,7 @@ public class PartitionWaterServiceImpl extends AbstractBaseService<PartitionWate
 			//增加分水量记录
 			int rows = partitionWaterMapper.insertSelective(pw);
 			if(rows>0) {
+				this.updateMeterRecordStatus(recordId);//更新抄表记录分水量状态为已生成分水量
 				partitionWaterIdList.add(pw.getId());//增加分水量到
 				//增加日志（水价日志，多人口调整日志和政策减免日志）
 				this.insertTrace(pw.getId(), useWaterPriceTraceJSON, usePeopleAdjustTraceJSON, useDiscountTraceJSON);
@@ -2030,6 +2031,19 @@ public class PartitionWaterServiceImpl extends AbstractBaseService<PartitionWate
 		}
 		
 		return partitionWaterIdList;
+	}
+	
+	/**
+	 * @Title: updateMeterRecordStatus
+	 * @Description: 更新抄表记录分水量状态为已生成分水量
+	 * @param meterRecordId 
+	 */
+	private void updateMeterRecordStatus(Long meterRecordId) {
+		//更新抄表记录分水量状态为已生成分水量（1=是）
+		MeterRecord recordTemp = new MeterRecord();
+		recordTemp.setId(meterRecordId);
+		recordTemp.setIsPartWater(EnumPartitionWaterStatus.PARTITION_YES.getValue());
+		meterRecordService.updateByPrimaryKeySelective(recordTemp);
 	}
 	
 }
