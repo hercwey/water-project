@@ -126,6 +126,15 @@ public class BaseCommandResponse extends BaseResponse{
 	public void setJsonData(String jsonData) {
 		this.jsonData = jsonData;
 	}
-    
+	
+	@Override
+	public String toString() {
+		return "BaseCommandResponse [deviceId=" + deviceId + ", gatewayId=" + gatewayId + ", requestId=" + requestId
+				+ ", serviceId=" + serviceId + ", serviceType=" + serviceType + ", eventTime=" + eventTime
+				+ ", meterType=" + meterType + ", meterAddr=" + meterAddr + ", factoryCode=" + factoryCode
+				+ ", ctrlCode=" + ctrlCode + ", dataDI=" + dataDI + ", sequence=" + sequence + ", dataType=" + dataType
+				+ ", data=" + data + ", dataBasic=" + dataBasic + ", checksum=" + checksum + ", jsonData=" + jsonData
+				+ "]";
+	}
     
 }

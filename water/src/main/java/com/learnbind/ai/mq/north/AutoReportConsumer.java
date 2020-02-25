@@ -119,5 +119,52 @@ public class AutoReportConsumer {
 			e.printStackTrace();
 		}
 	}
+	
+	public static AutoReport getTest() {
+		String test = "{\r\n" + 
+				" \"checksum\": -97,\r\n" + 
+				" \"ctrlCode\": \"81\",\r\n" + 
+				" \"data\": \"{\\\"batteryVoltage\\\":3219,\\\"meterNumber\\\":\\\"434045073936\\\",\\\"meterStatus\\\":{\\\"batteryLow\\\":0,\\\"magneticAlarmOn\\\":0,\\\"magneticOn\\\":0,\\\"maxReportOn\\\":0,\\\"periodOn\\\":1,\\\"sampleLineCut\\\":0,\\\"valveAbnormal\\\":0,\\\"valveOpen\\\":1},\\\"meterTime\\\":1581374157000,\\\"pressure\\\":\\\"0.0\\\",\\\"sampleUnit\\\":\\\"0.1\\\",\\\"signal\\\":\\\"13\\\",\\\"totalVolume\\\":34}\",\r\n" + 
+				" \"dataBasic\": \"681036390745404358811d1f90b0363907454043573522100102200e0000000019320900130000009f16\",\r\n" + 
+				" \"dataDI\": -28641,\r\n" + 
+				" \"dataType\": 1,\r\n" + 
+				" \"deviceId\": \"b7c99b36-3f23-4d27-bd6d-bb0603c6fbcb\",\r\n" + 
+				" \"eventTime\": 1581374164000,\r\n" + 
+				" \"factoryCode\": \"5843\",\r\n" + 
+				" \"gatewayId\": \"b7c99b36-3f23-4d27-bd6d-bb0603c6fbcb\",\r\n" + 
+				" \"jsonData\": \"{\\\"notifyType\\\":\\\"deviceDatasChanged\\\",\\\"requestId\\\":null,\\\"deviceId\\\":\\\"b7c99b36-3f23-4d27-bd6d-bb0603c6fbcb\\\",\\\"gatewayId\\\":\\\"b7c99b36-3f23-4d27-bd6d-bb0603c6fbcb\\\",\\\"services\\\":[{\\\"serviceId\\\":\\\"JRprotocol\\\",\\\"serviceType\\\":\\\"JRprotocol\\\",\\\"data\\\":{\\\"JRprotocolXY\\\":\\\"681036390745404358811d1f90b0363907454043573522100102200e0000000019320900130000009f16\\\"},\\\"eventTime\\\":\\\"20200210T223604Z\\\"}]}\",\r\n" + 
+				" \"meterAddr\": \"4045073936\",\r\n" + 
+				" \"meterType\": 16,\r\n" + 
+				" \"reportData\": {\r\n" + 
+				"  \"batteryVoltage\": 3219,\r\n" + 
+				"  \"meterNumber\": \"434045073936\",\r\n" + 
+				"  \"meterStatus\": {\r\n" + 
+				"   \"batteryLow\": 0,\r\n" + 
+				"   \"magneticAlarmOn\": 0,\r\n" + 
+				"   \"magneticOn\": 0,\r\n" + 
+				"   \"maxReportOn\": 0,\r\n" + 
+				"   \"periodOn\": 1,\r\n" + 
+				"   \"sampleLineCut\": 0,\r\n" + 
+				"   \"valveAbnormal\": 0,\r\n" + 
+				"   \"valveOpen\": 1\r\n" + 
+				"  },\r\n" + 
+				"  \"meterTime\": 1581374157000,\r\n" + 
+				"  \"pressure\": \"0.0\",\r\n" + 
+				"  \"sampleUnit\": \"0.1\",\r\n" + 
+				"  \"signal\": \"13\",\r\n" + 
+				"  \"totalVolume\": 34\r\n" + 
+				" },\r\n" + 
+				" \"sequence\": 176,\r\n" + 
+				" \"serviceId\": \"JRprotocol\",\r\n" + 
+				" \"serviceType\": \"JRprotocol\"\r\n" + 
+				"}";
+		AutoReport report = AutoReport.fromJson(test);
+		System.out.println(report.toString());
+		System.out.println(report.getReportData().toString());
+		return report;
+	}
+	public static void main(String[] args) {
+		//test();
+	}
 
 }

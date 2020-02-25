@@ -172,7 +172,7 @@ public class DeviceParams {
 		meterConfig.setMeterBasicValue(params.getMeterBasicValue());
 		meterConfig.setMeterNumber(params.getMeterNumber());
 		meterConfig.setMeterStatusFlag(MeterStatusBean.toStatusFlag(params.getMeterStatus()));
-		meterConfig.setMeterTime(params.getMeterTime().toString());
+		meterConfig.setMeterTime(params.getMeterTime() != null ? params.getMeterTime().toString():"");
 		meterConfig.setReportPeriod(params.getReportPeriod());
 		meterConfig.setReportPeriodUnit(params.getReportPeriodUnit());
 		meterConfig.setReportRation(params.getReportRation());

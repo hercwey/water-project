@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.learnbind.ai.bean.AssistantBean;
@@ -16,12 +17,11 @@ import com.learnbind.ai.common.enumclass.EnumAiDebitCreditStatus;
 import com.learnbind.ai.common.enumclass.EnumDeletedStatus;
 import com.learnbind.ai.common.enumclass.EnumSubAccountStatus;
 import com.learnbind.ai.common.enumclass.accountitem.EnumAiCreditSubjectAction;
-import com.learnbind.ai.common.enumclass.accountitem.EnumAiDebitSubjectAction;
-import com.learnbind.ai.common.enumclass.accountitem.EnumAiTraceOperate;
 import com.learnbind.ai.common.util.BigDecimalUtils;
 import com.learnbind.ai.model.CustomerAccountItem;
 import com.learnbind.ai.model.PartitionWater;
 
+@Service
 public class BillBusiness {
 
 	

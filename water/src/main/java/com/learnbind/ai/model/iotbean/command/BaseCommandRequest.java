@@ -1,8 +1,11 @@
 package com.learnbind.ai.model.iotbean.command;
 
+import com.alibaba.fastjson.JSON;
 import com.learnbind.ai.model.iotbean.common.BaseRequest;
 
 public class BaseCommandRequest extends BaseRequest{
+	
+	private Long id;//指令在平台数据库中对应的id
 	
 	private String deviceId;//设备ID（电信平台）
     private String serviceId;//服务ID（电信平台）
@@ -54,5 +57,19 @@ public class BaseCommandRequest extends BaseRequest{
 	}
 	public void setSequence(byte sequence) {
 		this.sequence = sequence;
+	}
+
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public static String toJsonString(BaseCommandRequest request) {
+		return JSON.toJSONString(request);
+	}
+
+	public static BaseCommandRequest fromJson(String json) {
+		return JSON.parseObject(json, BaseCommandRequest.class);
 	}
 }

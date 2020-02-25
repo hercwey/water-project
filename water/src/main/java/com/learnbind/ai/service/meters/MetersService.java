@@ -1,6 +1,5 @@
 package com.learnbind.ai.service.meters;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -403,4 +402,12 @@ public interface MetersService extends IBaseService<Meters, Long> {
 	 * @return 
 	 */
 	public Long getMeterId(String deviceId);
+	
+	/**
+	 * @Title: getMeter
+	 * @Description: 根据IOT电信平台设备ID查询表计
+	 * @param iotDeviceId	IOT电信平台设备ID
+	 * @return 
+	 */
+	public Meters getMeter(String iotDeviceId);
 }

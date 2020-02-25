@@ -385,4 +385,8 @@ public interface MeterRecordService extends IBaseService<MeterRecord, Long> {
 	 * @return 
 	 */
 	public List<Map<String, Object>> getExportMeterRecordErrorAmountData(String searchCond, Integer readType, String traceIds, String period, Integer isPartWater, String startDate, String endDate, Integer currAmount);
+	
+	//-------------------------------------------------------------------------------------------
+	public MeterRecord saveMeterRecord(MeterRecord record, Long operatorId, String operatorName);
+	
 }
