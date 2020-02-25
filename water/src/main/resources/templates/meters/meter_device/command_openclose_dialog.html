@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发送开关阀指令对话框</title>
+
+<!-- 发送开关阀指令:对话框 -->
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-command-openclose" role="dialog"	aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span id="modal-title-span">开关阀指令</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body mx-auto">
+								<!-- //cmdType 1=关阀;2=开阀;3=打开50%;4=打开25%;5=打开12.5%; -->
+								<button type="button" class="btn btn-warning btn-sm" id="btn-send-command-close" data-command="1">关阀</button>
+								<button type="button" class="btn btn-success btn-sm" id="btn-send-command-open" data-command="2">开阀</button> 
+								<button type="button" class="btn btn-info btn-sm" id="btn-send-command-open-50" data-command="3">打开50%</button>
+								<button type="button" class="btn btn-info btn-sm" id="btn-send-command-open-25" data-command="4">打开25%</button>
+								<button type="button" class="btn btn-info btn-sm" id="btn-send-command-open-125" data-command="5">打开12.5%</button>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+	
+		/**
+		 * 	生成开/关阀指令通用函数
+		 */
+		function generatorOpenCloseCommandFn(id, cmdAction){
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+			//cmdAction 1=关阀;2=开阀;3=打开50%;4=打开25%;5=打开12.5%;
+			console.log("----------生成开/关阀指令："+id+":"+cmdAction);
+			var url = BASE_CONTEXT_PATH + "/meter-device/cmd-open-close-generator";
+			var parms = new Object();
+			parms.id = id;
+			parms.cmdType = 2;
+			parms.cmdAction = cmdAction;
+			
+			var command = null;
+			$.ajax({
+				type: "post",
+				url: url,
+				data: parms,
+				async: false, 
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					//var result = $.parseJSON(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							console.log("----------返回生成的开/关阀指令："+res.command);
+							command = res.command;
+						}
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+			    }
+			});
+			
+			/* $.post(url, parms, function(res){
+				console.log("----------"+JSON.stringify(res));
+				//var result = $.parseJSON(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						console.log("----------返回生成的指令："+res.command);
+						return res.command;
+					}
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"warning");
+				}
+				
+			}); */
+			return command;
+		}
+		
+		$(function(){
+			/**
+			 * 	绑定关阀按钮的click事件
+			 */
+			$("#modal-container-command-openclose #btn-send-command-close").on("click", function(){
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				var cmdAction = $(this).attr("data-command");//指令动作 1=关阀;2=开阀;3=打开50%;4=打开25%;5=打开12.5%;
+				
+				var command = generatorOpenCloseCommandFn(deviceId, cmdAction);//生成开/关阀指令通用函数
+				console.log("----------发送开/关阀指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+			});
+			/**
+			 * 	绑定开阀按钮的click事件
+			 */
+			$("#modal-container-command-openclose #btn-send-command-open").on("click", function(){
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				var cmdAction = $(this).attr("data-command");//指令动作 1=关阀;2=开阀;3=打开50%;4=打开25%;5=打开12.5%;
+				
+				var command = generatorOpenCloseCommandFn(deviceId, cmdAction);//生成开/关阀指令通用函数
+				console.log("----------发送开/关阀指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+			});
+			/**
+			 * 	绑定打开50%按钮的click事件
+			 */
+			$("#modal-container-command-openclose #btn-send-command-open-50").on("click", function(){
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				var cmdAction = $(this).attr("data-command");//指令动作 1=关阀;2=开阀;3=打开50%;4=打开25%;5=打开12.5%;
+				
+				var command = generatorOpenCloseCommandFn(deviceId, cmdAction);//生成开/关阀指令通用函数
+				console.log("----------发送开/关阀指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+			});
+			/**
+			 * 	绑定打开25%按钮的click事件
+			 */
+			$("#modal-container-command-openclose #btn-send-command-open-25").on("click", function(){
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				var cmdAction = $(this).attr("data-command");//指令动作 1=关阀;2=开阀;3=打开50%;4=打开25%;5=打开12.5%;
+				
+				var command = generatorOpenCloseCommandFn(deviceId, cmdAction);//生成开/关阀指令通用函数
+				console.log("----------发送开/关阀指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+			});
+			/**
+			 * 	绑定打开125%按钮的click事件
+			 */
+			$("#modal-container-command-openclose #btn-send-command-open-125").on("click", function(){
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				var cmdAction = $(this).attr("data-command");//指令动作 1=关阀;2=开阀;3=打开50%;4=打开25%;5=打开12.5%;
+				
+				var command = generatorOpenCloseCommandFn(deviceId, cmdAction);//生成开/关阀指令通用函数
+				console.log("----------发送开/关阀指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+			});
+		});
+	
+	</script>
+	
+	</th:block>
+
+</body>
+</html>

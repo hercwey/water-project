@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发送水量阀值指令对话框</title>
+
+<!-- 发送开关阀指令:对话框 -->
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-command-water-amount" role="dialog"	aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span id="modal-title-span">水量阀值指令</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<table class="table-layout table">
+									<tbody>
+										<tr>
+											<td>
+												<!-- 水量阀值 -->
+												<div class="form-group form-inline">
+													<label for="set-water-amount-value" class="col-sm-4 control-label">水量阀值</label>
+													<span class="input-group-sm col-sm-8">
+														<input type="number" class="form-control" id="set-water-amount-value" name="" value="" placeholder="水量阀值"/>
+													</span>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm" id="btn-send-cmd-water-amount">发送指令</button>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+	
+		/**
+		 * 	生成水量阀值指令通用函数
+		 */
+		function generatorWaterAmountCommandFn(id, cmdAction){
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+			//cmdAction 水量阀值（数字）;
+			console.log("----------生成水量阀值指令："+id+":"+cmdAction);
+			var url = BASE_CONTEXT_PATH + "/meter-device/cmd-water-amount-generator";
+			var parms = new Object();
+			parms.id = id;
+			parms.cmdType = 3;
+			parms.cmdAction = cmdAction;
+			
+			var command = null;
+			$.ajax({
+				type: "post",
+				url: url,
+				data: parms,
+				async: false, 
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					//var result = $.parseJSON(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							console.log("----------返回生成的水量阀值指令："+res.command);
+							command = res.command;
+						}
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+			    }
+			});
+			
+			return command;
+		}
+		
+		$(function(){
+			/**
+			 * 	绑定对话框中发送指令按钮的click事件
+			 */
+			 $("#modal-container-command-water-amount #btn-send-cmd-water-amount").on("click", function(){
+				var waterAmountValue = $("#modal-container-command-water-amount #set-water-amount-value").val();
+				if(waterAmountValue==null || waterAmountValue=="" || waterAmountValue<=0){
+					//dialog type: success warning info error,默认为info
+					util.message("水量阀值不允许为空，且必须大于零！",null,"warning");
+					return false;
+				}
+				
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				var command = generatorWaterAmountCommandFn(deviceId, waterAmountValue);//生成水量阀值指令通用函数
+				console.log("----------发送水量阀值指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+			});
+		});
+	
+	</script>
+	
+	</th:block>
+
+</body>
+</html>

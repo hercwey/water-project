@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发送水表配置指令对话框</title>
+
+<!-- 发送开关阀指令:对话框 -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<style type="text/css">
+	.table-center tr th{
+		vertical-align: middle;
+		/* text-align: center; */
+		border: 0px;
+	}
+	.table-middle tr td{
+		vertical-align: middle;
+	}
+	.table-middle tr td.center{
+		text-align: center;
+	}
+	.table-center tr td select{
+		height: 30.8px !important;
+	}
+</style>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-command-meter-config" role="dialog"	aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span id="modal-title-span">水表配置指令</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal" role="form" id="meter-config-form">
+									<!-- <div class="card">
+									</div> -->
+									<table class="table-layout table table-sm table-middle">
+										<thead>
+											<tr>
+												<th>参数名称</th>
+												<th>参数值</th>
+												<th>
+													是否下发此参数
+													<!-- <div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-all-config" value="">是否下发此参数
+														</label>
+													</div> -->
+												</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>定时上传周期</td>
+												<td>
+													<input type="text" class="form-control btn-sm" id="config-report-period" name="" 
+																th:value="${meterConfigBean==null ? '' : meterConfigBean.reportPeriod}"
+																placeholder="定时上传周期" />
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-report-period" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>定时上传周期单位</td>
+												<td>
+													<select class="form-control btn-sm" id="config-report-period-unit">
+														<option value="0" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==0 ? 'true' : 'false'}">分钟</option>
+														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==1 ? 'true' : 'false'}">小时</option>
+														<option value="2" th:attr="selected=${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==2 ? 'true' : 'false'}">天</option>
+													</select>
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-report-period-unit" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>定量上传值</td>
+												<td>
+													<input type="text" class="form-control btn-sm" id="config-report-ration" name="" 
+																th:value="${meterConfigBean==null ? '' : meterConfigBean.reportRation}" 
+																placeholder="定量上传值" />
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-report-ration" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>用户临时开阀用水限定时间</td>
+												<td>
+													<input type="text" class="form-control btn-sm" id="config-temporary-time" name="" 
+																th:value="${meterConfigBean==null ? '' : meterConfigBean.temporaryTime}" 
+																placeholder="用户临时开阀用水限定时间" />
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-temporary-time" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													阀门行程时间
+												</td>
+												<td>
+													<input type="text" class="form-control btn-sm" id="config-valve-run-time" name="" 
+																th:value="${meterConfigBean==null ? '' : meterConfigBean.valveRunTime}" 
+																placeholder="阀门行程时间" />
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-valve-run-time" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>阀门维护周期</td>
+												<td>
+													<input type="text" class="form-control btn-sm" id="config-valve-maintain-period" name="" 
+																th:value="${meterConfigBean==null ? '' : meterConfigBean.valveMaintainPeriod}" 
+																placeholder="阀门维护周期" />
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-valve-maintain-period" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>表底数</td>
+												<td>
+													<input type="text" class="form-control btn-sm" id="config-meter-basic-value" name="" 
+																th:value="${meterConfigBean==null ? '' : meterConfigBean.meterBasicValue}" 
+																placeholder="表底数" />
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-basic-value" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>采样参数单位</td>
+												<td>
+													<select class="form-control btn-sm" id="config-sample-unit" th:value="${meterConfigBean!=null ? meterConfigBean.sampleUnit : '1'}">
+														<!-- 采样参数：1字节(0-255)十进制，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样； -->
+														<!-- <option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==1 ? 'true' : 'false'}">1立方</option>
+														<option value="0.1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==0 ? 'true' : 'false'}">0.1立方</option>
+														<option value="0.01" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==2 ? 'true' : 'false'}">0.01立方</option>
+														<option value="0.001" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit==3 ? 'true' : 'false'}">1升</option> -->
+														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='1' ? 'true' : 'false'}">1立方</option>
+														<option value="0.1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.1' ? 'true' : 'false'}">0.1立方</option>
+														<option value="0.01" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.01' ? 'true' : 'false'}">0.01立方</option>
+														<option value="0.001" th:attr="selected=${meterConfigBean!=null && meterConfigBean.sampleUnit=='0.001' ? 'true' : 'false'}">1升</option>
+													</select>
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-sample-unit" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>表当前时间</td>
+												<td>
+													<input type="text" class="form-control btn-sm Wdate" id="config-meter-time" name="" 
+															th:value="${meterConfigBean==null ? '' : #dates.format(meterConfigBean.meterTime, 'yyyy-MM-dd HH:mm:ss')}" 
+															onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});"
+															placeholder="表当前时间" />
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-time" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>磁干扰报警消除</td>
+												<td>
+													<select class="form-control btn-sm" id="config-magnetic-alarm-on" th:value="${meterConfigBean!=null && meterConfigBean.meterStatus!=null ? meterConfigBean.meterStatus.magneticAlarmOn : '0'}">
+														<option value="0" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticAlarmOn=='0' ? 'true' : 'false'}">否</option>
+														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticAlarmOn=='1' ? 'true' : 'false'}">是</option>
+													</select>
+												</td>
+												<td class="center">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-magnetic-alarm-on" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>上传功能</td>
+												<td>
+													<!-- 表状态字-定时/定量上传功能开关 (1开 / 0关) -->
+													<select class="form-control btn-sm" id="config-meter-status-upload-type">
+														<!-- <option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.periodOn==1 ? 'true' : 'false'}">开</option>
+														<option value="0" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.periodOn==0 ? 'true' : 'false'}">关</option> -->
+														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.periodOn==1 ? 'true' : 'false'}">定时上传</option>
+														<option value="2" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.maxReportOn==1 ? 'true' : 'false'}">定量上传</option>
+													</select>
+												</td>
+												<td class="center" rowspan="2">
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-status" value="" style="position: unset;" />
+														</label>
+													</div>
+												</td>
+											</tr>
+											<!-- <tr>
+												<td>定量上传功能</td>
+												<td>
+													表状态字-定量上传功能开关 (1开 / 0关)
+													<select class="form-control btn-sm" id="config-meter-status-max-report">
+														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.maxReportOn==1 ? 'true' : 'false'}">开</option>
+														<option value="0" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.maxReportOn==0 ? 'true' : 'false'}">关</option>
+													</select>
+												</td>
+												<td>
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-status-max-report" value="">
+														</label>
+													</div>
+												</td> --
+											</tr> -->
+											<tr>
+												<td>磁干扰关阀功能</td>
+												<td>
+													<!-- 表状态字-磁干扰关阀功能开关 (1开 / 0关) -->
+													<select class="form-control btn-sm" id="config-meter-status-magnetic">
+														<option value="1" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticOn==1 ? 'true' : 'false'}">开</option>
+														<option value="0" th:attr="selected=${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticOn==0 ? 'true' : 'false'}">关</option>
+													</select>
+												</td>
+												<!-- <td>
+													<div class="form-check">
+														<label class="form-check-label">
+															<input type="checkbox" class="form-check-input" id="checkbox-config-meter-status-magnetic" value="">
+														</label>
+													</div>
+												</td> -->
+											</tr>
+											<tr>
+												<td></td>
+												<td colspan="2" style="color: red; float: left;">
+													注：以上需要录入的信息均为十进制
+												</td>
+											</tr>
+											
+										</tbody>
+									</table>
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary btn-sm" id="btn-send-cmd-meter-config">发送指令</button>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+	
+		/**
+		 * 	获取发送水表配置指令动作参数
+		 */
+		function getSendMeterConfigCmdActionParmsFn(){
+			
+			var reportPeriod = $("#modal-container-command-meter-config #config-report-period").val();//定时上传周期
+			var checkboxReportPeriod = $("#modal-container-command-meter-config #checkbox-config-report-period").prop("checked");//是否配置定时上传周期
+			if(checkboxReportPeriod && (reportPeriod==null || reportPeriod=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("定时上传周期不允许为空！",null,"warning");
+				return false;
+			}
+			var reportPeriodUnit = $("#modal-container-command-meter-config #config-report-period-unit").val();//定时上传周期单位
+			var checkboxReportPeriodUnit = $("#modal-container-command-meter-config #checkbox-config-report-period-unit").prop("checked");//是否配置定时上传周期单位
+			if(checkboxReportPeriodUnit && (reportPeriodUnit==null || reportPeriodUnit=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("定时上传周期单位不允许为空！",null,"warning");
+				return false;
+			}
+			var reportRation = $("#modal-container-command-meter-config #config-report-ration").val();//定量上传值
+			var checkboxReportRation = $("#modal-container-command-meter-config #checkbox-config-report-ration").prop("checked");//是否配置定量上传值
+			if(checkboxReportRation && (reportRation==null || reportRation=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("定量上传值不允许为空！",null,"warning");
+				return false;
+			}
+			var temporaryTime = $("#modal-container-command-meter-config #config-temporary-time").val();//用户临时开阀用水限定时间
+			var checkboxTemporaryTime = $("#modal-container-command-meter-config #checkbox-config-temporary-time").prop("checked");//是否配置用户临时开阀用水限定时间
+			if(checkboxTemporaryTime && (temporaryTime==null || temporaryTime=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("用户临时开阀用水限定时间不允许为空！",null,"warning");
+				return false;
+			}
+			var valveRunTime = $("#modal-container-command-meter-config #config-valve-run-time").val();//阀门行程时间
+			var checkboxValveRunTime = $("#modal-container-command-meter-config #checkbox-config-valve-run-time").prop("checked");//是否配置阀门行程时间
+			if(checkboxValveRunTime && (valveRunTime==null || valveRunTime=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("阀门行程时间不允许为空！",null,"warning");
+				return false;
+			}
+			var valveMaintainPeriod = $("#modal-container-command-meter-config #config-valve-maintain-period").val();//阀门维护周期
+			var checkboxValveMaintainPeriod = $("#modal-container-command-meter-config #checkbox-config-valve-maintain-period").prop("checked");//是否配置阀门维护周期
+			if(checkboxValveMaintainPeriod && (valveMaintainPeriod==null || valveMaintainPeriod=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("阀门维护周期不允许为空！",null,"warning");
+				return false;
+			}
+			var meterBasicValue = $("#modal-container-command-meter-config #config-meter-basic-value").val();//表底数
+			var checkboxMeterBasicValue = $("#modal-container-command-meter-config #checkbox-config-meter-basic-value").prop("checked");//是否配置表底数
+			if(checkboxMeterBasicValue && (meterBasicValue==null || meterBasicValue=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("表底数不允许为空！",null,"warning");
+				return false;
+			}
+			var sampleUnit = $("#modal-container-command-meter-config #config-sample-unit").val();//采样参数单位
+			var checkboxSampleUnit = $("#modal-container-command-meter-config #checkbox-config-sample-unit").prop("checked");//是否配置采样参数单位
+			if(checkboxSampleUnit && (sampleUnit==null || sampleUnit=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("采样参数单位不允许为空！",null,"warning");
+				return false;
+			}
+			var meterTime = $("#modal-container-command-meter-config #config-meter-time").val();//表当前时间
+			var checkboxMeterTime = $("#modal-container-command-meter-config #checkbox-config-meter-time").prop("checked");//是否配置表当前时间
+			if(checkboxMeterTime && (meterTime==null || meterTime=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("表当前时间不允许为空！",null,"warning");
+				return false;
+			}
+			
+			var magneticAlarmOn = $("#modal-container-command-meter-config #config-magnetic-alarm-on").val();//磁干扰告警消除
+			var checkboxMagneticAlarmOn = $("#modal-container-command-meter-config #checkbox-config-magnetic-alarm-on").prop("checked");//是否配置磁干扰告警消除
+			if(checkboxMagneticAlarmOn && (magneticAlarmOn==null || magneticAlarmOn=="")){
+				//dialog type: success warning info error,默认为info
+				util.message("请选择磁干扰告警消除状态！",null,"warning");
+				return false;
+			}
+			
+			var meterStatusUploadType = $("#modal-container-command-meter-config #config-meter-status-upload-type").val();//表状态字-上传功能类型：1=定时上传；2=定量上传；
+			//var meterStatusPeriod = $("#modal-container-command-meter-config #config-meter-status-period").val();//表状态字-定时上传功能开关 (1开 / 0关)
+			//var meterStatusMaxReport = $("#modal-container-command-meter-config #config-meter-status-max-report").val();//表状态字-定量上传功能开关 (1开 / 0关)
+			var meterStatusPeriod = 1;//默认值，表状态字-定时上传功能开
+			var meterStatusMaxReport = 0;//默认值，表状态字-定量上传功能关
+			if(meterStatusUploadType==1){
+				meterStatusPeriod = 1;//表状态字-定时上传功能开
+				meterStatusMaxReport = 0;//表状态字-定量上传功能关
+			}else{
+				meterStatusPeriod = 0;//表状态字-定时上传功能关
+				meterStatusMaxReport = 1;//表状态字-定量上传功能开
+			}
+			var meterStatusMagnetic = $("#modal-container-command-meter-config #config-meter-status-magnetic").val();//表状态字-磁干扰关阀功能开关 (1开 / 0关)
+			var checkboxMeterStatus = $("#modal-container-command-meter-config #checkbox-config-meter-status").prop("checked");//是否配置表状态字
+			
+			//如果所有选项都未勾选，表示所有选项都不需要设置，所以不需要下发指令
+			if(!checkboxReportPeriod && !checkboxReportPeriodUnit && !checkboxReportRation 
+					&& !checkboxTemporaryTime && !checkboxValveRunTime && !checkboxValveMaintainPeriod 
+					&& !checkboxMeterBasicValue && !checkboxSampleUnit && !checkboxMeterTime 
+					&& !checkboxMagneticAlarmOn && !checkboxMeterStatus){
+				//dialog type: success warning info error,默认为info
+				util.message("至少选择一个需要下发指令的参数！",null,"warning");
+				return false;
+			}			
+			
+			var meterNumber = getSendCmdMeterNumberFn();//获取发送指令的表号，与设备（水表）编号不同
+			
+			var parms = new Object();
+			parms.meterNumber = meterNumber;//表号
+			
+			parms.checkboxReportPeriod = checkboxReportPeriod;//是否配置定时上传周期
+			parms.reportPeriod = reportPeriod;//定时上传周期
+			
+			parms.checkboxReportPeriodUnit = checkboxReportPeriodUnit;//是否配置定时上传周期单位
+			parms.reportPeriodUnit = reportPeriodUnit;//定时上传周期单位
+			
+			parms.checkboxReportRation = checkboxReportRation;//是否配置定量上传值
+			parms.reportRation = reportRation;//定量上传值
+			
+			parms.checkboxTemporaryTime = checkboxTemporaryTime;//是否配置用户临时开阀用水限定时间
+			parms.temporaryTime = temporaryTime;//用户临时开阀用水限定时间
+			
+			parms.checkboxValveRunTime = checkboxValveRunTime;//是否配置阀门行程时间
+			parms.valveRunTime = valveRunTime;//阀门行程时间
+			
+			parms.checkboxValveMaintainPeriod = checkboxValveMaintainPeriod;//是否配置阀门维护周期
+			parms.valveMaintainPeriod = valveMaintainPeriod;//阀门维护周期
+			
+			parms.checkboxMeterBasicValue = checkboxMeterBasicValue;//是否配置表底数
+			parms.meterBasicValue = meterBasicValue;//表底数
+			
+			parms.checkboxSampleUnit = checkboxSampleUnit;//是否配置采样参数单位
+			parms.sampleUnit = sampleUnit;//采样参数单位
+			
+			parms.checkboxMeterTime = checkboxMeterTime;//是否配置表当前时间
+			parms.meterTime = meterTime;//表当前时间
+			
+			parms.checkboxMagneticAlarmOn = checkboxMagneticAlarmOn;//是否配置磁干扰告警消除
+			parms.magneticAlarmOn = magneticAlarmOn;//磁干扰告警消除
+			
+			parms.checkboxMeterStatus = checkboxMeterStatus;//是否配置表状态字
+			parms.meterStatusPeriod = meterStatusPeriod;//表状态字-定时上传功能开关 (1开 / 0关)
+			parms.meterStatusMaxReport = meterStatusMaxReport;//表状态字-定量上传功能开关 (1开 / 0关)
+			parms.meterStatusMagnetic = meterStatusMagnetic;//表状态字-磁干扰关阀功能开关 (1开 / 0关)
+			
+			var actionJson = JSON.stringify(parms);//转为JSON字符串
+			return actionJson;
+		}
+		/**
+		 * 	生成水表配置指令通用函数
+		 */
+		function generatorMeterConfigCommandFn(id, cmdAction){
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+			//cmdAction 水量阀值（数字）;
+			console.log("----------生成水表配置指令："+id+":"+cmdAction);
+			var url = BASE_CONTEXT_PATH + "/meter-device/cmd-meter-config-generator";
+			var parms = new Object();
+			parms.id = id;
+			parms.cmdType = 1;
+			parms.cmdAction = cmdAction;
+			
+			var command = null;
+			$.ajax({
+				type: "post",
+				url: url,
+				data: parms,
+				async: false, 
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					//var result = $.parseJSON(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							console.log("----------返回生成的水表配置指令："+res.command);
+							command = res.command;
+						}
+					}
+					if(command==null || command==""){
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+					
+			    }
+			});
+			
+			/* $.post(url, parms, function(res){
+				console.log("----------"+JSON.stringify(res));
+				//var result = $.parseJSON(res);
+				if (res != null && res != "") {
+					if (res.result_code == "success") {
+						console.log("----------返回生成的指令："+res.command);
+						return res.command;
+					}
+					//dialog type: success warning info error,默认为info
+					util.message(res.result_msg,null,"warning");
+				}
+				
+			}); */
+			return command;
+		}
+		
+		$(function(){
+			/**
+			 * 	绑定对话框中发送指令按钮的click事件
+			 */
+			 $("#modal-container-command-meter-config #btn-send-cmd-meter-config").on("click", function(){
+				
+				var actionJson = getSendMeterConfigCmdActionParmsFn();//获取发送水表配置指令动作参数
+				if(!actionJson){
+					return false;
+				}
+				
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				var command = generatorMeterConfigCommandFn(deviceId, actionJson);//生成水量阀值指令通用函数
+				console.log("----------发送水表配置指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+			});
+		});
+	
+	</script>
+	
+	</th:block>
+
+</body>
+</html>
