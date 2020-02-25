@@ -56,6 +56,10 @@ public class Consumer {
 	 * 通过构造函数 实例化对象
 	 */
 	public Consumer() throws MQClientException {
+		
+	}
+	
+	public void initConsumer() {
 		try {
 			DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(CONSUMER_GROUP);
 			consumer.setNamesrvAddr(MQConstant.NAME_SERVER);
