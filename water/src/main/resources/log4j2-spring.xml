@@ -130,7 +130,7 @@
     </logger>
     
     <!-- 将业务dao接口填写进去,并用控制台输出即可 -->
-    <logger name="com.learnbind.ai" level="debug" additivity="false">
+    <logger name="com.learnbind.ai" level="info" additivity="false">
         <appender-ref ref="Console"/>
         <appender-ref ref="Debug"/>
     </logger>

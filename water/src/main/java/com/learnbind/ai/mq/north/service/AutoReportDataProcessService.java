@@ -75,11 +75,16 @@ public class AutoReportDataProcessService {
 	 */
 	public void processAutoReportData(AutoReport reportData) {
 
-		log.debug("----------设备主动上报数据处理");
+		log.info("----------设备主动上报数据处理");
 		
+		Long date1 = System.currentTimeMillis();
 		// 1、保存设备上报数据到数据库
 		this.saveReportData(reportData);
 
+		Long date2 = System.currentTimeMillis();
+		log.info("----------保存设备上报数据到数据库用时："+(date2-date1));
+		log.info("----------总用时："+(date2-date1));
+		
 		String deviceId = reportData.getDeviceId();// IOT电信平台设备ID
 		Integer dataType = reportData.getDataType();// 数据类型
 		
@@ -88,19 +93,33 @@ public class AutoReportDataProcessService {
 			// 水表数据封装信息保存（更新MeterConfig信息）
 			this.processAutoReportData(deviceId, reportData.getData());
 		} else {
-			log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
+			log.info("----------其他数据类型，不做处理，数据类型："+dataType);
 		}
 		
+		Long date3 = System.currentTimeMillis();
+		log.info("----------更新表配置与月冻结数据用时："+(date3-date2));
+		log.info("----------总用时："+(date3-date1));
 		if(dataType == ReportDataType.METER_DATA_TYPE_REPORT) {// 如果数据类型是 设备主动上报数据 时，自动执行保存抄表记录、生成分水量、生成账单、余额自动销账
 			// 3、保存到抄表记录
 			MeterRecord meterRecord = this.saveMeterRecord(deviceId, reportData.getReportData());
+			Long date4 = System.currentTimeMillis();
+			log.info("----------保存抄表记录用时："+(date4-date3));
+			log.info("----------总用时："+(date4-date1));
 			if(meterRecord!=null) {
 				// 4、生成分水量（生成分水量时会计算水费）
 				List<Long> pwIdList = partitionWaterService.generatorPartitionWater(meterRecord);
+				
+				Long date5 = System.currentTimeMillis();
+				log.info("----------生成分水量用时："+(date5-date4));
+				log.info("----------总用时："+(date5-date1));
+				
 				// 5、生成账单，并用余额自动结算
 				this.generatorBillAndSettleBill(pwIdList);
+				Long date6 = System.currentTimeMillis();
+				log.info("----------生成账单并销账用时："+(date6-date4));
+				log.info("----------总用时："+(date6-date1));
 			}else {
-				log.debug("----------保存抄表记录异常");
+				log.info("----------保存抄表记录异常");
 			}
 		}
 	}
@@ -118,7 +137,7 @@ public class AutoReportDataProcessService {
 		//Date sysDate = new Date();//系统日期
 		Long meterId = metersService.getMeterId(deviceId);//获取表计ID		
 		if(meterId==null) {
-			log.debug("未查询到对应的表计信息，设备ID："+deviceId);
+			log.info("未查询到对应的表计信息，设备ID："+deviceId);
 			return null;
 		}
 		CustomerMeter cm = customerMeterService.getCustomerByMeterId(meterId);//查询客户表计关系表
@@ -170,18 +189,18 @@ public class AutoReportDataProcessService {
 					//结算账单
 					int rows = customerAccountItemService.balanceAutoSettlement(waterFeeBill);
 					if(rows>0) {//rows>0时余额自动结算成功
-						log.debug("----------余额自动结算账单成功");
+						log.info("----------余额自动结算账单成功");
 					}else if(rows==0) {//rows=0时余额自动结算失败
-						log.debug("----------余额自动结算账单异常，请手动操作结算账单");
+						log.info("----------余额自动结算账单异常，请手动操作结算账单");
 					}else {//rows<0时余额不足
-						log.debug("----------余额不足");
+						log.info("----------余额不足");
 					}
 				}else {
-					log.debug("当前账单欠费金额<=0，不需要自动结算，账单ID："+waterFeeBillId);
+					log.info("当前账单欠费金额<=0，不需要自动结算，账单ID："+waterFeeBillId);
 				}
 				
 			}else {
-				log.debug("----------生成账单异常");
+				log.info("----------生成账单异常");
 			}
 		}
 		
