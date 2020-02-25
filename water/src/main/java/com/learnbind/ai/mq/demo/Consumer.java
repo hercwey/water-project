@@ -50,12 +50,14 @@ public class Consumer {
                     ConsumeConcurrentlyContext context) {
                 	
                 	System.out.println("Receive Message is "+"--"+msgs);
-                	System.out.println("Receive context is "+"--"+context);
+//                	System.out.println("Receive context is "+"--"+context);
                 	
                 	// msgs中只收集同一个topic，同一个tag，并且key相同的message
                     // 会把不同的消息分别放置到不同的队列中
                     try {
-                        for (Message msg : msgs) {
+                        for (MessageExt msg : msgs) {
+                        	System.out.println("----------MsgId:"+msg.getMsgId());
+                        	System.out.println("----------Keys:"+msg.getKeys());
                             //消费者获取消息 这里只输出 不做后面逻辑处理
                             String body = new String(msg.getBody(), "utf-8");
                             System.out.println("Consumer-获取消息-主题topic为={}, 消费消息为={}"+"--topic:"+msg.getTopic()+"--body:"+body);

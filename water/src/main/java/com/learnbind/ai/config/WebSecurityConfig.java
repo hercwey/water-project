@@ -91,6 +91,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring().antMatchers("/wechat/**");
 		web.ignoring().antMatchers("/commons/**");
 		
+		web.ignoring().antMatchers("/test/**");
+		
 		//IOT接入平台测试
 		web.ignoring().antMatchers("/iot/**");
 		web.ignoring().antMatchers("/auth/**");

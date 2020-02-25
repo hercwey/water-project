@@ -11,12 +11,12 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.space.water.iot.api.common.JsonResult;
 import com.space.water.iot.api.config.Constants;
-import com.space.water.iot.api.config.MQTags;
 import com.space.water.iot.api.model.command.OrderStatusResponse;
 import com.space.water.iot.api.model.common.CommandCallbackConstants;
 import com.space.water.iot.api.model.iot.command.CommandBean;
 import com.space.water.iot.api.model.iot.command.DeviceCommandResp;
 import com.space.water.iot.api.rocketmq.Producer;
+import com.space.water.iot.api.rocketmq.RocketTopicConfig;
 import com.space.water.iot.api.service.ICommandService;
 import com.space.water.iot.api.util.IoTRequestUtil;
 import com.space.water.iot.api.util.JsonUtil;
@@ -25,6 +25,8 @@ import com.space.water.iot.api.util.JsonUtil;
 public class CommandService implements ICommandService {
 	@Autowired
 	Producer producer;
+	@Autowired
+	RocketTopicConfig topicConfig;
 
 	@Override
 	public JsonResult postCommand(CommandBean commandBean) {
@@ -83,6 +85,6 @@ public class CommandService implements ICommandService {
 			orderSatusResponse.setStatus(CommandCallbackConstants.COMMAND_STATUS_SENT);
 		}
 
-		producer.sendNorth(OrderStatusResponse.toJsonString(orderSatusResponse), MQTags.ORDER_STATUS);
+		producer.sendNorth(OrderStatusResponse.toJsonString(orderSatusResponse), topicConfig.getTagOrderStatus());
 	}
 }
