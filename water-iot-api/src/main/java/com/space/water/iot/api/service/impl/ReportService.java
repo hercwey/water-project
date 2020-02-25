@@ -27,6 +27,7 @@ import com.space.water.iot.api.model.report.BaseReportData;
 import com.space.water.iot.api.model.report.MeterDataBaseBean;
 import com.space.water.iot.api.model.report.MeterReportBean;
 import com.space.water.iot.api.rocketmq.Producer;
+import com.space.water.iot.api.rocketmq.RocketTopicConfig;
 import com.space.water.iot.api.service.ICommandService;
 import com.space.water.iot.api.service.IReportService;
 
@@ -37,6 +38,8 @@ public class ReportService implements IReportService {
 	ICommandService commandService;
 	@Autowired
 	Producer producer;
+	@Autowired
+	RocketTopicConfig topicConfig;
 	
 	@Override
 	public JsonResult process(BaseReportData meterBean) {		
@@ -74,7 +77,9 @@ public class ReportService implements IReportService {
 			System.out.println("-------------------------------------");
 
 			//TODO G11 下发消息后，从消息列表中删除消息
-			commandList.clear();
+			if (commandList != null) {
+				commandList.clear();
+			}
 		}
 		
 		return JsonResult.success(JsonResult.SUCCESS, BaseReportData.toJsonString(meterBean));
@@ -86,46 +91,46 @@ public class ReportService implements IReportService {
 		String tag = "";
 		switch (meterBean.getDataType()) {
 		case ReportDataType.METER_DATA_TYPE_REPORT:
-			tag = MQTags.AUTO_REPORT;
+			tag =  topicConfig.getTagAutoReport();
 			AutoReport report = AutoReport.fromJson(BaseReportData.toJsonString(meterBean));
 			report.setReportData(MeterReportBean.fromJson(meterBean.getData()));
 			response = AutoReport.toJsonString(report);
 			break;
 		case ReportDataType.METER_DATA_TYPE_MONTH_FREEZE:
-			tag = MQTags.QUERY_MONTH_DATA_NORTH;
+			tag = topicConfig.getTagQueryMonthdataNorth();
 			QueryMonthDataResponse monthDataResp = QueryMonthDataResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			monthDataResp.setMonthData(MonthData.fromJson(meterBean.getData()));
 			response = QueryMonthDataResponse.toJsonString(monthDataResp);
 			break;
 		case ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG:
-			tag = MQTags.QUERY_PARAMS_NORTH;
+			tag = topicConfig.getTagQueryParmsNorth();
 			QueryParamsResponse paramsResponse = QueryParamsResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			paramsResponse.setDeviceParams(DeviceParams.fromJson(meterBean.getData()));
 			response = AutoReport.toJsonString(paramsResponse);
 			break;
 		case ReportDataType.METER_DATA_TYPE_RSP_SET_THRESHOLD:
-			tag = MQTags.CONFIG_THRESHOLD_NORTH;
+			tag = topicConfig.getTagConfigThresholdNorth();
 			ConfigThresholdResponse thresholdResp = ConfigThresholdResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(thresholdResp);
 			break;
 		case ReportDataType.METER_DATA_TYPE_RSP_SWITCH_VALVE:
-			tag = MQTags.CONTROL_VALVE_NORTH;
+			tag = topicConfig.getTagControlValveNorth();
 			ControlValveResponse cvResp = ControlValveResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(cvResp);
 			break;
 		case ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG:
-			tag = MQTags.CONFIG_PARAMS_NORTH;
+			tag = topicConfig.getTagConfigParmsNorth();
 			ConfigParamsResponse configParamsResponse = ConfigParamsResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			configParamsResponse.setDeviceParams(DeviceParams.fromJson(meterBean.getData()));
 			response = AutoReport.toJsonString(configParamsResponse);
 			break;
 		case ReportDataType.METER_DATA_TYPE_START_CONNECT:
-			tag = MQTags.AUTO_REPORT;
+			tag =  topicConfig.getTagAutoReport();
 			AutoReport reportConnect = AutoReport.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(reportConnect);
 			break;
 		case ReportDataType.METER_DATA_TYPE_START_DISCONNECT:
-			tag = MQTags.AUTO_REPORT;
+			tag =  topicConfig.getTagAutoReport();
 			AutoReport reportDisonnect = AutoReport.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(reportDisonnect);
 			break;

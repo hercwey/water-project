@@ -20,7 +20,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.space.water.iot.api.command.CommandCache;
 import com.space.water.iot.api.common.JsonResult;
-import com.space.water.iot.api.config.MQTags;
 import com.space.water.iot.api.model.command.BaseCommandRequest;
 import com.space.water.iot.api.model.command.ConfigParamsRequest;
 import com.space.water.iot.api.model.command.ConfigThresholdRequest;
@@ -45,7 +44,9 @@ import com.space.water.iot.api.service.impl.DeviceService;
 public class Consumer {
 
 	@Autowired
-	private Producer producer;
+	Producer producer;
+	@Autowired
+	RocketTopicConfig topicConfig;
 	/**
 	 * 消费者组
 	 */
@@ -107,46 +108,43 @@ public class Consumer {
 
 	private void processMessage(Message msg) {
 		String msgTag = msg.getTags();
-		switch (msgTag) {
-		case MQTags.CONFIG_PARAMS_SOUTH:
+		if (msgTag.equals(topicConfig.getTagConfigParmsSouth())) {
 			// TODO G11 设置设备参数
 			configParamsSouth(msg);
-			break;
-		case MQTags.CONFIG_THRESHOLD_SOUTH:
+		}
+		else if (msgTag.equals(topicConfig.getTagConfigThresholdSouth())) {
 			// TODO G11 设置阈值参数
 			configThresholdSouth(msg);
-			break;
-		case MQTags.QUERY_PARAMS_SOUTH:
+		}
+		else if (msgTag.equals(topicConfig.getTagQueryParmsSouth())) {
 			// TODO G11 读取设备参数
 			queryParamsSouth(msg);
-			break;
-		case MQTags.QUERY_MONTH_DATA_SOUTH:
+		}
+		else if (msgTag.equals(topicConfig.getTagQueryMonthDataSouth())) {
 			// TODO G11 读取月冻结数据
 			queryMonthDataSouth(msg);
-			break;
-		case MQTags.CONTROL_VALVE_SOUTH:
+		}
+		else if (msgTag.equals(topicConfig.getTagControlValveSouth())) {
 			// TODO G11 控制阀门开关
 			controlValveSouth(msg);
-			break;
-		case MQTags.DEVICE_REGISTER_SOUTH:
+		}
+		else if (msgTag.equals(topicConfig.getTagDeviceRegisterSouth())) {
 			// TODO G11 注册设备
 			deviceRegisterSouth(msg);
-			break;
-		case MQTags.DEVICE_UPDATE_SOUTH:
+		}
+		else if (msgTag.equals(topicConfig.getTagDeviceUpdateSouth())) {
 			// TODO G11 修改设备
 			deviceUpdateSouth(msg);
-			break;
-		case MQTags.DEVICE_DELETE_SOUTH:
+		}
+		else if (msgTag.equals(topicConfig.getTagDeviceDeleteSouth())) {
 			// TODO G11 删除设备
 			deviceDeleteSouth(msg);
-			break;
-		case MQTags.DEVICE_QUERY_SOUTH:
+		}
+		else if (msgTag.equals(topicConfig.getTagDeviceQuerySouth())) {
 			// TODO G11 查询设备
 			deviceQuerySouth(msg);
-			break;
-		default:
+		} else {
 			System.out.println("| 未知位置消息类型，不处理");
-			break;
 		}
 	}
 
@@ -243,7 +241,7 @@ public class Consumer {
 			RegisterDeviceRequest request = RegisterDeviceRequest.fromJson(requestJson);
 			DeviceService deviceService = new DeviceService();
 			JsonResult result = deviceService.registerDevice(request);
-			producer.sendNorth(result.getData(), MQTags.DEVICE_REGISTER_NORTH);
+			producer.sendNorth(result.getData(), topicConfig.getTagDeviceRegisterNorth());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -255,7 +253,7 @@ public class Consumer {
 			UpdateDeviceRequest request = UpdateDeviceRequest.fromJson(requestJson);
 			DeviceService deviceService = new DeviceService();
 			JsonResult result = deviceService.modifyDevice(request);
-			producer.sendNorth(result.getData(), MQTags.DEVICE_UPDATE_NORTH);
+			producer.sendNorth(result.getData(), topicConfig.getTagDeviceUpdateNorth());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -267,7 +265,7 @@ public class Consumer {
 			DeleteDeviceRequest request = DeleteDeviceRequest.fromJson(requestJson);
 			DeviceService deviceService = new DeviceService();
 			JsonResult result = deviceService.deleteFromIoT(request.getDeviceId());
-			producer.sendNorth(result.getData(), MQTags.DEVICE_DELETE_NORTH);
+			producer.sendNorth(result.getData(), topicConfig.getTagDeviceDeleteNorth());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -276,7 +274,7 @@ public class Consumer {
 	private void deviceQuerySouth(Message msg) {
 		DeviceService deviceService = new DeviceService();
 		JsonResult result = deviceService.queryDevices("0", "10000");
-		producer.sendNorth(result.getData(), MQTags.DEVICE_QUERY_NORTH);
+		producer.sendNorth(result.getData(), topicConfig.getTagDeviceQueryNorth());
 	}
 
 	private void cacheCommand(BaseCommandRequest request, String cmdHexStr) {
@@ -288,7 +286,7 @@ public class Consumer {
 		JSONObject parasObject = new JSONObject();
 		parasObject.put("value", cmdHexStr);
 		commandBean.setParas(parasObject);
-		
+
 		CommandCache.getInstance().addCommand(request.getDeviceId(), JSON.toJSONString(commandBean));
 	}
 }
