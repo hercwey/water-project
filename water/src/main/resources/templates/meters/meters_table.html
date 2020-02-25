@@ -507,13 +507,15 @@
 				dataObj.protocolType = "CoAP";
 				dataObj.deviceType = "JRNBWaterMeter";
 				var dataJson = JSON.stringify(dataObj);
+				var parms = new Object();
+				parms.dataJson=dataJson;
+				console.log(JSON.stringify(dataObj))
 				//需要提交的url	
 				var url = BASE_CONTEXT_PATH + "/meter-device/register";
-				$.post(url, dataJson, function(res){
+				$.post(url, parms, function(res){
 					if (res != null && res != "") {
 						if (res.result_code == "success") {
 							loadPageClickPageNum(); //	重新刷新当前页面
-							util.message(res.result_msg,null,"success");
 						} else {
 							util.message(res.result_msg,null,"warning");
 						}

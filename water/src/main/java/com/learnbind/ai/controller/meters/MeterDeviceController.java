@@ -102,6 +102,7 @@ public class MeterDeviceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/register", produces = "application/json")
+	@ResponseBody
 	public Object register(String dataJson) throws Exception {
 		//接收前台传递参数
 		JSONObject jsonObj=JSON.parseObject(dataJson);
@@ -120,8 +121,8 @@ public class MeterDeviceController {
 		//调用注册服务接口
 		String oJson = JSON.toJSONString(request);
 		SendResult sendResult = deviceRegisterProducer.sendMsg(null, oJson);
-		return sendResult;
-		//return RequestResultUtil.getResultSaveWarn("注册成功！");
+		//return sendResult;
+		return RequestResultUtil.getResultSaveWarn("注册成功！");
 
 	}
 	
@@ -258,14 +259,14 @@ public class MeterDeviceController {
 			if(rows>0) {
 				
 				QueryMonthDataRequest queryMonthData = new QueryMonthDataRequest();
-//				queryMonthData.setDeviceId(meter.getDeviceId());
-//				queryMonthData.setId(wmCommand.getId());
-//				queryMonthData.setMeterAddress(meterAddress);
-//				queryMonthData.setMeterFactoryCode(meterFactoryCode);
-//				queryMonthData.setMeterType(meterType);
-//				queryMonthData.setMethod(method);
-//				queryMonthData.setSequence(sequence);
-//				queryMonthData.setServiceId(serviceId);
+				queryMonthData.setDeviceId(device.getDeviceId());
+				queryMonthData.setId(wmCommand.getId());
+				queryMonthData.setMeterAddress(meterAddress);
+				queryMonthData.setMeterFactoryCode(meterFactoryCode);
+				queryMonthData.setMeterType(meterType.byteValue());
+				queryMonthData.setMethod(METHOD);
+				queryMonthData.setSequence(sequence.byteValue());
+				queryMonthData.setServiceId(SERVICE_ID);
 				
 				SendResult sendResult = queryMonthDataProducer.sendMsg(null, queryMonthData.toJsonString(queryMonthData));
 				if(sendResult.getSendStatus()==SendStatus.SEND_OK) {
@@ -356,16 +357,32 @@ public class MeterDeviceController {
 	    	
 	    	byte sequenceB = 0x00;
 	    	
-			//生成开/关阀指令
-			String command = null;
-			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+	    	//5=读表配置指令
 			System.out.println("----------生成读表配置指令");
 			//读表配置指令
-			command = this.generatorReadMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), deviceId);
-			
-	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
-	    	resultMap.put("command", command);
-	    	return resultMap;
+			String command = this.generatorReadMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), deviceId);
+			//获取指令对象
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_READ_METER_CONFIG.getKey(), command);
+			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
+			if(rows>0) {
+				
+				BaseCommandRequest request = new BaseCommandRequest();
+				request.setDeviceId(deviceId);
+				request.setMeterAddress(meterAddress);
+				request.setMeterFactoryCode(meterFactoryCode);
+				request.setMeterType(meterType.byteValue());
+				request.setMethod(METHOD);
+				request.setSequence(sequence.byteValue());
+				request.setServiceId(SERVICE_ID);
+				
+				SendResult sendResult = queryParmsProducer.sendMsg(null, request.toJsonString(request));
+				if(sendResult.getSendStatus()==SendStatus.SEND_OK) {
+					//发送成功
+					return RequestResultUtil.getResultSuccess("发送读表配置指令成功，请到下发指令记录列表中查看结果！");
+				}
+			}
+			//发送失败
+			return RequestResultUtil.getResultFail("发送读表配置指令失败，请重新操作！");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -442,16 +459,43 @@ public class MeterDeviceController {
 	    	}
 	    	
 	    	byte sequenceB = 0x00;
-	    	
-			//生成开/关阀指令
-			String command = null;
-			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+	    	//5=水量阀值指令
 			System.out.println("----------生成水量阀值指令");
-			//生成水量阀值指令
-			command = this.generatorWaterAmountCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction), deviceId);
-	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
-	    	resultMap.put("command", command);
-	    	return resultMap;
+			//水量阀值指令
+			String command = this.generatorWaterAmountCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(),Integer.valueOf(cmdAction), deviceId);
+			//获取指令对象
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_WATER_AMOUNT.getKey(), command);
+			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
+			if(rows>0) {
+				
+				ConfigThresholdRequest request = new ConfigThresholdRequest();
+				request.setThreshold((Integer.valueOf(cmdAction)).shortValue());
+		    	request.setDeviceId(deviceId);
+				request.setMeterAddress(meterAddress);
+				request.setMeterFactoryCode(meterFactoryCode);
+				request.setMeterType(meterType.byteValue());
+				request.setMethod(METHOD);
+				request.setSequence(sequence.byteValue());
+				request.setServiceId(SERVICE_ID);
+				
+				SendResult sendResult = configThresholdProducer.sendMsg(null, request.toJsonString(request));
+				if(sendResult.getSendStatus()==SendStatus.SEND_OK) {
+					//发送成功
+					return RequestResultUtil.getResultSuccess("发送水量阀值指令成功，请到下发指令记录列表中查看结果！");
+				}
+			}
+			//发送失败
+			return RequestResultUtil.getResultFail("发送水量阀值指令失败，请重新操作！");
+			
+//			//生成开/关阀指令
+//			String command = null;
+//			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+//			System.out.println("----------生成水量阀值指令");
+//			//生成水量阀值指令
+//			command = this.generatorWaterAmountCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction), deviceId);
+//	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
+//	    	resultMap.put("command", command);
+//	    	return resultMap;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -528,16 +572,43 @@ public class MeterDeviceController {
 	    	}
 	    	
 	    	byte sequenceB = 0x00;
-	    	
-			//生成开/关阀指令
-			String command = null;
-			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+	    	//5=开/关阀指令
 			System.out.println("----------生成开/关阀指令");
-			//生成水量阀值指令
-			command = this.generatorOpenCloseCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction), deviceId);
-	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
-	    	resultMap.put("command", command);
-	    	return resultMap;
+			//开/关阀指令
+			String command = this.generatorOpenCloseCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(),Integer.valueOf(cmdAction), deviceId);
+			//获取指令对象
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_OPEN_CLOSE.getKey(), command);
+			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
+			if(rows>0) {
+				
+				ControlValveRequest request = new ControlValveRequest();
+				request.setAction((Integer.valueOf(cmdAction)).byteValue());
+		    	request.setDeviceId(deviceId);
+				request.setMeterAddress(meterAddress);
+				request.setMeterFactoryCode(meterFactoryCode);
+				request.setMeterType(meterType.byteValue());
+				request.setMethod(METHOD);
+				request.setSequence(sequence.byteValue());
+				request.setServiceId(SERVICE_ID);
+				
+				SendResult sendResult = controlValveProducer.sendMsg(null, request.toJsonString(request));
+				if(sendResult.getSendStatus()==SendStatus.SEND_OK) {
+					//发送成功
+					return RequestResultUtil.getResultSuccess("发送开/关阀指令成功，请到下发指令记录列表中查看结果！");
+				}
+			}
+			//发送失败
+			return RequestResultUtil.getResultFail("发送水开/关阀指令失败，请重新操作！");
+	    	
+//			//生成开/关阀指令
+//			String command = null;
+//			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+//			System.out.println("----------生成开/关阀指令");
+//			//生成水量阀值指令
+//			command = this.generatorOpenCloseCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), Integer.valueOf(cmdAction), deviceId);
+//	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
+//	    	resultMap.put("command", command);
+//	    	return resultMap;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -614,16 +685,46 @@ public class MeterDeviceController {
 	    	}
 	    	
 	    	byte sequenceB = 0x00;
+	    	//水表配置指令
+			System.out.println("----------生成水表配置指令");
+			//水表配置指令
+			String command = this.generatorMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(),cmdAction, deviceId);
+			//获取指令对象
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_METER_CONFIG.getKey(), command);
+			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
+			if(rows>0) {
+				
+				ConfigParamsRequest request = new ConfigParamsRequest();
+				
+				//QueryMonthDataRequest queryMonthData = new QueryMonthDataRequest();
+//				queryMonthData.setDeviceId(meter.getDeviceId());
+//				queryMonthData.setId(wmCommand.getId());
+//				queryMonthData.setMeterAddress(meterAddress);
+//				queryMonthData.setMeterFactoryCode(meterFactoryCode);
+//				queryMonthData.setMeterType(meterType);
+//				queryMonthData.setMethod(method);
+//				queryMonthData.setSequence(sequence);
+//				queryMonthData.setServiceId(serviceId);
+				
+				SendResult sendResult = configParmsProducer.sendMsg(null, request.toJsonString(request));
+				if(sendResult.getSendStatus()==SendStatus.SEND_OK) {
+					//发送成功
+					return RequestResultUtil.getResultSuccess("发送水表配置指令成功，请到下发指令记录列表中查看结果！");
+				}
+			}
+			//发送失败
+			return RequestResultUtil.getResultFail("发送水水表配置指令失败，请重新操作！");
+	    	
 	    	
 			//生成开/关阀指令
-			String command = null;
-			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
-			System.out.println("----------生成水表配置指令");
-			//生成水表配置指令
-			command = this.generatorMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), cmdAction, deviceId);
-	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
-	    	resultMap.put("command", command);
-	    	return resultMap;
+//			String command = null;
+//			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+//			System.out.println("----------生成水表配置指令");
+//			//生成水表配置指令
+//			command = this.generatorMeterConfigCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), cmdAction, deviceId);
+//	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
+//	    	resultMap.put("command", command);
+//	    	return resultMap;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
