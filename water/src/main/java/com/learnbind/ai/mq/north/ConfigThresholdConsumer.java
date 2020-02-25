@@ -88,8 +88,8 @@ public class ConfigThresholdConsumer {
 				public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs,
 						ConsumeConcurrentlyContext context) {
 
-					log.debug("Receive Message is " + "--" + msgs);
-					log.debug("Receive context is " + "--" + context);
+					log.info("Receive Message is " + "--" + msgs);
+					log.info("Receive context is " + "--" + context);
 
 					// msgs中只收集同一个topic，同一个tag，并且key相同的message
 					// 会把不同的消息分别放置到不同的队列中
@@ -97,7 +97,7 @@ public class ConfigThresholdConsumer {
 						for (Message msg : msgs) {
 							// 消费者获取消息 这里只输出 不做后面逻辑处理
 							String body = new String(msg.getBody(), charsetName);
-							log.debug("消费者分组-设置阈值返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
+							log.info("消费者分组-设置阈值返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
 							//ConfigThresholdResponse configThresholdRspData = ConfigThresholdResponse
 							ConfigThresholdResponse configThresholdRspData = JSON.parseObject(body, ConfigThresholdResponse.class);
@@ -105,16 +105,16 @@ public class ConfigThresholdConsumer {
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
-						log.debug("----------消费异常");
+						log.info("----------消费异常");
 						return ConsumeConcurrentlyStatus.RECONSUME_LATER;
 					}
-					log.debug("----------消费成功");
+					log.info("----------消费成功");
 					return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
 
 				}
 			});
 			consumer.start();
-			log.debug("----------消费者-监听设置阈值返回数据启动成功");
+			log.info("----------消费者-监听设置阈值返回数据启动成功");
 		} catch (MQClientException e) {
 			e.printStackTrace();
 		}
