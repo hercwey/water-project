@@ -15,11 +15,12 @@ import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.ControlValveResponseProcessService;
+import com.learnbind.ai.mq.north.service.DeviceDeleteResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -34,8 +35,7 @@ import com.learnbind.ai.mq.MQConstant;
  * @version V1.0
  *
  */
-//@Component
-@AutoConfigureAfter
+@Component
 public class DeviceDeleteConsumer {
 
 	/**
@@ -48,11 +48,22 @@ public class DeviceDeleteConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private DeviceDeleteResponseProcessService deviceDeleteResponseProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
 	 */
-	public DeviceDeleteConsumer() throws MQClientException {
+	public DeviceDeleteConsumer() {
+		
+	}
+	
+	/**
+	 * @Title: start
+	 * @Description: 启动消费者监听
+	 * @throws MQClientException 
+	 */
+	public void start() throws MQClientException {
 		try {
 
 			String charsetName = MQConstant.CHARSET_NAME;//字符集
@@ -87,6 +98,8 @@ public class DeviceDeleteConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-删除设备返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							
+							deviceDeleteResponseProcessService.processResponseData();
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
@@ -103,7 +116,6 @@ public class DeviceDeleteConsumer {
 		} catch (MQClientException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }

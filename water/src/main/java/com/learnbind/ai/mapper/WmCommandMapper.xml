@@ -199,8 +199,15 @@
         REMARK = #{desc,jdbcType=VARCHAR},
       </if>
     </set>
-    where DEVICE_ID = (select id from WM_DEVICE where DEVICE_ID=#{deviceId,jdbcType=VARCHAR})
-    and COMMAND_ID = #{commandId,jdbcType=VARCHAR}
+    <where>
+    	1=1
+    	<if test="deviceId!=null and deviceId!=''">
+    		AND DEVICE_ID = (select id from WM_DEVICE where DEVICE_ID=#{deviceId,jdbcType=VARCHAR})
+    	</if>
+    	<if test="commandId!=null and commandId!=''">
+    		AND COMMAND_ID = #{commandId,jdbcType=VARCHAR}
+    	</if>
+    </where>
   </update>
   
   <!-- 查询发送命令记录 -->

@@ -15,12 +15,12 @@ import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
 import com.learnbind.ai.model.iotbean.report.AutoReport;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.AutoReportDataProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -35,8 +35,7 @@ import com.learnbind.ai.mq.MQConstant;
  * @version V1.0
  *
  */
-//@Component
-@AutoConfigureAfter
+@Component
 public class AutoReportConsumer {
 
 	/**
@@ -49,11 +48,22 @@ public class AutoReportConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private AutoReportDataProcessService autoReportDataProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
 	 */
-	public AutoReportConsumer() throws MQClientException {
+	public AutoReportConsumer() {
+		
+	}
+	
+	/**
+	 * @Title: start
+	 * @Description: 启动消费者监听
+	 * @throws MQClientException 
+	 */
+	public void start() throws MQClientException {
 		try {
 
 			String charsetName = MQConstant.CHARSET_NAME;//字符集
@@ -89,9 +99,8 @@ public class AutoReportConsumer {
 							log.debug("消费者分组-设备自动上报数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
 							
-							AutoReport data = AutoReport.fromJson(body);//把接收到的数据转成对象
-							Integer dataType = data.getDataType();//接收到的数据类型
-							
+							AutoReport reportData = AutoReport.fromJson(body);//把接收到的数据转成对象
+							autoReportDataProcessService.processAutoReportData(reportData);//处理接收到的数据
 							
 						}
 					} catch (UnsupportedEncodingException e) {
@@ -109,7 +118,6 @@ public class AutoReportConsumer {
 		} catch (MQClientException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }

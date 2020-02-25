@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
 import com.learnbind.ai.common.util.BigDecimalUtils;
-import com.learnbind.ai.model.iotbean.report.AutoReport;
 import com.learnbind.ai.model.iotbean.report.MeterReportBean;
 
 /**

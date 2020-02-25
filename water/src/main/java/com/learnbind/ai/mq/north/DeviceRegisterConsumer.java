@@ -15,11 +15,13 @@ import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
+import com.learnbind.ai.model.iotbean.device.RegisterDeviceResponse;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.DeviceQueryResponseProcessService;
+import com.learnbind.ai.mq.north.service.DeviceRegisterResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -34,8 +36,7 @@ import com.learnbind.ai.mq.MQConstant;
  * @version V1.0
  *
  */
-//@Component
-@AutoConfigureAfter
+@Component
 public class DeviceRegisterConsumer {
 
 	/**
@@ -48,11 +49,22 @@ public class DeviceRegisterConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private DeviceRegisterResponseProcessService deviceRegisterResponseProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
 	 */
-	public DeviceRegisterConsumer() throws MQClientException {
+	public DeviceRegisterConsumer() {
+		
+	}
+	
+	/**
+	 * @Title: start
+	 * @Description: 启动消费者监听
+	 * @throws MQClientException 
+	 */
+	public void start() throws MQClientException {
 		try {
 
 			String charsetName = MQConstant.CHARSET_NAME;//字符集
@@ -87,6 +99,8 @@ public class DeviceRegisterConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-注册设备返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							RegisterDeviceResponse registerDeviceRsp = RegisterDeviceResponse.fromJson(body);
+							deviceRegisterResponseProcessService.processResponseData(registerDeviceRsp);
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
@@ -103,7 +117,6 @@ public class DeviceRegisterConsumer {
 		} catch (MQClientException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }

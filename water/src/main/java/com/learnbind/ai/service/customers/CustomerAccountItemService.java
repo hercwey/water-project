@@ -928,4 +928,24 @@ public interface CustomerAccountItemService extends IBaseService<CustomerAccount
 	 */
 	public void deleteDebitBill(Long rechargeBillId);
 	
+	//--------------------------------智慧水务平台分水量业务处理部分------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: autoGeneratorWaterFeeBill
+	 * @Description: 自动生成水费账单
+	 * @param pw
+	 * @return 
+	 */
+	public Long autoGeneratorWaterFeeBill(PartitionWater pw);
+	
+	/**
+	 * @Title: balanceAutoSettlement
+	 * @Description: 余额自动结算水费账单
+	 * @param waterFeeBill
+	 * @return 
+	 * 		rows>0时余额自动结算成功
+	 * 		rows=0时余额自动结算失败
+	 * 		rows<0时余额不足
+	 */
+	public int balanceAutoSettlement(CustomerAccountItem waterFeeBill);
+	
 }

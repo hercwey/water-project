@@ -1,0 +1,140 @@
+package com.learnbind.ai.mq.north.service;
+
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.learnbind.ai.model.Meters;
+import com.learnbind.ai.model.iot.WmMeter;
+import com.learnbind.ai.model.iotbean.command.ConfigParamsResponse;
+import com.learnbind.ai.model.iotbean.common.ReportDataType;
+import com.learnbind.ai.service.iot.WmMeterService;
+import com.learnbind.ai.service.meters.MetersService;
+
+import tk.mybatis.mapper.entity.Example;
+
+/**
+ * Copyright (c) 2020 by SRD
+ * 
+ * @Package com.learnbind.ai.mq.north.service
+ *
+ * @Title: ConfigParamsResponseProcessService.java
+ * @Description: 写表配置响应数据处理
+ *
+ * @author SRD
+ * @date 2020年2月23日 上午11:49:25
+ * @version V1.0
+ *
+ */
+@Service
+public class ConfigParamsResponseProcessService {
+
+	/**
+	 * @Fields log：日志
+	 */
+	private static final Logger log = LoggerFactory.getLogger(ConfigParamsResponseProcessService.class);
+	
+	@Autowired
+	private WmMeterService wmMeterService;
+	@Autowired
+	private MetersService metersService;
+
+	/**
+	 * @Title: processAutoReportData
+	 * @Description: 处理设备上报数据
+	 * @param configParamsRspData
+	 */
+	public void processResponseData(ConfigParamsResponse configParamsRspData) {
+
+		log.debug("----------写表配置响应数据处理");
+		
+		// 1、保存设备上报数据到数据库
+		this.saveResponseData(configParamsRspData);
+
+		String deviceId = configParamsRspData.getDeviceId();// IOT电信平台设备ID
+		Integer dataType = configParamsRspData.getDataType();// 数据类型
+		
+		// 2、收到上报数据后更新表配置与月冻结数据
+		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG
+				|| dataType == ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG) {// 如果数据类型是 设备配置信息数据 或 写配置指令返回信息
+			// 水表配置信息，更新数据库device表meter_config内容
+			this.processReadConfigOrWriteConfigData(deviceId, configParamsRspData.getData());
+		} else {
+			log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
+		}
+		
+	}
+	
+	// --------------------------------数据类型是 设备配置信息数据 或 写配置指令返回信息 的业务处理部分--------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: processReadConfigOrWriteConfigData
+	 * @Description: 数据类型是 设备配置信息数据 或 写配置指令返回信息 的业务处理，更新meter_config
+	 * @param deviceId
+	 * @param data	原始HEX数据中数据域部分解析后的json数据
+	 * @return 
+	 */
+	private int processReadConfigOrWriteConfigData(String deviceId, String data) {
+		// 水表配置信息，更新数据库meters表meter_config内容
+		Example example = new Example(Meters.class);
+		example.createCriteria().andEqualTo("deviceId", deviceId);
+		Meters meter = new Meters();
+		meter.setMeterConfig(data);
+		return metersService.updateByExampleSelective(meter, example);
+	}
+	
+	// --------------------------------保存设备上报数据--------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: save
+	 * @Description: 保存设备上报数据
+	 * @param configParamsRspData
+	 * @return
+	 */
+	private int saveResponseData(ConfigParamsResponse configParamsRspData) {
+
+		Date sysDate = new Date();// 系统时间
+		Long deviceId = this.getDeviceId(configParamsRspData.getDeviceId());// 通过IOT电信平台ID查询本地库设备表主键ID
+
+		WmMeter meter = new WmMeter();
+		meter.setCreateTime(sysDate);
+		meter.setCtrlCode(configParamsRspData.getCtrlCode());
+		meter.setDataDi(String.valueOf(configParamsRspData.getDataDI()));
+		meter.setDeviceId(deviceId);
+		meter.setEventTime(configParamsRspData.getEventTime());
+		meter.setFactoryCode(configParamsRspData.getFactoryCode());
+		meter.setGatewayId(configParamsRspData.getGatewayId());
+		meter.setJsonData(configParamsRspData.getJsonData());
+		meter.setMeterAddr(configParamsRspData.getMeterAddr());
+		meter.setMeterChecksum(configParamsRspData.getChecksum().longValue());
+		meter.setMeterData(configParamsRspData.getData());
+		meter.setMeterDataBasic(configParamsRspData.getDataBasic());
+		meter.setMeterDataType(configParamsRspData.getDataType());
+		meter.setMeterSequence(configParamsRspData.getSequence().longValue());
+		meter.setMeterType(configParamsRspData.getMeterType().longValue());
+		meter.setRequestId(configParamsRspData.getRequestId());
+		meter.setServiceId(configParamsRspData.getServiceId());
+		meter.setServiceType(configParamsRspData.getServiceType());
+		meter.setUpdateTime(sysDate);
+		return wmMeterService.insertSelective(meter);
+	}
+
+	/**
+	 * @Title: getDeviceId
+	 * @Description: 获取设备表主键ID
+	 * @param deviceId IOT电信平台设备ID
+	 * @return 返回本地库设备表主键ID
+	 */
+	private Long getDeviceId(String deviceId) {
+		Meters meter = new Meters();
+		meter.setDeviceId(deviceId);
+		List<Meters> meterList = metersService.select(meter);
+		if (meterList != null && meterList.size() > 0) {
+			return meterList.get(0).getId();
+		}
+		return null;
+	}
+	
+}

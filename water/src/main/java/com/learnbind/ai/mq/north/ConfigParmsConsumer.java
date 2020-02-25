@@ -15,11 +15,13 @@ import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
+import com.learnbind.ai.model.iotbean.command.ConfigParamsResponse;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.AutoReportDataProcessService;
+import com.learnbind.ai.mq.north.service.ConfigParamsResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -34,8 +36,7 @@ import com.learnbind.ai.mq.MQConstant;
  * @version V1.0
  *
  */
-//@Component
-@AutoConfigureAfter
+@Component
 public class ConfigParmsConsumer {
 
 	/**
@@ -48,11 +49,22 @@ public class ConfigParmsConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private ConfigParamsResponseProcessService configParamsResponseProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
 	 */
-	public ConfigParmsConsumer() throws MQClientException {
+	public ConfigParmsConsumer() {
+		
+	}
+	
+	/**
+	 * @Title: start
+	 * @Description: 启动消费者监听
+	 * @throws MQClientException 
+	 */
+	public void start() throws MQClientException {
 		try {
 
 			String charsetName = MQConstant.CHARSET_NAME;//字符集
@@ -87,6 +99,8 @@ public class ConfigParmsConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-配置设备参数返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							ConfigParamsResponse configParams = ConfigParamsResponse.fromJson(body);
+							configParamsResponseProcessService.processResponseData(configParams);
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
@@ -103,7 +117,6 @@ public class ConfigParmsConsumer {
 		} catch (MQClientException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }

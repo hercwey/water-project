@@ -50,6 +50,7 @@ import com.learnbind.ai.model.SysWaterPrice;
 import com.learnbind.ai.model.UseDiscountTrace;
 import com.learnbind.ai.model.UsePeopleAdjustTrace;
 import com.learnbind.ai.model.UseWaterPriceTrace;
+import com.learnbind.ai.service.business.CalculatingWaterFeeBusiness;
 import com.learnbind.ai.service.common.AbstractBaseService;
 import com.learnbind.ai.service.customers.CustomerAccountItemService;
 import com.learnbind.ai.service.customers.CustomerAccountService;
@@ -90,7 +91,8 @@ public class PartitionWaterServiceImpl extends AbstractBaseService<PartitionWate
 	
 	@Autowired
 	public PartitionWaterMapper partitionWaterMapper;
-	
+	@Autowired
+	private CalculatingWaterFeeBusiness calculatingWaterFeeBusiness;//计算水费
 		
 	/** 
 		* <p>Title:采用构造函数注入 </p> 
@@ -502,7 +504,6 @@ public class PartitionWaterServiceImpl extends AbstractBaseService<PartitionWate
 				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 				break;
 			}
-			
 		}
 		
 		return rows;
@@ -778,15 +779,17 @@ public class PartitionWaterServiceImpl extends AbstractBaseService<PartitionWate
 												BigDecimal totalPrice, BigDecimal currWaterAmount, BigDecimal waterFee) {
 		
 		//登录用户
-		UserBean userBean = (UserBean)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		//UserBean userBean = (UserBean)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		PartitionWater pw = new PartitionWater();
 		pw.setMeterId(meterIds);
 		pw.setRecordId(recordIds);
 		pw.setPeriod(period);
 		pw.setWaterUse(waterUse);
-		pw.setOperatorId(userBean.getId());
-		pw.setOperatorName(userBean.getRealname());
+		//pw.setOperatorId(userBean.getId());
+		//pw.setOperatorName(userBean.getRealname());
+		pw.setOperatorId(0l);
+		//pw.setOperatorName("系统管理员");
 		pw.setOperationTime(sysDate);
 		pw.setStartTime(startTime);
 		pw.setEndTime(endTime);
@@ -1004,6 +1007,9 @@ public class PartitionWaterServiceImpl extends AbstractBaseService<PartitionWate
 	 * @Description: 获取政策减免 
 	 */
 	private SysDiscount getDiscount(Long discountId) {
+		if(discountId==null) {
+			return null;
+		}
 		return discountService.selectByPrimaryKey(discountId);
 	}
 	
@@ -1902,5 +1908,128 @@ public class PartitionWaterServiceImpl extends AbstractBaseService<PartitionWate
 //		}
 //		return cardMeterAmount;
 //	}
+	
+	//--------------------------------智慧水务平台分水量业务处理部分------------------------------------------------------------------------------------------------------------------------
+	/** 
+	 * @Title: generatorPartitionWater
+	 * @Description: 生成分水量
+	 * @param meterRecord
+	 * @return 
+	 * @see com.learnbind.ai.service.meterrecord.PartitionWaterService#generatorPartitionWater(com.learnbind.ai.model.MeterRecord)
+	 */
+	@Override
+	public List<Long> generatorPartitionWater(MeterRecord meterRecord) {
+		
+		Date sysDate = new Date();//系统时间
+		
+		Long recordId = meterRecord.getId();//抄表记录ID
+		Long customerId = meterRecord.getCustomerId();//客户ID
+		String period = meterRecord.getPeriod();//期间
+		Long meterId = meterRecord.getMeterId();//表计ID
+		BigDecimal waterAmount = meterRecord.getCurrAmount();//本期水量
+		Date startTime = meterRecord.getPreDate();//上期抄表日期
+		Date endTime = meterRecord.getCurrDate();//基本抄表日期
+		
+		Customers customer = customersService.selectByPrimaryKey(customerId);//获取客户信息
+		Meters meter = metersService.selectByPrimaryKey(meterId);//查询表计信息
+		
+		//获取价格分类和价格
+		String waterUse = null;
+		String priceCode = null;
+		//是否使用表计水价
+		boolean isMeterPrice = calculatingWaterFeeBusiness.isMeterPrice(meter.getWaterUse(), meter.getPriceCode());
+		if(isMeterPrice) {
+			waterUse = meter.getWaterUse();
+			priceCode = meter.getPriceCode();
+		}else {
+			waterUse = customer.getWaterUse();
+			priceCode = customer.getPriceCode();
+		}
+		
+		List<Map<String, Object>> waterPriceMapList = new ArrayList<>();//水价、水量及其他日志信息集合
+		if(StringUtils.isNotBlank(priceCode)) {//水价不为空时表示非阶梯水价
+			SysWaterPrice wp = new SysWaterPrice();
+			wp.setPriceTypeCode(waterUse);
+			wp.setPriceCode(priceCode);
+			List<SysWaterPrice> wpList = waterPriceService.select(wp);
+			if(wpList!=null && wpList.size()>0) {
+				//非阶梯水价确定本期总水量和价格
+				SysWaterPrice tempWp = wpList.get(0);
+				Map<String, Object> waterPriceMap = calculatingWaterFeeBusiness.getNotLadderWaterPrice(waterUse, priceCode, waterAmount, tempWp);
+				waterPriceMapList.add(waterPriceMap);
+			}
+		}else {
+			String[] periodArr = period.split("-");
+			String year = periodArr[0];//从期中获取年
+			//年总用水量
+			BigDecimal yearWaterAmount = this.getYearWaterAmount(customerId, year, null);
+			//获取所有阶梯水价集合
+			List<SysWaterPrice> waterPriceList = waterPriceService.getJmshysPriceList(); 
+			//获取有效的多人口调整记录
+			CustomerPeopleAdjust peopleAdjust = this.getPeopleAdjustRecord(customerId);
+			//获取多人口调整中配置的每增加一人所增加的水量（默认值：36）
+			BigDecimal cfgWaterAmount = this.getPeopleAdjustCfgWaterAmount();
+			//获取政策减免信息
+			SysDiscount discount = this.getDiscount(customer.getDiscountType());
+			
+			waterPriceMapList = calculatingWaterFeeBusiness.getLadderWaterPrice(customerId, period, waterAmount, yearWaterAmount, waterPriceList, peopleAdjust, cfgWaterAmount, discount);
+		}
+		return this.generatorBatchPartitionWater(meterId, recordId, period, sysDate, startTime, endTime, customerId, waterPriceMapList);
+	}
+	
+	/**
+	 * @Title: insertBatchPartitionWater
+	 * @Description: 批量增加分水量
+	 * @param meterId
+	 * @param recordId
+	 * @param period
+	 * @param sysDate
+	 * @param startTime
+	 * @param endTime
+	 * @param customerId
+	 * @param waterPriceMapList
+	 * @return 
+	 */
+	@Transactional
+	private List<Long> generatorBatchPartitionWater(Long meterId, Long recordId, String period, Date sysDate, Date startTime, Date endTime, Long customerId, List<Map<String, Object>> waterPriceMapList) {
+		//删除本期分水量（只删除未开账的分水量）
+		//this.delete(customerId, period);
+		
+		List<Long> partitionWaterIdList = new ArrayList<>();//生成分水量ID集合
+		for(Map<String, Object> waterPriceMap : waterPriceMapList) {
+			
+			String useWaterPriceTraceJSON = (String)waterPriceMap.get(this.JSON_USE_WATER_PRICE_TRACE);//使用水价日志（json）
+			String usePeopleAdjustTraceJSON = (String)waterPriceMap.get(this.JSON_USE_PEOPLE_ADJUST_TRACE);//使用多人口调整日志（json）
+			String useDiscountTraceJSON = (String)waterPriceMap.get(this.JSON_USE_DISCOUNT_TRACE);//使用政策减免日志（json）
+			
+			
+			String priceCode = (String)waterPriceMap.get("priceCode");//水价编码
+			
+			BigDecimal basePrice = new BigDecimal(waterPriceMap.get("basePrice").toString());//基础水价
+			BigDecimal treatmentFee = new BigDecimal(waterPriceMap.get("treatmentFee").toString());//污水处理费
+			BigDecimal totalPrice = new BigDecimal(waterPriceMap.get("totalPrice").toString());//总单价
+			BigDecimal currWaterAmount = new BigDecimal(waterPriceMap.get("waterAmount").toString());//水量
+			//本期水费=水单价*总水量
+			BigDecimal waterFee = BigDecimalUtils.multiply(totalPrice, currWaterAmount); 
+			
+			//获取分水量实体
+			//PartitionWater pw = this.getPartitionWater(meterId.toString(), recordId.toString(), period, customer.getWaterUse(), sysDate, startTime, endTime, customerId, basePrice, treatmentFee, totalPrice, currWaterAmount, waterFee);
+			PartitionWater pw = this.getPartitionWater(meterId.toString(), recordId.toString(), period, priceCode, sysDate, startTime, endTime, customerId, basePrice, treatmentFee, totalPrice, currWaterAmount, waterFee);
+			
+			//增加分水量记录
+			int rows = partitionWaterMapper.insertSelective(pw);
+			if(rows>0) {
+				partitionWaterIdList.add(pw.getId());//增加分水量到
+				//增加日志（水价日志，多人口调整日志和政策减免日志）
+				this.insertTrace(pw.getId(), useWaterPriceTraceJSON, usePeopleAdjustTraceJSON, useDiscountTraceJSON);
+			}else {
+				partitionWaterIdList = null;//保存分水量异常时设置分水量ID集合为空
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+				break;
+			}
+		}
+		
+		return partitionWaterIdList;
+	}
 	
 }

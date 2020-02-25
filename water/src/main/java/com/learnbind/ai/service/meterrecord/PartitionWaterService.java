@@ -280,4 +280,12 @@ public interface PartitionWaterService extends IBaseService<PartitionWater, Long
 	 */
 	//public BigDecimal getCardMeterAmount(String period);
 	
+	//-------------------------生成分水量部分-------------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: generatorPartitionWater
+	 * @Description: 生成分水量
+	 * @param meterRecord
+	 * @return 
+	 */
+	public List<Long> generatorPartitionWater(MeterRecord meterRecord);
 }
