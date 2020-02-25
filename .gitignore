@@ -1,0 +1,5 @@
+
+src/main/resources/iot_cert/outgoing.CertwithKey.pkcs12
+src/main/resources/cert/outgoing.CertwithKey.pkcs12
+src/main/resources/cert/ca.jks
+src/main/resources/iot_cert/ca.jks
