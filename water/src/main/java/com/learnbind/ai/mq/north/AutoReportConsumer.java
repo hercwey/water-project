@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
+import com.learnbind.ai.model.iotbean.report.AutoReport;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.AutoReportDataProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -46,6 +48,8 @@ public class AutoReportConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private AutoReportDataProcessService autoReportDataProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
@@ -95,9 +99,8 @@ public class AutoReportConsumer {
 							log.debug("消费者分组-设备自动上报数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
 							
-//							AutoReport data = AutoReport.fromJson(body);//把接收到的数据转成对象
-//							Integer dataType = data.getDataType();//接收到的数据类型
-							
+							AutoReport reportData = AutoReport.fromJson(body);//把接收到的数据转成对象
+							autoReportDataProcessService.processAutoReportData(reportData);//处理接收到的数据
 							
 						}
 					} catch (UnsupportedEncodingException e) {

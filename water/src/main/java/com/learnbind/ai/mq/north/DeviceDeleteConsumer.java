@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.ControlValveResponseProcessService;
+import com.learnbind.ai.mq.north.service.DeviceDeleteResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -46,6 +48,8 @@ public class DeviceDeleteConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private DeviceDeleteResponseProcessService deviceDeleteResponseProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
@@ -94,6 +98,8 @@ public class DeviceDeleteConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-删除设备返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							
+							deviceDeleteResponseProcessService.processResponseData();
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();

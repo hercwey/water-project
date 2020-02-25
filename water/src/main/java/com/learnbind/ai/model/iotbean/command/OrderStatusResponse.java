@@ -14,5 +14,13 @@ public class OrderStatusResponse extends BaseResponse{
 	public void setCommandId(String commandId) {
 		this.commandId = commandId;
 	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
 	
 }

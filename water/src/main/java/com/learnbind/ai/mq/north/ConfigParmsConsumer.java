@@ -18,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
+import com.learnbind.ai.model.iotbean.command.ConfigParamsResponse;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.AutoReportDataProcessService;
+import com.learnbind.ai.mq.north.service.ConfigParamsResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -46,6 +49,8 @@ public class ConfigParmsConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private ConfigParamsResponseProcessService configParamsResponseProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
@@ -94,6 +99,8 @@ public class ConfigParmsConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-配置设备参数返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							ConfigParamsResponse configParams = ConfigParamsResponse.fromJson(body);
+							configParamsResponseProcessService.processResponseData(configParams);
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();

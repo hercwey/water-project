@@ -72,7 +72,7 @@ public enum EnumAiDebitSubjectAction {
 	/**
 	 * @Fields ADVANCE_WATER_FEE：51=预存水费
 	 */
-	ADVANCE_WATER_FEE("51", "预存水费"),
+	ADVANCE_WATER_FEE("51", "交水费（综合水费）预存水费，余额扣费"),
 	/**
 	 * @Fields ADVANCE_SETTLE_WATER_FEE：52=预存销账（综合水费）
 	 */

@@ -25,9 +25,9 @@ public enum EnumAiTraceOperate {
 	 */
 	RECHARGE_SETTLEMENT("303", "充值销账"),
 	/**
-	 * @Fields AUTO_SETTLEMENT：自动销账
+	 * @Fields AUTO_SETTLEMENT：余额自动销账
 	 */
-	AUTO_SETTLEMENT("301", "自动销账"),
+	AUTO_SETTLEMENT("301", "余额自动销账"),
 	/**
 	 * @Fields BILL_SETTLEMENT：账单冲账单
 	 */

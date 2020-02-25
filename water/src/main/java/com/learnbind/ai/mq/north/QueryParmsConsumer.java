@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
+import com.learnbind.ai.model.iotbean.command.QueryParamsResponse;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.QueryParmsResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -26,7 +28,7 @@ import com.learnbind.ai.mq.MQConstant;
  * @Package com.learnbind.ai.mq.north
  *
  * @Title: QueryParmsConsumer.java
- * @Description: 消费者-查询参数返回数据
+ * @Description: 消费者-查询表参数返回数据
  *
  * @author SRD
  * @date 2020年2月22日 上午10:57:23
@@ -46,6 +48,8 @@ public class QueryParmsConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private QueryParmsResponseProcessService queryParmsResponseProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
@@ -94,6 +98,8 @@ public class QueryParmsConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-查询参数返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							QueryParamsResponse queryParamsRsp = QueryParamsResponse.fromJson(body);
+							queryParmsResponseProcessService.processResponseData(queryParamsRsp);
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,7 @@ import com.learnbind.ai.model.PartitionWater;
 import com.learnbind.ai.model.SendSmsLog;
 import com.learnbind.ai.model.SysOverdueFine;
 import com.learnbind.ai.model.SysRoles;
+import com.learnbind.ai.service.business.BillBusiness;
 import com.learnbind.ai.service.common.AbstractBaseService;
 import com.learnbind.ai.service.customers.BankService;
 import com.learnbind.ai.service.customers.CustomerAccountItemLogService;
@@ -128,6 +130,9 @@ public class CustomerAccountItemServiceImpl extends AbstractBaseService<Customer
 	private SMSService smsService;// 发送短信
 	@Autowired
 	private SendSmsLogService sendSmsLogService;// 短信通知
+	@Autowired
+	private BillBusiness billBusiness;//账单业务处理部分
+	
 	/**
 	 * <p>
 	 * Title:采用构造函数注入
@@ -3787,5 +3792,191 @@ public class CustomerAccountItemServiceImpl extends AbstractBaseService<Customer
 		}
 		return operatorId;
 	}
+
+	//--------------------------------智慧水务平台分水量业务处理部分------------------------------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: autoGeneratorWaterFeeBill
+	 * @Description: 自动生成水费账单
+	 * @param pw
+	 * @return 
+	 */
+	@Override
+	public Long autoGeneratorWaterFeeBill(PartitionWater pw) {
+		
+		Long customerId = pw.getCustomerId();//客户ID
+		CustomerAccount ca = this.getCustomerAccount(customerId);//获取客户账户信息
+		
+		Long operatorId = 0l;//操作员ID
+		
+		CustomerAccountItem item = billBusiness.getWaterFeeBill(pw, ca.getId(), operatorId);
+		int rows = customerAccountItemMapper.insertSelective(item);
+		if(rows>0) {
+			Long billId = item.getId();//水费账单ID
+			//更新状态 更新分水量开账状态，并设置账目ID; 更新水价日志表中的账目ID; 更新抄表记录的开账状态；
+			this.updateStatus(pw.getId(), item.getId(), pw.getRecordId());
+			//增加水费账单日志
+			accountItemTraceService.insert(item.getId(), item.getCreditSubject(), operatorId.toString(), pw.getWaterFee().setScale(2));
+			//修改分水量表的账目ID
+			partitionWaterService.updateAccountItemId(pw.getId(), billId);
+			//修改水价日志表的账目ID
+			useWaterPriceTraceService.updateAccountItemId(pw.getId(), billId);
+			//修改抄表记录的生成账单状态
+			//this.updateRecordCreateBillStatus(pw.getRecordId());
+			return billId;
+		}
+		return null;
+		
+	}
+
+	/** 
+	 * (非 Javadoc)
+	 * 
+	 * @Title: balanceAutoSettlement
+	 * @Description: 余额自动结算水费账单
+	 * @param waterFeeBill
+	 * @return 
+	 * @see com.learnbind.ai.service.customers.CustomerAccountItemService#balanceAutoSettlement(com.learnbind.ai.model.CustomerAccountItem)
+	 */
+	@Override
+	@Transactional
+	public int balanceAutoSettlement(CustomerAccountItem waterFeeBill) {
+			
+		try {
+			
+			Long operatorId = 0l;//操作员ID
+			int rows=1;
+			
+			BigDecimal zero = new BigDecimal(0.00);//初始化BigDecimal类型的0
+			
+			Long customerId = waterFeeBill.getCustomerId();//客户ID
+			BigDecimal customerBalance = this.getCustomerBalance(customerId);//客户余额
+			if(BigDecimalUtils.lessOrEquals(customerBalance, zero)) {//如果客户余额<=0时,直接返回
+				return -1;
+			}
+			
+			//欠费金额
+			BigDecimal oweAmount = BigDecimalUtils.subtract(waterFeeBill.getCreditAmount(), waterFeeBill.getDebitAmount());
+			if(BigDecimalUtils.lessThan(customerBalance, oweAmount)) {//如果客户余额<欠费金额，直接返回余额不足
+				return -2;
+			}
+			
+			//查询有余额的充值账单
+			List<CustomerAccountItem> rechargeBillList = this.getHaveBalanceRechargeBill(customerId);
+			for(CustomerAccountItem rechargeBill : rechargeBillList) {
+				//欠费金额
+				oweAmount = BigDecimalUtils.subtract(waterFeeBill.getCreditAmount(), waterFeeBill.getDebitAmount());
+				if(BigDecimalUtils.lessOrEquals(oweAmount, zero)) {//如果欠费金额<=0时，自动执行下一次循环
+					break;
+				}
+				//结算
+				rows = this.settleWaterFeeBill(waterFeeBill, rechargeBill, operatorId);
+				if(rows>0) {
+					waterFeeBill = customerAccountItemMapper.selectByPrimaryKey(waterFeeBill.getId());
+				}else {
+					break;
+				}
+			}
+			if(rows<=0) {
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			}
+			return rows;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+		return 0;
+
+	}
+	
+	/**
+	 * @Title: settleWaterFeeBill
+	 * @Description: 结算水费账单
+	 * @param oweBill		水费欠费账单
+	 * @param rechargeBill	充值账单
+	 * @param operatorId	操作员ID
+	 * @return 
+	 */
+	private int settleWaterFeeBill(CustomerAccountItem oweBill, CustomerAccountItem rechargeBill, Long operatorId) {
+		
+		try {
+			
+			Date sysDate = new Date();//系统时间
+			
+			//余额自动销账
+			String traceOperate = EnumAiTraceOperate.AUTO_SETTLEMENT.getKey();
+			
+			int rows = 0;
+			
+			//计算账单欠费金额
+			BigDecimal billOweAmount = BigDecimalUtils.subtract(oweBill.getCreditAmount(), oweBill.getDebitAmount());
+			//计算充值账单余额
+			BigDecimal billBalance = BigDecimalUtils.subtract(rechargeBill.getDebitAmount(), rechargeBill.getCreditAmount());
+			
+			BigDecimal oweDebitAmount = oweBill.getDebitAmount();//欠费账单的借方金额
+			BigDecimal rechargeCreditAmount = rechargeBill.getCreditAmount();//充值账单的贷方金额
+			
+			//需要更新欠费账单中的借方金额
+			BigDecimal debitAmount = billBusiness.getOweBillDebitAmount(billBalance, billOweAmount, oweDebitAmount);
+			//需要更新充值账单中的贷方金额
+			BigDecimal creditAmount = billBusiness.getRechargeBillCreditAmount(billBalance, billOweAmount, rechargeCreditAmount);
+			
+			//获取水费账单借方辅助核算中金额
+			BigDecimal assistantDebitAmount = billBusiness.getOweBillAssistantDebitAmount(billBalance, billOweAmount);
+			//获取充值账单贷方辅助核算中金额
+			BigDecimal assistantCreditAmount = billBusiness.getRechargeBillAssistantCreditAmount(billBalance, billOweAmount);
+			
+			//-----------------------------更新欠费账单的借方信息------------------------------
+			Long rechargeBillId = rechargeBill.getId();
+			String debitSubject = rechargeBill.getDebitSubject();
+			String debitDigest = rechargeBill.getDebitDigest();
+			
+			//欠费账单中原有的借方辅助核算
+			String debitAssistant = oweBill.getDebitAssistant();
+			//欠费账单的借方辅助核算信息
+			String debitAssistantJSON = this.getAssistantJSON(debitAssistant, rechargeBillId, assistantDebitAmount, debitDigest, debitSubject, sysDate, operatorId);
+			//更新欠费账单中借方信息
+			rows = this.updateOweBillDebitInfo(oweBill.getId(), debitAmount, debitAssistantJSON);
+			if(rows>0) {
+				accountItemTraceService.insert(oweBill.getId(), oweBill.getCreditSubject(), rechargeBillId, debitSubject, traceOperate, assistantDebitAmount);
+			}
+			if(rows<=0) {
+				//TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+				return rows;
+			}
+			//-----------------------------更新充值账单的贷方信息------------------------------
+			Long oweBillId = oweBill.getId();
+			String creditSubject = oweBill.getCreditSubject();
+			//BigDecimal creditAmount = oweBill.getCreditAmount();
+			String creditDigest = oweBill.getCreditDigest();
+			//充值账单中原有的贷方辅助核算
+			String creditAssistant = rechargeBill.getCreditAssistant();
+			//充值账单的贷方辅助核算信息
+			String creditAssistantJSON = this.getAssistantJSON(creditAssistant, oweBillId, assistantCreditAmount, creditDigest, creditSubject, sysDate, operatorId);
+			//更新充值账单中贷方信息
+			rows = this.updateRechargeBillCreditInfo(rechargeBill.getId(), creditAmount, creditAssistantJSON);
+			if(rows>0) {
+				accountItemTraceService.insert(rechargeBill.getId(), rechargeBill.getDebitSubject(), oweBillId, creditSubject, traceOperate, assistantDebitAmount);
+			}
+			if(rows<=0) {
+				//TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+				return rows;
+			}
+			
+			rows = this.setOweBillSettlementStatus(oweBill.getId());//设置结算状态为成功
+			if(rows<=0) {
+				//TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+				return rows;
+			}
+			
+			return rows;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		//TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+		return 0;
+	}
+	
 	
 }

@@ -4,23 +4,28 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.learnbind.ai.common.enumclass.EnumReadMode;
 import com.learnbind.ai.common.enumclass.EnumReadType;
+import com.learnbind.ai.model.CustomerAccountItem;
 import com.learnbind.ai.model.CustomerMeter;
 import com.learnbind.ai.model.MeterRecord;
-import com.learnbind.ai.model.iot.WmDevice;
+import com.learnbind.ai.model.Meters;
+import com.learnbind.ai.model.PartitionWater;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.model.iotbean.common.ReportDataType;
 import com.learnbind.ai.model.iotbean.report.AutoReport;
 import com.learnbind.ai.model.iotbean.report.MeterReportBean;
 import com.learnbind.ai.service.business.MeterRecordBusiness;
+import com.learnbind.ai.service.customers.CustomerAccountItemService;
 import com.learnbind.ai.service.customers.CustomerMeterService;
-import com.learnbind.ai.service.iot.WmDeviceService;
 import com.learnbind.ai.service.iot.WmMeterService;
 import com.learnbind.ai.service.meterrecord.MeterRecordService;
+import com.learnbind.ai.service.meterrecord.PartitionWaterService;
 import com.learnbind.ai.service.meters.MetersService;
 
 import tk.mybatis.mapper.entity.Example;
@@ -31,7 +36,7 @@ import tk.mybatis.mapper.entity.Example;
  * @Package com.learnbind.ai.mq.north.service
  *
  * @Title: AutoReportDataProcessService.java
- * @Description: 自动上报数据处理
+ * @Description: 设备主动上报数据处理
  *
  * @author SRD
  * @date 2020年2月23日 上午11:49:25
@@ -41,8 +46,11 @@ import tk.mybatis.mapper.entity.Example;
 @Service
 public class AutoReportDataProcessService {
 
-	@Autowired
-	private WmDeviceService wmDeviceService;
+	/**
+	 * @Fields log：日志
+	 */
+	private static final Logger log = LoggerFactory.getLogger(AutoReportDataProcessService.class);
+	
 	@Autowired
 	private WmMeterService wmMeterService;
 	@Autowired
@@ -53,6 +61,10 @@ public class AutoReportDataProcessService {
 	private MeterRecordService meterRecordService;
 	@Autowired
 	private MeterRecordBusiness meterRecordBusiness;
+	@Autowired
+	private PartitionWaterService partitionWaterService;//分水量
+	@Autowired
+	private CustomerAccountItemService customerAccountItemService;//账单
 
 	/**
 	 * @Title: processAutoReportData
@@ -61,6 +73,8 @@ public class AutoReportDataProcessService {
 	 */
 	public void processAutoReportData(AutoReport reportData) {
 
+		log.debug("----------设备主动上报数据处理");
+		
 		// 1、保存设备上报数据到数据库
 		this.saveReportData(reportData);
 
@@ -68,38 +82,47 @@ public class AutoReportDataProcessService {
 		Integer dataType = reportData.getDataType();// 数据类型
 		
 		// 2、收到上报数据后更新表配置与月冻结数据
-		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG
-				|| dataType == ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG) {// 如果数据类型是 设备配置信息数据 或 写配置指令返回信息
-			// 水表配置信息，更新数据库device表meter_config内容
-			this.processReadConfigOrWriteConfigData(deviceId, reportData);
-		} else if (dataType == ReportDataType.METER_DATA_TYPE_MONTH_FREEZE) {// 如果数据类型是 设备月冻结数据
-			// 水表月冻结信息，更新数据库device表meter_freeze内容
-			this.processMonthFreezeData(deviceId, reportData);
-		} else if (dataType == ReportDataType.METER_DATA_TYPE_REPORT) {// 如果数据类型是 设备主动上报数据
+		if (dataType == ReportDataType.METER_DATA_TYPE_REPORT) {// 如果数据类型是 设备主动上报数据
 			// 水表数据封装信息保存（更新MeterConfig信息）
-			this.processAutoReportData(deviceId, reportData);
+			this.processAutoReportData(deviceId, reportData.getData());
 		} else {
-			// 其他类型数据不做特殊处理
+			log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
 		}
 		
-		// 3、保存到抄表记录
-		
-		
+		if(dataType == ReportDataType.METER_DATA_TYPE_REPORT) {// 如果数据类型是 设备主动上报数据 时，自动执行保存抄表记录、生成分水量、生成账单、余额自动销账
+			// 3、保存到抄表记录
+			MeterRecord meterRecord = this.saveMeterRecord(deviceId, reportData.getMonthData());
+			if(meterRecord!=null) {
+				// 4、生成分水量（生成分水量时会计算水费）
+				List<Long> pwIdList = partitionWaterService.generatorPartitionWater(meterRecord);
+				// 5、生成账单，并用余额自动结算
+				this.generatorBillAndSettleBill(pwIdList);
+			}else {
+				log.debug("----------保存抄表记录异常");
+			}
+		}
 	}
 	
 	// --------------------------------保存到抄表记录--------------------------------------------------------------------------------------------------
-	private int saveMeterRecord(String deviceId, MeterReportBean meterReport) {
+	/**
+	 * @Title: saveMeterRecord
+	 * @Description: 保存抄表记录
+	 * @param deviceId
+	 * @param meterReport
+	 * @return 
+	 */
+	private MeterRecord saveMeterRecord(String deviceId, MeterReportBean meterReport) {
 		
-		Date sysDate = new Date();//系统日期
+		//Date sysDate = new Date();//系统日期
 		Long meterId = metersService.getMeterId(deviceId);//获取表计ID		
 		CustomerMeter cm = customerMeterService.getCustomerByMeterId(meterId);//查询客户表计关系表
 		Long customerId = cm.getCustomerId();//客户ID
 		//查询最后一次抄表记录
-		MeterRecord lastMeterRecord = meterRecordService.getLastMeterRecord(customerId, null, meterId);
+		//MeterRecord lastMeterRecord = meterRecordService.getLastMeterRecord(customerId, null, meterId);
 		//获取本次表底
 		BigDecimal currReadMeter = meterRecordBusiness.getCurrReadMeter(meterReport);
 		
-		//增加抄表记录
+		//保存抄表记录
 		MeterRecord record = new MeterRecord();
 		record.setCustomerId(customerId);
 		record.setMeterId(meterId);
@@ -107,41 +130,43 @@ public class AutoReportDataProcessService {
 		record.setReadMode(EnumReadMode.READ_REMOTE.getCode());
 		record.setReadType(EnumReadType.NORMAL_READ.getValue());
 		int rows = meterRecordService.insertMeterRecord(record, null, null);
-		return rows;
+		if(rows>0) {
+			//查询最后一次抄表记录
+			MeterRecord lastMeterRecord = meterRecordService.getLastMeterRecord(customerId, null, meterId);
+			return lastMeterRecord;
+		}
+		return null;
 	}
-
-	// --------------------------------数据类型是 设备配置信息数据 或 写配置指令返回信息 的业务处理部分--------------------------------------------------------------------------------------------------
+	
+	// --------------------------------保存到抄表记录--------------------------------------------------------------------------------------------------
 	/**
-	 * @Title: processReadConfigOrWriteConfigData
-	 * @Description: 数据类型是 设备配置信息数据 或 写配置指令返回信息 的业务处理，更新meter_config
-	 * @param deviceId
-	 * @param reportData
-	 * @return
+	 * @Title: generatorBillAndSettleBill
+	 * @Description: 生成账单并结算账单
+	 * @param partitionWaterIdList 
 	 */
-	private int processReadConfigOrWriteConfigData(String deviceId, AutoReport reportData) {
-		// 水表配置信息，更新数据库device表meter_config内容
-		Example example = new Example(WmDevice.class);
-		example.createCriteria().andEqualTo("deviceId", deviceId);
-		WmDevice wmDevice = new WmDevice();
-		wmDevice.setMeterConfig(reportData.getData());
-		return wmDeviceService.updateByExampleSelective(wmDevice, example);
-	}
-
-	// --------------------------------数据类型是 设备月冻结数据 的业务处理部分--------------------------------------------------------------------------------------------------
-	/**
-	 * @Title: processMonthFreezeData
-	 * @Description: 数据类型是 设备月冻结数据 的业务处理，更新meter_freeze
-	 * @param deviceId
-	 * @param reportData
-	 * @return
-	 */
-	private int processMonthFreezeData(String deviceId, AutoReport reportData) {
-		// 水表月冻结信息，更新数据库device表meter_freeze内容
-		Example example = new Example(WmDevice.class);
-		example.createCriteria().andEqualTo("deviceId", deviceId);
-		WmDevice wmDevice = new WmDevice();
-		wmDevice.setMeterFreeze(reportData.getData());
-		return wmDeviceService.updateByExampleSelective(wmDevice, example);
+	private void generatorBillAndSettleBill(List<Long> partitionWaterIdList) {
+		for(Long pwId : partitionWaterIdList) {
+			//查询生成的分水量
+			PartitionWater pw = partitionWaterService.selectByPrimaryKey(pwId);
+			//生成账单
+			Long waterFeeBillId = customerAccountItemService.autoGeneratorWaterFeeBill(pw);
+			if(waterFeeBillId!=null) {
+				//查询水费账单
+				CustomerAccountItem waterFeeBill = customerAccountItemService.selectByPrimaryKey(waterFeeBillId);
+				//结算账单
+				int rows = customerAccountItemService.balanceAutoSettlement(waterFeeBill);
+				if(rows>0) {//rows>0时余额自动结算成功
+					
+				}else if(rows==0) {//rows=0时余额自动结算失败
+					log.debug("----------余额自动结算账单异常，请手动操作结算账单");
+				}else {//rows<0时余额不足
+					log.debug("----------余额不足");
+				}
+			}else {
+				log.debug("----------生成账单异常");
+			}
+		}
+		
 	}
 
 	// --------------------------------数据类型是 设备主动上报数据 的业务处理部分--------------------------------------------------------------------------------------------------
@@ -149,23 +174,23 @@ public class AutoReportDataProcessService {
 	 * @Title: processAutoReportData
 	 * @Description: 主动上报数据处理，更新meter_config
 	 * @param deviceId
-	 * @param reportData
+	 * @param data	原始HEX数据中数据域部分解析后的json数据
 	 * @return 
 	 */
-	private int processAutoReportData(String deviceId, AutoReport reportData) {
+	private int processAutoReportData(String deviceId, String data) {
 		// TODO 水表数据封装信息保存（更新MeterConfig信息）
 		// TODO 需要重点测试
-		MeterReportBean reportBean = MeterReportBean.fromJson(reportData.getData());
+		MeterReportBean reportBean = MeterReportBean.fromJson(data);
 		if (reportBean != null) {
 
 			String meterReportJSON = reportBean.toJsonString(reportBean);// 转成JSON
 
-			// 水表月冻结信息，更新数据库device表meter_freeze内容
-			Example example = new Example(WmDevice.class);
+			// 水表月冻结信息，更新数据库meters表meter_freeze内容
+			Example example = new Example(Meters.class);
 			example.createCriteria().andEqualTo("deviceId", deviceId);
-			WmDevice wmDevice = new WmDevice();
-			wmDevice.setMeterConfig(meterReportJSON);
-			return wmDeviceService.updateByExampleSelective(wmDevice, example);
+			Meters meter = new Meters();
+			meter.setMeterConfig(meterReportJSON);
+			return metersService.updateByExampleSelective(meter, example);
 		}
 		return 0;
 	}
@@ -212,12 +237,11 @@ public class AutoReportDataProcessService {
 	 * @return 返回本地库设备表主键ID
 	 */
 	private Long getDeviceId(String deviceId) {
-
-		WmDevice device = new WmDevice();
-		device.setDeviceId(deviceId);
-		List<WmDevice> deviceList = wmDeviceService.select(device);
-		if (deviceList != null && deviceList.size() > 0) {
-			return deviceList.get(0).getId();
+		Meters meter = new Meters();
+		meter.setDeviceId(deviceId);
+		List<Meters> meterList = metersService.select(meter);
+		if (meterList != null && meterList.size() > 0) {
+			return meterList.get(0).getId();
 		}
 		return null;
 	}

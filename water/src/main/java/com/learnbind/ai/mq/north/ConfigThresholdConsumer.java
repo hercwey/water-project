@@ -17,8 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
+import com.learnbind.ai.model.iotbean.command.ConfigThresholdResponse;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.ConfigThresholdResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -46,7 +49,9 @@ public class ConfigThresholdConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
-
+	@Autowired
+	private ConfigThresholdResponseProcessService configThresholdResponseProcessService;
+	
 	/**
 	 * 通过构造函数 实例化对象
 	 */
@@ -94,6 +99,9 @@ public class ConfigThresholdConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-设置阈值返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							//ConfigThresholdResponse configThresholdRspData = ConfigThresholdResponse
+							ConfigThresholdResponse configThresholdRspData = JSON.parseObject(body, ConfigThresholdResponse.class);
+							configThresholdResponseProcessService.processResponseData(configThresholdRspData);
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();

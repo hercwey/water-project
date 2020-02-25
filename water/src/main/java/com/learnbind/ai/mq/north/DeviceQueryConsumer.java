@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.DeviceDeleteResponseProcessService;
+import com.learnbind.ai.mq.north.service.DeviceQueryResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -46,6 +48,8 @@ public class DeviceQueryConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private DeviceQueryResponseProcessService deviceQueryResponseProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
@@ -94,6 +98,8 @@ public class DeviceQueryConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-查询设备返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							
+							deviceQueryResponseProcessService.processResponseData();
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();

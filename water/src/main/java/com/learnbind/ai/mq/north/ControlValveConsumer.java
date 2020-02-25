@@ -17,8 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
+import com.learnbind.ai.model.iotbean.command.ControlValveResponse;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.ControlValveResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -46,6 +49,8 @@ public class ControlValveConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private ControlValveResponseProcessService controlValveResponseProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
@@ -94,6 +99,9 @@ public class ControlValveConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-控制设备（开关阀控制）返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							//ControlValveResponse controlValveRspData = ControlValveResponse.
+							ControlValveResponse controlValveRspData = JSON.parseObject(body, ControlValveResponse.class);
+							controlValveResponseProcessService.processResponseData(controlValveRspData);
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();

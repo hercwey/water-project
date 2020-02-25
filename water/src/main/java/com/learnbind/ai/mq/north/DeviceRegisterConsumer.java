@@ -18,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.config.rocketmq.RocketTopicConfig;
+import com.learnbind.ai.model.iotbean.device.RegisterDeviceResponse;
 import com.learnbind.ai.mq.MQConstant;
+import com.learnbind.ai.mq.north.service.DeviceQueryResponseProcessService;
+import com.learnbind.ai.mq.north.service.DeviceRegisterResponseProcessService;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -46,6 +49,8 @@ public class DeviceRegisterConsumer {
 	 */
 	@Autowired
 	private RocketTopicConfig rocketTopicConfig;
+	@Autowired
+	private DeviceRegisterResponseProcessService deviceRegisterResponseProcessService;
 
 	/**
 	 * 通过构造函数 实例化对象
@@ -94,6 +99,8 @@ public class DeviceRegisterConsumer {
 							String body = new String(msg.getBody(), charsetName);
 							log.debug("消费者分组-注册设备返回数据【" + consumerGroup + "】，主题topic【" + msg.getTopic() + "】，tag【" + tag
 									+ "】，消费消息【" + body + "】");
+							RegisterDeviceResponse registerDeviceRsp = RegisterDeviceResponse.fromJson(body);
+							deviceRegisterResponseProcessService.processResponseData(registerDeviceRsp);
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
