@@ -11,6 +11,7 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.space.water.iot.api.config.MQTags;
@@ -130,6 +131,7 @@ public class Tester {
 		request.setServiceId("JRprotocol");
 
 		request.setThreshold((short) 50);
+		jsonData = JSON.toJSONString(request);
 		return jsonData;
 	}
 	
@@ -166,6 +168,7 @@ public class Tester {
 		request.setSequence((byte) 123);
 		request.setServiceId("JRprotocol");
 
+		jsonData = JSON.toJSONString(request);
 		return jsonData;
 	}
 
@@ -217,6 +220,7 @@ public class Tester {
 		request.setSequence((byte) 123);
 		request.setServiceId("JRprotocol");
 
+		jsonData = JSON.toJSONString(request);
 		return jsonData;
 	}
 
@@ -271,6 +275,7 @@ public class Tester {
 		request.setServiceId("JRprotocol");
 		request.setAction((byte) 1);
 
+		jsonData = JSON.toJSONString(request);
 		return jsonData;
 	}
 
@@ -307,6 +312,7 @@ public class Tester {
 		request.setProtocolType("CoAP");
 		request.setTimeout(0);
 		request.setVerifyCode("12345677777");
+		jsonData = JSON.toJSONString(request);
 
 		return jsonData;
 	}
@@ -320,6 +326,7 @@ public class Tester {
 		request.setManufacturerName("JRIWA");
 		request.setModel("JR0912Y");
 		request.setProtocolType("CoAP");
+		jsonData = JSON.toJSONString(request);
 
 		return jsonData;
 	}
@@ -328,6 +335,7 @@ public class Tester {
 		String jsonData = "";
 		DeleteDeviceRequest request = new DeleteDeviceRequest();
 		request.setDeviceId("b7c99b36-3f23-4d27-bd6d-bb0603c6fbcb");
+		jsonData = JSON.toJSONString(request);
 
 		return jsonData;
 	}
@@ -336,6 +344,7 @@ public class Tester {
 		String jsonData = "";
 		DeleteDeviceRequest request = new DeleteDeviceRequest();
 		request.setDeviceId("b7c99b36-3f23-4d27-bd6d-bb0603c6fbcb");
+		jsonData = JSON.toJSONString(request);
 
 		return jsonData;
 	}
@@ -343,7 +352,7 @@ public class Tester {
 	public static Message packMQMessage(String tag, String data) {
 		Message message = null;
 		try {
-			message = new Message("TOPIC", tag, data.getBytes("UTF-8"));
+			message = new Message("Topic1", tag, data.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -4,6 +4,7 @@ import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.space.water.iot.api.config.MQTags;
@@ -12,6 +13,9 @@ import com.space.water.iot.api.config.MQTags;
 public class Producer {
     private String producerGroup = "example_group_name";
     private DefaultMQProducer producer;
+    
+    @Autowired
+    RocketTopicConfig topicConfig;
     
     public Producer(){
         //示例生产者
@@ -47,7 +51,7 @@ public class Producer {
     public SendResult sendNorth(String response,String tag) {
     	SendResult sendResult = null;		
 		// 创建生产信息
-		Message message = new Message("TOPIC", tag, "keys" , response.getBytes());
+		Message message = new Message(topicConfig.getTopicName(), tag, "keys" , response.getBytes());
 		// 发送
 		try {
     		sendResult = getProducer().send(message);

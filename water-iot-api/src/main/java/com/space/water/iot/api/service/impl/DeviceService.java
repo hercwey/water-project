@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.space.water.iot.api.common.JsonResult;
 import com.space.water.iot.api.config.Constants;
-import com.space.water.iot.api.config.MQTags;
 import com.space.water.iot.api.model.device.RegisterDeviceRequest;
 import com.space.water.iot.api.model.device.RegisterDeviceResponse;
 import com.space.water.iot.api.model.device.UpdateDeviceRequest;

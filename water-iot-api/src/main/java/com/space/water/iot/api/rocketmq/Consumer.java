@@ -38,11 +38,13 @@ import com.space.water.iot.api.protocol.bean.MeterConfigWriteCmd;
 import com.space.water.iot.api.protocol.bean.MeterReadWaterCmd;
 import com.space.water.iot.api.protocol.bean.MeterValveControlCmd;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdCmd;
-import com.space.water.iot.api.service.impl.DeviceService;
+import com.space.water.iot.api.service.IDeviceService;
 
 @Component
 public class Consumer {
 
+	@Autowired
+	IDeviceService deviceService;
 	@Autowired
 	Producer producer;
 	@Autowired
@@ -69,7 +71,7 @@ public class Consumer {
 			// set to broadcast mode
 			consumer.setMessageModel(MessageModel.BROADCASTING);
 			// 订阅主题和 标签（ * 代表所有标签)下信息
-			consumer.subscribe("TOPIC", "*");
+			consumer.subscribe(topicConfig.getTopicName(), "*");
 			// //注册消费的监听 并在此监听中消费信息，并返回消费的状态信息
 			consumer.registerMessageListener(new MessageListenerConcurrently() {
 
@@ -243,7 +245,6 @@ public class Consumer {
 		try {
 			String requestJson = new String(msg.getBody(), "utf-8");
 			RegisterDeviceRequest request = RegisterDeviceRequest.fromJson(requestJson);
-			DeviceService deviceService = new DeviceService();
 			JsonResult result = deviceService.registerDevice(request);
 			producer.sendNorth(result.getData(), topicConfig.getTagDeviceRegisterNorth());
 		} catch (Exception e) {
@@ -255,7 +256,6 @@ public class Consumer {
 		try {
 			String requestJson = new String(msg.getBody(), "utf-8");
 			UpdateDeviceRequest request = UpdateDeviceRequest.fromJson(requestJson);
-			DeviceService deviceService = new DeviceService();
 			JsonResult result = deviceService.modifyDevice(request);
 			producer.sendNorth(result.getData(), topicConfig.getTagDeviceUpdateNorth());
 		} catch (Exception e) {
@@ -267,7 +267,6 @@ public class Consumer {
 		try {
 			String requestJson = new String(msg.getBody(), "utf-8");
 			DeleteDeviceRequest request = DeleteDeviceRequest.fromJson(requestJson);
-			DeviceService deviceService = new DeviceService();
 			JsonResult result = deviceService.deleteFromIoT(request.getDeviceId());
 			producer.sendNorth(result.getData(), topicConfig.getTagDeviceDeleteNorth());
 		} catch (Exception e) {
@@ -276,7 +275,6 @@ public class Consumer {
 	}
 
 	private void deviceQuerySouth(Message msg) {
-		DeviceService deviceService = new DeviceService();
 		JsonResult result = deviceService.queryDevices("0", "10000");
 		producer.sendNorth(result.getData(), topicConfig.getTagDeviceQueryNorth());
 	}

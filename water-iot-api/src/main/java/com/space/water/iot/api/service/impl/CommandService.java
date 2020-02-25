@@ -11,7 +11,6 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.space.water.iot.api.common.JsonResult;
 import com.space.water.iot.api.config.Constants;
-import com.space.water.iot.api.config.MQTags;
 import com.space.water.iot.api.model.command.OrderStatusResponse;
 import com.space.water.iot.api.model.common.CommandCallbackConstants;
 import com.space.water.iot.api.model.iot.command.CommandBean;

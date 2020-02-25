@@ -42,7 +42,7 @@ public class MQTestController {
 		 */
 		// 自动生成模拟数据
 		String tag = jsonObject.getString("tag");
-		String messageData = "";
+		String messageData = "{}";
 		if (tag.equals(topicConfig.getTagAutoReport())) {
 			messageData = Tester.autoReport();
 		} else if (tag.equals(topicConfig.getTagConfigParmsSouth())) {
