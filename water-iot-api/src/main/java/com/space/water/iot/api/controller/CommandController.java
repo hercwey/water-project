@@ -15,6 +15,7 @@ import com.space.water.iot.api.model.common.CommandCallbackConstants;
 import com.space.water.iot.api.model.iot.command.CommandBean;
 import com.space.water.iot.api.model.iot.command.CommandCallbackBean;
 import com.space.water.iot.api.rocketmq.Producer;
+import com.space.water.iot.api.rocketmq.RocketTopicConfig;
 import com.space.water.iot.api.service.ICommandService;
 import com.space.water.iot.api.service.IDeviceService;
 
@@ -28,6 +29,8 @@ public class CommandController {
     IDeviceService deviceService;
     @Autowired
     Producer producer;
+    @Autowired
+    RocketTopicConfig topicConfig;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     @ResponseBody
@@ -71,7 +74,7 @@ public class CommandController {
 		}
 		
 		response.setStatus(status);
-		producer.sendNorth(OrderStatusResponse.toJsonString(response), MQTags.ORDER_STATUS);
+		producer.sendNorth(OrderStatusResponse.toJsonString(response), topicConfig.getTagOrderStatus());
 
         return ResponseEntity.ok(JsonResult.success(JsonResult.SUCCESS,data).toString());
     }

@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.rocketmq.common.message.Message;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -37,9 +38,10 @@ import com.space.water.iot.api.protocol.bean.MeterConfigWriteResp;
 import com.space.water.iot.api.protocol.bean.MeterReadWaterResp;
 import com.space.water.iot.api.protocol.bean.MeterValveControlResp;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdResp;
+import com.space.water.iot.api.rocketmq.RocketTopicConfig;
 
 public class Tester {
-
+	
 	public static String autoReport() {
 		String iotReportData = "{\"notifyType\":\"deviceDatasChanged\",\"requestId\":null,\"deviceId\":\"b7c99b36-3f23-4d27-bd6d-bb0603c6fbcb\",\"gatewayId\":\"b7c99b36-3f23-4d27-bd6d-bb0603c6fbcb\",\"services\":[{\"serviceId\":\"JRprotocol\",\"serviceType\":\"JRprotocol\",\"data\":{\"JRprotocolXY\":\"681036390745404358811d1f90b0363907454043573522100102200e0000000019320900130000009f16\"},\"eventTime\":\"20200210T223604Z\"}]}";
 		// TODO 数据解析
@@ -391,14 +393,4 @@ public class Tester {
 		return iotData;
 	}
 
-	public static void main(String[] args) {
-//		Message message = Tester.packMQMessage(MQTags.CONFIG_PARAMS_SOUTH, Tester.configParamsSouth());
-		Message message = Tester.packMQMessage(MQTags.CONFIG_PARAMS_NORTH, Tester.configParamsNorth());
-
-		System.out.println("---------------------------");
-		System.out.println("| 生成模拟指令");
-		System.out.println("| tag ：" + message.getTags());
-		System.out.println("| body：" + new String(message.getBody()));
-		System.out.println("---------------------------");
-	}
 }

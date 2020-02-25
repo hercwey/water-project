@@ -1,14 +1,12 @@
 package com.space.water.iot.api.rocketmq;
 
 import org.apache.rocketmq.client.producer.SendResult;
-import org.apache.rocketmq.common.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
-import com.space.water.iot.api.config.MQTags;
 import com.space.water.iot.api.test.Tester;
 
 @RestController
@@ -16,6 +14,9 @@ public class MQTestController {
 
 	@Autowired
 	private Producer producer;
+	@Autowired
+	RocketTopicConfig topicConfig;
+
 	/**
 	 * 初始化消息
 	 */
@@ -27,74 +28,52 @@ public class MQTestController {
 	public Object callback(@RequestBody String data) throws Exception {
 		JSONObject jsonObject = (JSONObject) JSONObject.parse(data);
 		/**
-		String topic = jsonObject.getString("topic");
-		String tag = jsonObject.getString("tag");
-		String key = jsonObject.getString("key");
-		String dataStr = jsonObject.getString("data");
-
-		System.out.println("--------------------------------------------------------------------------------------");
-		System.out.println("| Topic:" + topic);
-		System.out.println("| tag  :" + tag);
-		System.out.println("| key  :" + key);
-		System.out.println("| data :" + dataStr);
-		System.out.println("--------------------------------------------------------------------------------------");
-
-		// 创建生产信息
-		Message message = new Message(topic, tag, key, dataStr.getBytes());
-		*/
-		//自动生成模拟数据
+		 * String topic = jsonObject.getString("topic"); String tag =
+		 * jsonObject.getString("tag"); String key = jsonObject.getString("key"); String
+		 * dataStr = jsonObject.getString("data");
+		 * 
+		 * System.out.println("--------------------------------------------------------------------------------------");
+		 * System.out.println("| Topic:" + topic); System.out.println("| tag :" + tag);
+		 * System.out.println("| key :" + key); System.out.println("| data :" +
+		 * dataStr);
+		 * System.out.println("--------------------------------------------------------------------------------------");
+		 * 
+		 * // 创建生产信息 Message message = new Message(topic, tag, key, dataStr.getBytes());
+		 */
+		// 自动生成模拟数据
 		String tag = jsonObject.getString("tag");
 		String messageData = "";
-		switch (tag) {
-		case MQTags.AUTO_REPORT:
+		if (tag.equals(topicConfig.getTagAutoReport())) {
 			messageData = Tester.autoReport();
-			break;
-		case MQTags.CONFIG_PARAMS_SOUTH:
+		} else if (tag.equals(topicConfig.getTagConfigParmsSouth())) {
 			messageData = Tester.configParamsSouth();
-			break;
-		case MQTags.CONFIG_PARAMS_NORTH:
+		} else if (tag.equals(topicConfig.getTagConfigParmsNorth())) {
 			messageData = Tester.configParamsNorth();
-			break;
-		case MQTags.CONFIG_THRESHOLD_SOUTH:
+		} else if (tag.equals(topicConfig.getTagConfigThresholdSouth())) {
 			messageData = Tester.configThresholdSouth();
-			break;
-		case MQTags.CONFIG_THRESHOLD_NORTH:
+		} else if (tag.equals(topicConfig.getTagConfigThresholdNorth())) {
 			messageData = Tester.configThresholdNorth();
-			break;
-		case MQTags.CONTROL_VALVE_SOUTH:
+		} else if (tag.equals(topicConfig.getTagControlValveSouth())) {
 			messageData = Tester.controlValveSouth();
-			break;
-		case MQTags.CONTROL_VALVE_NORTH:
+		} else if (tag.equals(topicConfig.getTagControlValveNorth())) {
 			messageData = Tester.controlValveNorth();
-			break;
-		case MQTags.DEVICE_REGISTER_SOUTH:
+		} else if (tag.equals(topicConfig.getTagDeviceRegisterSouth())) {
 			messageData = Tester.deviceRegisterSouth();
-			break;
-		case MQTags.DEVICE_UPDATE_SOUTH:
-			messageData = Tester.deviceUpdateSouth();
-			break;
-		case MQTags.DEVICE_DELETE_SOUTH:
+		} else if (tag.equals(topicConfig.getTagDeviceRegisterNorth())) {
+		} else if (tag.equals(topicConfig.getTagDeviceDeleteSouth())) {
 			messageData = Tester.deviceDeleteSouth();
-			break;
-		case MQTags.DEVICE_QUERY_SOUTH:
+		} else if (tag.equals(topicConfig.getTagDeviceQuerySouth())) {
 			messageData = Tester.deviceQuery();
-			break;
-		case MQTags.QUERY_MONTH_DATA_SOUTH:
+		} else if (tag.equals(topicConfig.getTagQueryMonthDataSouth())) {
 			messageData = Tester.queryMonthDataSouth();
-			break;
-		case MQTags.QUERY_MONTH_DATA_NORTH:
+		} else if (tag.equals(topicConfig.getTagQueryMonthdataNorth())) {
 			messageData = Tester.queryMonthDataNorth();
-			break;
-		case MQTags.QUERY_PARAMS_SOUTH:
+		} else if (tag.equals(topicConfig.getTagQueryParmsSouth())) {
 			messageData = Tester.queryParamsSouth();
-			break;
-		case MQTags.QUERY_PARAMS_NORTH:
+		} else if (tag.equals(topicConfig.getTagQueryParmsNorth())) {
 			messageData = Tester.queryParamsNorth();
-			break;
-		default:
-			break;
 		}
-		
+
 		// 发送
 		SendResult sendResult = producer.getProducer().send(Tester.packMQMessage(tag, messageData));
 		System.out.println("输出生产者信息={}" + sendResult);

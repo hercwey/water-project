@@ -14,6 +14,7 @@ import com.space.water.iot.api.model.device.RegisterDeviceRequest;
 import com.space.water.iot.api.model.device.RegisterDeviceResponse;
 import com.space.water.iot.api.model.device.UpdateDeviceRequest;
 import com.space.water.iot.api.rocketmq.Producer;
+import com.space.water.iot.api.rocketmq.RocketTopicConfig;
 import com.space.water.iot.api.service.IDeviceService;
 import com.space.water.iot.api.util.IoTRequestUtil;
 
@@ -22,6 +23,9 @@ public class DeviceService implements IDeviceService {
 
 	@Autowired
 	Producer producer;
+	@Autowired
+	RocketTopicConfig topicConfig;
+	
 	@Override
 	public JsonResult registerDevice(RegisterDeviceRequest registerReq) {
 		JsonResult jsonResult = JsonResult.fail(0, "Unknown Error");
@@ -55,7 +59,7 @@ public class DeviceService implements IDeviceService {
 			e.printStackTrace();
 		}
 
-		producer.sendNorth(registerResponse, MQTags.DEVICE_REGISTER_NORTH);
+		producer.sendNorth(registerResponse,topicConfig.getTagDeviceRegisterNorth());
 		return jsonResult;
 	}
 
@@ -76,7 +80,7 @@ public class DeviceService implements IDeviceService {
 			e.printStackTrace();
 		}
 
-		producer.sendNorth(jsonResult == null ? "":jsonResult.getData(), MQTags.DEVICE_UPDATE_NORTH);
+		producer.sendNorth(jsonResult == null ? "":jsonResult.getData(), topicConfig.getTagDeviceUpdateNorth());
 		return jsonResult;
 	}
 
@@ -93,7 +97,7 @@ public class DeviceService implements IDeviceService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		producer.sendNorth(jsonResult == null ? "":jsonResult.getData(), MQTags.DEVICE_QUERY_NORTH);
+		producer.sendNorth(jsonResult == null ? "":jsonResult.getData(),  topicConfig.getTagDeviceQueryNorth());
 		return jsonResult;
 	}
 
@@ -108,7 +112,7 @@ public class DeviceService implements IDeviceService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		producer.sendNorth(jsonResult == null ? "":jsonResult.getData(), MQTags.DEVICE_DELETE_NORTH);
+		producer.sendNorth(jsonResult == null ? "":jsonResult.getData(),  topicConfig.getTagDeviceDeleteNorth());
 		return jsonResult;
 	}
 }
