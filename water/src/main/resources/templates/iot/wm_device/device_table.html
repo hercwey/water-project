@@ -11,11 +11,11 @@
 	<!-- 加载表配置详情对话框 -->
 	<div id="load-meter-config-detail-dialog"></div>
 	<!-- 发送水表配置指令对话框 -->
-	<div id="command-meter-config-dialog" th:include="iot/command_meter_config_dialog::dialog"></div>
+	<div id="command-meter-config-dialog" th:include="meters/meter_device/command_meter_config_dialog::dialog"></div>
 	<!-- 发送开关阀指令对话框 -->
-	<div id="command-openclose-dialog" th:include="iot/command_openclose_dialog::dialog"></div>
+	<div id="command-openclose-dialog" th:include="meters/meter_device/command_openclose_dialog::dialog"></div>
 	<!-- 发送水量阀值指令对话框 -->
-	<div id="command-water-amount-dialog" th:include="iot/command_water_amount_dialog::dialog"></div>
+	<div id="command-water-amount-dialog" th:include="meters/meter_device/command_water_amount_dialog::dialog"></div>
 	
 	<!-- 批次列表 -->
 	<table class="table table-bordered table-sm table-hovers">

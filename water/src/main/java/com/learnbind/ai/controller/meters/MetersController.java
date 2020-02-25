@@ -597,14 +597,6 @@ public class MetersController {
 
 	}
 	
-	@RequestMapping(value = "/register", produces = "application/json")
-	@ResponseBody
-	public Object register(Model model) throws Exception {
-
-		return RequestResultUtil.getResultSaveWarn("注册成功！");
-
-	}
-	
 	//------------------------------	内部方法	------------------------------
 	/**
 	 * @Title: getDataDictValue

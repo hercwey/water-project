@@ -6,6 +6,16 @@
 </head>
 <body>
 	
+	<!-- 保存发送指令的设备ID（水表ID） -->
+	<input type="hidden" id="send-cmd-device-id" data-iot-device-id="" data-meter-number="" data-command-type="0" value="" />
+	<!-- 加载表配置详情对话框 -->
+	<div id="load-meter-config-detail-dialog"></div>
+	<!-- 发送水表配置指令对话框 -->
+	<div id="command-meter-config-dialog" th:include="iot/command_meter_config_dialog::dialog"></div>
+	<!-- 发送开关阀指令对话框 -->
+	<div id="command-openclose-dialog" th:include="iot/command_openclose_dialog::dialog"></div>
+	<!-- 发送水量阀值指令对话框 -->
+	<div id="command-water-amount-dialog" th:include="iot/command_water_amount_dialog::dialog"></div>
 	<!-- 表计列表 -->
 	<table class="table table-hover table-sm" id="meter-table">
 		<thead>
@@ -112,6 +122,37 @@
 									<i class="fa fa-info" aria-hidden="true"> <span>注册设备</span></i>
 								</a>
 							</span>
+							
+							<div class="dropdown-divider" style="border-top: 0.8px solid blue;"></div>
+							<!-- 发送读月冻结指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-read-month-freeze"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}, data-meter-number=${item.meterNumber}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送读月冻结指令</span></i>
+							</a>
+							<!-- 发送读表配置指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-read-meter-config"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}, data-meter-number=${item.meterNumber}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送读表配置指令</span></i>
+							</a>
+							
+							<div class="dropdown-divider" style="border-top: 0.8px solid blue;"></div>
+							
+							<!-- 发送水表配置指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-meter-config"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}, data-meter-number=${item.meterNumber}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水表配置指令</span></i>
+							</a>
+							<!-- 发送开关阀指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-open-close"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送开关阀指令</span></i>
+							</a>
+							<!-- 发送水量阈值指令 -->
+							<a class="dropdown-item btn-sm btn-send-cmd-water-amount"
+								th:attr="bind-id=${item.id}, data-iot-device-id=${item.deviceId}">
+								<i class="fa fa-arrow-up" aria-hidden="true"> <span>发送水量阈值指令</span></i>
+							</a>
+							
 					    </div>
 					</div>
 					
@@ -140,8 +181,69 @@
 
 
 	<script type="text/javascript">
+		
 	
 		var g_is_edit = true;//全局变量是否是编辑操作
+		var G_OPEN_CLOSE_METER_CONFIG_DETAIL_DIALOG_ID = "modal-container-meter-config-detail";//水表配置信息对话框ID
+		var G_OPEN_CLOSE_COMMAND_DIALOG_ID = "modal-container-command-openclose";//开关阀指令发送对话框ID
+		var G_METER_CONFIG_COMMAND_DIALOG_ID = "modal-container-command-meter-config";//水表配置指令发送对话框ID
+		var G_WATER_AMOUNT_COMMAND_DIALOG_ID = "modal-container-command-water-amount";//水量阀值指令发送对话框ID
+		
+		//------------获取/设置发送指令的设备ID------------------------------------------------------------------
+		/**
+		 * 	获取发送指令的设备ID
+		 */
+		function getSendCmdDeviceIdFn(){
+			return $("#send-cmd-device-id").val();
+		}
+		/**
+		 * 	设置发送指令的设备ID
+		 */
+		function setSendCmdDeviceIdFn(id){
+			$("#send-cmd-device-id").val(id);
+		}
+		
+		/**
+		 * 	获取发送指令的IOT设备ID
+		 */
+		function getSendCmdIotDeviceIdFn(){
+			return $("#send-cmd-device-id").attr("data-iot-device-id");
+		}
+		/**
+		 * 	设置发送指令的IOT设备ID
+		 */
+		function setSendCmdIotDeviceIdFn(iotDeviceId){
+			console.log("----------设置发送指令的IOT设备ID:"+iotDeviceId);
+			$("#send-cmd-device-id").attr("data-iot-device-id", iotDeviceId);
+		}
+		
+		/**
+		 * 	获取发送指令的表号，与设备（水表）编号不同
+		 */
+		function getSendCmdMeterNumberFn(){
+			return $("#send-cmd-device-id").attr("data-meter-number");
+		}
+		/**
+		 * 	设置发送指令的表号，与设备（水表）编号不同
+		 */
+		function setSendCmdMeterNumberFn(meterNumber){
+			console.log("----------设置发送指令的表号，与设备（水表）编号不同:"+meterNumber);
+			$("#send-cmd-device-id").attr("data-meter-number", meterNumber);
+		}
+		
+		/**
+		 * 	获取发送指令类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
+		 */
+		function getSendCommandTypeFn(){
+			return $("#send-cmd-device-id").attr("data-command-type");
+		}
+		/**
+		 * 	设置发送指令类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
+		 */
+		function setSendCommandTypeFn(commandType){
+			console.log("----------设置发送指令类型:"+commandType);
+			$("#send-cmd-device-id").attr("data-command-type", commandType);
+		}
 		
 		//------------------------------	停/复水操作	------------------------------
 		/* 
@@ -284,6 +386,100 @@
 			return idArr;
 		}
 		
+		//----------------生成读操作指令通用函数----------------------------------------------------------------------------------------------------
+		/**
+		 * 	生成读月冻结指令通用函数
+		 */
+		function generatorReadMonthFreezeCommand(id, cmdType, cmdAction){
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+			//cmdAction 指令动作;
+			console.log("----------生成月冻结操作指令："+id+":"+cmdAction);
+			var url = BASE_CONTEXT_PATH + "/meter-device/cmd-freeze-generator";
+			var parms = new Object();
+			parms.id = id;
+			parms.cmdType = cmdType;
+			parms.cmdAction = cmdAction;
+			var command = null;
+			$.ajax({
+				type: "post",
+				url: url,
+				data: parms,
+				async: false, 
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					//var result = $.parseJSON(res);
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							console.log("----------返回生成的水表配置指令："+res.command);
+							command = res.command;
+						}
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+			    }
+			});
+			return command;
+		}
+		
+		/**
+		 * 	生成读操作指令通用函数
+		 */
+		function generatorReadMeterConfigCommand(id, cmdType, cmdAction){
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+			//cmdAction 指令动作;
+			console.log("----------生成读表操作指令："+id+":"+cmdAction);
+			var url = BASE_CONTEXT_PATH + "/meter-device/cmd-read-generator";
+			var parms = new Object();
+			parms.id = id;
+			parms.cmdType = cmdType;
+			parms.cmdAction = cmdAction;
+			
+			var command = null;
+			$.ajax({
+				type: "post",
+				url: url,
+				data: parms,
+				async: false, 
+				success: function(res){
+					console.log("----------"+JSON.stringify(res));
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							console.log("----------返回生成的水表配置指令："+res.command);
+							command = res.command;
+						}
+						util.message(res.result_msg,null,"warning");
+					}
+			    }
+			});
+			return command;
+		}
+		
+		/**
+		 * 	发送读表配置指令到设备（给水表发送指令）
+		 */
+		$(".btn-send-cmd-read-meter-config").on("click", function(){
+			var itemId = $(this).attr("bind-id"); //条目ID
+			var iotDeviceId = $(this).attr("data-iot-device-id");
+			var meterNumber = $(this).attr("data-meter-number");
+			setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+			setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+			setSendCmdMeterNumberFn(meterNumber);//设置发送指令的表号，与设备（水表）编号不同
+			console.log("发送读表配置指令到设备（给水表发送指令）");
+			
+			var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+			if(deviceId==null || deviceId==""){
+				alert("设备ID为空，请重新初始化对话框！");
+			}
+			
+			//setSendCommandTypeFn(5);//获取发送指令类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
+			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+			var command = generatorReadMeterConfigCommand(deviceId, null, null);//生成读操作指令通用函数
+			console.log("----------发送读表配置指令："+command);
+			if(command!=null && command!=""){
+				util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+			}
+		});
+		
 		//-----------------page loaded ready------------------
 		$(function() {
 			
@@ -303,19 +499,123 @@
 				
 			});
 			function registerDeviceFn(meterNo) {
+				var dataObj = new Object();
+				dataObj.verifyCode = meterNo;
+				dataObj.manufacturerId = "JR0912X";
+				dataObj.manufacturerName = "JRIWA";
+				dataObj.model = "JR0912Y";
+				dataObj.protocolType = "CoAP";
+				dataObj.deviceType = "JRNBWaterMeter";
+				var dataJson = JSON.stringify(dataObj);
 				//需要提交的url	
-				var url = BASE_CONTEXT_PATH + "/meters/register";
-				var parms = new Object();
-				$.post(url, parms, function(res){
+				var url = BASE_CONTEXT_PATH + "/meter-device/register";
+				$.post(url, dataJson, function(res){
 					if (res != null && res != "") {
 						if (res.result_code == "success") {
 							loadPageClickPageNum(); //	重新刷新当前页面
+							util.message(res.result_msg,null,"success");
 						} else {
 							util.message(res.result_msg,null,"warning");
 						}
 					}
 				});
 			 }
+			
+			/**
+			 * 	发送读月冻结指令到设备（给水表发送指令）
+			 */
+			$(".btn-send-cmd-read-month-freeze").on("click", function(){
+				var itemId = $(this).attr("bind-id"); //条目ID
+				var iotDeviceId = $(this).attr("data-iot-device-id");
+				var meterNumber = $(this).attr("data-meter-number");
+				setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+				setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+				setSendCmdMeterNumberFn(meterNumber);//设置发送指令的表号，与设备（水表）编号不同
+				console.log("发送读月冻结指令到设备（给水表发送指令）");
+				
+				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
+				if(deviceId==null || deviceId==""){
+					alert("设备ID为空，请重新初始化对话框！");
+				}
+				
+				//setSendCommandTypeFn(4);//获取发送指令类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
+				//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+				var command = generatorReadMonthFreezeCommand(deviceId, null, null);//生成读操作指令通用函数(月冻结指令)
+				console.log("----------发送读月冻结指令："+command);
+				if(command!=null && command!=""){
+					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
+				}
+				
+			});
+			
+			/**
+			 * 	发送水量阀值指令到设备（给水表发送指令）
+			 */
+			$(".btn-send-cmd-water-amount").on("click", function(){
+				var itemId = $(this).attr("bind-id"); //条目ID
+				var iotDeviceId = $(this).attr("data-iot-device-id");
+				setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+				setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+				
+				//setSendCommandTypeFn(3);//获取发送指令类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
+				
+				var url = BASE_CONTEXT_PATH + "/meter-device/load-send-cmd-water-amount-dialog";
+				var parms = new Object();
+				parms.itemId = itemId;
+				parms.cmdType = 3;//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+				$("#command-water-amount-dialog").load(url, parms, function(){
+					console.log("----------加载水量阀值指令对话框完成！");
+					DialogUtil.openDialogFn(G_WATER_AMOUNT_COMMAND_DIALOG_ID);//打开发送水量阀值指令对话框
+				});
+				
+			});
+			
+			/**
+			 * 	发送开关阀指令到设备（给水表发送指令）
+			 */
+			$(".btn-send-cmd-open-close").on("click", function(){
+				var itemId = $(this).attr("bind-id"); //条目ID
+				var iotDeviceId = $(this).attr("data-iot-device-id");
+				setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+				setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+				
+				//setSendCommandTypeFn(2);//获取发送指令类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
+				
+				var url = BASE_CONTEXT_PATH + "/water-device/load-send-cmd-open-close-dialog";
+				var parms = new Object();
+				parms.itemId = itemId;
+				parms.cmdType = 2;//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+				$("#command-openclose-dialog").load(url, parms, function(){
+					console.log("----------加载开/关阀指令对话框完成！");
+					DialogUtil.openDialogFn(G_OPEN_CLOSE_COMMAND_DIALOG_ID);//打开发送开/关阀指令对话框
+				});
+				
+			});
+			
+			/**
+			 * 	发送水表配置指令到设备（给水表发送指令）
+			 */
+			$(".btn-send-cmd-meter-config").on("click", function(){
+				var itemId = $(this).attr("bind-id"); //条目ID
+				var iotDeviceId = $(this).attr("data-iot-device-id");
+				var meterNumber = $(this).attr("data-meter-number");
+				setSendCmdDeviceIdFn(itemId);//设置需要发送指令的设备ID（水表ID）
+				setSendCmdIotDeviceIdFn(iotDeviceId);//设置发送指令的IOT设备ID
+				setSendCmdMeterNumberFn(meterNumber);//设置发送指令的表号，与设备（水表）编号不同
+				
+				//setSendCommandTypeFn(1);//获取发送指令类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
+				
+				var url = BASE_CONTEXT_PATH + "/meter-device/load-send-cmd-meter-config-dialog";
+				var parms = new Object();
+				parms.itemId = itemId;
+				parms.cmdType = 1;//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
+				$("#command-meter-config-dialog").load(url, parms, function(){
+					console.log("----------加载水表配置指令对话框完成！");
+					DialogUtil.openDialogFn(G_METER_CONFIG_COMMAND_DIALOG_ID);//打开发送水表配置指令对话框
+				});
+				
+			});
+			
 			
 			//------------------------------	表计档案详情功能	------------------------------
 			/**
