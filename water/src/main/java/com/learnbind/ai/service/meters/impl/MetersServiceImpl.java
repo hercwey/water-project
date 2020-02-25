@@ -1095,9 +1095,9 @@ public class MetersServiceImpl extends AbstractBaseService<Meters, Long> impleme
 	
 	//-----------------------新增加方法------------------------------------------------------------------------------------------------------------------
 	@Override
-	public Long getMeterId(String deviceId) {
+	public Long getMeterId(String iotDeviceId) {
 		Meters meter = new Meters();
-		meter.setDeviceId(deviceId);
+		meter.setDeviceId(iotDeviceId);
 		List<Meters> meterList = metersMapper.select(meter);
 		if(meterList!=null && meterList.size()>0) {
 			return meterList.get(0).getId();
@@ -1105,6 +1105,17 @@ public class MetersServiceImpl extends AbstractBaseService<Meters, Long> impleme
 		return null;
 	}
 	
+	@Override
+	public Meters getMeter(String iotDeviceId) {
+		Meters meter = new Meters();
+		meter.setDeviceId(iotDeviceId);
+		List<Meters> meterList = metersMapper.select(meter);
+		if(meterList!=null && meterList.size()>0) {
+			return meterList.get(0);
+		}
+		return null;
+	}
+
 	public static void main(String[] args) {
 		String newIdRule = "meter_63034";
 		String rule = "meter_63033,-,meter_63034,+,meter_63034";

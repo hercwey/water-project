@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.client.producer.SendStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.learnbind.ai.common.RequestResultUtil;
+import com.learnbind.ai.common.enumclass.iot.EnumCommandType;
 import com.learnbind.ai.iot.protocol.CommandGenerator;
 import com.learnbind.ai.iot.protocol.Protocol;
 import com.learnbind.ai.iot.protocol.bean.MeterConfig;
@@ -26,6 +28,8 @@ import com.learnbind.ai.iot.protocol.bean.MeterReadWaterCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
 import com.learnbind.ai.iot.protocol.bean.MeterVolumeThresholdCmd;
 import com.learnbind.ai.model.iot.MeterConfigBean;
+import com.learnbind.ai.model.iot.TestCommandBean;
+import com.learnbind.ai.model.iot.WmCommand;
 import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iotbean.command.BaseCommandRequest;
 import com.learnbind.ai.model.iotbean.command.ConfigParamsRequest;
@@ -42,6 +46,7 @@ import com.learnbind.ai.mq.south.ControlValveProducer;
 import com.learnbind.ai.mq.south.DeviceRegisterProducer;
 import com.learnbind.ai.mq.south.QueryMonthDataProducer;
 import com.learnbind.ai.mq.south.QueryParmsProducer;
+import com.learnbind.ai.service.iot.WmCommandService;
 import com.learnbind.ai.service.iot.WmDeviceService;
 import com.learnbind.ai.service.meters.MetersService;
 
@@ -85,8 +90,8 @@ public class MeterDeviceController {
 	private ControlValveProducer controlValveProducer;//下发控制设备（开关阀控制）命令
 	@Autowired
 	private ConfigParmsProducer configParmsProducer;//配置水表参数
-	
-
+	@Autowired
+	private WmCommandService wmCommandService;//下发命令记录
 
 	/**
 	 * @Title: register
@@ -239,17 +244,37 @@ public class MeterDeviceController {
 	    	
 	    	byte sequenceB = 0x00;
 	    	
-			//生成开/关阀指令
-			String command = null;
-			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
 			//4=读月冻结指令；
 			System.out.println("----------生成读月冻结指令");
 			//生成读月冻结指令
-			command = this.generatorReadMonthFreezeCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), deviceId);
+			String command = this.generatorReadMonthFreezeCommand(meterTypeB, meterAddress, meterFactoryCode, sequence.byteValue(), deviceId);
 			
-	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
-	    	resultMap.put("command", command);
-	    	return resultMap;
+			//获取指令对象
+			WmCommand wmCommand = wmCommandService.getWmCommand(meter, EnumCommandType.TYPE_READ_MONTH_FREEZE, command);
+			int rows = wmCommandService.insertSelective(wmCommand);//增加命令记录
+			if(rows>0) {
+				
+				QueryMonthDataRequest queryMonthData = new QueryMonthDataRequest();
+				queryMonthData.setDeviceId(meter.getDeviceId());
+				queryMonthData.setId(wmCommand.getId());
+				queryMonthData.setMeterAddress(meterAddress);
+				queryMonthData.setMeterFactoryCode(meterFactoryCode);
+				queryMonthData.setMeterType(meterType);
+				queryMonthData.setMethod(method);
+				queryMonthData.setSequence(sequence);
+				queryMonthData.setServiceId(serviceId);
+				
+				SendResult sendResult = queryMonthDataProducer.sendMsg(null, queryMonthData.toJsonString(queryMonthData));
+				if(sendResult.getSendStatus()==SendStatus.SEND_OK) {
+					//发送成功
+					return RequestResultUtil.getResultSuccess("发送指令成功，请到下发指令记录列表中查看结果！");
+				}
+			}
+			//发送失败
+			return RequestResultUtil.getResultFail("发送指令失败，请重新操作！");
+//	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
+//	    	resultMap.put("command", command);
+//	    	return resultMap;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
