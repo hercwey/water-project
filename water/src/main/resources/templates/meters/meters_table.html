@@ -27,6 +27,7 @@
 				<th>表地址</th>
 				<th>描述</th>
 				<th>停/复水</th>
+				<th>注册状态</th>
 				<th style="width:100px;">操作</th>
 			</tr>
 		</thead>
@@ -59,6 +60,15 @@
 				<td th:text="${item.description}">描述</td>
 				<!-- 停/复水 -->
 				<td th:id="'meter-status-'+${item.id}" th:text="${item.meterStatusStr}">停/复水</td>
+				<td>
+					<!-- 注册状态：水表编号为空时未注册，水表编号不为空时已注册; -->
+					<span th:if="${item.deviceId==null || item.deviceId==''}" th:remove="tag">
+						<span class="badge badge-warning">未注册</span>
+					</span>
+					<span th:if="${item.deviceId!=null && item.deviceId!=''}" th:remove="tag">
+						<span class="badge badge-success">已注册</span>
+					</span>
+				</td>
 				<!-- 操作列 -->
 				<td>
 					<div class="dropdown">
@@ -92,6 +102,14 @@
 								<!-- 删除 -->
 								<a class="dropdown-item btn-delete-meter btn-sm" th:attr="bind-id=${item.id}">
 									<i class="fa fa-remove" aria-hidden="true"><span>删除</span></i>
+								</a>
+							</span>
+							<!-- 如果IOT平台设备ID为空时说明设备未注册显示注册设备按钮 -->
+							<span th:if="${item.deviceId==null || item.deviceId==''}" th:remove="tag">
+								<!-- 注册设备 -->
+								<a class="dropdown-item btn-sm btn-register-device" title="注册设备"
+									th:attr="data-meter-no=${item.meterNo}">
+									<i class="fa fa-info" aria-hidden="true"> <span>注册设备</span></i>
 								</a>
 							</span>
 					    </div>
@@ -268,6 +286,36 @@
 		
 		//-----------------page loaded ready------------------
 		$(function() {
+			
+			//--------注册设备---------
+			/**
+			 * 	注册设备
+			 */
+			$(".btn-register-device").on("click", function(){
+				
+				var meterNo = $(this).attr("data-meter-no");
+				if(meterNo==null || meterNo==""){
+					util.message("此水表设备编号为空，不允许注册！",null,"warning");
+					return false;
+				}
+				
+				registerDeviceFn(meterNo);//注册设备
+				
+			});
+			function registerDeviceFn(meterNo) {
+				//需要提交的url	
+				var url = BASE_CONTEXT_PATH + "/meters/register";
+				var parms = new Object();
+				$.post(url, parms, function(res){
+					if (res != null && res != "") {
+						if (res.result_code == "success") {
+							loadPageClickPageNum(); //	重新刷新当前页面
+						} else {
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				});
+			 }
 			
 			//------------------------------	表计档案详情功能	------------------------------
 			/**

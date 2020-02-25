@@ -30,12 +30,12 @@
 					<td>水表检定证书编号：</td>
 					<td th:text="${meter==null ? '' : meter.certificateNo}"></td>
 				</tr>
-				<tr>
+				<!-- <tr>
 					<td>水表检定日期：</td>
 					<td th:text="${meter==null ? '' : meter.checkDateStr}"></td>
 					<td>水表有效日期：</td>
 					<td th:text="${meter==null ? '' : meter.effectiveDateStr}"></td>
-				</tr>
+				</tr> -->
 				<tr>
 					<td>水表钢印号：</td>
 					<td th:text="${meter==null ? '' : meter.steelSealNo}"></td>
@@ -67,8 +67,8 @@
 					<td th:text="${meter==null ? '' : meter.remark}"></td>
 				</tr>
 				<tr>
-					<td>采集器地址：</td>
-					<td th:text="${meter==null ? '' : meter.collectorAddr}"></td>
+					<td>表号：</td>
+					<td th:text="${meter==null ? '' : meter.meterNo}"></td>
 					<td>表地址</td>
 					<td th:text="${meter==null ? '' : meter.meterAddress}"></td>
 				</tr>
@@ -77,12 +77,6 @@
 					<td th:text="${meter==null ? '' : meter.waterUseValue}"></td>
 					<td>水价：</td>
 					<td th:text="${meter==null ? '' : meter.waterPriceName}"></td>
-				</tr>
-				<tr>
-					<td>水表生命周期状态：</td>
-					<td th:text="${meter==null ? '' : meter.cycleStatusStr}"></td>
-					<td>地理位置：</td>
-					<td th:text="${locationName}"></td>
 				</tr>
 				<tr>
 					<td>虚实表：</td>
@@ -97,11 +91,17 @@
 					<td th:text="${meter==null ? '' : meter.meterFactoryCodeValue}"></td>
 				</tr>
 				<tr>
+					<td>地理位置：</td>
+					<td th:text="${locationName}"></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<!-- <tr>
 					<td>表号：</td>
 					<td th:text="${meter==null ? '' : meter.meterNumber}"></td>
 					<td></td>
 					<td></td>
-				</tr>
+				</tr> -->
 			</tbody>
 		</table>
 
