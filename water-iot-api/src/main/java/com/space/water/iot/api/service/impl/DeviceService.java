@@ -4,19 +4,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.space.water.iot.api.common.JsonResult;
 import com.space.water.iot.api.config.Constants;
+import com.space.water.iot.api.config.MQTags;
 import com.space.water.iot.api.model.device.RegisterDeviceRequest;
 import com.space.water.iot.api.model.device.RegisterDeviceResponse;
 import com.space.water.iot.api.model.device.UpdateDeviceRequest;
+import com.space.water.iot.api.rocketmq.Producer;
 import com.space.water.iot.api.service.IDeviceService;
 import com.space.water.iot.api.util.IoTRequestUtil;
 
 @Service
 public class DeviceService implements IDeviceService {
 
+	@Autowired
+	Producer producer;
 	@Override
 	public JsonResult registerDevice(RegisterDeviceRequest registerReq) {
 		JsonResult jsonResult = JsonResult.fail(0, "Unknown Error");
@@ -27,11 +32,11 @@ public class DeviceService implements IDeviceService {
 
 		Map<String, Object> paramReg = new HashMap<>();
 		paramReg = RegisterDeviceRequest.toRegisterParamsMap(registerReq);
-
+		String registerResponse = "";
 		try {
 			jsonResult = IoTRequestUtil.doPostJsonGetStatusLine(urlReg, paramReg);
 			// {"deviceId":"5616575e-4ff0-4e0e-a5c1-ee37a7163c91","verifyCode":"012345678910","timeout":0,"psk":"2b7d8054905de276c28152fec697ad45"}
-			String registerResponse = jsonResult.getData();
+			registerResponse = jsonResult.getData();
 
 	        if (StringUtils.isNotBlank(registerResponse) && !registerResponse.contains("error_code")) {
 	        	RegisterDeviceResponse registerRsp = RegisterDeviceResponse.fromJson(registerResponse);
@@ -49,6 +54,8 @@ public class DeviceService implements IDeviceService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		producer.sendNorth(registerResponse, MQTags.DEVICE_REGISTER_NORTH);
 		return jsonResult;
 	}
 
@@ -68,6 +75,8 @@ public class DeviceService implements IDeviceService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		producer.sendNorth(jsonResult == null ? "":jsonResult.getData(), MQTags.DEVICE_UPDATE_NORTH);
 		return jsonResult;
 	}
 
@@ -84,6 +93,7 @@ public class DeviceService implements IDeviceService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		producer.sendNorth(jsonResult == null ? "":jsonResult.getData(), MQTags.DEVICE_QUERY_NORTH);
 		return jsonResult;
 	}
 
@@ -98,6 +108,7 @@ public class DeviceService implements IDeviceService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		producer.sendNorth(jsonResult == null ? "":jsonResult.getData(), MQTags.DEVICE_DELETE_NORTH);
 		return jsonResult;
 	}
 }

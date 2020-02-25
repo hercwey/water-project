@@ -74,7 +74,9 @@ public class ReportService implements IReportService {
 			System.out.println("-------------------------------------");
 
 			//TODO G11 下发消息后，从消息列表中删除消息
-			commandList.clear();
+			if (commandList != null) {
+				commandList.clear();
+			}
 		}
 		
 		return JsonResult.success(JsonResult.SUCCESS, BaseReportData.toJsonString(meterBean));
