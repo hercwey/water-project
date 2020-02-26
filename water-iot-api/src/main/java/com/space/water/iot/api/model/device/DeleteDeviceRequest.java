@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
+import com.space.water.iot.api.config.Constants;
 import com.space.water.iot.api.model.common.BaseRequest;
 import com.space.water.iot.api.model.iot.auth.LoginReq;
 
 public class DeleteDeviceRequest extends BaseRequest{
 
 	private String deviceId;//设备ID
-	private String appId;//应用ID（不用传该参数）
+	private String appId = Constants.APP_ID;//应用ID（不用传该参数）
 	
 	public String getDeviceId() {
 		return deviceId;
@@ -32,7 +33,7 @@ public class DeleteDeviceRequest extends BaseRequest{
 		Map<String, Object> result = new HashMap<>();
 
 		result.put("deviceId", deleteReq.getDeviceId());
-		result.put("appId", deleteReq.getAppId());
+		result.put("appId", Constants.APP_ID);
 		
 		return result;
 	}

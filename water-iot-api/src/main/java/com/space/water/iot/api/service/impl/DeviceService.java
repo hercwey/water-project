@@ -35,6 +35,7 @@ public class DeviceService implements IDeviceService {
 
 		Map<String, Object> paramReg = new HashMap<>();
 		paramReg = RegisterDeviceRequest.toRegisterParamsMap(registerReq);
+		paramReg.put("appId", Constants.APP_ID);
 		String registerResponse = "";
 		try {
 			jsonResult = IoTRequestUtil.doPostJsonGetStatusLine(urlReg, paramReg);
@@ -44,7 +45,7 @@ public class DeviceService implements IDeviceService {
 	        if (StringUtils.isNotBlank(registerResponse) && !registerResponse.contains("error_code")) {
 	        	RegisterDeviceResponse registerRsp = RegisterDeviceResponse.fromJson(registerResponse);
 	            UpdateDeviceRequest modifyReq = new UpdateDeviceRequest();
-	            modifyReq.setAppId(registerReq.getAppId());
+	            modifyReq.setAppId(Constants.APP_ID);
 	            modifyReq.setDeviceId(registerRsp.getDeviceId());
 	            modifyReq.setDeviceType(registerReq.getDeviceType());
 	            modifyReq.setManufacturerId(registerReq.getManufacturerId());
@@ -72,6 +73,7 @@ public class DeviceService implements IDeviceService {
 
 		Map<String, Object> paramModifyDeviceInfo = new HashMap<>();
 		paramModifyDeviceInfo = UpdateDeviceRequest.toMap(modifyReq);
+		paramModifyDeviceInfo.put("appId", Constants.APP_ID);
 
 		try {
 			jsonResult = IoTRequestUtil.doPutJsonGetStatusLine(urlModifyDeviceInfo, paramModifyDeviceInfo);
