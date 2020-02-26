@@ -9,10 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import com.space.water.iot.api.common.JsonResult;
 import com.space.water.iot.api.service.IAuthService;
+import com.space.water.iot.api.service.ISubscribeService;
 
 /**
  * @author SRD
@@ -28,6 +27,8 @@ public class IotTefreshTokenScheduledTask {
 	
 	@Autowired
     IAuthService authService;
+	@Autowired
+	ISubscribeService subService;
 	
     /**
      * @Title: scheduled
@@ -41,7 +42,7 @@ public class IotTefreshTokenScheduledTask {
     	
     	JsonResult result = authService.login();
     	log.debug("----------定时任务刷新Token结果："+result.toString());
-    	
+//    	JsonResult subscribeResult = subService.subscribeDeviceData();
         log.info("----------	【"+sdf.format(new Date())+"】	定时刷新【电信平台】Token【每30分钟执行一次】任务执行完成。。。	");
         
     }

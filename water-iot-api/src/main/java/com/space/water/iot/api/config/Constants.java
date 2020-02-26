@@ -9,7 +9,7 @@ public class Constants {
 	public static final String APP_ID = "QVeez53jfLYq6Rk8cQ0XEbB3KQwa";
 	public static final String SECRET = "GQzxIbNje7Bg7ICFABkjffu41VEa";
 
-	public static final String CALLBACK_BASE_URL = "http://118.190.141.247:8282";
+	public static final String CALLBACK_BASE_URL = "http://39.107.230.168:8888";
 
 	public static final String DEVICE_DATA_CHANGED_CALLBACK_URL = CALLBACK_BASE_URL + "/report/uploadDeviceData";
 

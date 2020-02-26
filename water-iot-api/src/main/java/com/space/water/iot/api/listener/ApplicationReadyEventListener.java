@@ -6,20 +6,23 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.space.water.iot.api.rocketmq.Consumer;
-import com.space.water.iot.api.rocketmq.Producer;
-import com.space.water.iot.api.service.impl.AuthService;
+import com.space.water.iot.api.service.IAuthService;
+import com.space.water.iot.api.service.ISubscribeService;
 
 @Component
 public class ApplicationReadyEventListener implements  ApplicationListener<ApplicationReadyEvent> {
 
 	@Autowired
-	private AuthService authService;
+	private IAuthService authService;
+	@Autowired
+	private ISubscribeService subService;
 	@Autowired
 	Consumer consumer;
 	
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
     	authService.login();
+//    	subService.subscribeDeviceData();
     	consumer.initConsumer();
     }
     
