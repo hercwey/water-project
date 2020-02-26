@@ -77,6 +77,7 @@ public class CommandService implements ICommandService {
 
 		// TODO G11 调用命令执行状态改变方法，返回给“营收子系统”，状态为，已发送
 		OrderStatusResponse orderSatusResponse = new OrderStatusResponse();
+		orderSatusResponse.setId(commandBean.getId());
 		orderSatusResponse.setCommandId(commandBean.getCommandId());
 		if (response == null) {
 			orderSatusResponse.setStatus(CommandCallbackConstants.COMMAND_STATUS_FAILED);

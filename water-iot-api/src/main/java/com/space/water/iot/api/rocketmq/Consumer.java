@@ -282,6 +282,7 @@ public class Consumer {
 	private void cacheCommand(BaseCommandRequest request, String cmdHexStr) {
 		// TODO G11 生成CommandBean
 		CommandBean commandBean = new CommandBean();
+		commandBean.setId(request.getId());
 		commandBean.setDeviceId(request.getDeviceId());
 		commandBean.setServiceId(request.getServiceId());
 		commandBean.setMethod(request.getMethod());

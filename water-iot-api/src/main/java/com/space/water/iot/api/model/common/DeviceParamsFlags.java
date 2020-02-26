@@ -19,15 +19,15 @@ public class DeviceParamsFlags {
 //    public static final short FLAG_SERVER_PORT        = 0x1000;  
 //    public static final short FLAG_MAGNETIC_ALARM_CLEAR = 0x2000;  
 
-	private Boolean period = true;// 定时上传周期
-	private Boolean periodUnit = true;// 定时上传周期单位
-	private Boolean maxReport = true;// 定量上传值
-	private Boolean emergTime = true;// 用户临时开阀用水限定时间
-	private Boolean valveTime = true;// 阀门行程时间
-	private Boolean valveMaintainTime = true;// 阀门维护周期
-	private Boolean waterVolume = true;// 累计使用量
-	private Boolean sampleUnit = true;// 采样参数
-	private Boolean meterNum = true;// 表号
+	private Boolean period = false;// 定时上传周期
+	private Boolean periodUnit = false;// 定时上传周期单位
+	private Boolean maxReport = false;// 定量上传值
+	private Boolean emergTime = false;// 用户临时开阀用水限定时间
+	private Boolean valveTime = false;// 阀门行程时间
+	private Boolean valveMaintainTime = false;// 阀门维护周期
+	private Boolean waterVolume = false;// 累计使用量
+	private Boolean sampleUnit = false;// 采样参数
+	private Boolean meterNum = false;// 表号
 	private Boolean meterTime = false;// 表时间
 	private Boolean meterStatus = false;// 表状态字
 	private Boolean serverIp = false;// 服务器IP
