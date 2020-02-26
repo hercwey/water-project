@@ -71,8 +71,8 @@ public class MeterDeviceController {
 	private static Log log = LogFactory.getLog(MeterDeviceController.class);
 	private static final String TEMPLATE_PATH = "meters/meter_device/"; // 页面
 	private static final int PAGE_SIZE = 8; // 页大小
-	private static final String SERVICE_ID = "SERVICE_ID"; // 页大小
-	private static final String METHOD = "METHOD"; // 页大小
+	private static final String SERVICE_ID = "JRprotocol"; // 页大小
+	private static final String METHOD = "JRprotocolYX"; // 页大小
 
 	
 	@Autowired

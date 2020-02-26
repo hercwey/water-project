@@ -105,8 +105,7 @@ public class ApplicationReadyEventListener implements  ApplicationListener<Appli
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-    	//this.startConsumer();//启动消费者监听
-    	
+    	this.startConsumer();//启动消费者监听
     }
     
     /**

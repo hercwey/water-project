@@ -28,12 +28,15 @@ public class MeterRecordBusiness {
 	 * @Description: 获取本次表底
 	 * @param meterReport
 	 * @return 
+	 * 		返回表底整数
 	 */
 	public BigDecimal getCurrReadMeter(MeterReportBean meterReport) {
 		Integer totalVolume = meterReport.getTotalVolume();//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
 		String sampleUnit = meterReport.getSampleUnit();//采样参数：单位M3
 		
 		BigDecimal readMeter = BigDecimalUtils.multiply(new BigDecimal(totalVolume), new BigDecimal(sampleUnit));
+		//表底取整，四舍五入
+		readMeter = readMeter.setScale(0, BigDecimal.ROUND_HALF_UP);//四舍五入（若舍弃部分>=.5，就进位）
 		return readMeter;
 	}
 	

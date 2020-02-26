@@ -3412,22 +3412,6 @@ public class CustomerAccountItemServiceImpl extends AbstractBaseService<Customer
 		return customerAccountItemMapper.getStatOweCompanyMeter(searchCond, period, creditSubjectList, EnumAiDebitCreditStatus.CREDIT.getKey(), settleStatusList);
 	}
 
-	public static void main(String[] args) {
-		String t1 = "南庄新村1-1-101"+"5.23";
-		String t2 = "南庄新村10-1-1101"+"105.23";
-		
-		System.out.println("t1:"+t1.getBytes().length);
-		System.out.println("t2:"+t2.getBytes().length);
-		
-		String t3 = "雍雅锦江一期1-1-101"+"5.23";
-		String t4 = "雍雅锦江一期11-1-1101"+"105.23";
-		System.out.println("t3:"+t3.getBytes().length);
-		System.out.println("t4:"+t4.getBytes().length);
-		
-		String t5 = "主语城一期11-1-101"+"15.23";
-		System.out.println("t5:"+t5.getBytes().length);
-	}
-
 	/** 
 	 * (非 Javadoc)
 	 * 
@@ -3978,5 +3962,23 @@ public class CustomerAccountItemServiceImpl extends AbstractBaseService<Customer
 		return 0;
 	}
 	
+	public static void main(String[] args) {
+		String t1 = "南庄新村1-1-101"+"5.23";
+		String t2 = "南庄新村10-1-1101"+"105.23";
+		
+		System.out.println("t1:"+t1.getBytes().length);
+		System.out.println("t2:"+t2.getBytes().length);
+		
+		String t3 = "雍雅锦江一期1-1-101"+"5.23";
+		String t4 = "雍雅锦江一期11-1-1101"+"105.23";
+		System.out.println("t3:"+t3.getBytes().length);
+		System.out.println("t4:"+t4.getBytes().length);
+		
+		String t5 = "主语城一期11-1-101"+"15.23";
+		System.out.println("t5:"+t5.getBytes().length);
+		
+		String test = "[{\"amount\":84.2,\"date\":1582654002876,\"desc\":\"水费\",\"id\":130699,\"operator\":0,\"subject\":\"201\"},{\"amount\":15.17,\"date\":1582654003037,\"desc\":\"水费\",\"id\":130702,\"operator\":0,\"subject\":\"201\"},{\"amount\":10.46,\"date\":1582654003076,\"desc\":\"水费\",\"id\":130720,\"operator\":0,\"subject\":\"201\"},{\"amount\":5.75,\"date\":1582654003104,\"desc\":\"水费\",\"id\":130703,\"operator\":0,\"subject\":\"201\"},{\"amount\":2.09,\"date\":1582654003268,\"desc\":\"水费\",\"id\":130707,\"operator\":0,\"subject\":\"201\"},{\"amount\":7.85,\"date\":1582654003302,\"desc\":\"水费\",\"id\":130744,\"operator\":0,\"subject\":\"201\"},{\"amount\":10.46,\"date\":1582654003510,\"desc\":\"水费\",\"id\":130705,\"operator\":0,\"subject\":\"201\"},{\"amount\":62.24,\"date\":1582654003589,\"desc\":\"水费\",\"id\":130756,\"operator\":0,\"subject\":\"201\"},{\"amount\":1.57,\"date\":1582654003607,\"desc\":\"水费\",\"id\":130704,\"operator\":0,\"subject\":\"201\"},{\"amount\":50.21,\"date\":1582654003680,\"desc\":\"水费\",\"id\":130740,\"operator\":0,\"subject\":\"201\"},{\"amount\":27.2,\"date\":1582654003724,\"desc\":\"水费\",\"id\":130757,\"operator\":0,\"subject\":\"201\"},{\"amount\":51.25,\"date\":1582654003769,\"desc\":\"水费\",\"id\":130715,\"operator\":0,\"subject\":\"201\"},{\"amount\":38.7,\"date\":1582654003796,\"desc\":\"水费\",\"id\":130716,\"operator\":0,\"subject\":\"201\"},{\"amount\":57.01,\"date\":1582654003850,\"desc\":\"水费\",\"id\":130766,\"operator\":0,\"subject\":\"201\"},{\"amount\":22.49,\"date\":1582654003906,\"desc\":\"水费\",\"id\":130722,\"operator\":0,\"subject\":\"201\"},{\"amount\":10.46,\"date\":1582654004020,\"desc\":\"水费\",\"id\":130804,\"operator\":0,\"subject\":\"201\"},{\"amount\":4.18,\"date\":1582654004069,\"desc\":\"水费\",\"id\":130808,\"operator\":0,\"subject\":\"201\"},{\"amount\":50.21,\"date\":1582654004110,\"desc\":\"水费\",\"id\":130792,\"operator\":0,\"subject\":\"201\"},{\"amount\":50.21,\"date\":1582654004151,\"desc\":\"水费\",\"id\":130775,\"operator\":0,\"subject\":\"201\"},{\"amount\":54.92,\"date\":1582654004282,\"desc\":\"水费\",\"id\":130822,\"operator\":0,\"subject\":\"201\"},{\"amount\":44.46,\"date\":1582654004303,\"desc\":\"水费\",\"id\":130777,\"operator\":0,\"subject\":\"201\"},{\"amount\":42.36,\"date\":1582654004343,\"desc\":\"水费\",\"id\":130717,\"operator\":0,\"subject\":\"201\"},{\"amount\":40.27,\"date\":1582654004470,\"desc\":\"水费\",\"id\":130790,\"operator\":0,\"subject\":\"201\"},{\"amount\":74.27,\"date\":1582654004531,\"desc\":\"水费\",\"id\":130749,\"operator\":0,\"subject\":\"201\"},{\"amount\":16.21,\"date\":1582654004555,\"desc\":\"水费\",\"id\":130779,\"operator\":0,\"subject\":\"201\"},{\"amount\":7.85,\"date\":1582654004634,\"desc\":\"水费\",\"id\":130730,\"operator\":0,\"subject\":\"201\"},{\"amount\":50.73,\"date\":1582654004675,\"desc\":\"水费\",\"id\":130759,\"operator\":0,\"subject\":\"201\"},{\"amount\":69.04,\"date\":1582654004701,\"desc\":\"水费\",\"id\":130811,\"operator\":0,\"subject\":\"201\"},{\"amount\":25.1,\"date\":1582654004740,\"desc\":\"水费\",\"id\":130815,\"operator\":0,\"subject\":\"201\"},{\"amount\":16.21,\"date\":1582654004766,\"desc\":\"水费\",\"id\":130767,\"operator\":0,\"subject\":\"201\"},{\"amount\":1.57,\"date\":1582654004799,\"desc\":\"水费\",\"id\":130818,\"operator\":0,\"subject\":\"201\"},{\"amount\":41.32,\"date\":1582654004848,\"desc\":\"水费\",\"id\":130789,\"operator\":0,\"subject\":\"201\"},{\"amount\":4.18,\"date\":1582654004891,\"desc\":\"水费\",\"id\":130762,\"operator\":0,\"subject\":\"201\"},{\"amount\":12.03,\"date\":1582654004930,\"desc\":\"水费\",\"id\":130776,\"operator\":0,\"subject\":\"201\"},{\"amount\":1.05,\"date\":1582654004958,\"desc\":\"水费\",\"id\":130778,\"operator\":0,\"subject\":\"201\"},{\"amount\":2.62,\"date\":1582654005000,\"desc\":\"水费\",\"id\":130800,\"operator\":0,\"subject\":\"201\"},{\"amount\":0.52,\"date\":1582654005078,\"desc\":\"水费\",\"id\":130842,\"operator\":0,\"subject\":\"201\"},{\"amount\":68.51,\"date\":1582654005115,\"desc\":\"水费\",\"id\":130737,\"operator\":0,\"subject\":\"201\"},{\"amount\":25.63,\"date\":1582654005174,\"desc\":\"水费\",\"id\":130797,\"operator\":0,\"subject\":\"201\"},{\"amount\":46.02,\"date\":1582654005262,\"desc\":\"水费\",\"id\":130760,\"operator\":0,\"subject\":\"201\"},{\"amount\":4.18,\"date\":1582654005398,\"desc\":\"水费\",\"id\":130827,\"operator\":0,\"subject\":\"201\"},{\"amount\":26.15,\"date\":1582654005481,\"desc\":\"水费\",\"id\":130860,\"operator\":0,\"subject\":\"201\"},{\"amount\":18.31,\"date\":1582654005559,\"desc\":\"水费\",\"id\":130854,\"operator\":0,\"subject\":\"201\"},{\"amount\":1.38,\"date\":1582654693301,\"desc\":\"水费\",\"id\":133199,\"operator\":0,\"subject\":\"201\"}]";
+		System.out.println(test.length());
+	}
 	
 }

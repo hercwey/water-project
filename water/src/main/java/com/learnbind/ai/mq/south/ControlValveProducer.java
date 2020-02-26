@@ -89,7 +89,7 @@ public class ControlValveProducer {
 		}
         //发送
         SendResult sendResult = producer.send(message);
-        log.debug("下发控制设备（开关阀控制）命令MQ，发送结果是："+sendResult);
+        log.info("下发控制设备（开关阀控制）命令MQ，发送结果是："+sendResult);
         return sendResult;
 	}
 

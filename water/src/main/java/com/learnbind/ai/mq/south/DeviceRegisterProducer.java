@@ -89,7 +89,7 @@ public class DeviceRegisterProducer {
 		}
         //发送
         SendResult sendResult = producer.send(message);
-        log.debug("调用IOT电信平台注册设备接口到MQ，发送结果是："+sendResult);
+        log.info("调用IOT电信平台注册设备接口到MQ，发送结果是："+sendResult);
         return sendResult;
 	}
 

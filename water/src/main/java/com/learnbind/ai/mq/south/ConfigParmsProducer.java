@@ -89,7 +89,7 @@ public class ConfigParmsProducer {
 		}
         //发送
         SendResult sendResult = producer.send(message);
-        log.debug("下发配置设备参数命令到MQ，发送结果是："+sendResult);
+        log.info("下发配置设备参数命令到MQ，发送结果是："+sendResult);
         return sendResult;
 	}
 

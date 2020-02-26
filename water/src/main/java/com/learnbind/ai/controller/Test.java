@@ -1,5 +1,7 @@
 package com.learnbind.ai.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,12 +15,21 @@ import com.learnbind.ai.mq.north.service.AutoReportDataProcessService;
 @RequestMapping(value = "/test/process")
 public class Test {
 
+	
+	private static final Logger log = LoggerFactory.getLogger(Test.class);
+
+	
 	@Autowired
 	private AutoReportDataProcessService autoReportDataProcessService;
+	
+	static Integer totalVolume=1000;
 	
 	@RequestMapping(value = "/starter")
 	@ResponseBody
 	public Object process() {
+		
+		totalVolume = totalVolume+1;
+		
 		String test = "{\r\n" + 
 				" \"checksum\": -97,\r\n" + 
 				" \"ctrlCode\": \"81\",\r\n" + 
@@ -50,17 +61,22 @@ public class Test {
 				"  \"pressure\": \"0.0\",\r\n" + 
 				"  \"sampleUnit\": \"0.1\",\r\n" + 
 				"  \"signal\": \"13\",\r\n" + 
-				"  \"totalVolume\": 264\r\n" + 
+				"  \"totalVolume\": "+totalVolume+"\r\n" + 
 				" },\r\n" + 
 				" \"sequence\": 176,\r\n" + 
 				" \"serviceId\": \"JRprotocol\",\r\n" + 
 				" \"serviceType\": \"JRprotocol\"\r\n" + 
 				"}";
+		
+		log.info("----------JSON字符串转对象");
+		Long date1 = System.currentTimeMillis();
 		AutoReport report = AutoReport.fromJson(test);
+		Long date2 = System.currentTimeMillis();
+		log.info("----------JSON字符串转对象用时："+(date2-date1));
 		System.out.println(report.toString());
 		System.out.println(report.getReportData().toString());
 		
-		autoReportDataProcessService.processAutoReportData(report);//处理接收到的数据
+		//autoReportDataProcessService.processAutoReportData(report);//处理接收到的数据
 		
 		return RequestResultUtil.getResultSuccess("成功");
 		

@@ -83,7 +83,7 @@ public class AutoReportDataProcessService {
 
 		Long date2 = System.currentTimeMillis();
 		log.info("----------保存设备上报数据到数据库用时："+(date2-date1));
-		log.info("----------总用时："+(date2-date1));
+		//log.info("----------总用时："+(date2-date1));
 		
 		String deviceId = reportData.getDeviceId();// IOT电信平台设备ID
 		Integer dataType = reportData.getDataType();// 数据类型
@@ -98,20 +98,20 @@ public class AutoReportDataProcessService {
 		
 		Long date3 = System.currentTimeMillis();
 		log.info("----------更新表配置与月冻结数据用时："+(date3-date2));
-		log.info("----------总用时："+(date3-date1));
+		//log.info("----------总用时："+(date3-date1));
 		if(dataType == ReportDataType.METER_DATA_TYPE_REPORT) {// 如果数据类型是 设备主动上报数据 时，自动执行保存抄表记录、生成分水量、生成账单、余额自动销账
 			// 3、保存到抄表记录
 			MeterRecord meterRecord = this.saveMeterRecord(deviceId, reportData.getReportData());
 			Long date4 = System.currentTimeMillis();
 			log.info("----------保存抄表记录用时："+(date4-date3));
-			log.info("----------总用时："+(date4-date1));
+			//log.info("----------总用时："+(date4-date1));
 			if(meterRecord!=null) {
 				// 4、生成分水量（生成分水量时会计算水费）
 				List<Long> pwIdList = partitionWaterService.generatorPartitionWater(meterRecord);
 				
 				Long date5 = System.currentTimeMillis();
 				log.info("----------生成分水量用时："+(date5-date4));
-				log.info("----------总用时："+(date5-date1));
+				//log.info("----------总用时："+(date5-date1));
 				
 				// 5、生成账单，并用余额自动结算
 				this.generatorBillAndSettleBill(pwIdList);
