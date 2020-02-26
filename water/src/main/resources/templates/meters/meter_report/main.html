@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- 引入通用对话框工具 -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+ <link rel="stylesheet"	href="/css/meterbody.css" />
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block">
+				<ul class="extra-l" style="list-style: none;" id="search-up-data-from">
+				
+					<!-- 面板:增加 -->
+					<li>
+						<!-- 0=未知类型数据
+						1=设备上报数据
+						2=设备配置信息数据
+						3=设备月冻结数据
+						4=设备开始与电信平台建立连接
+						5=设备即将断开连接 
+						6=写配置返回数据
+						7=开关阀门返回数据 
+						8=设置阈值返回数据-->
+						<select class="form-control btn-sm" id="search-data-type" style="height:30.8px;">
+							<option value="">——数据类型——</option>
+							<option value="1">设备主动上报数据</option>
+							<option value="2">设备配置信息数据</option>
+							<option value="3">设备月冻结数据</option>
+							<option value="4">设备与电信平台建立连接数据</option>
+							<option value="5">设备与电信平台断开连接数据</option>
+							<option value="6">写配置返回数据</option>
+							<option value="7">开关阀门返回数据</option>
+							<option value="8">设置阈值返回数据</option>
+						</select>
+					</li>
+
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入水表编号">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+						<button type="button" class="btn btn-info btn-sm"	id="btn-meter-up-data-timer">
+							<i class="fa fa-clock-o" aria-hidden="true"> <span id="btn-meter-up-data-timer-span">定时刷新</span>	</i>
+						</button>
+					</li>
+				</ul>
+			</div>
+
+			<div class="">
+				<!-- 容器:字典列表 -->
+				<div class="container-device-up-data-table table-container"></div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//---------------------------定时刷新-----------------------------------------------------------------------------------------------------------------
+		var g_meter_up_data_timer = null;//定时刷新启动后会返回一个 ID（数字），此处用于记录这个返回的ID
+		/**
+		 * 	定时查询上报数据列表，1分钟刷新一次
+		 */
+		function timeountSearchWmMeterFn(){
+			console.log("----------定时查询上报数据");
+			defaultSearchWmMeter();//查询
+			setTimeout(timeountSearchWmMeterFn,1*60*1000);
+		}
+	
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询核对类型列表
+		*/
+		function searchWmMeter(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meter-report/search-meters"
+			$(".container-device-up-data-table").load(url, parms, windowResizeFuncxx);
+		}
+		
+		function windowResizeFuncxx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchWmMeterParams(){
+			
+			var searchDataType = $("#search-up-data-from #search-data-type").val();
+			var searchCond = $("#search-up-data-from #search-cond").val();
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchDataType=searchDataType;
+			parms.searchCond=searchCond;
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchWmMeter() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchWmMeterParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchWmMeter(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchWmMeterClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchWmMeterParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchWmMeter(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function clickPagerReloadWmMeterTable(searchCond, pageNum, pageSize) {
+			var parms = getSearchWmMeterParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchWmMeter(parms);
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchWmMeter();//查询
+			
+			//---------事件绑定--------------
+			/**
+			 * 	绑定数据类型按钮的change事件
+			 */
+			$("#search-up-data-from #search-data-type").on('change', function(){
+				btnSearchWmMeterClick();
+			});
+			/*
+				查询按钮CLICK
+			*/
+			$('#search-up-data-from #btn-search').on('click', function() {
+				btnSearchWmMeterClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#search-up-data-from #btn-search-reset').on('click', function() {
+				$("#search-up-data-from #search-data-type").val("");//重置数据类型为空
+				$("#search-up-data-from #search-cond").val("");
+				$("#search-up-data-from #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#search-up-data-from #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#search-up-data-from #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/**
+			 * 	定时刷新
+			 */
+			$('#search-up-data-from #btn-meter-up-data-timer').on('click', function(event) {
+				if(g_meter_up_data_timer==null){
+					console.log("----------启动设备上报数据列表定时刷新");
+					timeountSearchWmMeterFn();//定时查询上报数据列表，1分钟刷新一次
+					$('#search-send-command-records-from #btn-meter-up-data-timer #btn-meter-up-data-timer-span').text("停止刷新");//设置定时按钮的显示文字
+				}else{
+					console.log("----------停止设备上报数据列表定时刷新");
+					clearTimeout(g_meter_up_data_timer);//取消由 setTimeout() 方法设置的定时操作。
+					g_meter_up_data_timer = null;//定时刷新启动后会返回一个 ID（数字），此处用于记录这个返回的ID
+					$('#search-send-command-records-from #btn-meter-up-data-timer #btn-meter-up-data-timer-span').text("定时刷新");//设置定时按钮的显示文字
+				}
+			});
+			
+		});
+	</script>
+
+
+
+</body>
+</html>

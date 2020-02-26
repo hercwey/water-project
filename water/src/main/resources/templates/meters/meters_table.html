@@ -114,6 +114,13 @@
 									<i class="fa fa-remove" aria-hidden="true"><span>删除</span></i>
 								</a>
 							</span>
+							<div class="dropdown-divider" style="border-top: 0.8px solid blue;"></div>
+							<!-- 查看水表配置详情 -->
+							<a class="dropdown-item btn-sm load-meter-config-detail-dialog" title="查看表配置信息"
+								th:attr="bind-id=${item.id}">
+								<i class="fa fa-eye" aria-hidden="true"> <span>查看表配置信息</span></i>
+							</a>
+							
 							<!-- 如果IOT平台设备ID为空时说明设备未注册显示注册设备按钮 -->
 							<span th:if="${item.deviceId==null || item.deviceId==''}" th:remove="tag">
 								<!-- 注册设备 -->
@@ -385,6 +392,23 @@
 			}); // end of item-selector
 			return idArr;
 		}
+		
+		//--------查看表配置信息-------------------------------------------------------------------------------------------------------
+		/**
+		 * 	加载水表配置信息对话框
+		 */
+		$(".load-meter-config-detail-dialog").on("click", function(){
+			var itemId = $(this).attr("bind-id"); //条目ID
+			
+			var url = BASE_CONTEXT_PATH + "/meter-device/load-meter-config-detail-dialog";
+			var parms = new Object();
+			parms.itemId = itemId;
+			$("#load-meter-config-detail-dialog").load(url, parms, function(){
+				console.log("----------加载水表配置详情对话框完成！");
+				DialogUtil.openDialogFn(G_OPEN_CLOSE_METER_CONFIG_DETAIL_DIALOG_ID);//打开表配置信息对话框
+			});
+			
+		});
 		
 		//----------------生成读操作指令通用函数----------------------------------------------------------------------------------------------------
 		/**

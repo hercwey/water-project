@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="table-responsive">
+		<!-- 列表 -->
+		<table class="table table-bordered table-sm table-hovers" id="meter-table" style="width:2500px;">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>数据类型</th>
+					<th>设备上报时间</th>
+					<th>水表编号</th>
+					<th>表地址</th>
+					<!-- <th>表号</th> -->
+					<th>表当前时间</th>
+					<th>累计使用量（t）</th>
+					<th>采样参数（m³）</th>
+					<th>电池电压（mV）</th>
+					<!-- <th>表状态字</th> -->
+					<th>电池电压状态</th>
+					<th>阀门状态</th>
+					<th>阀门故障</th>
+					<th>采样线断线状态</th>
+					<th>数据上报模式</th>
+					<th>阀门维护</th>
+					<th>磁干扰报警</th>
+					<th>信号强度（dBm）</th>
+					<th>压力值（MPa）</th>
+					<th>表类型</th>
+					<th>表厂商代码</th>
+					<th>控制码</th>
+					<th>数据标识</th>
+					<th>序列号</th>
+					<th>原始数据</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- String meterNumber = "";//表号: 6字节数字型字符串
+				String meterTime = "";//表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
+				Integer totalVolume = null;//累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
+				String sampleUnit = "";//采样参数：单位M3
+				Integer batteryVoltage = null;//电池电压：单位V
+				String meterStatus = "";//表状态字：2字节
+				String signal = "";//信号强度
+				String pressure = "";//压力值：xx.yyyy -->
+				<tr th:each="item,iterStat: ${meterList}">
+					
+					<!-- ID -->
+					<td th:text="${item.id}">ID</td>
+
+					<!-- 表计数据类型：
+						0=未知类型数据；
+						1=设备上报数据；
+						2=设备配置信息数据；
+						3=设备月冻结数据； 
+						4=设备开始与电信平台建立连接；
+						5=设备即将断开连接； 
+						6=写配置返回数据；
+						7=开关阀门返回数据； 
+						8=设置阈值返回数据-->
+					<td>
+						<span th:if="${item.dataType==0}" th:remove="tag">
+							未知类型数据
+						</span>
+						<span th:if="${item.dataType==1}" th:remove="tag">
+							设备主动上报数据
+						</span>
+						<span th:if="${item.dataType==2}" th:remove="tag">
+							设备配置信息数据
+						</span>
+						<span th:if="${item.dataType==3}" th:remove="tag">
+							设备月冻结数据
+						</span>
+						<span th:if="${item.dataType==4}" th:remove="tag">
+							设备与电信平台建立连接
+						</span>
+						<span th:if="${item.dataType==5}" th:remove="tag">
+							设备与电信平台断开连接
+						</span>
+						<span th:if="${item.dataType==6}" th:remove="tag">
+							写配置返回数据
+						</span>
+						<span th:if="${item.dataType==7}" th:remove="tag">
+							开关阀门返回数据
+						</span>
+						<span th:if="${item.dataType==8}" th:remove="tag">
+							设置阈值返回数据
+						</span>
+					</td>
+					<!-- 上报到电信平台的时间 -->
+					<td th:text="${item.eventTime==null ? '' : #dates.format(item.eventTime, 'yyyy-MM-dd HH:mm:ss')}">上报到电信平台的时间</td>
+					<td th:text="${item.verifyCode}">水表编号</td>
+					<!-- 表地址 -->
+					<td th:text="${item.meterAddr}">表地址</td>
+					<!-- <td th:text="${item.meterNumber}">表号</td> -->
+					<td th:text="${item.meterTime}">表当前时间</td>
+					<td th:text="${item.totalVolumeBd}">累计使用量</td>
+					<td th:text="${item.sampleUnit}">采样参数</td>
+					<td th:text="${item.batteryVoltage}">电池电压</td>
+					<!-- <td>
+						<!-- public static final short METER_STATUS_VALVE_OPEN       = 0x0001;    // 阀门状态开 (开1 / 关0)
+						    public static final short METER_STATUS_VALVE_ABNORMAL   = 0x0002;    // 阀门故障 (1有效 / 0无效)
+						    public static final short METER_STATUS_BATTERY_LOW      = 0x0004;    // 电池电压低 (1有效 / 0无效)
+						    public static final short METER_STATUS_PERIOD_ON        = 0x0008;    // 定时上传功能开关 (1开 / 0关)
+						    public static final short METER_STATUS_MAX_REPORT_ON    = 0x0010;    // 定量上传功能开关 (1开 / 0关)
+						    public static final short METER_STATUS_MAGNETIC_ON      = 0x0020;    // 磁干扰关阀功能开关 (1开 / 0关)
+						    public static final short METER_STATUS_SMAPLE_LINE_CUT  = 0x0040;    // 采样线断线报警状态 (1有效 / 0无效) --
+						阀门状态开 (开1 / 关0)
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveOpen==0}">&nbsp;阀门关</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveOpen==1}">&nbsp;阀门开</span>
+						阀门故障 (1有效 / 0无效)
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveAbnormal==1}">&nbsp;阀门故障</span>
+						电池电压低 (1有效 / 0无效)
+						<span th:if="${item.meterStatus!=null && item.meterStatus.batteryLow==1}">&nbsp;电池电压低</span>
+						定时上传功能开关 (1开 / 0关)
+						<span th:if="${item.meterStatus!=null && item.meterStatus.periodOn==0}">&nbsp;定时上传功能关</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.periodOn==1}">&nbsp;定时上传功能开</span>
+						定量上传功能开关 (1开 / 0关)
+						<span th:if="${item.meterStatus!=null && item.meterStatus.maxReportOn==0}">&nbsp;定量上传功能关</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.maxReportOn==1}">&nbsp;定量上传功能开</span>
+						磁干扰关阀功能开关 (1开 / 0关)
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==0}">&nbsp;磁干扰关阀功能关</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==1}">&nbsp;磁干扰关阀功能开</span>
+						采样线断线报警状态 (1有效 / 0无效)
+						<span th:if="${item.meterStatus!=null && item.meterStatus.sampleLineCut==1}">&nbsp;采样线断线报警</span>
+					</td> -->
+					<td>
+						<!-- 电池电压低 (1有效 / 0无效) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.batteryLow==0}">正常</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.batteryLow==1}">电压低</span>
+					</td>
+					<td>
+						<!-- 阀门状态开 (开1 / 关0) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveOpen==0}">关</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveOpen==1}">开</span>
+					</td>
+					<td>
+						<!-- 阀门故障 (1有效 / 0无效) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveAbnormal==0}">正常</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.valveAbnormal==1}">故障</span>
+					</td>
+					<td>
+						<!-- 采样线断线报警状态 (1有效 / 0无效) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.sampleLineCut==0}">正常</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.sampleLineCut==1}">采样线断线报警</span>
+					</td>
+					<td>
+						<!-- 定时上传功能开关 (1开 / 0关) -->
+						<!-- <span th:if="${item.meterStatus!=null && item.meterStatus.periodOn==0}">定时上传功能关</span> -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.periodOn==1}">定时上传</span>
+						<!-- 定量上传功能开关 (1开 / 0关) -->
+						<!-- <span th:if="${item.meterStatus!=null && item.meterStatus.maxReportOn==0}">定量上传功能关</span> -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.maxReportOn==1}">定量上传</span>
+					</td>
+					<td>
+						<!-- 阀门维护，磁干扰关阀功能开关 (1开 / 0关) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==0}">关</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticOn==1}">开</span>
+					</td>
+					<td>
+						<!-- 磁干扰报警 (1有效 / 0无效) -->
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticAlarmOn==0}">正常</span>
+						<span th:if="${item.meterStatus!=null && item.meterStatus.magneticAlarmOn==1}">报警</span>
+					</td>
+					<td th:text="${item.signal}">信号强度</td>
+					<td th:text="${item.pressure}">压力值</td>
+					<!-- 表类型 -->
+					<td th:text="${item.meterType}">表类型</td>
+					<!-- 表厂商代码 -->
+					<td th:text="${item.factoryCode}">表厂商代码</td>
+					<!-- 控制码 -->
+					<td th:text="${item.ctrlCode}">控制码</td>
+					<!-- 数据标识 -->
+					<td th:text="${item.dataDi}">数据标识</td>
+					<!-- 序列号 -->
+					<td th:text="${item.meterSequence}">序列号</td>
+					<!-- 原始数据 -->
+					<td th:text="${item.meterDataBasic}">原始数据</td>
+	
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<!-- <hr style="height: 1px; border: none; border-top: 1px solid blue;"> -->
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('wm-meter-pager')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var curr_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+		});
+		
+		//创建分页组件实例
+		var pagerWmMeter=new Pager("wm-meter-pager");
+		$(function(){			
+			pagerWmMeter.init(clickPagerReloadWmMeterTable, null);			
+		});
+	</script>
+</body>
+</html>

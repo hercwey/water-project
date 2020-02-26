@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="table-responsive">
+		<!-- 列表 -->
+		<table class="table table-bordered table-sm table-hovers" id="command-records-table" style="width:1600px;">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<!-- <th>IoT平台指令ID</th>
+					<th>IoT平台应用ID</th>
+					<th>IoT平台对应设备ID</th>
+					<th>服务名称</th> -->
+					<th>指令类型</th>
+					<th>水表编号</th>
+					<th>表地址</th>
+					<th>状态</th>
+					<th>指令创建时间</th>
+					<th>下发指令时间</th>
+					<th>下发指令</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="item,iterStat: ${commandMapList}">
+					
+					<!-- ID -->
+					<td th:text="${item.ID}">ID</td>
+					<!-- IoT平台指令ID -->
+					<!-- <td th:text="${item.COMMAND_ID}">IoT平台指令ID</td> -->
+					<!-- IoT平台应用ID -->
+					<!-- <td th:text="${item.APP_ID}">IoT平台应用ID</td> -->
+					<!-- IoT平台对应设备ID -->
+					<!-- <td th:text="${item.DEVICE_IDS}">IoT平台对应设备ID</td> -->
+					<!-- 服务名称 -->
+					<!-- <td th:text="${item.SERVICE_NAME}">服务名称</td> -->
+					<!-- 指令类型 -->
+					<td>
+						<!-- 指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令； -->
+						<span th:if="${item.COMMAND_TYPE==0}">未知指令</span>
+						<span th:if="${item.COMMAND_TYPE==1}">表配置指令</span>
+						<span th:if="${item.COMMAND_TYPE==2}">开/关阀指令</span>
+						<span th:if="${item.COMMAND_TYPE==3}">设置水量阀值指令</span>
+						<span th:if="${item.COMMAND_TYPE==4}">读月冻结指令</span>
+						<span th:if="${item.COMMAND_TYPE==5}">读表配置指令</span>
+					</td>
+					<!-- 水表编号 -->
+					<td th:text="${item.VERIFY_CODE}">水表编号</td>
+					<!-- 表地址 -->
+					<td th:text="${item.METER_ADDRESS}">表地址</td>
+					<!-- 状态 -->
+					<!-- 指令执行状态（0:未下发;1:已下发，未执行;2:执行成功;负数:执行失败） -->
+					<td>
+						<span th:if="${item.STATUS==0}">
+							<span class="badge badge-secondary">未下发指令</span>
+						</span>
+						<span th:if="${item.STATUS==1}">
+							<span class="badge badge-info">已下发指令</span>
+						</span>
+						<span th:if="${item.STATUS==2}">
+							<span class="badge badge-success">指令执行成功</span>
+						</span>
+						<span th:if="${item.STATUS<0}">
+							<span class="badge badge-warning">指令执行失败</span>
+						</span>
+					</td>
+					<!-- 下发指令时间 -->
+					<td th:text="${item.CREATE_TIME_STR}">指令创建时间</td>
+					<!-- 下发指令时间 -->
+					<td th:text="${item.PLATFORM_ISSUED_TIME_STR}">下发指令时间</td>
+					<!-- 下发指令 -->
+					<td th:text="${item.METHOD_PARAMS}">下发指令</td>
+	
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<!-- <hr style="height: 1px; border: none; border-top: 1px solid blue;"> -->
+
+	<!-- 加入分页 -->
+	<div th:include="common/common_pager_pagesize::pager('command-records-table-pager')" class="pagerx"
+		style="float: right; margin-right: 10px;"></div>	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/		
+		var curr_pageNum=[[${pageNum}]];
+		var curr_pageSize=[[${pageSize}]];
+		var currWmCommand_searchCond=[[${searchCond}]];
+		/*]]>*/
+	</script>
+
+
+	<script type="text/javascript">
+		
+		
+		//-----------------page loaded ready------------------
+		$(function() {
+			
+		});
+		
+		//创建分页组件实例
+		var pagerWmCommandRecords=new Pager("command-records-table-pager");
+		$(function(){			
+			pagerWmCommandRecords.init(clickPagerReloadWmCommandTable, null);			
+		});
+	</script>
+</body>
+</html>

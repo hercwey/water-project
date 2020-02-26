@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发送水表配置指令对话框</title>
+
+<!-- 发送开关阀指令:对话框 -->
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+<style type="text/css">
+	.table-center tr th{
+		vertical-align: middle;
+		text-align: center;
+		border: 0px;
+	}
+	.table-center tr td{
+		vertical-align: middle;
+		text-align: center;
+	}
+	.table-center tr td select{
+		height: 30.8px !important;
+	}
+</style>
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-meter-config-detail" role="dialog"	aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span id="modal-title-span">水表配置信息</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal" role="form" id="meter-config-detail-form">
+									<!-- <div class="card">
+									</div> -->
+									<table class="table table-bordered table-sm table-center">
+										<thead>
+											<tr>
+												<th style="width: 50%;">参数名称</th>
+												<th style="width: 50%;">参数值</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>定时上传周期</td>
+												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.reportPeriod}"></td>
+											</tr>
+											<tr>
+												<td>定时上传周期单位</td>
+												<td>
+													<span th:if="${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==0}">分钟</span>
+													<span th:if="${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==1}">小时</span>
+													<span th:if="${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==2}">天</span>
+												</td>
+											</tr>
+											<tr>
+												<td>定量上传值</td>
+												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.reportRation}"></td>
+											</tr>
+											<tr>
+												<td>用户临时开阀用水限定时间</td>
+												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.temporaryTime}"></td>
+											</tr>
+											<tr>
+												<td>
+													阀门行程时间
+												</td>
+												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.valveRunTime}"></td>
+											</tr>
+											<tr>
+												<td>阀门维护周期</td>
+												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.valveMaintainPeriod}"></td>
+											</tr>
+											<tr>
+												<td>表底数</td>
+												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.meterBasicValue}"></td>
+											</tr>
+											<tr>
+												<td>采样参数单位</td>
+												<td th:text="${meterConfigBean==null} ? '' : ${meterConfigBean.sampleUnit}+'立方米'">
+													<!-- 采样参数：1字节(0-255)十进制，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样； -->
+												</td>
+											</tr>
+											<tr>
+												<td>表当前时间</td>
+												<td th:text="${meterConfigBean!=null && meterConfigBean.meterTime!=null ? #dates.format(meterConfigBean.meterTime, 'yyyy-MM-dd HH:mm:ss') : ''}"></td>
+											</tr>
+											<tr>
+												<td>上传功能</td>
+												<td>
+													<!-- 表状态字-定时/定量上传功能开关 (1开 / 0关) -->
+													<span th:if="${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.periodOn==1}">定时上传</span>
+													<span th:if="${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.maxReportOn==1}">定量上传</span>
+												</td>
+											</tr>
+											<tr>
+												<td>磁干扰关阀功能</td>
+												<td>
+													<!-- 表状态字-磁干扰关阀功能开关 (1开 / 0关) -->
+													<span th:if="${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticOn==1}">开</span>
+													<span th:if="${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticOn==0}">关</span>
+												</td>
+											</tr>
+											
+										</tbody>
+									</table>
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+	
+		$(function(){
+			
+		});
+	
+	</script>
+	
+	</th:block>
+
+</body>
+</html>
