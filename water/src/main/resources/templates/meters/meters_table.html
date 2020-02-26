@@ -399,6 +399,7 @@
 			parms.id = id;
 			parms.cmdType = cmdType;
 			parms.cmdAction = cmdAction;
+			
 			var command = null;
 			$.ajax({
 				type: "post",
@@ -583,7 +584,7 @@
 				
 				//setSendCommandTypeFn(2);//获取发送指令类型，指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；
 				
-				var url = BASE_CONTEXT_PATH + "/water-device/load-send-cmd-open-close-dialog";
+				var url = BASE_CONTEXT_PATH + "/meter-device/load-send-cmd-open-close-dialog";
 				var parms = new Object();
 				parms.itemId = itemId;
 				parms.cmdType = 2;//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令

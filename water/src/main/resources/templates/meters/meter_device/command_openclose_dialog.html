@@ -81,6 +81,7 @@
 						if (res.result_code == "success") {
 							console.log("----------返回生成的开/关阀指令："+res.command);
 							command = res.command;
+							DialogUtil.closeDialogFn(G_OPEN_CLOSE_COMMAND_DIALOG_ID);
 						}
 						//dialog type: success warning info error,默认为info
 						util.message(res.result_msg,null,"warning");
