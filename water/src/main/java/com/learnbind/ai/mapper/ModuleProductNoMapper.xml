@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnbind.ai.dao.ModuleProductNoMapper">
+  <resultMap id="BaseResultMap" type="com.learnbind.ai.model.ModuleProductNo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PRODUCT_NO" jdbcType="VARCHAR" property="productNo" />
+    <result column="PRINTED" jdbcType="DECIMAL" property="printed" />
+    <result column="OPERATER_ID" jdbcType="DECIMAL" property="operaterId" />
+    <result column="OPERATER_NAME" jdbcType="VARCHAR" property="operaterName" />
+    <result column="OPERATER_DATE" jdbcType="TIMESTAMP" property="operaterDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    ID, PRODUCT_NO, PRINTED, OPERATER_ID, OPERATER_NAME, OPERATER_DATE
+  </sql>
+</mapper>
