@@ -224,7 +224,7 @@
 													</div>
 												</td>	
 											</tr>	
-											<tr>
+											<tr th:class="${currItem==null || (currItem!=null && currItem.userType==0) || (currItem!=null && currItem.userType==null) ? '' : 'd-none' }">
 												<td>
 													<!-- 网点信息-->
 													<div class="form-group form-inline" id="user-office-div">
@@ -234,7 +234,7 @@
 																<!-- 默认选择第一个 -->
 																<option value="0">-请选择-</option>
 																<span th:each="item,iterStat: ${officeList}" th:remove="tag">
-																	<option th:value="${item.officeName}"  th:attr="selected=${item!=null && item.officeName==office.officeName ? 'true':'false'}, data-office-id=${item==null ? 0 : item.id}"
+																	<option th:value="${item.officeName}"  th:attr="selected=${item!=null && (office!=null && item.officeName==office.officeName) ? 'true':'false'}, data-office-id=${item==null ? 0 : item.id}"
 																			th:text="${item.officeName}">数据字典的值</option>
 																</span>
 																
@@ -242,7 +242,10 @@
 														</span>
 													</div>
 												</td>
-												<td></td>
+												<td>
+													<!-- <span th:text="${currItem==null}"></span>，
+													<span th:text="${(currItem!=null && currItem.userType==0) || (currItem!=null && currItem.userType==null)}"></span> -->
+												</td>
 											</tr>	
 											
 										</tbody>

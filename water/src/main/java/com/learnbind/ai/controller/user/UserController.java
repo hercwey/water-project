@@ -175,6 +175,7 @@ public class UserController {
 		//获取网点信息
 		List<BusinessOffice> officeList = businessOfficeService.selectAll();
 		model.addAttribute("officeList", officeList);
+		model.addAttribute("office", null);
 		return TEMPLATE_PATH + "user_dialog_edit";
 	}
 	
@@ -192,11 +193,19 @@ public class UserController {
 		String password = DigestUtils.md5Hex("123456").toUpperCase();//默认密码123456
 		user.setPassword(password);
 		user.setCreateTime(new Date());
-		int row = usersService.addUser(user);
-		if (row > 0)
+		int rows = usersService.addUser(user);
+		if(rows>0) {
+			if(officeId!=null) {
+				//增加用户-营业网点关系
+				UsersBusOffice usoffice = new UsersBusOffice();
+				usoffice.setOfficeId(officeId);
+				usoffice.setUserId(user.getId());
+				userBusOfficeService.insertSelective(usoffice);
+			}
+			
 			return RequestResultUtil.getResultAddSuccess();
-		else
-			return RequestResultUtil.getResultAddWarn();
+		}
+		return RequestResultUtil.getResultAddWarn();
 	}
 
 	/** 
@@ -270,18 +279,32 @@ public class UserController {
 	@ResponseBody
 	public Object updateUser(SysUsers user, Long officeId) throws Exception {
 		
-		usersService.updateByPrimaryKeySelective(user);
-		UsersBusOffice usoffice = userBusOfficeService.getBusOfficeMessage(user.getId()); 
-		if(officeId != null) {
-			usoffice.setOfficeId(officeId);
-			usoffice.setUserId(user.getId());;
-			userBusOfficeService.updateByPrimaryKeySelective(usoffice);
-		} else {
-			userBusOfficeService.delete(usoffice);
+		try {
+			int rows = usersService.updateByPrimaryKeySelective(user);
+			if(rows>0) {
+				UsersBusOffice usoffice = userBusOfficeService.getBusOfficeMessage(user.getId()); 
+				if(officeId != null) {
+					if(usoffice==null) {
+						usoffice = new UsersBusOffice();
+						usoffice.setOfficeId(officeId);
+						usoffice.setUserId(user.getId());;
+						userBusOfficeService.insertSelective(usoffice);
+					}else {
+						usoffice.setOfficeId(officeId);
+						usoffice.setUserId(user.getId());;
+						userBusOfficeService.updateByPrimaryKeySelective(usoffice);
+					}
+				} else {
+					if(usoffice!=null) {
+						userBusOfficeService.delete(usoffice);
+					}
+				}
+				return RequestResultUtil.getResultUpdateSuccess();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		
-		return RequestResultUtil.getResultUpdateSuccess();
+		return RequestResultUtil.getResultUpdateWarn();
 	}
 
 	/**
