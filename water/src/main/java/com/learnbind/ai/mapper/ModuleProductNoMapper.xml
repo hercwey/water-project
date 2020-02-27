@@ -6,6 +6,7 @@
       WARNING - @mbg.generated
     -->
     <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="MODULE_NO" jdbcType="VARCHAR" property="moduleNo" />
     <result column="PRODUCT_NO" jdbcType="VARCHAR" property="productNo" />
     <result column="PRINTED" jdbcType="DECIMAL" property="printed" />
     <result column="OPERATER_ID" jdbcType="DECIMAL" property="operaterId" />
@@ -16,6 +17,6 @@
     <!--
       WARNING - @mbg.generated
     -->
-    ID, PRODUCT_NO, PRINTED, OPERATER_ID, OPERATER_NAME, OPERATER_DATE
+    ID, MODULE_NO, PRODUCT_NO, PRINTED, OPERATER_ID, OPERATER_NAME, OPERATER_DATE
   </sql>
 </mapper>

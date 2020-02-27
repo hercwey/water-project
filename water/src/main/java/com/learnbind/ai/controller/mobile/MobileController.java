@@ -71,7 +71,7 @@ import tk.mybatis.mapper.util.StringUtil;
 //@RequestMapping(value = "/api")
 
 @RestController // 使用该注解后相当于每个控制器方法自动添加@ResponseBody注解
-@RequestMapping("/api")
+@RequestMapping("/api/mobile")
 public class MobileController {
 	private static Log log = LogFactory.getLog(MobileController.class);	
 	

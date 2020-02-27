@@ -1,15 +1,23 @@
 package com.learnbind.ai.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "MODULE_PRODUCT_NO")
 public class ModuleProductNo {
     @Id
     @Column(name = "ID")
-    @GeneratedValue(generator = "JDBC")
-    private BigDecimal id;
+    //@GeneratedValue(generator = "JDBC")
+    @GeneratedValue(strategy=GenerationType.IDENTITY, generator="SELECT M_P_NO_SEQ_GENERATOR.CURRVAL FROM DUAL")//前提是先创建了oracle序列
+    private Long id;
+
+    @Column(name = "MODULE_NO")
+    private String moduleNo;
 
     @Column(name = "PRODUCT_NO")
     private String productNo;
@@ -18,7 +26,7 @@ public class ModuleProductNo {
     private Integer printed;
 
     @Column(name = "OPERATER_ID")
-    private BigDecimal operaterId;
+    private Long operaterId;
 
     @Column(name = "OPERATER_NAME")
     private String operaterName;
@@ -29,15 +37,29 @@ public class ModuleProductNo {
     /**
      * @return ID
      */
-    public BigDecimal getId() {
+    public Long getId() {
         return id;
     }
 
     /**
      * @param id
      */
-    public void setId(BigDecimal id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * @return MODULE_NO
+     */
+    public String getModuleNo() {
+        return moduleNo;
+    }
+
+    /**
+     * @param moduleNo
+     */
+    public void setModuleNo(String moduleNo) {
+        this.moduleNo = moduleNo == null ? null : moduleNo.trim();
     }
 
     /**
@@ -71,14 +93,14 @@ public class ModuleProductNo {
     /**
      * @return OPERATER_ID
      */
-    public BigDecimal getOperaterId() {
+    public Long getOperaterId() {
         return operaterId;
     }
 
     /**
      * @param operaterId
      */
-    public void setOperaterId(BigDecimal operaterId) {
+    public void setOperaterId(Long operaterId) {
         this.operaterId = operaterId;
     }
 
@@ -117,6 +139,7 @@ public class ModuleProductNo {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", moduleNo=").append(moduleNo);
         sb.append(", productNo=").append(productNo);
         sb.append(", printed=").append(printed);
         sb.append(", operaterId=").append(operaterId);
