@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- 引入通用对话框工具 -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+ <link rel="stylesheet"	href="/css/meterbody.css" />
+ <link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+</head>
+<body>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label">
+		<div class="col-md-12 column">
+
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block">
+				<ul class="extra-l" style="list-style: none;" id="search-send-command-records-from">
+				
+					<!-- 面板 -->
+					<li>
+						<!-- 指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令； -->
+						<select class="form-control btn-sm" id="search-command-type" style="height:30.8px;">
+							<option value="">——指令类型——</option>
+							<option value="1">表配置指令</option>
+							<option value="2">开/关阀指令</option>
+							<option value="3">设置水量阀值指令</option>
+							<option value="4">读月冻结指令</option>
+							<option value="5">读表配置指令</option>
+						</select>
+					</li>
+
+					<!-- 面板:查询 -->
+					<li class="input-group-sm"><input type="text" class="form-control" id="search-cond" placeholder="请输入水表编号">
+					</li>
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm"	id="btn-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button>
+						<button type="button" class="btn btn-warning btn-sm"	id="btn-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button>
+						<button type="button" class="btn btn-info btn-sm"	id="btn-command-timer">
+							<i class="fa fa-clock-o" aria-hidden="true"> <span id="btn-command-timer-span">定时刷新</span>	</i>
+						</button>
+					</li>
+				</ul>
+			</div>
+
+			<div class="">
+				<!-- 容器:字典列表 -->
+				<div class="container-send-command-records-table table-container"></div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!--  -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<script>
+	
+		//---------------------------定时刷新-----------------------------------------------------------------------------------------------------------------
+		var g_command_timer = null;//定时刷新启动后会返回一个 ID（数字），此处用于记录这个返回的ID
+		/**
+		 * 	定时查询下发指令数据列表，1分钟刷新一次
+		 */
+		function timeountSearchWmCommandFn(){
+			console.log("----------定时查询下发指令数据");
+			defaultSearchWmCommand();//查询
+			g_command_timer = setTimeout(timeountSearchWmCommandFn,1*60*1000);
+		}
+		
+		//--------------------公共查询函数--------------------------
+		/*	
+			公共查询函数
+			
+			查询列表
+		*/
+		function searchWmCommand(parms) {
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/meter-send-command/search-send-cmd-records"
+			$(".container-send-command-records-table").load(url, parms, windowResizeFuncxxx);
+		}
+		
+		function windowResizeFuncxxx(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		function getSearchWmCommandParams(){
+			
+			var searchCommandType = $("#search-send-command-records-from #search-command-type").val();
+			var searchCond = $("#search-send-command-records-from #search-cond").val();
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCommandType=searchCommandType;
+			parms.searchCond=searchCond;
+			return parms;
+		}
+
+		//---------------------------------------------
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchWmCommand() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			var parms = null;
+			parms = getSearchWmCommandParams();//获取普通查询参数（不包括分页信息）
+			
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchWmCommand(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchWmCommandClick() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			var parms = getSearchWmCommandParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchWmCommand(parms);
+		}
+
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function clickPagerReloadWmCommandTable(searchCond, pageNum, pageSize) {
+			
+			var parms = getSearchWmCommandParams();//获取查询参数（不包括分页信息）
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+
+			searchWmCommand(parms);
+		}
+
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//------------init-------------
+			//主页:默认查询(加载默认列表)
+			defaultSearchWmCommand();//查询
+			
+			//---------事件绑定--------------
+			/**
+			 * 	绑定数据类型按钮的change事件
+			 */
+			$("#search-send-command-records-from #search-command-type").on('change', function(){
+				btnSearchWmCommandClick();
+			});
+			/*
+				查询按钮CLICK
+			*/
+			$('#search-send-command-records-from #btn-search').on('click', function() {
+				btnSearchWmCommandClick();
+			});
+			
+			/*
+				查询条件复位按钮CLICK
+			*/
+			$('#search-send-command-records-from #btn-search-reset').on('click', function() {
+				$("#search-send-command-records-from #search-command-type").val("");//重置数据类型为空
+				$("#search-send-command-records-from #search-cond").val("");
+				$("#search-send-command-records-from #search-cond").focus();  //	获得焦点
+			});
+			
+			/*
+				查询条件输入框 KEYUP
+			*/
+			$('#search-send-command-records-from #search-cond').on('keyup', function(event) {
+				if(event.keyCode == 13){
+					$('#search-send-command-records-from #btn-search').trigger("click");	                
+	            }	
+			});
+			
+			/**
+			 * 	定时刷新
+			 */
+			$('#search-send-command-records-from #btn-command-timer').on('click', function(event) {
+				if(g_command_timer==null){
+					console.log("----------启动发送指令记录列表定时刷新");
+					timeountSearchWmCommandFn();//定时查询下发指令数据列表，1分钟刷新一次
+					$('#search-send-command-records-from #btn-command-timer #btn-command-timer-span').text("停止刷新");//设置定时按钮的显示文字
+				}else{
+					console.log("----------停止发送指令记录列表定时刷新");
+					clearTimeout(g_command_timer);//取消由 setTimeout() 方法设置的定时操作。
+					g_command_timer = null;//定时刷新启动后会返回一个 ID（数字），此处用于记录这个返回的ID
+					$('#search-send-command-records-from #btn-command-timer #btn-command-timer-span').text("定时刷新");//设置定时按钮的显示文字
+				}
+			});
+			
+		});
+	</script>
+
+
+
+</body>
+</html>

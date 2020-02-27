@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
+import com.space.water.iot.api.config.Constants;
 import com.space.water.iot.api.model.common.BaseRequest;
 import com.space.water.iot.api.model.iot.device.UpdateDeviceInfoReqDTO;
 
@@ -11,11 +12,11 @@ public class UpdateDeviceRequest extends BaseRequest{
 	
 	private String appId;//应用ID（无需传入）
 	private String deviceId;//设备ID（电信平台）
-    private String manufacturerId;//厂商ID（电信平台）
-    private String manufacturerName;//厂商名（电信平台）
-    private String deviceType;//设备类型（电信平台）
-    private String model;//型号（电信平台）
-    private String protocolType;//设备协议类型（电信平台）
+    private String manufacturerId = "JR0912X";//厂商ID（电信平台）
+    private String manufacturerName = "JRIWA";//厂商名（电信平台）
+    private String deviceType = "JRNBWaterMeter";//设备类型（电信平台）
+    private String model = "JR0912Y";//型号（电信平台）
+    private String protocolType = "CoAP";//设备协议类型（电信平台）
     
 	public String getAppId() {
 		return appId;
@@ -66,7 +67,7 @@ public class UpdateDeviceRequest extends BaseRequest{
 	public static Map<String, Object> toMap(UpdateDeviceRequest modifyReq) {
 		Map<String, Object> result = new HashMap<>();
 		
-		result.put("appId", modifyReq.getAppId());
+		result.put("appId", Constants.APP_ID);
 		result.put("deviceId", modifyReq.getDeviceId());
 		result.put("manufacturerId", modifyReq.getManufacturerId());
 		result.put("manufacturerName", modifyReq.getManufacturerName());

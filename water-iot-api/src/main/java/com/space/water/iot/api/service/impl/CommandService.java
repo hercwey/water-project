@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.space.water.iot.api.common.JsonResult;
 import com.space.water.iot.api.config.Constants;
@@ -68,23 +69,29 @@ public class CommandService implements ICommandService {
 		JsonResult jsonResult = postCommand(commandBean);
 
 		String result = jsonResult.getData();
-		System.out.println("---------------------------");
-		System.out.println("| 控制指令异步发送到IoT平台：" + commandBean.getDeviceId() + "==" + commandBean.getCommandId());
-		System.out.println("| 控制指令异步发送完成：" + result);
-		System.out.println("---------------------------");
-
 		DeviceCommandResp response = JSON.parseObject(result, DeviceCommandResp.class);
 
 		// TODO G11 调用命令执行状态改变方法，返回给“营收子系统”，状态为，已发送
 		OrderStatusResponse orderSatusResponse = new OrderStatusResponse();
 		orderSatusResponse.setId(commandBean.getId());
 		orderSatusResponse.setCommandId(commandBean.getCommandId());
+		JSONObject methodParams = JSONObject.parseObject(commandBean.getMethodParams());
+		String commandHex = "";
+		if (methodParams != null) {
+			commandHex = methodParams.getString("value");
+		}
+		orderSatusResponse.setCommandHex(commandHex);
 		if (response == null) {
 			orderSatusResponse.setStatus(CommandCallbackConstants.COMMAND_STATUS_FAILED);
 		} else {
 			orderSatusResponse.setCommandId(response.getCommandId());
 			orderSatusResponse.setStatus(CommandCallbackConstants.COMMAND_STATUS_SENT);
 		}
+
+		System.out.println("---------------------------");
+		System.out.println("| 控制指令异步发送到IoT平台：" + commandBean.getDeviceId() + "==" + response.getCommandId());
+		System.out.println("| 控制指令异步发送完成：" + result);
+		System.out.println("---------------------------");
 
 		producer.sendNorth(OrderStatusResponse.toJsonString(orderSatusResponse), topicConfig.getTagOrderStatus());
 	}

@@ -1,4 +1,4 @@
-package com.space.water;
+package com.space.water.iot.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
