@@ -114,6 +114,9 @@ public class MobileScanController {
 			mpNo.setModuleNo(moduleNo);
 			int count = moduleProductNoService.selectCount(mpNo);
 			if(count>0) {
+				log.info("----------模组号有相同值，不需要保存");
+				return new ResponseEntity<>(REPEAT, HttpStatus.OK);
+			}else {
 				mpNo = new ModuleProductNo();//模组号-出厂编号对照表
 				mpNo.setModuleNo(moduleNo);
 				mpNo.setOperatorId(operatorId);
@@ -125,9 +128,6 @@ public class MobileScanController {
 					log.info("----------保存扫描结果成功");
 					return new ResponseEntity<>(OK, HttpStatus.OK);
 				}
-			}else {
-				log.info("----------模组号有相同值，不需要保存");
-				return new ResponseEntity<>(REPEAT, HttpStatus.OK);
 			}
 			
 		} catch (Exception e) {
