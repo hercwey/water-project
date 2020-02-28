@@ -23,7 +23,6 @@ public class StringUtil {
 			date = sdf2.format(dateTemp);
 			return sdf2.parse(date);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return new Date(0);
@@ -45,7 +44,6 @@ public class StringUtil {
 			meterTime = sdf2.format(dateTemp);
 			return sdf2.parse(meterTime);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return new Date(0);

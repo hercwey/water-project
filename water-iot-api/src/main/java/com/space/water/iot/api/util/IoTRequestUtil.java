@@ -121,7 +121,7 @@ public class IoTRequestUtil {
          * 4** 请求错误这些状态代码表示请求可能出错，妨碍了服务器的处理。
          * 5**（服务器错误）这些状态代码表示服务器在尝试处理请求时发生内部错误。 这些错误可能是服务器本身的错误，而不是请求出错。
          */
-        LogUtil.debug("\n----------------------------------------");
+        LogUtil.debug("----------------------------------------");
         LogUtil.debug("| IoT Platform Request, response content:");
         try {
             if (response != null) {
