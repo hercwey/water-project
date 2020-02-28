@@ -2,12 +2,14 @@ package com.space.water.iot.api.rocketmq;
 
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.space.water.iot.api.config.MQTags;
+import com.space.water.iot.api.util.LogUtil;
 
 @Component
 public class Producer {
@@ -54,8 +56,29 @@ public class Producer {
 		Message message = new Message(topicConfig.getTopicName(), tag, "keys" , response.getBytes());
 		// 发送
 		try {
-    		sendResult = getProducer().send(message);
-    		System.out.println("输出生产者信息={}" + sendResult);
+    		getProducer().send(message,new SendCallback() {
+				
+				@Override
+				public void onSuccess(SendResult sendResult) {
+					LogUtil.debug("----------------------------------------");
+					LogUtil.debug("| 消息发送成功");
+					LogUtil.debug("| tag :" + tag);
+					LogUtil.debug("| data:" + response);
+					LogUtil.debug("----------------------------------------");
+				}
+				
+				@Override
+				public void onException(Throwable e) {
+					LogUtil.error("----------------------------------------");
+					LogUtil.error("| 消息发送失败");
+					LogUtil.error("| tag :" + tag);
+					LogUtil.error("| data:" + response);
+					LogUtil.error(e.getMessage());
+					LogUtil.error("----------------------------------------");
+					
+				}
+			});
+//    		LogUtil.debug("输出生产者信息={}" + sendResult);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

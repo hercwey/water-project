@@ -40,6 +40,7 @@ import com.space.water.iot.api.protocol.bean.MeterReadWaterResp;
 import com.space.water.iot.api.protocol.bean.MeterValveControlResp;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdResp;
 import com.space.water.iot.api.rocketmq.RocketTopicConfig;
+import com.space.water.iot.api.util.LogUtil;
 
 public class Tester {
 	
@@ -51,9 +52,9 @@ public class Tester {
 		report.setReportData(MeterReportBean.fromJson(meterBean.getData()));
 		String jsonData = AutoReport.toJsonString(report);
 		// 调用数据上报接口
-		System.out.println("---------------------------");
-		System.out.println("| 模拟自动上报数据：" + jsonData);
-		System.out.println("---------------------------");
+		LogUtil.debug("---------------------------");
+		LogUtil.debug("| 模拟自动上报数据：" + jsonData);
+		LogUtil.debug("---------------------------");
 		return jsonData;
 	}
 
@@ -75,9 +76,9 @@ public class Tester {
 
 		jsonData = ConfigParamsRequest.toJsonString(request);
 		// 调用数据上报接口
-		System.out.println("---------------------------");
-		System.out.println("| 模拟配置设备指令数据：" + jsonData);
-		System.out.println("---------------------------");
+		LogUtil.debug("---------------------------");
+		LogUtil.debug("| 模拟配置设备指令数据：" + jsonData);
+		LogUtil.debug("---------------------------");
 		return jsonData;
 	}
 

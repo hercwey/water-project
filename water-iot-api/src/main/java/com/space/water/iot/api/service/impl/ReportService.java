@@ -56,19 +56,22 @@ public class ReportService implements IReportService {
 					// TODO G11 向电信平台发送指令，并向“营收子系统”发布命令执行状态改变消息
 					commandService.postAsynCommand(CommandBean.parseJson(commandList.get(i)));
 
-					System.out.println("-------------------------------------");
-					System.out.println("| 下发设备指令");
-					System.out.println("| DeviceID：" + meterBean.getDeviceId());
-					System.out.println("| Command ：" + commandList.get(i));
-					System.out.println("-------------------------------------");
+					/**
+					LogUtil.debug("-------------------------------------");
+					LogUtil.debug("| 下发设备指令");
+					LogUtil.debug("| DeviceID：" + meterBean.getDeviceId());
+					LogUtil.debug("| Command ：" + commandList.get(i));
+					LogUtil.debug("-------------------------------------");
+					*/
 					
 				}
+				/**
+				LogUtil.debug("-------------------------------------");
+				LogUtil.debug("| 下发设备指令列表完成");
+				LogUtil.debug("| DeviceID：" + meterBean.getDeviceId());
+				LogUtil.debug("-------------------------------------");
+				*/
 			}
-			
-			System.out.println("-------------------------------------");
-			System.out.println("| 下发设备指令列表完成");
-			System.out.println("| DeviceID：" + meterBean.getDeviceId());
-			System.out.println("-------------------------------------");
 
 			//TODO G11 下发消息后，从消息列表中删除消息
 			if (commandList != null) {
@@ -132,6 +135,6 @@ public class ReportService implements IReportService {
 			break;
 		}
 		
-		return producer.sendNorth(response, tag);
+		return producer.sendNorth(response, tag);//new SendResult();//
 	}
 }

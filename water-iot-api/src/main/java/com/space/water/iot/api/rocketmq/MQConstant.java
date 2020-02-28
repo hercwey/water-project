@@ -99,6 +99,11 @@ public class MQConstant {
 	 */
 	public static final String P_G_SORTH_DEVICE_QUERY = "SORTH_DEVICE_QUERY";
 	
+	/**
+	 * @Fields G_AUTO_REPORT_CACHE:设备上报数据缓存
+	 */
+	public static final String G_AUTO_REPORT_CACHE = "AUTO_REPORT_CACHE";
+	
 	//---------------------------字符集常量-------------------------------------------------------------
 	/**
 	 * @Fields CHARSET_NAME：字符集

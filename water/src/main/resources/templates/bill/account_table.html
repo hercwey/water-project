@@ -116,28 +116,28 @@
 								<i class="fa fa-credit-card-alt" aria-hidden="true"></i> <span>计算违约金</span>
 							</a>  -->
 							<!-- 减免违约金 -->
-							<a class="dropdown-item btn-sm overdue-reduce-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}, data-settlement-status=${item.SETTLEMENT_STATUS}">
+							<!-- <a class="dropdown-item btn-sm overdue-reduce-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}, data-settlement-status=${item.SETTLEMENT_STATUS}">
 								<i class="fa fa-sort-amount-desc" aria-hidden="true"></i> <span>违约金减免</span>
 							</a> 
-							<!-- 减免水费 -->
+							减免水费
 							<a class="dropdown-item btn-sm water-fee-reduce-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}, data-settlement-status=${item.SETTLEMENT_STATUS}">
 								<i class="fa fa-sort-amount-desc" aria-hidden="true"></i> <span>水费减免</span>
-							</a> 
+							</a>  -->
 							
 							<!-- 分账单 -->
 							<!-- account_status 账目状态（只针对水费账单，充值记录默认为null），0=不需要分账；1=未分账；2=已分账 -->
-							<span th:if="${item.ACCOUNT_STATUS==1}">
+							<!-- <span th:if="${item.ACCOUNT_STATUS==1}">
 								<a class="dropdown-item btn-sm sub-account-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}, data-settlement-status=${item.SETTLEMENT_STATUS}">
 									<i class="fa fa-files-o" aria-hidden="true"></i> <span>分账</span>
 								</a>
 							</span>
-							<!-- 撤销分账单 -->
-							<!-- account_status 账目状态（只针对水费账单，充值记录默认为null），0=不需要分账；1=未分账；2=已分账 -->
+							撤销分账单
+							account_status 账目状态（只针对水费账单，充值记录默认为null），0=不需要分账；1=未分账；2=已分账
 							<span th:if="${item.ACCOUNT_STATUS==2}">
 								<a class="dropdown-item btn-sm cancel-sub-account-single" th:attr="bind-id=${item.ID}, data-customer-id=${item.CUSTOMER_ID}, data-period=${item.PERIOD}, data-settlement-status=${item.SETTLEMENT_STATUS}">
 									<i class="fa fa-file-o" aria-hidden="true"></i> <span>撤销分账</span>
 								</a>
-							</span>
+							</span> -->
 							<!-- 发送短信 -->
 							<!-- <a class="dropdown-item btn-sm send-sms-notify" th:attr="bind-id=${item.ID}, data-settlement-status=${item.SETTLEMENT_STATUS}" title="发送短信通知">
 								<i class="fa fa-comments-o" aria-hidden="true"></i> <span>发送短信通知</span>

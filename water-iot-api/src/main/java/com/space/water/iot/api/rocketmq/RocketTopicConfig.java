@@ -67,6 +67,9 @@ public class RocketTopicConfig {
     private String tagDeviceDeleteNorth;//删除设备响应	发布	订阅
     @Value("${tag.device.query.north}")
     private String tagDeviceQueryNorth;//查询设备响应	发布	订阅
+
+    @Value("${tag.auto.report.cache}")
+    private String tagAutoReportCache;//设备自动上报数据缓存
     
     
 	public String getTopicName() {
@@ -196,6 +199,12 @@ public class RocketTopicConfig {
 		this.tagDeviceQueryNorth = tagDeviceQueryNorth;
 	}
 	
+	public String getTagAutoReportCache() {
+		return tagAutoReportCache;
+	}
+	public void setTagAutoReportCache(String tagAutoReportCache) {
+		this.tagAutoReportCache = tagAutoReportCache;
+	}
 	@Override
 	public String toString() {
 		return "RocketTopicConfig [topicName=" + topicName + ", tagAutoReport=" + tagAutoReport
@@ -209,7 +218,8 @@ public class RocketTopicConfig {
 				+ tagDeviceUpdateSouth + ", tagDeviceDeleteSouth=" + tagDeviceDeleteSouth + ", tagDeviceQuerySouth="
 				+ tagDeviceQuerySouth + ", tagDeviceRegisterNorth=" + tagDeviceRegisterNorth + ", tagDeviceUpdateNorth="
 				+ tagDeviceUpdateNorth + ", tagDeviceDeleteNorth=" + tagDeviceDeleteNorth + ", tagDeviceQueryNorth="
-				+ tagDeviceQueryNorth + "]";
+				+ tagDeviceQueryNorth + ", tagAutoReportCache=" + tagAutoReportCache
+				+ "]";
 	}
     
 }

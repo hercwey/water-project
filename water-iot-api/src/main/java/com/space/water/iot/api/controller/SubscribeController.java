@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.space.water.iot.api.common.JsonResult;
 import com.space.water.iot.api.service.ISubscribeService;
+import com.space.water.iot.api.util.LogUtil;
 
 @RestController
 @RequestMapping("/subscribe")
@@ -19,9 +20,9 @@ public class SubscribeController {
     @RequestMapping(value = "/deviceData", method = RequestMethod.POST)
     public ResponseEntity<String> subscribeDeviceData() {
         JsonResult jsonResult = subscribeService.subscribeDeviceData();
-    	System.out.println("-----------------------------");
-    	System.out.println("| 设备数据上报地址订阅接口");
-    	System.out.println("-----------------------------");
+    	LogUtil.info("-----------------------------");
+    	LogUtil.info("| 设备数据上报地址订阅接口");
+    	LogUtil.info("-----------------------------");
         return ResponseEntity.ok(jsonResult.toString());
     }
 }

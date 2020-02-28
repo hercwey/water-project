@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
 import com.space.water.iot.api.test.Tester;
+import com.space.water.iot.api.util.LogUtil;
 
 @RestController
 public class MQTestController {
@@ -32,11 +33,11 @@ public class MQTestController {
 		 * jsonObject.getString("tag"); String key = jsonObject.getString("key"); String
 		 * dataStr = jsonObject.getString("data");
 		 * 
-		 * System.out.println("--------------------------------------------------------------------------------------");
-		 * System.out.println("| Topic:" + topic); System.out.println("| tag :" + tag);
-		 * System.out.println("| key :" + key); System.out.println("| data :" +
+		 * LogUtil.debug("--------------------------------------------------------------------------------------");
+		 * LogUtil.debug("| Topic:" + topic); LogUtil.debug("| tag :" + tag);
+		 * LogUtil.debug("| key :" + key); LogUtil.debug("| data :" +
 		 * dataStr);
-		 * System.out.println("--------------------------------------------------------------------------------------");
+		 * LogUtil.debug("--------------------------------------------------------------------------------------");
 		 * 
 		 * // 创建生产信息 Message message = new Message(topic, tag, key, dataStr.getBytes());
 		 */
@@ -76,7 +77,7 @@ public class MQTestController {
 
 		// 发送
 		SendResult sendResult = producer.getProducer().send(Tester.packMQMessage(tag, messageData));
-		System.out.println("输出生产者信息={}" + sendResult);
+		LogUtil.debug("输出生产者信息={}" + sendResult);
 		return "成功";
 	}
 }

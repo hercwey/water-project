@@ -169,7 +169,7 @@ public class HttpsUtil extends DefaultHttpClient {
 
 		HttpResponse response = executeHttpRequest(request);
 		if (null == response) {
-			System.out.println("The response body is null.");
+			LogUtil.debug("The response body is null.");
 		}
 
 		return (StreamClosedHttpResponse) response;
@@ -183,7 +183,7 @@ public class HttpsUtil extends DefaultHttpClient {
 
 		HttpResponse response = executeHttpRequest(request);
 		if (null == response) {
-			System.out.println("The response body is null.");
+			LogUtil.debug("The response body is null.");
 		}
 
 		return (StreamClosedHttpResponse) response;
@@ -209,7 +209,7 @@ public class HttpsUtil extends DefaultHttpClient {
 
 		HttpResponse response = executeHttpRequest(request);
 		if (null == response) {
-			System.out.println("The response body is null.");
+			LogUtil.debug("The response body is null.");
 			throw new Exception();
 		}
 
@@ -238,7 +238,7 @@ public class HttpsUtil extends DefaultHttpClient {
 			String content) {
 		HttpResponse response = doPutJson(url, headerMap, content);
 		if (null == response) {
-			System.out.println("The response body is null.");
+			LogUtil.debug("The response body is null.");
 		}
 
 		return (StreamClosedHttpResponse) response;
@@ -247,7 +247,7 @@ public class HttpsUtil extends DefaultHttpClient {
 	public StreamClosedHttpResponse doPutGetStatusLine(String url, Map<String, String> headerMap) {
 		HttpResponse response = doPut(url, headerMap);
 		if (null == response) {
-			System.out.println("The response body is null.");
+			LogUtil.debug("The response body is null.");
 		}
 
 		return (StreamClosedHttpResponse) response;
@@ -281,7 +281,7 @@ public class HttpsUtil extends DefaultHttpClient {
 			throws Exception {
 		HttpResponse response = doGetWithParas(url, queryParams, headerMap);
 		if (null == response) {
-			System.out.println("The response body is null.");
+			LogUtil.debug("The response body is null.");
 		}
 
 		return (StreamClosedHttpResponse) response;
@@ -298,7 +298,7 @@ public class HttpsUtil extends DefaultHttpClient {
 			Map<String, String> headerMap) {
 		HttpResponse response = doDelete(url, headerMap);
 		if (null == response) {
-			System.out.println("The response body is null.");
+			LogUtil.debug("The response body is null.");
 		}
 
 		return (StreamClosedHttpResponse) response;
@@ -326,12 +326,12 @@ public class HttpsUtil extends DefaultHttpClient {
 		try {
 			response = httpClient.execute(request);
 		} catch (Exception e) {
-			System.out.println("executeHttpRequest failed.");
+			LogUtil.error("executeHttpRequest failed.");
 		} finally {
 			try {
 				response = new StreamClosedHttpResponse(response);
 			} catch (IOException e) {
-				System.out.println("IOException: " + e.getMessage());
+				LogUtil.error("IOException: " + e.getMessage());
 			}
 		}
 
