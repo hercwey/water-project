@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <title>产品登记</title>
 
-<link rel="stylesheet" type="text/css" href="/bootstrap/switch/css/bootstrap-switch.min.css" />
-<script type="text/javascript" src="/bootstrap/switch/js/bootstrap-switch.min.js"></script>
-
 <style type="text/css">
 	/* .input-group-text{
 		font-size: .875rem;
@@ -180,7 +177,7 @@
 												</div> -->
 												<input id="checkbox-auto-save" type="checkbox" style="float: right; heigth: 30px;" />
 												&nbsp;
-												<button type="button" class="btn btn-primary" id="btn-confirm-save" style="float: right; height: 36px;">确认保存</button>
+												<button type="button" class="btn btn-primary" id="btn-confirm-save" style="float: right; height: 29px;">确认保存</button>
 								        	</span>
 										</span>
 									</div>
@@ -490,6 +487,16 @@
 			});
 		}
 		
+		//--------------初始化Bootstrap Switch大小和开关------------------------------------------
+		/**
+		 * 	初始化自动生成出厂编号开关和自动保存开关的开关状态和大小
+		 */
+		function initSwitchSizeAndOnOff(){
+			$("#checkbox-auto-generator-number").bootstrapSwitch("state", true);//设置自动生成出厂编号开关状态为开
+			$("#checkbox-auto-generator-number").bootstrapSwitch("size","small");//设置自动生成出厂编号开关大小为small
+			$("#checkbox-auto-save").bootstrapSwitch("size","small");//设置自动保存开关大小为small
+		}
+		
 		$(function(){
 			
 			/**
@@ -568,7 +575,6 @@
 		        	//$("#checkbox-auto-generator-number").bootstrapSwitch('state', true);
 		        } */
 			});
-			$("#checkbox-auto-generator-number").bootstrapSwitch('state', true);//设置自动生成出厂编号状态为开
 			
 			/**
 			 * 	自动保存
@@ -641,23 +647,24 @@
 			/**
 			 * 	确认保存
 			 */
-			$("#btn-confirm-save").on(
-					"click",
-					function() {
-						var id = $("#curr-edit-product-no")
-								.attr("data-item-id");//主键ID
-						var productNo = $("#curr-edit-product-no").val();//当前编辑的出厂编号
-						console.log("----------主键ID：" + id);
-						console.log("----------出厂编号：" + productNo);
-						if (id == null || id == "" || productNo == null
-								|| productNo == "") {
-							//dialog type: success warning info error,默认为info
-							util.message("请确认出厂编号！", null, "warning");
-							return false;
-						}
+			$("#btn-confirm-save").on("click", function() {
+				var id = $("#curr-edit-product-no")
+						.attr("data-item-id");//主键ID
+				var productNo = $("#curr-edit-product-no").val();//当前编辑的出厂编号
+				console.log("----------主键ID：" + id);
+				console.log("----------出厂编号：" + productNo);
+				if (id == null || id == "" || productNo == null
+						|| productNo == "") {
+					//dialog type: success warning info error,默认为info
+					util.message("请确认出厂编号！", null, "warning");
+					return false;
+				}
 
-						saveCurrEditMeterNumber();//保存当前编辑的出厂编号
-					});
+				saveCurrEditMeterNumber();//保存当前编辑的出厂编号
+			});
+			
+			initSwitchSizeAndOnOff();//初始化自动生成出厂编号开关和自动保存开关的开关状态和大小
+			
 		});
 	</script>
 

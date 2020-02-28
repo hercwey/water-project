@@ -17,6 +17,12 @@
 <link rel="stylesheet"	href="/css/meterbookbody.css" />
 <link rel="stylesheet"	href="/css/commform.css" />
 <link rel="stylesheet"	href="/css/searchpanel.css" />
+
+<!-- Bootstrap Switch CSS -->
+<link rel="stylesheet" type="text/css" href="/bootstrap/switch/css/bootstrap-switch.min.css" />
+<!-- Bootstrap Switch JS -->
+<script type="text/javascript" src="/bootstrap/switch/js/bootstrap-switch.min.js"></script>
+
 <style type="text/css">
 	#module-product-no-search-form ul li label{
 		margin-bottom: 0px;
@@ -46,7 +52,7 @@
 					</li> -->
 					<!-- 查询按钮 -->
 					<li>
-						<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
+						<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search" style="height: 29px;">
 							<i class="fa fa-refresh" aria-hidden="true"> <span>刷新</span>	</i>
 						</button>
 						<!-- <button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
@@ -57,11 +63,12 @@
 						</button> -->
 					</li>
 					<li>
-						<div class="input-group-prepend btn-default">
+						<input id="checkbox-auto-refresh" type="checkbox" /><!-- 默认是选中状态，初始初始化时设置 -->
+						<!-- <div class="input-group-prepend btn-default">
 							<div class="input-group-text">
 								<label><input type="checkbox" class="" id="checkbox-auto-refresh">&nbsp;自动刷新</label>
 							</div>
-						</div>
+						</div> -->
 					</li>
 				</ul>
 			</div>
@@ -254,6 +261,14 @@
 		function closeEditDialog() {
 			DialogUtil.closeDialogFn(G_EDIT_DIALOG);
 		}
+
+		//--------------初始化Bootstrap Switch大小和开关------------------------------------------
+		/**
+		 * 	初始化自动刷新Switch大小
+		 */
+		function initAutoRefreshSwitchSize(){
+			$("#checkbox-auto-refresh").bootstrapSwitch("size","small");//设置自动刷新开关大小为small
+		}
 		
 		//-------------------PAGE LOADED READY--------------------
 
@@ -292,7 +307,7 @@
 			/**
 			 * 	绑定自动刷新checkbox的click事件
 			 */
-			$('#module-product-no-search-form #checkbox-auto-refresh').on('click', function(event) {
+			/* $('#module-product-no-search-form #checkbox-auto-refresh').on('click', function(event) {
 				var refreshFlag = $(this).is(":checked");
 				console.log("----------自动刷新："+refreshFlag);
 				if(refreshFlag){//启动自动刷新
@@ -300,6 +315,32 @@
 				}else{////停止自动刷新
 					clearAutoRefresh();//取消自动刷新
 				}
+			}); */
+			/**
+			 * 	自动刷新
+			 */
+			$("#checkbox-auto-refresh").bootstrapSwitch({
+				onText:"开",//左侧开关显示文本
+		        offText:"关",//右侧开关显示文本
+		        labelText: "自动刷新",//开关中间显示文本
+		        onColor:"success",//左侧开关颜色  
+		        offColor:"default",//右侧开关颜色
+		        handleWidth: "70",//开关左右2侧的宽度
+		        labelWidth: "80",//开关中间的宽度
+		        size: "mini",//开关大小，取值范围：null|mini|small|normal|large
+	        	onSwitchChange:function(event,state){  
+	        		if (state == true) {
+	        			console.log("----------自动刷新已开启");
+	        			autoRefresh();//自动刷新，5秒刷新一次
+					} else {
+						console.log("----------自动刷新已关闭");
+						clearAutoRefresh();//取消自动刷新
+					}
+		        },
+		        /* onInit: function(event,state){
+		        	console.log("----------自动生成出厂编号默认值："+state);
+		        	//$("#checkbox-auto-generator-number").bootstrapSwitch('state', true);
+		        } */
 			});
 			
 			/*
@@ -314,6 +355,7 @@
 				batchDeleteConfirm();  //显示删除确认对话框
 			}); */
 			
+			initAutoRefreshSwitchSize();//初始化自动刷新Switch大小
 
 		});
 	</script>
