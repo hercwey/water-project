@@ -15,6 +15,7 @@ import com.space.water.iot.api.protocol.bean.MeterValveControlResp;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdCmd;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdResp;
 import com.space.water.iot.api.protocol.util.ProtoUtil;
+import com.space.water.iot.api.util.LogUtil;
 /**
  * 报文编解码器, 解析和打包的总入口
  */
@@ -39,7 +40,7 @@ public class PacketCodec {
         // 校验和检查, 非关键信息, 只打印
         byte chk = ProtoUtil.calcChecksum(msgBytes, 0, msgBytes.length - 2);  //除最后两个字节外计算校验
         if (packetFrame.getChecksum() != chk) {
-            System.out.println("***检验和检查不通过!***");
+            LogUtil.error("***检验和检查不通过!***");
         }
 
         return packetFrame;
@@ -100,7 +101,7 @@ public class PacketCodec {
                 break;
             }
             default:{
-                System.out.println("***错误的数据标识***");
+                LogUtil.error("***错误的数据标识***");
             }
         }
 

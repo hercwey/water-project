@@ -21,6 +21,7 @@ import com.space.water.iot.api.rocketmq.RocketTopicConfig;
 import com.space.water.iot.api.service.ICommandService;
 import com.space.water.iot.api.util.IoTRequestUtil;
 import com.space.water.iot.api.util.JsonUtil;
+import com.space.water.iot.api.util.LogUtil;
 
 @Service
 public class CommandService implements ICommandService {
@@ -34,7 +35,7 @@ public class CommandService implements ICommandService {
 
 		JsonResult jsonResult = JsonResult.fail(0, "Unknown Error");
 
-		System.out.println("| postCommand 下发控制指令：" + commandBean.getDeviceId() + "==" + commandBean.getCommandId());
+		LogUtil.debug("| postCommand 下发控制指令：" + commandBean.getDeviceId() + "==" + commandBean.getCommandId());
 		try {
 			String urlPostAsyncCmd = Constants.POST_ASYNC_CMD;
 			String callbackUrl = Constants.REPORT_CMD_EXEC_RESULT_CALLBACK_URL;
@@ -88,10 +89,10 @@ public class CommandService implements ICommandService {
 			orderSatusResponse.setStatus(CommandCallbackConstants.COMMAND_STATUS_SENT);
 		}
 
-		System.out.println("---------------------------");
-		System.out.println("| 控制指令异步发送到IoT平台：" + commandBean.getDeviceId() + "==" + response.getCommandId());
-		System.out.println("| 控制指令异步发送完成：" + result);
-		System.out.println("---------------------------");
+		LogUtil.debug("---------------------------");
+		LogUtil.debug("| 控制指令异步发送到IoT平台：" + commandBean.getDeviceId() + "==" + response.getCommandId());
+		LogUtil.debug("| 控制指令异步发送完成：" + result);
+		LogUtil.debug("---------------------------");
 
 		producer.sendNorth(OrderStatusResponse.toJsonString(orderSatusResponse), topicConfig.getTagOrderStatus());
 	}

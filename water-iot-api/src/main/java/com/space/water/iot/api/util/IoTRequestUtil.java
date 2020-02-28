@@ -88,7 +88,7 @@ public class IoTRequestUtil {
 
         HttpResponse response = httpsUtil.doGetWithParas(url, queryParams, header);
         if (null == response) {
-            System.out.println("The response body is null.");
+            LogUtil.debug("The response body is null.");
         }
         JsonResult jsonResult = getJsonResult(response,httpsUtil);
         return jsonResult;
@@ -106,7 +106,7 @@ public class IoTRequestUtil {
 
         HttpResponse response = httpsUtil.doDelete(url, header);
         if (null == response) {
-            System.out.println("The response body is null.");
+            LogUtil.debug("The response body is null.");
         }
         JsonResult jsonResult = getJsonResult(response,httpsUtil);
         return jsonResult;
@@ -121,12 +121,12 @@ public class IoTRequestUtil {
          * 4** 请求错误这些状态代码表示请求可能出错，妨碍了服务器的处理。
          * 5**（服务器错误）这些状态代码表示服务器在尝试处理请求时发生内部错误。 这些错误可能是服务器本身的错误，而不是请求出错。
          */
-        System.out.println("\n----------------------------------------");
-        System.out.println("| IoT Platform Request, response content:");
+        LogUtil.debug("\n----------------------------------------");
+        LogUtil.debug("| IoT Platform Request, response content:");
         try {
             if (response != null) {
 
-                System.out.println("| Status   Code:" + response.getStatusLine());
+                LogUtil.debug("| Status   Code:" + response.getStatusLine());
 
                 int statusCode = response.getStatusLine().getStatusCode();
                 int statusType = statusCode/100;
@@ -137,7 +137,7 @@ public class IoTRequestUtil {
                     responseBody = httpsUtil.getHttpResponseBody(response);
                 }
 
-                System.out.println("| Response Body:"+responseBody);
+                LogUtil.debug("| Response Body:"+responseBody);
 
                 /**
                  * 请求失败消息，需要重新登录
@@ -178,7 +178,7 @@ public class IoTRequestUtil {
             jsonResult = JsonResult.fail(0,"Error:" + e.getMessage());
         }
 
-        System.out.println("----------------------------------------\n");
+        LogUtil.debug("----------------------------------------\n");
         return jsonResult;
     }
 

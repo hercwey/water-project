@@ -10,6 +10,7 @@ import com.space.water.iot.api.protocol.bean.MeterConfigWriteCmd;
 import com.space.water.iot.api.protocol.bean.MeterReadWaterCmd;
 import com.space.water.iot.api.protocol.bean.MeterValveControlCmd;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdCmd;
+import com.space.water.iot.api.util.LogUtil;
 
 public class CommandGenerator {
 	
@@ -32,7 +33,7 @@ public class CommandGenerator {
                 meterBase);
         
         cmd = HexUtils.toHexString(packetBytes);
-        System.out.println("生成命令:[" +cmd +"]");
+        LogUtil.debug("生成命令:[" +cmd +"]");
     	return cmd;
     }
     

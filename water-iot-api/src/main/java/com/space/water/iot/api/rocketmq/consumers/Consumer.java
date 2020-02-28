@@ -1,7 +1,6 @@
-package com.space.water.iot.api.rocketmq;
+package com.space.water.iot.api.rocketmq.consumers;
 
 import java.io.UnsupportedEncodingException;
-import java.sql.Date;
 import java.util.List;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
@@ -32,19 +31,27 @@ import com.space.water.iot.api.model.device.DeleteDeviceRequest;
 import com.space.water.iot.api.model.device.RegisterDeviceRequest;
 import com.space.water.iot.api.model.device.UpdateDeviceRequest;
 import com.space.water.iot.api.model.iot.command.CommandBean;
+import com.space.water.iot.api.model.report.BaseReportData;
 import com.space.water.iot.api.protocol.CommandGenerator;
 import com.space.water.iot.api.protocol.bean.MeterConfigReadCmd;
 import com.space.water.iot.api.protocol.bean.MeterConfigWriteCmd;
 import com.space.water.iot.api.protocol.bean.MeterReadWaterCmd;
 import com.space.water.iot.api.protocol.bean.MeterValveControlCmd;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdCmd;
+import com.space.water.iot.api.rocketmq.MQConstant;
+import com.space.water.iot.api.rocketmq.Producer;
+import com.space.water.iot.api.rocketmq.RocketTopicConfig;
 import com.space.water.iot.api.service.IDeviceService;
+import com.space.water.iot.api.service.IReportService;
+import com.space.water.iot.api.util.LogUtil;
 
 @Component
 public class Consumer {
 
 	@Autowired
 	IDeviceService deviceService;
+	@Autowired
+	IReportService reportService;
 	@Autowired
 	Producer producer;
 	@Autowired
@@ -78,20 +85,18 @@ public class Consumer {
 				@Override
 				public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs,
 						ConsumeConcurrentlyContext context) {
-					// msgs中只收集同一个topic，同一个tag，并且key相同的message
-					// 会把不同的消息分别放置到不同的队列中
 					try {
 						for (Message msg : msgs) {
 							String body = new String(msg.getBody(), "utf-8");
-							System.out.println("-------------------------------------");
-							System.out.println("| Consumer获取消息");
-							System.out.println("| Time :" + new Date(System.currentTimeMillis()).toGMTString());
-							System.out.println("| Topic:" + msg.getTopic());
-							System.out.println("| Tags :" + msg.getTags());
-							System.out.println("| Data :" + body);
+//							LogUtil.debug("-------------------------------------");
+//							LogUtil.debug("| Consumer获取消息");
+//							LogUtil.debug("| Time :" + new Date(System.currentTimeMillis()).toGMTString());
+//							LogUtil.debug("| Topic:" + msg.getTopic());
+//							LogUtil.debug("| Tags :" + msg.getTags());
+//							LogUtil.debug("| Data :" + body);
 							// TODO G11 根据tags中的值调用对应接口
 							processMessage(msg);
-							System.out.println("-------------------------------------");
+//							LogUtil.debug("-------------------------------------");
 						}
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
@@ -103,9 +108,9 @@ public class Consumer {
 			});
 
 			consumer.start();
-			System.out.println("-------------------------------------");
-			System.out.println("| IoT Api Consumer 启动成功=======");
-			System.out.println("-------------------------------------");
+			LogUtil.info("-------------------------------------");
+			LogUtil.info("| IoT Api Consumer 启动成功=======");
+			LogUtil.info("-------------------------------------");
 		} catch (MQClientException e) {
 			e.printStackTrace();
 		}
@@ -149,8 +154,13 @@ public class Consumer {
 		else if (msgTag.equals(topicConfig.getTagDeviceQuerySouth())) {
 			// TODO G11 查询设备
 			deviceQuerySouth(msg);
-		} else {
-			System.out.println("| 未知位置消息类型，不处理");
+		}
+		else if (msgTag.equals(topicConfig.getTagAutoReportCache())) {
+			// TODO 数据解析
+			autoReportCache(msg);
+		}
+		else {
+			LogUtil.debug("| 未知位置消息类型，不处理");
 		}
 	}
 
@@ -279,6 +289,11 @@ public class Consumer {
 		producer.sendNorth(result.getData(), topicConfig.getTagDeviceQueryNorth());
 	}
 
+	private void autoReportCache(Message msg) {
+		// TODO 数据解析
+		BaseReportData meterBean = BaseReportData.fromUploadDataJson(new String(msg.getBody()));
+		reportService.process(meterBean);
+	}
 	private void cacheCommand(BaseCommandRequest request, String cmdHexStr) {
 		// TODO G11 生成CommandBean
 		CommandBean commandBean = new CommandBean();

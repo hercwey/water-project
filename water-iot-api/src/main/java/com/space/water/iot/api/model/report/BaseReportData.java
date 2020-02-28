@@ -21,6 +21,7 @@ import com.space.water.iot.api.protocol.bean.MeterReport;
 import com.space.water.iot.api.protocol.bean.MeterValveControlResp;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdResp;
 import com.space.water.iot.api.protocol.util.HexStringUtils;
+import com.space.water.iot.api.util.LogUtil;
 import com.space.water.iot.api.util.StringUtil;
 
 public class BaseReportData {
@@ -304,10 +305,8 @@ public class BaseReportData {
 	public static void main(String[] args) {
 		String data = "{\"notifyType\":\"deviceDatasChanged\",\"requestId\":null,\"deviceId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"gatewayId\":\"20a1a5a3-7705-4850-92fd-9deb88988c24\",\"services\":[{\"serviceId\":\"JRprotocol\",\"serviceType\":\"JRprotocol\",\"data\":{\"JRprotocolXY\":\"681002390745404358811d1f90a702390745404350172309010220a6090000024836090015000000db16\"},\"eventTime\":\"20200206T050809Z\"}]}";
 		BaseReportData meterBean = BaseReportData.fromUploadDataJson(data);
-		System.out.println(JSON.toJSON(meterBean.getData()));
-		System.out.println(JSON.toJSON(meterBean));
 		
-		System.out.println(meterBean.getEventTime().toString());
-		System.out.println(MeterReportBean.fromJson(meterBean.getData()).getMeterTime().toString());
+		LogUtil.debug(meterBean.getEventTime().toString());
+		LogUtil.debug(MeterReportBean.fromJson(meterBean.getData()).getMeterTime().toString());
 	}
 }

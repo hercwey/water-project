@@ -3,16 +3,14 @@ package com.space.water.iot.api.service.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.space.water.iot.api.common.JsonResult;
 import com.space.water.iot.api.config.Constants;
 import com.space.water.iot.api.model.iot.auth.LoginResp;
 import com.space.water.iot.api.service.IAuthService;
-import com.space.water.iot.api.service.ISubscribeService;
 import com.space.water.iot.api.util.IoTRequestUtil;
-import com.space.water.iot.api.util.JsonUtil;
+import com.space.water.iot.api.util.LogUtil;
 
 @Service
 public class AuthService implements IAuthService {
@@ -34,7 +32,7 @@ public class AuthService implements IAuthService {
 			LoginResp response = LoginResp.fromJson(jsonResult.getData());
 			Constants.accessToken = response.getAccessToken();
 
-			System.out.println("accessToken:" + Constants.accessToken);
+			LogUtil.debug("accessToken:" + Constants.accessToken);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -69,7 +67,7 @@ public class AuthService implements IAuthService {
 			param_reg.put("refreshToken", accessToken);
 
 			String response = IoTRequestUtil.doPostJsonGetStatusLine(urlRefreshToken, param_reg).getData();
-			System.out.println("============" + response);
+			LogUtil.debug("============" + response);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

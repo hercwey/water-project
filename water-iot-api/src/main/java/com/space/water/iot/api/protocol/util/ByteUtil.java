@@ -4,6 +4,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+import com.space.water.iot.api.util.LogUtil;
+
 public class ByteUtil {
 
     public static int arrayCopy(byte[] src, int srcPos, byte[] dest) {
@@ -526,7 +528,7 @@ public class ByteUtil {
 
     public static double getDouble(byte[] bytes) {
         long l = getLong(bytes);
-        System.out.println(l);
+        LogUtil.debug(l+"");
         return Double.longBitsToDouble(l);
     }
 

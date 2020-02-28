@@ -31,7 +31,7 @@ public class StreamUtil {
 
 			return strBuf.toString();
 		} catch (IOException e) {
-			System.out.println(e);
+			LogUtil.error(e.getMessage());
 		} finally {
 			closeStream(inReader);
 		}
@@ -44,7 +44,7 @@ public class StreamUtil {
 			try {
 				closeable.close();
 			} catch (IOException e) {
-				System.out.println(e);
+				LogUtil.error(e.getMessage());
 			}
 		}
 	}

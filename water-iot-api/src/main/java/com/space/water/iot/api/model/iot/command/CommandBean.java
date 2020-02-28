@@ -6,6 +6,7 @@ import java.util.Date;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.space.water.iot.api.util.LogUtil;
 
 public class CommandBean {
     private static final long serialVersionUID = 1L;
@@ -223,11 +224,9 @@ public class CommandBean {
                 commandBean.setMethodParams(commandBean.getParas().toJSONString());
             }
         } catch (IOException e) {
-            /**
-            System.out.println("\n---------------------------");
-            System.out.println("| CommandBean数据解析失败："+e.getMessage());
-            System.out.println("---------------------------\n");
-             */
+            LogUtil.error("\n---------------------------");
+            LogUtil.error("| CommandBean数据解析失败："+e.getMessage());
+            LogUtil.error("---------------------------\n");
         }
 
         return commandBean;

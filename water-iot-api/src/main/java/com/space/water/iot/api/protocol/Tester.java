@@ -23,12 +23,13 @@ import com.space.water.iot.api.protocol.bean.MeterValveControlResp;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdCmd;
 import com.space.water.iot.api.protocol.bean.MeterVolumeThresholdResp;
 import com.space.water.iot.api.protocol.util.ByteUtil;
+import com.space.water.iot.api.util.LogUtil;
 
 public class Tester {
 
     private static void unitTestValveControl() {
 
-        System.out.println("测试阀门控制");
+        LogUtil.debug("测试阀门控制");
 
         /////////////////////////////////////////////////////////////////////////
         // [主站] 申请命令对象, 设置阀门开阀命令
@@ -43,15 +44,15 @@ public class Tester {
                 valveCmd);
 
         // [主站] 发送 ...
-        System.out.println("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
+        LogUtil.debug("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
 
         /////////////////////////////////////////////////////////////////////////
 
         // [从站] 接收 解析字节消息
         PacketFrame packetFrame = new PacketFrame(packetBytes);
         MeterValveControlCmd recvCmd = (MeterValveControlCmd)decodeData(packetFrame);
-        System.out.println("[从站] 接收到消息帧{" + packetFrame.toString() + "}");
-        System.out.println("[从站] 接收到消息体{" + recvCmd.toString() + "}");
+        LogUtil.debug("[从站] 接收到消息帧{" + packetFrame.toString() + "}");
+        LogUtil.debug("[从站] 接收到消息体{" + recvCmd.toString() + "}");
 
         // [从站] 封装应答消息
         MeterValveControlResp response = new MeterValveControlResp();
@@ -62,7 +63,7 @@ public class Tester {
                 "7833",
                 (byte)0x01,
                 response);
-        System.out.println("[从站] 发送应答数据:[" + HexUtils.toHexString(packetBytes)+"]");
+        LogUtil.debug("[从站] 发送应答数据:[" + HexUtils.toHexString(packetBytes)+"]");
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -70,13 +71,13 @@ public class Tester {
         PacketFrame packetFrame2 = new PacketFrame(respBytes);
         MeterValveControlResp respMsg = (MeterValveControlResp)decodeData(packetFrame2);
 
-        System.out.println("[主站] 接收应答帧:{" + packetFrame2.toString() +"}");
-        System.out.println("[主站] 接收应答体:{" + respMsg.toString() +"}");
+        LogUtil.debug("[主站] 接收应答帧:{" + packetFrame2.toString() +"}");
+        LogUtil.debug("[主站] 接收应答体:{" + respMsg.toString() +"}");
     }
 
     private static void unitTestReport() {
 
-        System.out.println("测试数据上报");
+        LogUtil.debug("测试数据上报");
 
         // [从站] 封装应答消息
         MeterReport report = new MeterReport();
@@ -95,7 +96,7 @@ public class Tester {
                 "7833",
                 (byte)0x02,
                 report);
-        System.out.println("[从站] 发送数据:[" + HexUtils.toHexString(reportBytes)+"]");
+        LogUtil.debug("[从站] 发送数据:[" + HexUtils.toHexString(reportBytes)+"]");
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -103,14 +104,14 @@ public class Tester {
         PacketFrame packetFrame2 = new PacketFrame(reportBytes);
         MeterReport respMsg = (MeterReport)decodeData(packetFrame2);
 
-        System.out.println("[主站] 接收数据帧:{" + packetFrame2.toString() +"}");
-        System.out.println("[主站] 接收数据体:{" + respMsg.toString() +"}");
+        LogUtil.debug("[主站] 接收数据帧:{" + packetFrame2.toString() +"}");
+        LogUtil.debug("[主站] 接收数据体:{" + respMsg.toString() +"}");
 
-        System.out.println("======================================");
+        LogUtil.debug("======================================");
     }
 
     private static void unitTestReadConfig() {
-        System.out.println("测试读取配置");
+        LogUtil.debug("测试读取配置");
 
         /////////////////////////////////////////////////////////////////////////
         // [主站] 申请命令对象
@@ -124,15 +125,15 @@ public class Tester {
                 command);
 
         // [主站] 发送 ...
-        System.out.println("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
+        LogUtil.debug("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
 
         /////////////////////////////////////////////////////////////////////////
 
         // [从站] 接收 解析字节消息
         PacketFrame packetFrame = new PacketFrame(packetBytes);
         MeterConfigReadCmd recvCmd = (MeterConfigReadCmd)decodeData(packetFrame);
-        System.out.println("[从站] 接收到消息帧{" + packetFrame.toString() + "}");
-        System.out.println("[从站] 接收到消息体{" + recvCmd.toString() + "}");
+        LogUtil.debug("[从站] 接收到消息帧{" + packetFrame.toString() + "}");
+        LogUtil.debug("[从站] 接收到消息体{" + recvCmd.toString() + "}");
 
         // [从站] 封装应答消息
         MeterConfigReadResp cmdResp = new MeterConfigReadResp();
@@ -162,7 +163,7 @@ public class Tester {
                 "7833",
                 (byte)0x01,
                 cmdResp);
-        System.out.println("[从站] 发送应答数据:[" + HexUtils.toHexString(packetBytes)+"]");
+        LogUtil.debug("[从站] 发送应答数据:[" + HexUtils.toHexString(packetBytes)+"]");
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -170,12 +171,12 @@ public class Tester {
         PacketFrame packetFrame2 = new PacketFrame(respBytes);
         MeterConfigReadResp respMsg = (MeterConfigReadResp)decodeData(packetFrame2);
 
-        System.out.println("[主站] 接收应答帧:{" + packetFrame2.toString() +"}");
-        System.out.println("[主站] 接收应答体:{" + respMsg.toString() +"}");
+        LogUtil.debug("[主站] 接收应答帧:{" + packetFrame2.toString() +"}");
+        LogUtil.debug("[主站] 接收应答体:{" + respMsg.toString() +"}");
     }
 
     private static void unitTestWriteConfig() {
-        System.out.println("测试下发写配置");
+        LogUtil.debug("测试下发写配置");
 
         /////////////////////////////////////////////////////////////////////////
         // [主站] 【1】 申请命令对象
@@ -226,15 +227,15 @@ public class Tester {
                 command);
 
         // [主站] 发送 ...
-        System.out.println("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
+        LogUtil.debug("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
 
         /////////////////////////////////////////////////////////////////////////
 
         // [从站] 接收 解析字节消息
         PacketFrame packetFrame = new PacketFrame(packetBytes);
         MeterConfigWriteCmd recvCmd = (MeterConfigWriteCmd)decodeData(packetFrame);
-        System.out.println("[从站] 接收到消息帧{" + packetFrame.toString() + "}");
-        System.out.println("[从站] 接收到消息体{" + recvCmd.toString() + "}");
+        LogUtil.debug("[从站] 接收到消息帧{" + packetFrame.toString() + "}");
+        LogUtil.debug("[从站] 接收到消息体{" + recvCmd.toString() + "}");
 
         // [从站] 封装应答消息
         MeterConfigWriteResp cmdResp = new MeterConfigWriteResp();
@@ -264,7 +265,7 @@ public class Tester {
                 "7833",
                 (byte)0x01,
                 cmdResp);
-        System.out.println("[从站] 发送应答数据:[" + HexUtils.toHexString(packetBytes)+"]");
+        LogUtil.debug("[从站] 发送应答数据:[" + HexUtils.toHexString(packetBytes)+"]");
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -272,12 +273,12 @@ public class Tester {
         PacketFrame packetFrame2 = new PacketFrame(respBytes);
         MeterConfigWriteResp respMsg = (MeterConfigWriteResp)decodeData(packetFrame2);
 
-        System.out.println("[主站] 接收应答帧:{" + packetFrame2.toString() +"}");
-        System.out.println("[主站] 接收应答体:{" + respMsg.toString() +"}");
+        LogUtil.debug("[主站] 接收应答帧:{" + packetFrame2.toString() +"}");
+        LogUtil.debug("[主站] 接收应答体:{" + respMsg.toString() +"}");
     }
 
     private static void unitTestReadWaterVolume() {
-        System.out.println("测试冻结水量");
+        LogUtil.debug("测试冻结水量");
 
         /////////////////////////////////////////////////////////////////////////
         // [主站] 申请命令对象
@@ -291,15 +292,15 @@ public class Tester {
                 command);
 
         // [主站] 发送 ...
-        System.out.println("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
+        LogUtil.debug("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
 
         /////////////////////////////////////////////////////////////////////////
 
         // [从站] 接收 解析字节消息
         PacketFrame packetFrame = new PacketFrame(packetBytes);
         MeterReadWaterCmd recvCmd = (MeterReadWaterCmd)decodeData(packetFrame);
-        System.out.println("[从站] 接收到消息帧{" + packetFrame.toString() + "}");
-        System.out.println("[从站] 接收到消息体{" + recvCmd.toString() + "}");
+        LogUtil.debug("[从站] 接收到消息帧{" + packetFrame.toString() + "}");
+        LogUtil.debug("[从站] 接收到消息体{" + recvCmd.toString() + "}");
 
         // [从站] 封装应答消息
         MeterReadWaterResp cmdResp = new MeterReadWaterResp();
@@ -327,7 +328,7 @@ public class Tester {
                 "7833",
                 (byte)0x01,
                 cmdResp);
-        System.out.println("[从站] 发送应答数据:[" + HexUtils.toHexString(packetBytes)+"]");
+        LogUtil.debug("[从站] 发送应答数据:[" + HexUtils.toHexString(packetBytes)+"]");
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -335,8 +336,8 @@ public class Tester {
         PacketFrame packetFrame2 = new PacketFrame(respBytes);
         MeterReadWaterResp respMsg = (MeterReadWaterResp)decodeData(packetFrame2);
 
-        System.out.println("[主站] 接收应答帧:{" + packetFrame2.toString() +"}");
-        System.out.println("[主站] 接收应答体:{" + respMsg.toString() +"}");
+        LogUtil.debug("[主站] 接收应答帧:{" + packetFrame2.toString() +"}");
+        LogUtil.debug("[主站] 接收应答体:{" + respMsg.toString() +"}");
 
     }
 
@@ -355,56 +356,56 @@ public class Tester {
 
         // [主站] 1. 通过解码器调用解析帧
         PacketFrame packetFrame = PacketCodec.decodeFrame(recvBytes);
-        System.out.println("[主站] 接收数据帧:{" + packetFrame.toString() +"}");
+        LogUtil.debug("[主站] 接收数据帧:{" + packetFrame.toString() +"}");
 
         // [主站] 2. 解码器解析数据, 需要判断null的情况
         MeterBase msgData = PacketCodec.decodeData(packetFrame);
         if (null == msgData){
-            System.out.println("解析失败");
+            LogUtil.debug("解析失败");
             return;
         }
 
         // [主站] 3. 通过基类的实例化分别判断对象实例
         if (msgData instanceof MeterConfigReadCmd) {
             // 接收函数中可忽略 (主站发起的读配置命令)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterConfigReadCmd)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterConfigReadCmd)msgData).toString() +"}");
         } else if (msgData instanceof MeterConfigReadResp) {
             // 接收函数需处理 (从站回应的读取配置结果)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterConfigReadResp)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterConfigReadResp)msgData).toString() +"}");
         } else if (msgData instanceof MeterConfigWriteCmd) {
             // 接收函数中可忽略 (主站发起的写配置命令)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterConfigWriteCmd)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterConfigWriteCmd)msgData).toString() +"}");
         } else if (msgData instanceof MeterConfigWriteResp) {
             // 接收函数需处理 (从站回应的写配置结果)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterConfigWriteResp)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterConfigWriteResp)msgData).toString() +"}");
         } else if (msgData instanceof MeterReadWaterCmd){
             // 接收函数中可忽略 (主站发起的读月冻结量的指令)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterReadWaterCmd)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterReadWaterCmd)msgData).toString() +"}");
         } else if (msgData instanceof MeterReadWaterResp){
             // 接收函数需处理 (从站回应的读月冻结量的结果)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterReadWaterResp)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterReadWaterResp)msgData).toString() +"}");
         } else if (msgData instanceof MeterReport){
             // 接收函数需处理 (从站上报数据)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterReport)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterReport)msgData).toString() +"}");
         } else if (msgData instanceof MeterValveControlCmd){
             // 接收函数中可忽略 (主站发起的阀门控制指令)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterValveControlCmd)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterValveControlCmd)msgData).toString() +"}");
         } else if (msgData instanceof MeterValveControlResp){
             // 接收函数需处理 (从站回应的阀门控制的结果)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterValveControlResp)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterValveControlResp)msgData).toString() +"}");
         }else if (msgData instanceof MeterVolumeThresholdCmd){
             // 接收函数中可忽略 (主站发起的设置水量阈值的指令)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterVolumeThresholdCmd)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterVolumeThresholdCmd)msgData).toString() +"}");
         } else if (msgData instanceof MeterVolumeThresholdResp){
             // 接收函数需处理 (从站回应的设置水量阈值的结果)
-            System.out.println("[主站] 接收 数据体:{" + ((MeterVolumeThresholdResp)msgData).toString() +"}");
+            LogUtil.debug("[主站] 接收 数据体:{" + ((MeterVolumeThresholdResp)msgData).toString() +"}");
         }
 
     }
 
 
     private static void UT_WriteConfig() {
-        System.out.println("========== 测试下发写配置 配置不写时，默认填充0 ============");
+        LogUtil.debug("========== 测试下发写配置 配置不写时，默认填充0 ============");
 
         /////////////////////////////////////////////////////////////////////////
         // [主站] 【1】 申请命令对象
@@ -442,7 +443,7 @@ public class Tester {
                 command);
 
         // [主站] 发送 ...
-        System.out.println("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
+        LogUtil.debug("[主站] 发送数据:[" + HexUtils.toHexString(packetBytes)+"]");
 
     }
 

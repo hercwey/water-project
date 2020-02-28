@@ -3,6 +3,7 @@ package com.space.water.iot.api.model.command;
 import com.alibaba.fastjson.JSON;
 import com.space.water.iot.api.model.common.DeviceParams;
 import com.space.water.iot.api.model.common.DeviceParamsFlags;
+import com.space.water.iot.api.util.LogUtil;
 
 public class ConfigParamsRequest extends BaseCommandRequest {
 	DeviceParams deviceParams;//设备详细参数
@@ -30,6 +31,6 @@ public class ConfigParamsRequest extends BaseCommandRequest {
 		DeviceParamsFlags flags = new DeviceParamsFlags();
 		deviceParams.setConfigFlag(flags);
 		request.setDeviceParams(deviceParams);
-		System.out.println(ConfigParamsRequest.toJsonString(request));
+		LogUtil.debug(ConfigParamsRequest.toJsonString(request));
 	}
 }

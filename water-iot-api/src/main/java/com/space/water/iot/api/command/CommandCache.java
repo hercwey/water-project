@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.space.water.iot.api.util.LogUtil;
+
 public class CommandCache {
 
 	Map<String, ArrayList<String>> commandMap;
@@ -38,13 +40,13 @@ public class CommandCache {
 		
 		commandMap.put(deviceId, commandList);
 		
-		System.out.println("-------------------------------------");
-		System.out.println("| 新增命令");
-		System.out.println("| DeviceID：" + deviceId);
-		System.out.println("| Command ：" + command);
-		System.out.println("-------------------------------------");
-		System.out.println("-------------------------------------");
-		System.out.println("| 设备（" + deviceId + "）指令总计：" + commandList.size() + " 条");
-		System.out.println("-------------------------------------");
+		LogUtil.debug("-------------------------------------");
+		LogUtil.debug("| 新增命令");
+		LogUtil.debug("| DeviceID：" + deviceId);
+		LogUtil.debug("| Command ：" + command);
+		LogUtil.debug("-------------------------------------");
+		LogUtil.debug("-------------------------------------");
+		LogUtil.debug("| 设备（" + deviceId + "）指令总计：" + commandList.size() + " 条");
+		LogUtil.debug("-------------------------------------");
 	}
 }

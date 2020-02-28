@@ -18,6 +18,7 @@ import com.space.water.iot.api.rocketmq.Producer;
 import com.space.water.iot.api.rocketmq.RocketTopicConfig;
 import com.space.water.iot.api.service.ICommandService;
 import com.space.water.iot.api.service.IDeviceService;
+import com.space.water.iot.api.util.LogUtil;
 
 @Controller
 @RequestMapping("/cmd")
@@ -35,10 +36,10 @@ public class CommandController {
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> send(@RequestBody String data) {
-    	System.out.println("-----------------------------");
-    	System.out.println("| 调用发送指令接口");
-    	System.out.println("| data:" + data);
-    	System.out.println("-----------------------------");
+    	LogUtil.info("-----------------------------");
+    	LogUtil.info("| 调用发送指令接口");
+    	LogUtil.info("| data:" + data);
+    	LogUtil.info("-----------------------------");
     	
         CommandBean commandBean = CommandBean.parseJson(data);
         //TODO G11 将指令发送到电信平台
@@ -51,10 +52,10 @@ public class CommandController {
     @RequestMapping(value = "/callback", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> callback(@RequestBody String data) {
-    	System.out.println("-----------------------------");
-    	System.out.println("| 下发指令返回执行结果");
-    	System.out.println("| data:" + data);
-    	System.out.println("-----------------------------");
+    	LogUtil.info("-----------------------------");
+    	LogUtil.info("| 下发指令返回执行结果");
+    	LogUtil.info("| data:" + data);
+    	LogUtil.info("-----------------------------");
 
         CommandCallbackBean commandResultBean = CommandCallbackBean.parseJson(data);
         //TODO G11 直接将执行结果，返回给《营收子系统》

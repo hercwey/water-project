@@ -10,6 +10,7 @@ import com.space.water.iot.api.protocol.PacketCodec;
 import com.space.water.iot.api.protocol.PacketFrame;
 import com.space.water.iot.api.protocol.bean.MeterConfig;
 import com.space.water.iot.api.protocol.util.HexStringUtils;
+import com.space.water.iot.api.util.LogUtil;
 import com.space.water.iot.api.util.StringUtil;
 
 public class DeviceParams {
@@ -198,10 +199,10 @@ public class DeviceParams {
 		PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(tempString));
 		MeterConfig meterConfig = (MeterConfig) PacketCodec.decodeData(packetFrame);
 		DeviceParams meterConfigBean = DeviceParams.fromMeterConfig(meterConfig);
-		System.out.println(DeviceParams.toJsonString(meterConfigBean));
+		LogUtil.debug(DeviceParams.toJsonString(meterConfigBean));
 
 		DeviceParams meterConfig2 = DeviceParams.fromJson(DeviceParams.toJsonString(meterConfigBean));
 
-		System.out.println(DeviceParams.toJsonString(meterConfig2));
+		LogUtil.debug(DeviceParams.toJsonString(meterConfig2));
 	}
 }
