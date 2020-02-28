@@ -421,6 +421,62 @@
 		modalobj.modal('show');
 		return modalobj;
 	};
+	util.alert = function(msg, type){
+		if($.inArray(type, ['success', 'error', 'info', 'warning']) == -1) {
+			type = '';
+		}
+		if(type == '') {
+			type = 'info';
+		}
+		
+		var icons = {
+			success : 'check-circle',
+			error :'times-circle',
+			info : 'info-circle',
+			warning : 'exclamation-triangle'
+		};
+		var p = '';
+		var content = 
+			'			<i class="pull-left fa fa-4x fa-'+icons[type]+'"></i>'+
+			'			<div class="pull-left"><p>'+ msg +'</p>' +
+			p +
+			'			</div>'+
+			'			<div class="clearfix"></div>';
+		/*var footer = 
+			'			<button type="button" class="btn btn-default" data-dismiss="modal" onclick="removeModal(this);">确认</button>';*/
+		
+		//modified by jch 2018/08/04 去掉onClick函数回调    
+		var footer = 
+			'			<button type="button" class="btn btn-default" data-dismiss="modal" >关闭</button>';
+		
+		var modalobj = util.dialog('系统提示', content, footer, {'containerName' : 'modal-message'});
+		modalobj.find('.modal-content').addClass('alert alert-'+type);
+		/*if(redirect) {
+			var timer = '';
+			timeout = 3;
+			modalobj.find("#timeout").html(timeout);
+			modalobj.on('show.bs.modal', function(){doredirect();});
+			modalobj.on('hide.bs.modal', function(){timeout = 0;doredirect(); });
+			modalobj.on('hidden.bs.modal', function(){modalobj.remove();});
+			function doredirect() {
+				timer = setTimeout(function(){
+					if (timeout <= 0) {
+						modalobj.modal('hide');
+						clearTimeout(timer);
+						window.location.href = redirect;
+//						util.redirect(redirect);
+						return;
+					} else {
+						timeout--;
+						modalobj.find("#timeout").html(timeout);
+						doredirect();
+					}
+				}, 1000);
+			}
+		}*/
+		modalobj.modal('show');
+		return modalobj;
+	};
 	function removeFun(obj){
 		console.log("remove");
 		$(obj).remove();

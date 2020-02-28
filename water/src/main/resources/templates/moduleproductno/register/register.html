@@ -24,6 +24,11 @@
 					<table class="table-layout table">
 					    <tbody>
 					    	<tr>
+						      <td colspan="2">
+						      	<hr/>
+						      </td>
+						    </tr>
+					    	<tr>
 								<td>
 									<!-- 生产厂商 -->
 									<div class="form-group form-inline">
@@ -310,7 +315,19 @@
 					//var obj = $.parseJSON(res);						
 					if (res.result_code == "success") {
 						//searchCurrEditMeterNumber();//查询当前编辑的出厂编号（出厂编号为空的记录，只返回一条记录）
-		 				autoRefreshProductRegister();//定时自动刷新产品注册
+						var isAlert = res.isAlert;//是否提示
+						if(isAlert){
+							//dialog type: success warning info error,默认为info
+							util.alert(res.result_msg,"warning");
+							//如果是自动保存时，关闭自动保存，同时设置确认保存按钮有效
+							var isAutoSave = getIsAutoSave();//获取是否自动保存，return true:自动保存；false:不自动保存
+							if(isAutoSave){
+								$("#checkbox-auto-save").bootstrapSwitch('state', false);//关闭自动保存
+								$("#btn-confirm-save").attr("disabled", false);//设置保存按钮为有效状态
+							}
+						}else{
+							autoRefreshProductRegister();//定时自动刷新产品注册
+						}
 					} else {
 						//dialog type: success warning info error,默认为info
 						util.message(res.result_msg,null,"warning");

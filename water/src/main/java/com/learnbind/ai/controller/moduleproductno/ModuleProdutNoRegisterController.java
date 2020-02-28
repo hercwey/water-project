@@ -180,11 +180,22 @@ public class ModuleProdutNoRegisterController {
 
 		try {
 			ModuleProductNo mpNo = new ModuleProductNo();
-			mpNo.setId(id);
 			mpNo.setProductNo(productNo);
-			int rows = moduleProductNoService.updateByPrimaryKeySelective(mpNo);
-			if (rows > 0) {
-				return RequestResultUtil.getResultUpdateSuccess();
+			int count = moduleProductNoService.selectCount(mpNo);
+			if(count>0) {//count>0表示出厂编号重复
+				Map<String, Object> resMap = RequestResultUtil.getResultSuccess("出厂编号重复，请手工录入后重新保存！");
+				resMap.put("isAlert", true);
+				return resMap;
+			}else {
+				mpNo = new ModuleProductNo();
+				mpNo.setId(id);
+				mpNo.setProductNo(productNo);
+				int rows = moduleProductNoService.updateByPrimaryKeySelective(mpNo);
+				if (rows > 0) {
+					Map<String, Object> resMap = RequestResultUtil.getResultUpdateSuccess();
+					resMap.put("isAlert", false);
+					return resMap;
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

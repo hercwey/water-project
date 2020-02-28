@@ -31,9 +31,9 @@
 						<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
 							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
 						</button>
-						<!-- <button type="button" class="btn btn-warning btn-sm btn-general-search-reset" id="btn-general-search-reset">
+						<button type="button" class="btn btn-warning btn-sm btn-general-search-reset" id="btn-general-search-reset">
 							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
-						</button> -->
+						</button>
 						<button type="button" class="btn btn-info btn-sm btn-export-excle" id="btn-export-excle">
 							<i class="fa fa-file-excel-o" aria-hidden="true"> <span>导出Excel</span></i>
 						</button>
@@ -51,7 +51,7 @@
 							placeholder="操作日期" title="操作日期" />
 					</li>
 					<li class="input-group-sm" style="float: right;">
-						<input type="text" class="form-control operator-name" id="operatorName" placeholder="操作员" title="操作员">
+						<input type="text" class="form-control operator-name" id="operator-name" placeholder="操作员" title="操作员">
 					</li>
 				</ul>
 			</div>
@@ -203,9 +203,11 @@
 				查询条件复位按钮CLICK
 			 */
 			$('#module-product-no-search-form .btn-general-search-reset').on('click', function() {
-				$("#module-product-no-search-form .search-cond").val("");
-				$("#module-product-no-search-form .search-cond").focus();//获得焦点
-	
+				$("#module-product-no-search-form .operator-name").val("");
+				$("#module-product-no-search-form .operator-date").val("");
+				$("#module-product-no-search-form .module-no").val("");
+				$("#module-product-no-search-form .product-no").val("");
+				$("#module-product-no-search-form .product-no").focus();//获得焦点
 			});
 			/*
 				查询条件输入框 KEYUP

@@ -10,8 +10,14 @@
 		background: #8FBC8F;
 		color: #fff
 	}
-	table tr td button {
+	#module-product-no-table tr td button {
 		font-size: 12px!important;
+	}
+	#module-product-no-table thead tr th {
+		text-align: center;
+	}
+	#module-product-no-table tbody tr td {
+		text-align: center;
 	}
 </style>
 </head>
@@ -28,7 +34,7 @@
 							class="custom-control-label" for="select-all-toggle"></label>
 					</div>
 				</th> -->
-				<th>ID</th>
+				<th style="text-align: left;">ID</th>
 				<th>模组号</th>
 				<th>出厂编号</th>
 				<th>操作员姓名</th>
@@ -48,7 +54,7 @@
 					</div> 
 				</td> -->
 				
-				<td th:text="${item.id}">ID</td>
+				<td th:text="${item.id}" style="text-align: left;">ID</td>
 				<td th:text="${item.moduleNo}">模组号</td>
 				<td th:text="${item.productNo}">出厂编号</td>
 				<td th:text="${item.operatorName}">操作员姓名</td>
@@ -65,7 +71,7 @@
 			</tr>
 		</tbody>
 	</table>
-
+	<hr/>
 	<!-- 加入分页 -->
 	<div th:include="common/common_pager_pagesize::pager('module-product-search-table')" class="pagerx"
 		style="float: right; margin-right: 10px;"></div>	
