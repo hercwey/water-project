@@ -12,9 +12,13 @@
 			<ul class="pagination pagination-sm">
 			
 				<!-- 总的记录个数 -->
-				<li class="page-item" style="display: none;">
+				<li class="page-item">
 					<select class="page-link setting-page-size" style="color:black;">
-						
+						<option value="1" th:attr="selected=${pageInfo.pageSize==1 ? true : false}">1</option>
+						<option value="2" th:attr="selected=${pageInfo.pageSize==2 ? true : false}">2</option>
+						<option value="3" th:attr="selected=${pageInfo.pageSize==3 ? true : false}">3</option>
+						<option value="4" th:attr="selected=${pageInfo.pageSize==4 ? true : false}">4</option>
+						<option value="5" th:attr="selected=${pageInfo.pageSize==5 ? true : false}">5</option>
 						<option value="10" th:attr="selected=${pageInfo.pageSize==10 ? true : false}">10</option>
 						<option value="15" th:attr="selected=${pageInfo.pageSize==15 ? true : false}">15</option>
 						<option value="20" th:attr="selected=${pageInfo.pageSize==20 ? true : false}">20</option>
