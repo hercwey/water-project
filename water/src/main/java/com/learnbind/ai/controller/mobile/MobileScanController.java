@@ -103,6 +103,7 @@ public class MobileScanController {
 	@RequestMapping(value = "/scanresult")	
 	public ResponseEntity<String> scanResult(HttpServletRequest request, Model model, String moduleNo, Long operatorId) {
 		final String OK="OK";      //保存成功常量
+		final String REPEAT="REPEAT";      //模组号重量常量
 		final String ERROR="ERROR";  //保存失败常量
 		
 		Date sysDate = new Date();//系统日期
@@ -111,15 +112,24 @@ public class MobileScanController {
 			
 			ModuleProductNo mpNo = new ModuleProductNo();//模组号-出厂编号对照表
 			mpNo.setModuleNo(moduleNo);
-			mpNo.setOperatorId(operatorId);
-			mpNo.setOperatorName(user.getRealname());
-			mpNo.setOperatorDate(sysDate);
-			
-			int rows = moduleProductNoService.insertSelective(mpNo);
-			if(rows>0) {
-				log.info("----------保存扫描结果成功");
-				return new ResponseEntity<>(OK, HttpStatus.OK);
+			int count = moduleProductNoService.selectCount(mpNo);
+			if(count>0) {
+				mpNo = new ModuleProductNo();//模组号-出厂编号对照表
+				mpNo.setModuleNo(moduleNo);
+				mpNo.setOperatorId(operatorId);
+				mpNo.setOperatorName(user.getRealname());
+				mpNo.setOperatorDate(sysDate);
+				
+				int rows = moduleProductNoService.insertSelective(mpNo);
+				if(rows>0) {
+					log.info("----------保存扫描结果成功");
+					return new ResponseEntity<>(OK, HttpStatus.OK);
+				}
+			}else {
+				log.info("----------模组号有相同值，不需要保存");
+				return new ResponseEntity<>(REPEAT, HttpStatus.OK);
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
