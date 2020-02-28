@@ -25,14 +25,14 @@ public class ModuleProductNo {
     @Column(name = "PRINTED")
     private Integer printed;
 
-    @Column(name = "OPERATER_ID")
-    private Long operaterId;
+    @Column(name = "OPERATOR_ID")
+    private Long operatorId;
 
-    @Column(name = "OPERATER_NAME")
-    private String operaterName;
+    @Column(name = "OPERATOR_NAME")
+    private String operatorName;
 
-    @Column(name = "OPERATER_DATE")
-    private Date operaterDate;
+    @Column(name = "OPERATOR_DATE")
+    private Date operatorDate;
 
     /**
      * @return ID
@@ -94,42 +94,42 @@ public class ModuleProductNo {
      * @return OPERATER_ID
      */
     public Long getOperaterId() {
-        return operaterId;
+        return operatorId;
     }
 
     /**
      * @param operaterId
      */
-    public void setOperaterId(Long operaterId) {
-        this.operaterId = operaterId;
+    public void setOperatorId(Long operatorId) {
+        this.operatorId = operatorId;
     }
 
     /**
      * @return OPERATER_NAME
      */
-    public String getOperaterName() {
-        return operaterName;
+    public String getOperatorName() {
+        return operatorName;
     }
 
     /**
      * @param operaterName
      */
-    public void setOperaterName(String operaterName) {
-        this.operaterName = operaterName == null ? null : operaterName.trim();
+    public void setOperatorName(String operatorName) {
+        this.operatorName = operatorName == null ? null : operatorName.trim();
     }
 
     /**
      * @return OPERATER_DATE
      */
-    public Date getOperaterDate() {
-        return operaterDate;
+    public Date getOperatorDate() {
+        return operatorDate;
     }
 
     /**
      * @param operaterDate
      */
-    public void setOperaterDate(Date operaterDate) {
-        this.operaterDate = operaterDate;
+    public void setOperatorDate(Date operatorDate) {
+        this.operatorDate = operatorDate;
     }
 
     @Override
@@ -142,9 +142,9 @@ public class ModuleProductNo {
         sb.append(", moduleNo=").append(moduleNo);
         sb.append(", productNo=").append(productNo);
         sb.append(", printed=").append(printed);
-        sb.append(", operaterId=").append(operaterId);
-        sb.append(", operaterName=").append(operaterName);
-        sb.append(", operaterDate=").append(operaterDate);
+        sb.append(", operatorId=").append(operatorId);
+        sb.append(", operatorName=").append(operatorName);
+        sb.append(", operatorDate=").append(operatorDate);
         sb.append("]");
         return sb.toString();
     }

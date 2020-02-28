@@ -1,5 +1,8 @@
 package com.learnbind.ai.service.moduleproductno.impl;
 
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +38,12 @@ public class ModuleProductNoServiceImpl extends AbstractBaseService<ModuleProduc
 	public ModuleProductNoServiceImpl(ModuleProductNoMapper mapper) {
 		this.moduleProductNoMapper=mapper;
 		this.setMapper(mapper);
+	}
+
+	@Override
+	public List<ModuleProductNo> searchList(String operatorName, Date operatorDate, String moduleNo,
+			String productNo) {
+		return moduleProductNoMapper.searchList(operatorName, operatorDate, moduleNo, productNo);
 	}
 	
 }

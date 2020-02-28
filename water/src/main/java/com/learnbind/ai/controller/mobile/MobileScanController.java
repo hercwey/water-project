@@ -111,9 +111,9 @@ public class MobileScanController {
 			
 			ModuleProductNo mpNo = new ModuleProductNo();//模组号-出厂编号对照表
 			mpNo.setModuleNo(moduleNo);
-			mpNo.setOperaterId(operatorId);
-			mpNo.setOperaterName(user.getRealname());
-			mpNo.setOperaterDate(sysDate);
+			mpNo.setOperatorId(operatorId);
+			mpNo.setOperatorName(user.getRealname());
+			mpNo.setOperatorDate(sysDate);
 			
 			int rows = moduleProductNoService.insertSelective(mpNo);
 			if(rows>0) {

@@ -9,14 +9,41 @@
     <result column="MODULE_NO" jdbcType="VARCHAR" property="moduleNo" />
     <result column="PRODUCT_NO" jdbcType="VARCHAR" property="productNo" />
     <result column="PRINTED" jdbcType="DECIMAL" property="printed" />
-    <result column="OPERATER_ID" jdbcType="DECIMAL" property="operaterId" />
-    <result column="OPERATER_NAME" jdbcType="VARCHAR" property="operaterName" />
-    <result column="OPERATER_DATE" jdbcType="TIMESTAMP" property="operaterDate" />
+    <result column="OPERATOR_ID" jdbcType="DECIMAL" property="operatorId" />
+    <result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName" />
+    <result column="OPERATOR_DATE" jdbcType="TIMESTAMP" property="operatorDate" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--
       WARNING - @mbg.generated
     -->
-    ID, MODULE_NO, PRODUCT_NO, PRINTED, OPERATER_ID, OPERATER_NAME, OPERATER_DATE
+    ID, MODULE_NO, PRODUCT_NO, PRINTED, OPERATOR_ID, OPERATOR_NAME, OPERATOR_DATE
   </sql>
+  
+  <!-- 查询 -->
+  <select id="searchList" resultMap="BaseResultMap">
+  	SELECT
+		* 
+	FROM
+		MODULE_PRODUCT_NO 
+	<where>
+		PRODUCT_NO IS NOT NULL 
+		<if test="operatorName!=null and operatorName!=''">
+			AND OPERATOR_NAME LIKE CONCAT('%', CONCAT( #{operatorName}, '%' )) 
+		</if>
+		<if test="operatorDate!=null">
+			AND TO_CHAR( OPERATOR_DATE, 'YYYY-MM-DD' ) = TO_CHAR( #{operatorDate}, 'YYYY-MM-DD' ) 
+		</if>
+		<if test="moduleNo!=null and moduleNo!=''">
+			AND MODULE_NO LIKE CONCAT('%', CONCAT( #{moduleNo}, '%' )) 
+		</if>
+		<if test="productNo!=null and productNo!=''">
+			AND PRODUCT_NO LIKE CONCAT('%', CONCAT( #{productNo}, '%' ))
+		</if>
+	</where>
+	ORDER BY 
+		ID DESC, 
+		OPERATOR_DATE DESC
+  </select>
+  
 </mapper>

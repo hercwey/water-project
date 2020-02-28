@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
+</head>
+<!-- 修改对话框 -->
+<body>
+
+	<th:block th:fragment="dialog">
+
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+
+				<div class="modal fade" id="modal-container-edit-dialog" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				
+					<div class="modal-dialog modal-md">
+					
+						<div class="modal-content">
+						
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span>编辑</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body">
+								<form class="form-horizontal " role="form" id="edit-dialog-form">
+									
+									<!-- 当前所编辑的条目ID -->
+									<input type="hidden" id="module-product-no-id" name="id" th:value="${currItem==null ? '' : currItem.id}" />
+									
+									<!-- 表单内容 -->
+									<!-- form-inline -->
+																		
+									<!-- 采用表格进行布局 -->
+									<table class="table-layout table" frame=void>
+										<tbody>
+											<tr>
+												<td>
+													<!-- 模组号 -->
+													<div class="form-group form-inline">
+														<label for="role-name" class="col-sm-4 control-label">模组号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="number"
+																	th:value="${currItem==null ? '' : currItem.moduleNo}" 
+																	class="form-control"
+																	id="module-no" name="moduleNo"  disabled="disabled"
+																	maxlength=32 title="请输入15位字符" placeholder="模组号" />
+														</span>
+													</div>
+												</td>												
+											</tr>
+											<tr>
+												<td>
+													<!-- 出厂编号 -->
+													<div class="form-group form-inline">
+														<label for="role-name" class="col-sm-4 control-label">出厂编号</label>
+														<span class="input-group-sm col-sm-8">
+															<input type="number"
+																	th:value="${currItem==null ? '' : currItem.productNo}" 
+																	class="form-control"
+																	id="product-no" name="productNo" 
+																	maxlength=32 title="请输入12位字符" placeholder="出厂编号" />
+														</span>
+													</div>
+												</td>												
+											</tr>
+											
+										</tbody>
+										
+									</table>
+																											
+								</form>
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"	data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary"	id="btn-modify-and-back">保存</button>
+							</div>
+							
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+			var curr_item=[[${currItem}]];
+		/*]]>*/
+	</script>
+
+	<script>
+		//------------------业务操作----------------------
+		/**
+		 * 	保存条目:修改
+		 * 	closeDialogFlag:是否关才对话框标志  true:
+		 * 	@returns
+		 */
+		function modiRoleItem(closeDialogFlag) {
+			//需要提交的url	
+			var id = $("#edit-dialog-form #module-product-no-id").val();
+			var productNo = $("#edit-dialog-form #product-no").val();
+			
+			if(id==null || id==""){
+				//dialog type: success warning info error,默认为info
+				util.message("打开编辑对话框错误，请重新操作编辑！",null,"warning");
+				return false;
+			}
+			
+			if(productNo==null || productNo==""){
+				//dialog type: success warning info error,默认为info
+				util.message("出厂编号不允许为空！",null,"warning");
+				return false;
+			}
+			
+			var urlStr = BASE_CONTEXT_PATH + "/module-product-register/update";
+			var parms = new Object();
+			parms.id = id;
+			parms.productNo = productNo;
+			$.post(urlStr, parms, function(res){
+				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+				if (res != null && res != "") {
+					//var obj = $.parseJSON(res);						
+					if (res.result_code == "success") {
+						loadPageClickPageNum();  //	重新刷新当前页面
+						if (closeDialogFlag){
+							closeEditDialog();//关闭对话框
+						}
+					} else {
+						//dialog type: success warning info error,默认为info
+						util.message(res.result_msg,null,"warning");
+					}
+				}
+			});
+			
+			/* var form=new FormData($("#edit-dialog-form")[0]);
+			$.ajax({
+				type : "POST", // 提交方式 get/post
+				url : urlStr,
+				/* contentType : "application/json", */ // 如果采用json格式传送所有参数时必须有,如果采普通js对象传送时,则不可以加此参数
+				//dataType : "html", // 表示返回值类型，不必须,如果返回的是面页，则必须
+				/* data : JSON.stringify(parms), *
+				processData:false,
+         		contentType:false,
+				data : form,
+				success : function(res) { // data 保存提交后返回的数据，一般为 json 数据
+					//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
+					if (res != null && res != "") {
+						//var obj = $.parseJSON(res);						
+						if (res.result_code == "success") {
+							loadPage();  //	重新刷新当前页面
+							if (closeDialogFlag){
+								closeModiRoleDialog();
+							}
+						} else {
+							//dialog type: success warning info error,默认为info
+							util.message(res.result_msg,null,"warning");
+						}
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					util.message("AJAX请求时发生错误!");
+				}
+			}); */
+		 }
+	
+		//--------------------page loaded ready-----------------------
+		$(function() {
+
+			//---------------click event process binding---------------
+			/**
+			 * 	绑定当前编辑的出厂编号的input事件，验证出厂编号长度
+			 */
+			$("#product-no").on("input", function(){
+				var productNo = $(this).val();
+				if(productNo!=null && productNo.length>12){
+					console.log("----------出厂编号不为空，且出厂编号长度>12，截取出厂编号的前12个字符，并设置到输入框");
+					console.log("----------出厂编号："+productNo);
+					productNo = productNo.substr(0, 12);
+					console.log("----------截取后正确的出厂编号："+productNo);
+					$(this).val(productNo);
+				}
+			});
+			/*
+				修改对话框-保存按钮-CLICK
+				保存所修改的条目
+			*/
+			$('#btn-modify-and-back').on('click',function() {
+				modiRoleItem(true);				
+			});
+
+		});
+	</script>
+	
+	</th:block>
+	
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主界面</title>
+<!-- ZTree CSS -->
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
+<!-- ZTree JS Scripts-->
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
+<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
+<!-- 引入通用对话框工具 -->
+<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+<!-- 正则表达式验证 -->
+<script src="/jquery/jquery-validation/jquery.validate.min.js"></script>
+<script src="/jquery/jquery-validation/messages_zh.js"></script>
+<link rel="stylesheet"	href="/css/meterbookbody.css" />
+<link rel="stylesheet"	href="/css/commform.css" />
+<link rel="stylesheet"	href="/css/searchpanel.css" />
+<style type="text/css">
+	#module-product-no-search-form ul li label{
+		margin-bottom: 0px;
+	}
+	#module-product-no-search-form .input-group-text{
+		font-size: .875rem;
+		background-color: #f8f9fa;
+	}
+	#module-product-no-search-form .input-group-prepend, .input-group-text {
+		height: 31px;
+	}
+</style>
+</head>
+<body>
+	<!-- 编辑对话框 -->
+	<div id="module-product-no-edit-dialog"></div>
+	
+	<!-- 主界面(操作页板+列表容器) -->
+	<div class="row clearfix medic-label module-product-no-main">
+		<div class="col-md-12 column">
+			<!-- 操作面板 -->
+			<div class="" style="display: inline-block; float: right;" id="module-product-no-search-form">
+				<ul class="extra-l" style="list-style: none; padding-inline-start: 20px;">
+					<!-- 面板:查询 -->
+					<!-- <li class="input-group-sm">
+						<input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入分组名称/客户名称" title="请输入分组名称、客户名称查询">
+					</li> -->
+					<!-- 查询按钮 -->
+					<li>
+						<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
+							<i class="fa fa-refresh" aria-hidden="true"> <span>刷新</span>	</i>
+						</button>
+						<!-- <button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
+							<i class="fa fa-search" aria-hidden="true"> <span>查询</span>	</i>
+						</button> -->
+						<!-- <button type="button" class="btn btn-warning btn-sm btn-general-search-reset" id="btn-general-search-reset">
+							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
+						</button> -->
+					</li>
+					<li>
+						<div class="input-group-prepend btn-default">
+							<div class="input-group-text">
+								<label><input type="checkbox" class="" id="checkbox-auto-refresh">&nbsp;自动刷新</label>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="module-product-no-table" id="module-product-no-table" style="padding-left:10px;padding-right:10px;">
+				<!-- 列表 -->
+			</div>
+		</div>
+		
+		<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+		
+		<div class="col-md-12 column">
+			<hr style="height: 1px; border: none; border-top: 1px solid blue;">
+		</div>
+		<div class="col-md-12 column">
+			<!-- 注册部分 -->
+			<span style="float: right; font-size: large;">当前时间：<b id="system-date">2020-02-28 00:00:00</b></span>
+		</div>
+		
+		<div class="col-md-12 column">
+			<!-- 注册部分 -->
+			<div th:include="moduleproductno/register/register" th:remove="tag"></div>
+		</div>
+	</div>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+
+		/*]]>*/
+	</script>
+
+	<!-- 初始化时间部分 -->
+	<script type="text/javascript">
+		/**
+		 * 	初始化时间
+		 */
+		function initDate() {
+			$("#system-date").text(moment().format("YYYY-MM-DD HH:mm:ss"));
+			setInterval(function() {
+				$("#system-date").text(moment().format("YYYY-MM-DD HH:mm:ss"));
+			}, 1000);
+		}
+		$(function(){
+			initDate();//初始化时间
+		});
+	</script>
+	
+	<script type="text/javascript">
+		var g_auto_refresh_timer = null;//自动刷新列表定时器返回值
+		/**
+		 * 	自动刷新，5秒刷新一次
+		 */
+		function autoRefresh() {
+			//主页:默认查询(加载默认列表)
+			defaultSearchModuleProductNoTable();
+			g_auto_refresh_timer = setTimeout(autoRefresh, 5000);//5秒刷新一次
+			console.log("----------启动自动刷新："+g_auto_refresh_timer);
+		}
+		
+		/**
+		 * 	取消自动刷新
+		 */
+		function clearAutoRefresh() {
+			console.log("----------取消自动刷新："+g_auto_refresh_timer);
+			clearTimeout(g_auto_refresh_timer);
+			g_auto_refresh_timer = null;//自动刷新列表定时器返回值
+		}
+		
+	</script>
+
+	<script type="text/javascript">
+		//调整表册中表计顺序对话框
+		const G_EDIT_DIALOG="modal-container-edit-dialog";
+		
+		//--------------------公共查询函数--------------------------
+		
+		/*	
+			公共查询函数
+			
+			查询
+		*/
+		function searchModuleProductNoTable(parms) {
+
+			//加载字典列表页面
+			var url = BASE_CONTEXT_PATH + "/module-product-register/table"
+			$(".module-product-no-table").load(url, parms, triggerResize);
+		}
+		
+		function triggerResize(){
+			console.log("call back........");
+			var myEvent = new Event('resize');
+	        window.dispatchEvent(myEvent);
+		}
+		
+		//------------------------------	获取查询参数	------------------------------
+		/**
+		 * 	获取查询参数（不包括分页信息）
+		 */
+		function getSearchModuleProductNoTableParams(){
+			var searchCond=$("#module-product-no-search-form .search-cond").val();
+			var includeFlag=$("#module-product-no-search-form .include-flag").val();
+			
+			//初始化请求参数
+			var parms = new Object();
+			parms.searchCond=searchCond;
+			parms.includeFlag=includeFlag;
+			return parms;
+		}
+		
+		/*
+			默认查询
+			Retrieve(default)查询(加载默认列表)
+		*/
+		function defaultSearchModuleProductNoTable() {
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//获取参数
+			//var parms = getSearchModuleProductNoTableParams();
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchModuleProductNoTable(parms);
+		}
+		
+		/*
+			查询按钮点击时调用
+			采用用户所输入的查询条件进行查询.
+		*/
+		function btnSearchMeterBookClick() {
+			
+			var pageNum = 0;
+			var pageSize = 0;
+			
+			//var parms = getSearchModuleProductNoTableParams();//获取查询参数（不包括分页信息）
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+			searchModuleProductNoTable(parms);
+		}
+	
+		/*
+			分页查询(采用所保存的状态)
+		*/
+		function loadPageClickPageNum(searchCond,pageNum,pageSize) {
+			//获取参数
+			//var parms = getSearchModuleProductNoTableParams();
+			var parms = new Object();
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
+			
+
+			searchModuleProductNoTable(parms);
+		}
+		
+		
+		
+		//----------Edit Dialog 操作 加载,打开,关闭------------------------
+		/*		
+			加载(Load): 增加/编辑对话框
+			将对话框内容加载到指定的容器中
+		 */
+		function loadEditDialog(parms) {
+			var url = BASE_CONTEXT_PATH + '/module-product-register/load-edit-dialog';
+			$("#module-product-no-edit-dialog").load(url, parms, openEditDialog); //加载完毕后显示
+		}
+		/*
+		 * 	打开(Open) 对话框
+		 */
+		function openEditDialog() {
+			DialogUtil.openDialogFn(G_EDIT_DIALOG);
+		}
+		/* 
+			关闭(CLOSE) 对话框
+		 */
+		function closeEditDialog() {
+			DialogUtil.closeDialogFn(G_EDIT_DIALOG);
+		}
+		
+		//-------------------PAGE LOADED READY--------------------
+
+		$(function() {
+			//---------事件绑定--------------
+			//------------init-------------
+			
+			//主页:默认查询(加载默认列表)
+			defaultSearchModuleProductNoTable();
+
+			//---------事件绑定--------------
+			
+			/*
+				查询按钮CLICK
+			*/
+			$('#module-product-no-search-form .btn-general-search').on('click', function() {
+				defaultSearchModuleProductNoTable();//查询
+			});
+			/*
+				查询条件复位按钮CLICK
+			 */
+			$('#module-product-no-search-form .btn-general-search-reset').on('click', function() {
+				$("#module-product-no-search-form .search-cond").val("");
+				$("#module-product-no-search-form .search-cond").focus();//获得焦点
+	
+			});
+			/*
+				查询条件输入框 KEYUP
+			 */
+			$('#module-product-no-search-form .search-cond').on('keyup', function(event) {
+				if (event.keyCode == 13) {
+					$('#module-product-no-search-form .btn-general-search').trigger("click");
+				}
+			});
+			
+			/**
+			 * 	绑定自动刷新checkbox的click事件
+			 */
+			$('#module-product-no-search-form #checkbox-auto-refresh').on('click', function(event) {
+				var refreshFlag = $(this).is(":checked");
+				console.log("----------自动刷新："+refreshFlag);
+				if(refreshFlag){//启动自动刷新
+					autoRefresh();//自动刷新，5秒刷新一次
+				}else{////停止自动刷新
+					clearAutoRefresh();//取消自动刷新
+				}
+			});
+			
+			/*
+				批量删除按钮
+			*/
+			/* $('#module-product-no-search-form #btn-del').on('click', function() {
+				var ids=getSelectedIds();  //此函数定义于_table.html中
+				if(ids==null || ids.length<=0){
+					util.message("请选择需要删除的条目！",null,"warning");
+					return;
+				}
+				batchDeleteConfirm();  //显示删除确认对话框
+			}); */
+			
+
+		});
+	</script>
+
+
+
+</body>
+</html>

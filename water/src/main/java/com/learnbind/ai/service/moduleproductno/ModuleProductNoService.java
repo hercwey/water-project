@@ -1,5 +1,8 @@
 package com.learnbind.ai.service.moduleproductno;
 
+import java.util.Date;
+import java.util.List;
+
 import com.learnbind.ai.model.ModuleProductNo;
 import com.learnbind.ai.service.common.IBaseService;
 
@@ -17,4 +20,16 @@ import com.learnbind.ai.service.common.IBaseService;
  *
  */
 public interface ModuleProductNoService extends IBaseService<ModuleProductNo, Long> {
+	
+	/**
+	 * @Title: searchList
+	 * @Description: 查询
+	 * @param operatorName
+	 * @param operatorDate
+	 * @param moduleNo
+	 * @param productNo
+	 * @return 
+	 */
+	public List<ModuleProductNo> searchList(String operatorName, Date operatorDate, String moduleNo, String productNo);
+	
 }
