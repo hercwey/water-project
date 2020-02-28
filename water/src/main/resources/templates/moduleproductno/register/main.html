@@ -76,8 +76,17 @@
 			<hr style="height: 1px; border: none; border-top: 1px solid blue;">
 		</div>
 		<div class="col-md-12 column">
-			<!-- 注册部分 -->
-			<span style="float: right; font-size: large;">当前时间：<b id="system-date">2020-02-28 00:00:00</b></span>
+			<div class="row clearfix">
+				<div class="col-md-2 column"></div>
+				<div class="col-md-8 column">
+					<!-- 操作员 -->
+					<span style="float: left; font-size: 16px; margin-left: 15px;">操作员：<b id="product-operator" th:text="${operatorName==null ? '' : operatorName}">管理员</b></span>
+					<!-- 系统时间 -->
+					<span style="float: right; font-size: 16px; margin-right: 45px;">当前时间：<b id="system-date">2020-02-28 00:00:00</b></span>
+				</div>
+				<div class="col-md-2 column"></div>
+			</div>
+			
 		</div>
 		
 		<div class="col-md-12 column">
@@ -145,12 +154,14 @@
 		function searchModuleProductNoTable(parms) {
 
 			//加载字典列表页面
-			var url = BASE_CONTEXT_PATH + "/module-product-register/table"
+			var url = BASE_CONTEXT_PATH + "/module-product-register/table";
+			UseLoading.show();//显示正在加载提示
 			$(".module-product-no-table").load(url, parms, triggerResize);
 		}
 		
 		function triggerResize(){
 			console.log("call back........");
+			UseLoading.hide();//隐藏正在加载提示
 			var myEvent = new Event('resize');
 	        window.dispatchEvent(myEvent);
 		}
@@ -227,12 +238,14 @@
 		 */
 		function loadEditDialog(parms) {
 			var url = BASE_CONTEXT_PATH + '/module-product-register/load-edit-dialog';
+			UseLoading.show();//显示正在加载提示
 			$("#module-product-no-edit-dialog").load(url, parms, openEditDialog); //加载完毕后显示
 		}
 		/*
 		 * 	打开(Open) 对话框
 		 */
 		function openEditDialog() {
+			UseLoading.hide();//隐藏正在加载提示
 			DialogUtil.openDialogFn(G_EDIT_DIALOG);
 		}
 		/* 

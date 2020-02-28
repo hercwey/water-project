@@ -100,7 +100,7 @@ public class MobileScanController {
 	 * @param operatorId
 	 * @return 
 	 */
-	@RequestMapping(value = "/user/scanresult")	
+	@RequestMapping(value = "/scanresult")	
 	public ResponseEntity<String> scanResult(HttpServletRequest request, Model model, String moduleNo, Long operatorId) {
 		final String OK="OK";      //保存成功常量
 		final String ERROR="ERROR";  //保存失败常量

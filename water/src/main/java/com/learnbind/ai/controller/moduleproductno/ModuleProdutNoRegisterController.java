@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,21 @@ public class ModuleProdutNoRegisterController {
 	 */
 	@RequestMapping(value = "/main")
 	public String main(Model model) {
+		
+		UserBean userBean = (UserBean)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String operatorName = null;
+		if(userBean!=null) {
+			String realname = userBean.getRealname();
+			String nickname = userBean.getNickname();
+			if(StringUtils.isNotBlank(realname)) {//如果真实姓名不为空时，设置操作员姓名为真实姓名
+				operatorName = userBean.getRealname();
+			}
+			if(StringUtils.isBlank(operatorName) && StringUtils.isNotBlank(nickname)) {//如果操作员姓名为空，且操作员昵称不为空时，设置操作姓名为昵称
+				operatorName = userBean.getRealname();
+			}
+		}
+		model.addAttribute("operatorName", operatorName);
+		
 		return TEMPLATE_PATH + "main";
 	}
 

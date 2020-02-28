@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <div th:include="common/common_head::headx('模组号-出厂编号对照登记')" th:remove="tag"></div>
 <!-- 页面正在加载loading-->
-<script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>
+<!-- <script th:src="@{/pivas/js/common/ajaxSetup.js}"></script> -->
+<!-- 页面正在加载loading-->
+<script th:src="@{/pivas/js/common/UseLoading.js}"></script>
 </head>
 <body>
 	<!-- 用户管理主页 -->
@@ -29,7 +31,10 @@
 				var url = "/module-product-register/main";
 				var callbackFunc = callback;
 				var containerId = "#container";
-				loadPage(containerId, url, parms, callbackFunc);
+				UseLoading.show();//显示正在加载提示
+				loadPage(containerId, url, parms, function(){
+					UseLoading.hide();//隐藏正在加载提示
+				});
 			}
 			
 			/* 
