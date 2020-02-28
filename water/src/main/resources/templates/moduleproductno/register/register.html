@@ -5,22 +5,12 @@
 <title>产品登记</title>
 
 <style type="text/css">
-	/* .input-group-text{
-		font-size: .875rem;
-		background-color: #f8f9fa;
-	}
-	.input-group-prepend, .input-group-text {
-		height: 31px;
-	} */
 	table.table-layout tbody .form-inline label {
 		display: block!important;
 		/* float: right; */
 		/* width: 60%; */
 		/* align: center!important; */
-	} */
-	/* table.table-layout tbody input,select {
-		width: 200px;
-	} */
+	}
 </style>
 </head>
 <body>
@@ -83,43 +73,6 @@
 									</div>
 								</td>											
 							</tr>
-					      <!-- <tr>
-					        <td style="width: 10%;">生产厂商</td>
-					        <td style="width: 40%;">
-					        	<select class="form-control" id="factory-code" name="factoryCode">
-									默认选择第一个
-									<option value="">-请选择-</option>
-									<option value="1">普惠</option>
-								</select>
-					        </td>
-					        <td style="width: 10%;">出厂编号起始</td>
-					        <td style="width: 40%;">
-					        	<input type="number" class="form-control" id="product-no-start" name="productNo" data-item-id=""
-					        		value="1" title="请输入初始编号起始" placeholder="初始编号起始" />
-					        </td>
-					      </tr>
-					      <tr>
-					        <td style="width: 10%;">IOT运营商</td>
-					        <td style="width: 40%;">
-					        	<div class="input-group-prepend">
-									<div class="input-group-text">
-										<label class="radio-inline"><input type="radio" class="" id="iot-operator-ct" name="iot-operator" value="1" checked="checked">&nbsp;电信</label>
-										&nbsp;
-										<label class="radio-inline"><input type="radio" class="" id="iot-operator-cm" name="iot-operator" value="2">&nbsp;移动</label>
-										&nbsp;
-										<label class="radio-inline"><input type="radio" class="" id="iot-operator-cu" name="iot-operator" value="3">&nbsp;联通</label>
-									</div>
-								</div>
-				        	</td>
-					        <td style="width: 10%;">自动生成出厂编号</td>
-					        <td style="width: 40%;">
-					        	<div class="input-group-prepend btn-default">
-									<div class="input-group-text">
-										<label><input type="checkbox" class="" id="checkbox-auto-generator-number" checked="checked">&nbsp;</label>
-									</div>
-								</div>
-					        </td>
-					      </tr> -->
 					      <tr>
 					      	<td colspan="2">
 					      		<hr/>
@@ -146,15 +99,6 @@
 									</div>
 								</td>											
 							</tr>
-					      <!-- <tr>
-					        <td style="width: 10%;">模组号</td>
-					        <td id="curr-edit-module-no" style="width: 40%;">863434045074033</td>
-					        <td style="width: 10%;">出厂编号</td>
-					        <td style="width: 40%;">
-					        	<input type="number" class="form-control" id="curr-edit-product-no" name="productNo" 
-					        		value="" maxlength=12 title="请输入12个数字" placeholder="出厂编号" />
-					        </td>
-					      </tr> -->
 					      <tr>
 					      	<td colspan="2">
 					      		<hr/>
@@ -169,34 +113,19 @@
 									<div class="form-group form-inline">
 										<label for="checkbox-auto-generator-number" class="col-sm-4 control-label">&nbsp;</label>
 										<span class="input-group-sm col-sm-8 form-inline">
-									        	<!-- <input class="weui-switch" type="checkbox" style="float: right;"> -->
-												<!-- <div class="input-group-prepend btn-default" style="float: right;">
-													<div class="input-group-text">
-														<label><input type="checkbox" class="" id="">&nbsp;自动保存</label>
-													</div>
-												</div> -->
-												<input id="checkbox-auto-save" type="checkbox" style="float: right; heigth: 30px;" />
-												&nbsp;
-												<button type="button" class="btn btn-primary" id="btn-confirm-save" style="float: right; height: 29px;">确认保存</button>
-								        	</span>
-										</span>
+								        	<!-- <input class="weui-switch" type="checkbox" style="float: right;"> -->
+											<!-- <div class="input-group-prepend btn-default" style="float: right;">
+												<div class="input-group-text">
+													<label><input type="checkbox" class="" id="">&nbsp;自动保存</label>
+												</div>
+											</div> -->
+											<input id="checkbox-auto-save" type="checkbox" />
+											&nbsp;
+											<button type="button" class="btn btn-primary" id="btn-confirm-save" style="float: right; height: 29px;">确认保存</button>
+								        </span>
 									</div>
 								</td>											
 							</tr>
-					      <!-- <tr>
-					      	<td style="width: 10%;"></td>
-					        <td style="width: 40%;"></td>
-					        <td style="width: 10%;"></td>
-					        <td style="width: 40%;">
-					        	<div class="input-group-prepend btn-default">
-									<div class="input-group-text">
-										<label><input type="checkbox" class="" id="checkbox-auto-save">&nbsp;自动保存</label>
-									</div>
-								</div>
-								<input type="checkbox" class="checkbox" id="checkbox-auto-save" value=""/>
-					        	<button type="button" class="btn btn-primary" id="btn-confirm-save">确认保存</button>
-					        </td>
-					      </tr> -->
 					    </tbody>
 					</table>
 				</div>
@@ -204,112 +133,15 @@
 			</div>
 			
 		</div>
-		
-		<!-- <div class="col-md-12 column">
-			<div class="row clearfix">
-				<div class="col-md-2 column"></div>
-				<div class="col-md-8 column">
-					<table class="table-layout table">
-					    <tbody>
-					    	<tr>
-								<td>
-									模组号
-									<div class="form-group form-inline">
-										<label for="curr-edit-module-no" class="col-sm-4 control-label">模组号</label>
-										<span class="input-group-sm col-sm-8 form-inline">
-											<b id="curr-edit-module-no">863434045074033</b>
-										</span>
-									</div>
-								</td>	
-								<td>
-									出厂编号
-									<div class="form-group form-inline">
-										<label for="checkbox-auto-generator-number" class="col-sm-4 control-label">出厂编号</label>
-										<span class="input-group-sm col-sm-8">
-											<input type="number" class="form-control" id="curr-edit-product-no" name="productNo" 
-					        					value="" maxlength=12 title="请输入12个数字" placeholder="出厂编号" />
-										</span>
-									</div>
-								</td>											
-							</tr>
-					      <tr>
-					        <td style="width: 10%;">模组号</td>
-					        <td id="curr-edit-module-no" style="width: 40%;">863434045074033</td>
-					        <td style="width: 10%;">出厂编号</td>
-					        <td style="width: 40%;">
-					        	<input type="number" class="form-control" id="curr-edit-product-no" name="productNo" 
-					        		value="" maxlength=12 title="请输入12个数字" placeholder="出厂编号" />
-					        </td>
-					      </tr> --
-					    </tbody>
-					</table>
-				</div>
-				<div class="col-md-2 column"></div>
-			</div>
-		</div> -->
-		<!-- <div class="col-md-12 column">
-			<div class="row clearfix">
-				<div class="col-md-2 column"></div>
-				<div class="col-md-8 column">
-					<table class="table-layout table">
-					    <tbody>
-					    	<tr>
-								<td style="width:50%; float: left;">
-									模组号
-									<div class="form-group form-inline">
-										<label for="" class="col-sm-4 control-label">模组号</label>
-										<span class="input-group-sm col-sm-8 form-inline">
-											&nbsp;
-										</span>
-									</div>
-								</td>	
-								<td style="width:50%; float: right;">
-									出厂编号
-									<div class="form-group form-inline">
-										<label for="checkbox-auto-generator-number" class="col-sm-4 control-label">&nbsp;</label>
-										<span class="input-group-sm col-sm-8 form-inline">
-											<div class="input-group-prepend btn-default">
-												<div class="input-group-text">
-													<label><input type="checkbox" class="" id="checkbox-auto-save">&nbsp;自动保存</label>
-												</div>
-											</div>
-											<input type="checkbox" class="checkbox" id="checkbox-auto-save" value=""/>
-								        	<button type="button" class="btn btn-primary" id="btn-confirm-save">确认保存</button>
-										</span>
-									</div>
-								</td>											
-							</tr>
-					      <tr>
-					      	<td style="width: 10%;"></td>
-					        <td style="width: 40%;"></td>
-					        <td style="width: 10%;"></td>
-					        <td style="width: 40%;">
-					        	<div class="input-group-prepend btn-default">
-									<div class="input-group-text">
-										<label><input type="checkbox" class="" id="checkbox-auto-save">&nbsp;自动保存</label>
-									</div>
-								</div>
-								<input type="checkbox" class="checkbox" id="checkbox-auto-save" value=""/>
-					        	<button type="button" class="btn btn-primary" id="btn-confirm-save">确认保存</button>
-					        </td>
-					      </tr>
-					    </tbody>
-					</table>
-				</div>
-				<div class="col-md-2 column"></div>
-			</div>
-		</div> -->
+		<div class="col-md-12 column">
+			
+		</div>
 	</div>
 	
 	<script th:inline="javascript">
 		/*<![CDATA[*/
 
 		/*]]>*/
-	</script>
-	<script type="text/javascript">
-		$(function(){
-			
-		});
 	</script>
 	<script type="text/javascript">
 		var g_auto_refresh_product_register_timer = null;
@@ -562,7 +394,7 @@
 		        offColor:"default",//右侧开关颜色
 		        handleWidth: "70",//开关左右2侧的宽度
 		        labelWidth: "80",//开关中间的宽度
-		        size: "mini",//开关大小，取值范围：null|mini|small|normal|large
+		        /* size: "mini",//开关大小，取值范围：null|mini|small|normal|large，此处设置无效，在初始完成后再设置 */
 	        	onSwitchChange:function(event,state){  
 		            if(state==true){  
 		               console.log("----------自动生成出厂编号已打开");  
@@ -570,10 +402,6 @@
 		               console.log("----------自动生成出厂编号已关闭");  
 		            }  
 		        },
-		        /* onInit: function(event,state){
-		        	console.log("----------自动生成出厂编号默认值："+state);
-		        	//$("#checkbox-auto-generator-number").bootstrapSwitch('state', true);
-		        } */
 			});
 			
 			/**
@@ -606,6 +434,7 @@
 			/**
 			 * 	自动保存
 			 */
+			 /* $("#checkbox-auto-save").bootstrapSwitch(); */
 			$("#checkbox-auto-save").bootstrapSwitch({
 				onText:"开",//左侧开关显示文本
 		        offText:"关",//右侧开关显示文本
@@ -614,7 +443,7 @@
 		        offColor:"default",//右侧开关颜色
 		        handleWidth: "70",//开关左右2侧的宽度
 		        labelWidth: "80",//开关中间的宽度
-		        size: "mini",//开关大小，取值范围：null|mini|small|normal|large
+		        /* size: "mini",//开关大小，取值范围：null|mini|small|normal|large，此处设置无效，在初始完成后再设置 */
 	        	onSwitchChange:function(event,state){  
 	        		if (state == true) {
 						console.log("----------自动保存已打开");
@@ -627,21 +456,21 @@
 						console.log("----------主键ID：" + id);
 						console.log("----------出厂编号：" + productNo);
 						if (id == null || id == "" || productNo == null || productNo == "") {
+							console.log("----------主键ID或出厂编号为空不保存，继续执行定时任务");
+							//autoRefreshProductRegister();//定时自动刷新产品注册
 							//dialog type: success warning info error,默认为info
-							util.message("请确认出厂编号！", null, "warning");
-							return false;
+							//util.message("请确认出厂编号！", null, "warning");
+							//return false;
+						}else{
+							console.log("----------主键ID和出厂编号不为空，先保存，再启动定时");
+							saveCurrEditMeterNumber();//保存当前编辑的出厂编号
 						}
 
-						saveCurrEditMeterNumber();//保存当前编辑的出厂编号
 					} else {
 						console.log("----------自动保存已关闭");
 						$("#btn-confirm-save").attr("disabled", false);//设置保存按钮为可编辑状态
 					}
 		        },
-		        /* onInit: function(event,state){
-		        	console.log("----------自动生成出厂编号默认值："+state);
-		        	//$("#checkbox-auto-generator-number").bootstrapSwitch('state', true);
-		        } */
 			});
 
 			/**

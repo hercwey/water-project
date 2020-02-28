@@ -3,38 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>主界面</title>
-<!-- ZTree CSS -->
-<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/metroStyle/metroStyle.css}">
-<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/custom.css}">
-<!-- ZTree JS Scripts-->
-<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.core.js}"></script>
-<script type="text/javascript"	th:src="@{/ztree/js/jquery.ztree.excheck.js}"></script>
-<!-- 引入通用对话框工具 -->
-<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
-<!-- 正则表达式验证 -->
-<script src="/jquery/jquery-validation/jquery.validate.min.js"></script>
-<script src="/jquery/jquery-validation/messages_zh.js"></script>
-<link rel="stylesheet"	href="/css/meterbookbody.css" />
-<link rel="stylesheet"	href="/css/commform.css" />
-<link rel="stylesheet"	href="/css/searchpanel.css" />
 
+<link rel="stylesheet"	href="/css/commform.css" />
 <!-- Bootstrap Switch CSS -->
 <link rel="stylesheet" type="text/css" href="/bootstrap/switch/css/bootstrap-switch.min.css" />
-<!-- Bootstrap Switch JS -->
-<script type="text/javascript" src="/bootstrap/switch/js/bootstrap-switch.min.js"></script>
 
-<style type="text/css">
-	#module-product-no-search-form ul li label{
-		margin-bottom: 0px;
-	}
-	#module-product-no-search-form .input-group-text{
-		font-size: .875rem;
-		background-color: #f8f9fa;
-	}
-	#module-product-no-search-form .input-group-prepend, .input-group-text {
-		height: 31px;
-	}
-</style>
 </head>
 <body>
 	<!-- 编辑对话框 -->
@@ -50,8 +23,16 @@
 					<!-- <li class="input-group-sm">
 						<input type="text" class="form-control search-cond" id="search-cond" placeholder="请输入分组名称/客户名称" title="请输入分组名称、客户名称查询">
 					</li> -->
+					<li style="float: right;">
+						<input id="checkbox-auto-refresh" type="checkbox" /><!-- 默认是选中状态，初始初始化时设置 -->
+						<!-- <div class="input-group-prepend btn-default">
+							<div class="input-group-text">
+								<label><input type="checkbox" class="" id="checkbox-auto-refresh">&nbsp;自动刷新</label>
+							</div>
+						</div> -->
+					</li>
 					<!-- 查询按钮 -->
-					<li>
+					<li style="float: right;">
 						<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search" style="height: 29px;">
 							<i class="fa fa-refresh" aria-hidden="true"> <span>刷新</span>	</i>
 						</button>
@@ -61,14 +42,6 @@
 						<!-- <button type="button" class="btn btn-warning btn-sm btn-general-search-reset" id="btn-general-search-reset">
 							<i class="fa fa-undo" aria-hidden="true"> <span>清除</span></i>
 						</button> -->
-					</li>
-					<li>
-						<input id="checkbox-auto-refresh" type="checkbox" /><!-- 默认是选中状态，初始初始化时设置 -->
-						<!-- <div class="input-group-prepend btn-default">
-							<div class="input-group-text">
-								<label><input type="checkbox" class="" id="checkbox-auto-refresh">&nbsp;自动刷新</label>
-							</div>
-						</div> -->
 					</li>
 				</ul>
 			</div>
@@ -89,7 +62,7 @@
 					<!-- 操作员 -->
 					<span style="float: left; font-size: 16px; margin-left: 15px;">操作员：<b id="product-operator" th:text="${operatorName==null ? '' : operatorName}">管理员</b></span>
 					<!-- 系统时间 -->
-					<span style="float: right; font-size: 16px; margin-right: 45px;">当前时间：<b id="system-date">2020-02-28 00:00:00</b></span>
+					<span style="float: right; font-size: 16px; margin-right: 90px;">当前时间：<b id="system-date">2020-02-28 00:00:00</b></span>
 				</div>
 				<div class="col-md-2 column"></div>
 			</div>
@@ -101,6 +74,11 @@
 			<div th:include="moduleproductno/register/register" th:remove="tag"></div>
 		</div>
 	</div>
+	
+	<!-- 引入通用对话框工具 -->
+	<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
+	<!-- Bootstrap Switch JS -->
+	<script type="text/javascript" src="/bootstrap/switch/js/bootstrap-switch.min.js"></script>
 	
 	<script th:inline="javascript">
 		/*<![CDATA[*/
@@ -327,7 +305,7 @@
 		        offColor:"default",//右侧开关颜色
 		        handleWidth: "70",//开关左右2侧的宽度
 		        labelWidth: "80",//开关中间的宽度
-		        size: "mini",//开关大小，取值范围：null|mini|small|normal|large
+		        /* size: "mini",//开关大小，取值范围：null|mini|small|normal|large，此处设置无效，在初始完成后再设置 */
 	        	onSwitchChange:function(event,state){  
 	        		if (state == true) {
 	        			console.log("----------自动刷新已开启");
@@ -337,23 +315,7 @@
 						clearAutoRefresh();//取消自动刷新
 					}
 		        },
-		        /* onInit: function(event,state){
-		        	console.log("----------自动生成出厂编号默认值："+state);
-		        	//$("#checkbox-auto-generator-number").bootstrapSwitch('state', true);
-		        } */
 			});
-			
-			/*
-				批量删除按钮
-			*/
-			/* $('#module-product-no-search-form #btn-del').on('click', function() {
-				var ids=getSelectedIds();  //此函数定义于_table.html中
-				if(ids==null || ids.length<=0){
-					util.message("请选择需要删除的条目！",null,"warning");
-					return;
-				}
-				batchDeleteConfirm();  //显示删除确认对话框
-			}); */
 			
 			initAutoRefreshSwitchSize();//初始化自动刷新Switch大小
 
