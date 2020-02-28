@@ -355,7 +355,6 @@ public class Tester {
 		try {
 			message = new Message("Topic1", tag, data.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return message;

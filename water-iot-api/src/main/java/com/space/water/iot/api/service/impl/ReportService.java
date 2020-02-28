@@ -51,7 +51,7 @@ public class ReportService implements IReportService {
 			//TODO G11 检测该设备是否有待下发指令，如果有，逐条下发
 			ArrayList<String> commandList = CommandCache.getInstance().getCommandList(meterBean.getDeviceId());
 			if (commandList != null && commandList.size() > 0) {
-				//TODO 逐条下发指令，并清除指令列表
+				//TODO G11 逐条下发指令，并清除指令列表
 				for (int i = 0; i < commandList.size(); i++) {
 					// TODO G11 向电信平台发送指令，并向“营收子系统”发布命令执行状态改变消息
 					commandService.postAsynCommand(CommandBean.parseJson(commandList.get(i)));

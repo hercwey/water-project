@@ -36,7 +36,7 @@ public class ReportController {
 	@ResponseBody
 	public ResponseEntity<String> uploadDeviceData(@RequestBody String data) {
 		// 创建生产信息
-		SendResult sendResult = producer.sendNorth(data, topicConfig.getTagAutoReportCache());
+		SendResult sendResult = producer.sendNorthAsync(data, topicConfig.getTagAutoReportCache());
 		/**
 		Message message = new Message("Topic1", "reportTest", "keys" , data.getBytes());
 		try {
