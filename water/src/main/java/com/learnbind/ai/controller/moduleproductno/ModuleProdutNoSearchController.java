@@ -101,7 +101,7 @@ public class ModuleProdutNoSearchController {
 		UserBean userBean = (UserBean)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		// 判定页码有效性
-		if (pageNum == null || pageNum == 0) {
+		if (pageNum == null || pageNum == 0 || pageSize==null || pageSize==0) {
 			pageNum = 1;
 			pageSize = PAGE_SIZE;//PagerConstant.DEFAULT_PAGE_SIZE;
 		}

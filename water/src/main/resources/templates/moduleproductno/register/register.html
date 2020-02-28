@@ -22,7 +22,15 @@
 	<!-- <div class="mt-5 bg-secondary vh-100" id="my_container">
         <p>My container</p>
     </div> -->
-    
+	<div class="row clearfix" style="margin-top:15px;">
+		<div class="col-md-2 column"></div>
+		<div class="col-md-8 column">
+			<!-- 操作员 -->
+			<span style="float: left; font-size: 16px; margin-left: 15px;">当前计数器：<b id="curr-countor-value">1</b></span>
+		</div>
+		<div class="col-md-2 column"></div>
+	</div>
+		
 	<br>
 	<!-- 主界面(操作页板+列表容器) -->
 	<div class="row clearfix">
@@ -189,6 +197,14 @@
 		var g_serial_number_countor = 1;//水表编号中流水号计数器
 		
 		/**
+		 * 	显示当前计数器的值
+		 */
+		function showCurrCountorValue(){
+			var countor = g_serial_number_countor;
+			$("#curr-countor-value").text(countor);
+		}
+		
+		/**
 		 * 	获取是否自动生成出厂编号
 		 * 		return true:自动生成出厂编号；false:不自动生成出厂编号
 		 */
@@ -256,6 +272,8 @@
 						
 						var mpNo = res.mpNo;//出厂表号为空的记录
 						if(mpNo!=null){
+							
+							showCurrCountorValue();//显示当前计数器的值
 							
 							clearAutoRefreshProductRegister();//取消定时自动刷新产品注册
 							$("#btn-confirm-save").attr("disabled", false);//设置保存按钮为可编辑状态
@@ -433,6 +451,7 @@
 				}
 				console.log("----------把用户设置的初始编号起始值赋值到计数器："+serialNumberStart);
 				g_serial_number_countor = serialNumberStart;//初始编号起始值设置为计数器初始值
+				showCurrCountorValue();//显示当前计数器的值
 				var isAutoGenNumber = getIsAutoGenNumber();//获取是否自动生成出厂编号，return true:自动生成出厂编号；false:不自动生成出厂编号
 				if(isAutoGenNumber){
 					//获取自动生成的出厂编号
