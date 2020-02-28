@@ -21,6 +21,15 @@ function Pager(pageComponentId) {
 		searchCond = outSearchCond; // 查询条件
 		setPageNoClickListener(); // 页号click-listener
 	}
+	
+	this.getPageNum = function(){
+		console.log("curr page num is :"+pageNum);
+		return pageNum;
+	}
+	this.getPageSize = function(){
+		console.log("curr page size is :"+pageSize);
+		return pageSize;
+	}
 
 	/**
 	 * 设置页号click事件监听器

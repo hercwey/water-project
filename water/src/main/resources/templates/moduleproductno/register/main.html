@@ -48,7 +48,7 @@
 					</li>
 					<!-- 查询按钮 -->
 					<li style="float: right;">
-						<button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search" style="height: 38px;">
+						<button type="button" class="btn btn-outline-success btn-sm btn-general-search" id="btn-general-search">
 							<i class="fa fa-refresh" aria-hidden="true">&nbsp;&nbsp;<span>刷新</span></i>
 						</button>
 						<!-- <button type="button" class="btn btn-success btn-sm btn-general-search" id="btn-general-search">
@@ -94,7 +94,8 @@
 	<script type="text/javascript"	th:src="@{/js/component/dialogutil/DialogUtil.js}"></script>
 	<!-- Bootstrap Switch JS -->
 	<script type="text/javascript" src="/bootstrap/switch/js/bootstrap-switch.min.js"></script>
-	
+	<!-- 分页组件JS -->
+	<script src="/js/pager/Pagers.js" type="text/javascript"></script>
 	<script th:inline="javascript">
 		/*<![CDATA[*/
 
@@ -125,11 +126,15 @@
 		function autoRefresh() {
 			//主页:默认查询(加载默认列表)
 			//defaultSearchModuleProductNoTable();
-			//加载字典列表页面
+			//加载列表页面
+			
+			var pageNum = 1;
+			var pageSize = pager.getPageSize();
+			
 			var url = BASE_CONTEXT_PATH + "/module-product-register/table";
 			var parms = new Object();
-			parms.pageNum=0;
-			parms.pageSize=0;
+			parms.pageNum=pageNum;
+			parms.pageSize=pageSize;
 			$(".module-product-no-table").load(url, parms, function(){
 				console.log("----------自动刷新查询完成");
 				g_auto_refresh_timer = setTimeout(autoRefresh, 5000);//5秒刷新一次
@@ -269,11 +274,12 @@
 		 * 	初始化自动刷新Switch大小
 		 */
 		function initAutoRefreshSwitchSize(){
-			//$("#checkbox-auto-refresh").bootstrapSwitch("size","normal");//设置自动刷新开关大小为small
+			$("#checkbox-auto-refresh").bootstrapSwitch("size","small");//设置自动刷新开关大小为small
 		}
 		
 		//-------------------PAGE LOADED READY--------------------
-
+		//创建分页组件实例
+		var pager=new Pager("module-product-register-table");
 		$(function() {
 			//---------事件绑定--------------
 			//------------init-------------
@@ -287,7 +293,18 @@
 				查询按钮CLICK
 			*/
 			$('#module-product-no-search-form .btn-general-search').on('click', function() {
-				defaultSearchModuleProductNoTable();//查询
+				//defaultSearchModuleProductNoTable();//查询
+				var pageNum = 1;
+				var pageSize = pager.getPageSize();
+				
+				console.log("----------当前页："+pageNum);
+				console.log("----------每页显示条数："+pageSize);
+				
+				var parms = new Object();
+				parms.pageNum=pageNum;
+				parms.pageSize=pageSize;
+				searchModuleProductNoTable(parms);//查询
+				
 			});
 			/*
 				查询条件复位按钮CLICK
@@ -330,9 +347,9 @@
 		        handleWidth: "70",//开关左右2侧的宽度
 		        labelWidth: "80",//开关中间的宽度 */
 		        /* size: "mini",//开关大小，取值范围：null|mini|small|normal|large，此处设置无效，在初始完成后再设置 */
-		        handleWidth: "50",//开关左右2侧的宽度
-		        labelWidth: "80",//开关中间的宽度
-		        labelText: "自动刷新",//开关中间显示文本
+		        handleWidth: "20",//开关左右2侧的宽度
+		        labelWidth: "30",//开关中间的宽度
+		        labelText: "自动",//开关中间显示文本
 	        	onSwitchChange:function(event,state){  
 	        		if (state == true) {
 	        			console.log("----------自动刷新已开启");

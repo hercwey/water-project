@@ -22,6 +22,15 @@ function Pager(pageComponentId) {
 		setPageNoClickListener(); // 页号click-listener
 		setPageSizeListener();//绑定页号下拉框的change事件，并设置页号
 	}
+	
+	this.getPageNum = function(){
+		console.log("curr page num is :"+pageNum);
+		return pageNum;
+	}
+	this.getPageSize = function(){
+		console.log("curr page size is :"+pageSize);
+		return pageSize;
+	}
 
 	/**
 	 * 设置页号click事件监听器
