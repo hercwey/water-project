@@ -13,12 +13,18 @@ public class CommandCallbackConstants {
 	public static final String COMMAND_CALLBACK_STATUS_SUCCESS = "SUCCESS";
 	public static final String COMMAND_CALLBACK_STATUS_TIMEOUT = "TIMEOUT";
 
-	public static final int COMMAND_STATUS_SENT = 1;
-	public static final int COMMAND_STATUS_PENDING = 2;
-	public static final int COMMAND_STATUS_DELIVERED = 3;
-	public static final int COMMAND_STATUS_FAILED = -1;
-	public static final int COMMAND_STATUS_SUCCESS = 4;
-	public static final int COMMAND_STATUS_TIMEOUT = 5;
+	/**
+	 * 等于0，为未向电信平台发送
+	 * 大于0，已下发电信平台
+	 * 小于0，指令执行失败
+	 */
+	public static final int COMMAND_STATUS_UNSENT = 0;//未发送
+	public static final int COMMAND_STATUS_SENT = 1;//已发送
+	public static final int COMMAND_STATUS_PENDING = 2;//等待
+	public static final int COMMAND_STATUS_DELIVERED = 3;//已送达
+	public static final int COMMAND_STATUS_SUCCESS = 4;//执行成功
+	public static final int COMMAND_STATUS_FAILED = -1;//执行失败
+	public static final int COMMAND_STATUS_TIMEOUT = -2;//超时
 
 	/**
 	 * 已取消，已发送，已送达，过期，超时，等待，成功，失败
