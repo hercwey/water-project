@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <title>产品登记</title>
 
+<!-- 日期组件 -->
+<script src="/calendar/WdatePicker.js" type="text/javascript"></script>
+
 <style type="text/css">
 	table.table-layout tbody .form-inline label {
 		display: block!important;
@@ -94,6 +97,20 @@
 										</span>
 									</div>
 								</td>											
+							</tr>
+							<tr>
+								<td>
+									<!-- 自动生成出厂编号日期 -->
+									<div class="form-group form-inline">
+										<label for="iot-operator-ct" class="col-sm-4 control-label">出厂编号日期</label>
+										<span class="input-group-sm col-sm-8 form-inline">
+											<input type="text" class="form-control Wdate" id="product-no-date" name="productNoDate" style="width: 150px; border-top:0px;border-left:0px;border-right:0px; outline:none;"
+												onClick="WdatePicker({dateFmt:'yyyy-MM-dd'});"
+					        					value="" title="请输入出厂编号日期" placeholder="出厂编号日期" />
+										</span>
+									</div>
+								</td>	
+								<td></td>											
 							</tr>
 					      <tr>
 					      	<td colspan="2">
@@ -236,7 +253,9 @@
 			console.log("----------自动生成出厂编号中的1位生产厂商："+factoryCode);
 			var iotOperator = $("input[name='iot-operator']:checked").val();//IOT运营商：1=电信；2=移动；3=联通
 			console.log("----------自动生成出厂编号中的1位IOT运营商："+iotOperator);
-			var yymmdd = moment().format("YYMMDD");//获取日期yymmdd
+			//var yymmdd = moment().format("YYMMDD");//获取日期yymmdd
+			var productNoDate = $("#product-no-date").val();//出厂编号日期
+			var yymmdd = moment(productNoDate).format("YYMMDD");//获取日期yymmdd
 			console.log("----------自动生成出厂编号中的6位日期："+yymmdd);
 			var serialNumber = 1;//流水号
 			if(countor<10){
@@ -426,7 +445,20 @@
 			$("#checkbox-auto-save").bootstrapSwitch("size","small");//设置自动保存开关大小为small
 		}
 		
+		//------------------初始化出厂编号日期-----------------------------------------------------------------
+		/**
+		 * 	初始化出厂日期，默认值是系统日期
+		 */
+		function initProductNoDate(){
+			var sysDate = moment().format('YYYY-MM-DD'); 
+			console.log("----------初始化出厂日期："+sysDate);
+			$("#product-no-date").val(sysDate);//初始化出厂日期为系统日期
+		}
+		
 		$(function(){
+			
+			//---------------初始化---------------------------------------------
+			initProductNoDate();//初始化出厂日期，默认值是系统日期
 			
 			/**
 			 * 	绑定初始编号起始值的input事件
