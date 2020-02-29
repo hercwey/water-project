@@ -8,6 +8,7 @@ public class OrderStatusResponse extends BaseResponse{
 	Long id;//“营收子系统”数据库中，指令对应id
 	
 	String commandId;//指令Id
+	String commandHex;//生成的设备指令
 	int status;//指令状态（对应CommandCallbackConstants）
 
 	public String getCommandId() {
@@ -32,6 +33,14 @@ public class OrderStatusResponse extends BaseResponse{
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getCommandHex() {
+		return commandHex;
+	}
+
+	public void setCommandHex(String commandHex) {
+		this.commandHex = commandHex;
 	}
 
 	public static String toJsonString(OrderStatusResponse response) {

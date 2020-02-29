@@ -5,11 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.learnbind.ai.model.iot.TestCommandBean;
 import com.learnbind.ai.model.iot.WmCommand;
 import com.learnbind.ai.model.iotbean.command.OrderStatusResponse;
 import com.learnbind.ai.service.iot.ICommandService;
 import com.learnbind.ai.service.iot.WmCommandService;
+
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * Copyright (c) 2020 by SRD
@@ -45,8 +46,9 @@ public class OrderStatusResponseProcessService {
 
 		log.debug("----------命令执行状态响应数据处理");
 		
-		Long id = orderStatusRsp.getId();
+		Long id = orderStatusRsp.getId();//营收子系统数据库中，指令对应的ID
 		String commandId = orderStatusRsp.getCommandId();//iot平台指令ID
+		String commandHex = orderStatusRsp.getCommandHex();//生成的设备指令
 		int status = orderStatusRsp.getStatus();//指令状态
 		
 		log.debug("----------指令状态："+status);
@@ -60,15 +62,21 @@ public class OrderStatusResponseProcessService {
 //		}
 		
 		if(id==null) {
-			TestCommandBean commandBean = new TestCommandBean();
-	        //commandBean.setDeviceId(deviceId);
-	        commandBean.setCommandId(commandId);
-	        commandBean.setDatabaseStatus(status);
-	        commandService.updateByDeviceCommand(commandBean);
+//			TestCommandBean commandBean = new TestCommandBean();
+//	        //commandBean.setDeviceId(deviceId);
+//	        commandBean.setCommandId(commandId);
+//	        commandBean.setDatabaseStatus(status);
+//	        commandService.updateByDeviceCommand(commandBean);
+			Example example = new Example(WmCommand.class);
+			example.createCriteria().andEqualTo("commandId", commandId);
+			WmCommand wmCommand = new WmCommand();
+			wmCommand.setStatus(status);
+			wmCommandService.updateByExampleSelective(wmCommand, example);
 		}else {
 			WmCommand wmCommand = new WmCommand();
 			wmCommand.setId(id);
 			wmCommand.setCommandId(commandId);
+			wmCommand.setMethodParams(commandHex);
 			wmCommand.setStatus(status);
 			wmCommandService.updateByPrimaryKeySelective(wmCommand);
 		}

@@ -22,26 +22,24 @@ import com.learnbind.ai.common.util.EntityUtils;
 import com.learnbind.ai.constant.PagerConstant;
 import com.learnbind.ai.iot.protocol.util.ByteUtil;
 import com.learnbind.ai.iot.protocol.util.HexStringUtils;
+import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.iot.TestMeterDataBaseBean;
 import com.learnbind.ai.model.iot.TestMeterReportBean;
 import com.learnbind.ai.model.iot.TestMeterStatusBean;
-import com.learnbind.ai.model.iot.WmDevice;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.service.iot.IMeterService;
-import com.learnbind.ai.service.iot.WmDeviceService;
 import com.learnbind.ai.service.meters.MetersService;
 
-
 /**
- * Copyright (c) 2019 by ZYC
+ * Copyright (c) 2020 by SRD
  * 
  * @Package com.learnbind.ai.controller.meters
  *
- * @Title: MeterDocController.java
- * @Description: 表计-单据管理
+ * @Title: MeterDeviceReportDataController.java
+ * @Description: 水表设备上报数据查询前端控制器
  *
- * @author Thinkpad
- * @date 2019年10月22日 上午11:58:44
+ * @author SRD
+ * @date 2020年3月1日 上午1:01:31
  * @version V1.0 
  *
  */
@@ -57,8 +55,8 @@ public class MeterDeviceReportDataController {
 	private MetersService metersService;  //表计档案
 	@Autowired
 	IMeterService imeterService;
-	@Autowired
-	private WmDeviceService wmDeviceService;
+//	@Autowired
+//	private WmDeviceService wmDeviceService;
 	
 	
 	/**
@@ -115,8 +113,8 @@ public class MeterDeviceReportDataController {
 
 			Long deviceId = meter.getDeviceId();// 设备（水表）表主键ID
 
-			WmDevice device = wmDeviceService.selectByPrimaryKey(deviceId);// 查询水表信息
-			meterMap.put("verifyCode", device.getVerifyCode());
+			Meters device = metersService.selectByPrimaryKey(deviceId);// 查询水表信息
+			meterMap.put("verifyCode", device.getMeterNo());
 
 			String meterData = meter.getMeterData();
 			TestMeterReportBean meterReportBean = null;

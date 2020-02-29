@@ -120,14 +120,14 @@
   	SELECT
 		M.*
 	FROM
-		WM_METER M LEFT JOIN WM_DEVICE D ON M.DEVICE_ID = D.ID  
+		WM_METER M LEFT JOIN METERS D ON M.DEVICE_ID = D.ID  
 	<where>
-		1=1
+		D.DEVICE_ID IS NOT NULL
 		<if test="searchDataType!=null">
 			AND M.METER_DATA_TYPE = #{searchDataType}
 		</if>
 		<if test="searchCond!=null and searchCond!=''">
-			AND D.VERIFY_CODE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+			AND D.METER_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
 		</if>
 	</where>
 	ORDER BY

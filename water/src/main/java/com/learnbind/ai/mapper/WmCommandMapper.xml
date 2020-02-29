@@ -215,7 +215,7 @@
   	SELECT
 		C.ID,
 		C.COMMAND_TYPE, 
-		D.VERIFY_CODE, 
+		D.METER_NO, 
 		D.METER_ADDRESS, 
 		C.COMMAND_ID,
 		C.APP_ID,
@@ -229,15 +229,15 @@
 		S.SERVICE_NAME 
 	FROM
 		WM_COMMAND C
-		LEFT JOIN WM_DEVICE D ON C.DEVICE_ID = D.ID
+		LEFT JOIN METERS D ON C.DEVICE_ID = D.ID
 		LEFT JOIN WM_SERVICE S ON C.SERVICE_ID = S.ID
 	<where>
-		1=1
+		D.DEVICE_ID IS NOT NULL
 		<if test="searchCommandType!=null">
 			AND C.COMMAND_TYPE = #{searchCommandType}
 		</if>
 		<if test="searchCond!=null and searchCond!=''">
-			AND D.VERIFY_CODE LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
+			AND D.METER_NO LIKE CONCAT('%', CONCAT(#{searchCond}, '%'))
 		</if>
 	</where>
 	ORDER BY
