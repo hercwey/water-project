@@ -54,6 +54,9 @@ public class Producer {
 
 	public SendResult sendNorth(String response, String tag) {
 		SendResult sendResult = null;
+		if (response == null || response.equals("")) {
+			response = "{}";
+		}
 		// 创建生产信息
 		Message message = new Message(topicConfig.getTopicName(), tag, "keys", response.getBytes());
 		// 发送
@@ -72,8 +75,12 @@ public class Producer {
 
 	public SendResult sendNorthAsync(String response, String tag) {
 		SendResult sendResult = null;
+		if (response == null || response.equals("")) {
+			response = "{}";
+		}
 		// 创建生产信息
 		Message message = new Message(topicConfig.getTopicName(), tag, "keys", response.getBytes());
+		final String responseFinal = response;
 		// 发送
 		try {
 			getProducer().send(message, new SendCallback() {
@@ -83,7 +90,7 @@ public class Producer {
 					LogUtil.debug("----------------------------------------");
 					LogUtil.debug("| 消息发送成功");
 					LogUtil.debug("| tag :" + tag);
-					LogUtil.debug("| data:" + response);
+					LogUtil.debug("| data:" + responseFinal);
 					LogUtil.debug("----------------------------------------");
 				}
 
@@ -92,7 +99,7 @@ public class Producer {
 					LogUtil.error("----------------------------------------");
 					LogUtil.error("| 消息发送失败");
 					LogUtil.error("| tag :" + tag);
-					LogUtil.error("| data:" + response);
+					LogUtil.error("| data:" + responseFinal);
 					LogUtil.error("| " + e.getMessage());
 					LogUtil.error("----------------------------------------");
 
