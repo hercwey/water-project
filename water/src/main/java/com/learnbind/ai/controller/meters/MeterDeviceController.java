@@ -383,6 +383,7 @@ public class MeterDeviceController {
 			if (rows > 0) {
 
 				BaseCommandRequest request = new BaseCommandRequest();
+				request.setId(wmCommand.getId());
 				request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);
 				request.setMeterFactoryCode(meterFactoryCode);
@@ -491,6 +492,7 @@ public class MeterDeviceController {
 			if (rows > 0) {
 
 				ConfigThresholdRequest request = new ConfigThresholdRequest();
+				request.setId(wmCommand.getId());
 				request.setThreshold((Integer.valueOf(cmdAction)).shortValue());
 				request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);
@@ -611,6 +613,7 @@ public class MeterDeviceController {
 				byte action = this.getOpenCloseAction(Integer.valueOf(cmdAction));
 
 				ControlValveRequest request = new ControlValveRequest();
+				request.setId(wmCommand.getId());
 				request.setAction(action);
 				request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);

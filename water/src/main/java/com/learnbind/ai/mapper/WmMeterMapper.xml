@@ -131,7 +131,7 @@
 		</if>
 	</where>
 	ORDER BY
-		M.ID DESC
+		M.EVENT_TIME DESC, M.ID DESC
   </select>
   
 </mapper>
