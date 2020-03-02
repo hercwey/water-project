@@ -23,7 +23,7 @@ public class DeviceParams {
 	private int meterBasicValue; // 表底数: 4字节, 整型
 	private float sampleUnit; // 采样参数：1字节(0-255)十进制，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样；
 	private String meterNumber; // 表号：12字节数字字符串(6字节水表资产编号，BCD格式；)
-	private Date meterTime; // 表当前时间：14字节数字字符串格式为yyyymmddHHMMSS (7字节，年、月、星期、日、时、分、秒，BCD格式；)
+	private Date meterTime = new Date(0L); // 表当前时间：14字节数字字符串格式为yyyymmddHHMMSS (7字节，年、月、星期、日、时、分、秒，BCD格式；)
 	private MeterStatusBean meterStatus; // 表状态字：由meterStatusFlag转换
 	private String serverIp; // 服务器IP：AAA.BBB.CCC.DDD格式
 	private short serverPort; // 端口号：2字节(0-65535)十进制
@@ -173,7 +173,7 @@ public class DeviceParams {
 		meterConfig.setMeterBasicValue(params.getMeterBasicValue());
 		meterConfig.setMeterNumber(params.getMeterNumber());
 		meterConfig.setMeterStatusFlag(MeterStatusBean.toStatusFlag(params.getMeterStatus()));
-		meterConfig.setMeterTime(params.getMeterTime() != null ? params.getMeterTime().toString():"");
+		meterConfig.setMeterTime(StringUtil.toMeterTime(params.getMeterTime()));
 		meterConfig.setReportPeriod(params.getReportPeriod());
 		meterConfig.setReportPeriodUnit(params.getReportPeriodUnit());
 		meterConfig.setReportRation(params.getReportRation());
