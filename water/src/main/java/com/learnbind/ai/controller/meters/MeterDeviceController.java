@@ -200,7 +200,7 @@ public class MeterDeviceController {
 			// WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
 
-			Integer meterType = Integer.valueOf(device.getMeterUseType());// 表类型
+			String meterTypeStr = device.getMeterUseType();// 表类型
 			String meterAddress = device.getMeterAddress();// 表地址
 			String meterFactoryCode = device.getMeterFactoryCode();// 表厂商
 			Integer sequence = device.getMeterSequence();// 序号
@@ -227,7 +227,7 @@ public class MeterDeviceController {
 			// if(StringUtils.isBlank(cmdAction) || meterType==null ||
 			// StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) ||
 			// sequence==null) {
-			if (meterType == null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
+			if (StringUtils.isBlank(meterTypeStr) || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
 					|| sequence == null) {
 				return RequestResultUtil.getResultFail("参数错误！");
 			}
@@ -245,16 +245,16 @@ public class MeterDeviceController {
 //				<option value="11">生活热水表</option>
 //				<option value="12">直饮水水表</option>
 //				<option value="13">中水水表</option>
-			byte meterTypeB = 0x00;
-			if (meterType == 10) {
-				meterTypeB = Protocol.METER_TYPE_10H;
-			} else if (meterType == 11) {
-				meterTypeB = Protocol.METER_TYPE_11H;
-			} else if (meterType == 12) {
-				meterTypeB = Protocol.METER_TYPE_12H;
-			} else if (meterType == 13) {
-				meterTypeB = Protocol.METER_TYPE_13H;
-			}
+//			byte meterTypeB = 0x00;
+//			if (meterType == 10) {
+//				meterTypeB = Protocol.METER_TYPE_10H;
+//			} else if (meterType == 11) {
+//				meterTypeB = Protocol.METER_TYPE_11H;
+//			} else if (meterType == 12) {
+//				meterTypeB = Protocol.METER_TYPE_12H;
+//			} else if (meterType == 13) {
+//				meterTypeB = Protocol.METER_TYPE_13H;
+//			}
 
 			byte sequenceB = 0x00;
 
@@ -274,7 +274,7 @@ public class MeterDeviceController {
 				queryMonthData.setId(wmCommand.getId());
 				queryMonthData.setMeterAddress(meterAddress);
 				queryMonthData.setMeterFactoryCode(meterFactoryCode);
-				queryMonthData.setMeterType(meterType.byteValue());
+				queryMonthData.setMeterType(Integer.valueOf(meterTypeStr).byteValue());
 				queryMonthData.setMethod(METHOD);
 				queryMonthData.setSequence(sequence.byteValue());
 				queryMonthData.setServiceId(SERVICE_ID);
@@ -313,7 +313,7 @@ public class MeterDeviceController {
 			// WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
 
-			Integer meterType = Integer.valueOf(device.getMeterUseType());// 表类型
+			String meterTypeStr = device.getMeterUseType();// 表类型
 			String meterAddress = device.getMeterAddress();// 表地址
 			String meterFactoryCode = device.getMeterFactoryCode();// 表厂商
 			Integer sequence = device.getMeterSequence();// 序号
@@ -340,7 +340,7 @@ public class MeterDeviceController {
 			// if(StringUtils.isBlank(cmdAction) || meterType==null ||
 			// StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) ||
 			// sequence==null) {
-			if (meterType == null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
+			if (StringUtils.isBlank(meterTypeStr) || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
 					|| sequence == null) {
 				return RequestResultUtil.getResultFail("参数错误！");
 			}
@@ -358,16 +358,16 @@ public class MeterDeviceController {
 //				<option value="11">生活热水表</option>
 //				<option value="12">直饮水水表</option>
 //				<option value="13">中水水表</option>
-			byte meterTypeB = 0x00;
-			if (meterType == 10) {
-				meterTypeB = Protocol.METER_TYPE_10H;
-			} else if (meterType == 11) {
-				meterTypeB = Protocol.METER_TYPE_11H;
-			} else if (meterType == 12) {
-				meterTypeB = Protocol.METER_TYPE_12H;
-			} else if (meterType == 13) {
-				meterTypeB = Protocol.METER_TYPE_13H;
-			}
+//			byte meterTypeB = 0x00;
+//			if (meterType == 10) {
+//				meterTypeB = Protocol.METER_TYPE_10H;
+//			} else if (meterType == 11) {
+//				meterTypeB = Protocol.METER_TYPE_11H;
+//			} else if (meterType == 12) {
+//				meterTypeB = Protocol.METER_TYPE_12H;
+//			} else if (meterType == 13) {
+//				meterTypeB = Protocol.METER_TYPE_13H;
+//			}
 
 			byte sequenceB = 0x00;
 
@@ -387,7 +387,7 @@ public class MeterDeviceController {
 				request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);
 				request.setMeterFactoryCode(meterFactoryCode);
-				request.setMeterType(meterType.byteValue());
+				request.setMeterType(Integer.valueOf(meterTypeStr).byteValue());
 				request.setMethod(METHOD);
 				request.setSequence(sequence.byteValue());
 				request.setServiceId(SERVICE_ID);
@@ -422,7 +422,7 @@ public class MeterDeviceController {
 			// Long id = Long.valueOf(deviceId);
 			// WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
-			Integer meterType = Integer.valueOf(device.getMeterUseType());// 表类型
+			String meterTypeStr = device.getMeterUseType();// 表类型
 			String meterAddress = device.getMeterAddress();// 表地址
 			String meterFactoryCode = device.getMeterFactoryCode();// 表厂商
 			Integer sequence = device.getMeterSequence();// 序号
@@ -449,7 +449,7 @@ public class MeterDeviceController {
 			// if(StringUtils.isBlank(cmdAction) || meterType==null ||
 			// StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) ||
 			// sequence==null) {
-			if (meterType == null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
+			if (StringUtils.isBlank(meterTypeStr) || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
 					|| sequence == null) {
 				return RequestResultUtil.getResultFail("参数错误！");
 			}
@@ -467,16 +467,16 @@ public class MeterDeviceController {
 //			<option value="11">生活热水表</option>
 //			<option value="12">直饮水水表</option>
 //			<option value="13">中水水表</option>
-			byte meterTypeB = 0x00;
-			if (meterType == 10) {
-				meterTypeB = Protocol.METER_TYPE_10H;
-			} else if (meterType == 11) {
-				meterTypeB = Protocol.METER_TYPE_11H;
-			} else if (meterType == 12) {
-				meterTypeB = Protocol.METER_TYPE_12H;
-			} else if (meterType == 13) {
-				meterTypeB = Protocol.METER_TYPE_13H;
-			}
+//			byte meterTypeB = 0x00;
+//			if (meterType == 10) {
+//				meterTypeB = Protocol.METER_TYPE_10H;
+//			} else if (meterType == 11) {
+//				meterTypeB = Protocol.METER_TYPE_11H;
+//			} else if (meterType == 12) {
+//				meterTypeB = Protocol.METER_TYPE_12H;
+//			} else if (meterType == 13) {
+//				meterTypeB = Protocol.METER_TYPE_13H;
+//			}
 
 			byte sequenceB = 0x00;
 			// 5=水量阀值指令
@@ -497,7 +497,7 @@ public class MeterDeviceController {
 				request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);
 				request.setMeterFactoryCode(meterFactoryCode);
-				request.setMeterType(meterType.byteValue());
+				request.setMeterType(Integer.valueOf(meterTypeStr).byteValue());
 				request.setMethod(METHOD);
 				request.setSequence(sequence.byteValue());
 				request.setServiceId(SERVICE_ID);
@@ -541,7 +541,7 @@ public class MeterDeviceController {
 		try {
 			// WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
-			Integer meterType = Integer.valueOf(device.getMeterUseType());// 表类型
+			String meterTypeStr = device.getMeterUseType();// 表类型
 			String meterAddress = device.getMeterAddress();// 表地址
 			String meterFactoryCode = device.getMeterFactoryCode();// 表厂商
 			Integer sequence = device.getMeterSequence();// 序号
@@ -568,7 +568,7 @@ public class MeterDeviceController {
 			// if(StringUtils.isBlank(cmdAction) || meterType==null ||
 			// StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) ||
 			// sequence==null) {
-			if (meterType == null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
+			if (StringUtils.isBlank(meterTypeStr) || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
 					|| sequence == null) {
 				return RequestResultUtil.getResultFail("参数错误！");
 			}
@@ -586,15 +586,18 @@ public class MeterDeviceController {
 //			<option value="11">生活热水表</option>
 //			<option value="12">直饮水水表</option>
 //			<option value="13">中水水表</option>
-			byte meterTypeB = 0x00;
-			if (meterType == 10) {
-				meterTypeB = Protocol.METER_TYPE_10H;
-			} else if (meterType == 11) {
-				meterTypeB = Protocol.METER_TYPE_11H;
-			} else if (meterType == 12) {
-				meterTypeB = Protocol.METER_TYPE_12H;
-			} else if (meterType == 13) {
-				meterTypeB = Protocol.METER_TYPE_13H;
+			if(StringUtils.isNotBlank(meterTypeStr)) {
+				Integer meterType = Integer.valueOf(meterTypeStr);
+				byte meterTypeB = 0x00;
+				if (meterType == 10) {
+					meterTypeB = Protocol.METER_TYPE_10H;
+				} else if (meterType == 11) {
+					meterTypeB = Protocol.METER_TYPE_11H;
+				} else if (meterType == 12) {
+					meterTypeB = Protocol.METER_TYPE_12H;
+				} else if (meterType == 13) {
+					meterTypeB = Protocol.METER_TYPE_13H;
+				}
 			}
 
 			byte sequenceB = 0x00;
@@ -618,7 +621,7 @@ public class MeterDeviceController {
 				request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);
 				request.setMeterFactoryCode(meterFactoryCode);
-				request.setMeterType(meterType.byteValue());
+				request.setMeterType(Integer.valueOf(meterTypeStr).byteValue());
 				request.setMethod(METHOD);
 				request.setSequence(sequence.byteValue());
 				request.setServiceId(SERVICE_ID);
@@ -662,7 +665,7 @@ public class MeterDeviceController {
 		try {
 			// WmDevice device = wmDeviceService.selectByPrimaryKey(id);
 			Meters device = metersService.selectByPrimaryKey(id);
-			Integer meterType = Integer.valueOf(device.getMeterUseType());// 表类型
+			String meterTypeStr = device.getMeterUseType();// 表类型
 			String meterAddress = device.getMeterAddress();// 表地址
 			String meterFactoryCode = device.getMeterFactoryCode();// 表厂商
 			Integer sequence = device.getMeterSequence();// 序号
@@ -689,7 +692,7 @@ public class MeterDeviceController {
 			// if(StringUtils.isBlank(cmdAction) || meterType==null ||
 			// StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode) ||
 			// sequence==null) {
-			if (meterType == null || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
+			if (StringUtils.isBlank(meterTypeStr) || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
 					|| sequence == null) {
 				return RequestResultUtil.getResultFail("参数错误！");
 			}
@@ -707,16 +710,16 @@ public class MeterDeviceController {
 //			<option value="11">生活热水表</option>
 //			<option value="12">直饮水水表</option>
 //			<option value="13">中水水表</option>
-			byte meterTypeB = 0x00;
-			if (meterType == 10) {
-				meterTypeB = Protocol.METER_TYPE_10H;
-			} else if (meterType == 11) {
-				meterTypeB = Protocol.METER_TYPE_11H;
-			} else if (meterType == 12) {
-				meterTypeB = Protocol.METER_TYPE_12H;
-			} else if (meterType == 13) {
-				meterTypeB = Protocol.METER_TYPE_13H;
-			}
+//			byte meterTypeB = 0x00;
+//			if (meterType == 10) {
+//				meterTypeB = Protocol.METER_TYPE_10H;
+//			} else if (meterType == 11) {
+//				meterTypeB = Protocol.METER_TYPE_11H;
+//			} else if (meterType == 12) {
+//				meterTypeB = Protocol.METER_TYPE_12H;
+//			} else if (meterType == 13) {
+//				meterTypeB = Protocol.METER_TYPE_13H;
+//			}
 
 			byte sequenceB = 0x00;
 			// 水表配置指令
