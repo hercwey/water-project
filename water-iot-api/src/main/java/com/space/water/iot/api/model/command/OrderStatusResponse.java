@@ -1,5 +1,7 @@
 package com.space.water.iot.api.model.command;
 
+import java.util.Date;
+
 import com.alibaba.fastjson.JSON;
 import com.space.water.iot.api.model.common.BaseResponse;
 
@@ -10,6 +12,7 @@ public class OrderStatusResponse extends BaseResponse{
 	String commandId;//指令Id
 	String commandHex;//生成的设备指令
 	int status;//指令状态（对应CommandCallbackConstants）
+	Date time = new Date(System.currentTimeMillis());//指令时间
 
 	public String getCommandId() {
 		return commandId;
@@ -41,6 +44,14 @@ public class OrderStatusResponse extends BaseResponse{
 
 	public void setCommandHex(String commandHex) {
 		this.commandHex = commandHex;
+	}
+
+	public Date getTime() {
+		return time;
+	}
+
+	public void setTime(Date time) {
+		this.time = time;
 	}
 
 	public static String toJsonString(OrderStatusResponse response) {
