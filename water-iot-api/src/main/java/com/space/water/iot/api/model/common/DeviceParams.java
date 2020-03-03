@@ -23,7 +23,7 @@ public class DeviceParams {
 	private int meterBasicValue; // 表底数: 4字节, 整型
 	private float sampleUnit; // 采样参数：1字节(0-255)十进制，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样；
 	private String meterNumber; // 表号：12字节数字字符串(6字节水表资产编号，BCD格式；)
-	private Date meterTime; // 表当前时间：14字节数字字符串格式为yyyymmddHHMMSS (7字节，年、月、星期、日、时、分、秒，BCD格式；)
+	private Date meterTime = new Date(0L); // 表当前时间：14字节数字字符串格式为yyyymmddHHMMSS (7字节，年、月、星期、日、时、分、秒，BCD格式；)
 	private MeterStatusBean meterStatus; // 表状态字：由meterStatusFlag转换
 	private String serverIp; // 服务器IP：AAA.BBB.CCC.DDD格式
 	private short serverPort; // 端口号：2字节(0-65535)十进制
@@ -170,19 +170,80 @@ public class DeviceParams {
 
 	public static MeterConfig toMeterConfig(DeviceParams params) {
 		MeterConfig meterConfig = new MeterConfig();
-		meterConfig.setMeterBasicValue(params.getMeterBasicValue());
-		meterConfig.setMeterNumber(params.getMeterNumber());
-		meterConfig.setMeterStatusFlag(MeterStatusBean.toStatusFlag(params.getMeterStatus()));
-		meterConfig.setMeterTime(params.getMeterTime() != null ? params.getMeterTime().toString():"");
-		meterConfig.setReportPeriod(params.getReportPeriod());
-		meterConfig.setReportPeriodUnit(params.getReportPeriodUnit());
-		meterConfig.setReportRation(params.getReportRation());
-		meterConfig.setSampleUnit(params.getSampleUnit());
-		meterConfig.setServerIp(params.getServerIp());
-		meterConfig.setServerPort(params.getServerPort());
-		meterConfig.setTemporaryTime(params.getTemporaryTime());
-		meterConfig.setValveMaintainPeriod(params.getValveMaintainPeriod());
-		meterConfig.setValveRunTime(params.getValveRunTime());
+		DeviceParamsFlags configFlag = params.getConfigFlag();
+		if (configFlag == null) {
+			configFlag = new DeviceParamsFlags();
+		}
+		
+		if (configFlag.getPeriod()) {// 定时上传周期
+			meterConfig.setReportPeriod(params.getReportPeriod());
+		} else {
+			meterConfig.setReportPeriod((short) 0);
+		}
+		if (configFlag.getPeriodUnit()) {// 定时上传周期单位
+			meterConfig.setReportPeriodUnit(params.getReportPeriodUnit());
+		} else {
+			meterConfig.setReportPeriodUnit((byte) 0);
+		}
+		if (configFlag.getMaxReport()) {// 定量上传值
+			meterConfig.setReportRation(params.getReportRation());
+		} else {
+			meterConfig.setReportRation((short) 0);
+		}
+		if (configFlag.getEmergTime()) {// 用户临时开阀用水限定时间
+			meterConfig.setTemporaryTime(params.getTemporaryTime());
+		} else {
+			meterConfig.setTemporaryTime((byte) 0);
+		}
+		if (configFlag.getValveTime()) {// 阀门行程时间
+			meterConfig.setValveRunTime(params.getValveRunTime());
+		} else {
+			meterConfig.setValveRunTime((byte) 0);
+		}
+		if (configFlag.getValveMaintainTime()) {// 阀门维护周期
+			meterConfig.setValveMaintainPeriod(params.getValveMaintainPeriod());
+		} else {
+			meterConfig.setValveMaintainPeriod((short) 0);
+		}
+		if (configFlag.getWaterVolume()) {// 累计使用量
+			meterConfig.setMeterBasicValue(params.getMeterBasicValue());
+		} else {
+			meterConfig.setMeterBasicValue(0);
+		}
+		if (configFlag.getSampleUnit()) {// 采样参数
+			meterConfig.setSampleUnit(params.getSampleUnit());
+		} else {
+			meterConfig.setSampleUnit((float) 0.0);
+		}
+		if (configFlag.getMeterNum()) {// 表号
+			meterConfig.setMeterNumber(params.getMeterNumber());
+		} else {
+			meterConfig.setMeterNumber("000000000000");
+		}
+		if (configFlag.getMeterTime()) {// 表时间
+			meterConfig.setMeterTime(StringUtil.toMeterTime(params.getMeterTime()));
+		} else {
+			meterConfig.setMeterTime(StringUtil.toMeterTime(null));
+		}
+		if (configFlag.getMeterStatus()) {// 表状态字
+			meterConfig.setMeterStatusFlag(MeterStatusBean.toStatusFlag(params.getMeterStatus()));
+		} else {
+			meterConfig.setMeterStatusFlag((short) 0);
+		}
+		if (configFlag.getServerIp()) {// 服务器IP
+			meterConfig.setServerIp(params.getServerIp());
+		} else {
+			meterConfig.setServerIp("0.0.0.0");
+		}
+		if (configFlag.getServerPort()) {// 端口号
+			meterConfig.setServerPort(params.getServerPort());
+		} else {
+			meterConfig.setServerPort((short) 0);
+		}
+		if (configFlag.getMagneticAlarmClear()) {// 磁干扰告警清除
+			
+		}
+		
 		return meterConfig;
 	}
 
