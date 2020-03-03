@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.space.water.iot.api.command.CommandCache;
 import com.space.water.iot.api.common.JsonResult;
+import com.space.water.iot.api.model.command.AccountStatusReadResponse;
+import com.space.water.iot.api.model.command.AccountStatusWriteResponse;
 import com.space.water.iot.api.model.command.ConfigParamsResponse;
 import com.space.water.iot.api.model.command.ConfigThresholdResponse;
 import com.space.water.iot.api.model.command.ControlValveResponse;
@@ -41,12 +43,14 @@ public class ReportService implements IReportService {
 		SendResult sendResult = sendNorth(meterBean);
 
 		int type = meterBean.getDataType();
-		if (type == ReportDataType.METER_DATA_TYPE_REPORT
-				|| type == ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG
-				|| type == ReportDataType.METER_DATA_TYPE_MONTH_FREEZE
-				|| type == ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG
-				|| type == ReportDataType.METER_DATA_TYPE_RSP_SWITCH_VALVE
-				|| type == ReportDataType.METER_DATA_TYPE_RSP_SET_THRESHOLD) {
+		if (type == ReportDataType.REPORT
+				|| type == ReportDataType.RSP_READ_CONFIG
+				|| type == ReportDataType.MONTH_FREEZE
+				|| type == ReportDataType.RSP_WRITE_CONFIG
+				|| type == ReportDataType.RSP_SWITCH_VALVE
+				|| type == ReportDataType.RSP_SET_THRESHOLD
+				|| type == ReportDataType.RSP_ACCOUNT_STATUS_READ
+				|| type == ReportDataType.RSP_ACCOUNT_STATUS_WRITE) {
 
 			//TODO G11 检测该设备是否有待下发指令，如果有，逐条下发
 			ArrayList<String> commandList = CommandCache.getInstance().getCommandList(meterBean.getDeviceId());
@@ -87,49 +91,59 @@ public class ReportService implements IReportService {
 		String response = "";
 		String tag = "";
 		switch (meterBean.getDataType()) {
-		case ReportDataType.METER_DATA_TYPE_REPORT:
+		case ReportDataType.REPORT:
 			tag =  topicConfig.getTagAutoReport();
 			AutoReport report = AutoReport.fromJson(BaseReportData.toJsonString(meterBean));
 			report.setReportData(MeterReportBean.fromJson(meterBean.getData()));
 			response = AutoReport.toJsonString(report);
 			break;
-		case ReportDataType.METER_DATA_TYPE_MONTH_FREEZE:
+		case ReportDataType.MONTH_FREEZE:
 			tag = topicConfig.getTagQueryMonthdataNorth();
 			QueryMonthDataResponse monthDataResp = QueryMonthDataResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			monthDataResp.setMonthData(MonthData.fromJson(meterBean.getData()));
 			response = QueryMonthDataResponse.toJsonString(monthDataResp);
 			break;
-		case ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG:
+		case ReportDataType.RSP_READ_CONFIG:
 			tag = topicConfig.getTagQueryParmsNorth();
 			QueryParamsResponse paramsResponse = QueryParamsResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			paramsResponse.setDeviceParams(DeviceParams.fromJson(meterBean.getData()));
 			response = AutoReport.toJsonString(paramsResponse);
 			break;
-		case ReportDataType.METER_DATA_TYPE_RSP_SET_THRESHOLD:
+		case ReportDataType.RSP_SET_THRESHOLD:
 			tag = topicConfig.getTagConfigThresholdNorth();
 			ConfigThresholdResponse thresholdResp = ConfigThresholdResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(thresholdResp);
 			break;
-		case ReportDataType.METER_DATA_TYPE_RSP_SWITCH_VALVE:
+		case ReportDataType.RSP_SWITCH_VALVE:
 			tag = topicConfig.getTagControlValveNorth();
 			ControlValveResponse cvResp = ControlValveResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(cvResp);
 			break;
-		case ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG:
+		case ReportDataType.RSP_WRITE_CONFIG:
 			tag = topicConfig.getTagConfigParmsNorth();
 			ConfigParamsResponse configParamsResponse = ConfigParamsResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			configParamsResponse.setDeviceParams(DeviceParams.fromJson(meterBean.getData()));
 			response = AutoReport.toJsonString(configParamsResponse);
 			break;
-		case ReportDataType.METER_DATA_TYPE_START_CONNECT:
+		case ReportDataType.START_CONNECT:
 			tag =  topicConfig.getTagAutoReport();
 			AutoReport reportConnect = AutoReport.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(reportConnect);
 			break;
-		case ReportDataType.METER_DATA_TYPE_START_DISCONNECT:
+		case ReportDataType.START_DISCONNECT:
 			tag =  topicConfig.getTagAutoReport();
 			AutoReport reportDisonnect = AutoReport.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(reportDisonnect);
+			break;
+		case ReportDataType.RSP_ACCOUNT_STATUS_READ:
+			tag =  topicConfig.getTagAutoReport();
+			AccountStatusReadResponse accountStatusReadResponse = AccountStatusReadResponse.fromJson(BaseReportData.toJsonString(meterBean));
+			response = AutoReport.toJsonString(accountStatusReadResponse);
+			break;
+		case ReportDataType.RSP_ACCOUNT_STATUS_WRITE:
+			tag =  topicConfig.getTagAutoReport();
+			AccountStatusWriteResponse accountStatusWriteResponse = AccountStatusWriteResponse.fromJson(BaseReportData.toJsonString(meterBean));
+			response = AutoReport.toJsonString(accountStatusWriteResponse);
 			break;
 		default:
 			break;

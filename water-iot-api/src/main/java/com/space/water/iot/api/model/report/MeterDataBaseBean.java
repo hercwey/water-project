@@ -5,7 +5,7 @@ import com.space.water.iot.api.model.common.ReportDataType;
 
 public class MeterDataBaseBean {
 	
-	private int type = ReportDataType.METER_DATA_TYPE_UNKNOWN;
+	private int type = ReportDataType.UNKNOWN;
 	private String data = "";
 	private String dataBasic = "";
 	public int getType() {

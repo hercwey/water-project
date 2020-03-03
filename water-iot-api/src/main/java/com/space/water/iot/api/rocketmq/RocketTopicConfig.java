@@ -68,6 +68,11 @@ public class RocketTopicConfig {
     @Value("${tag.device.query.north}")
     private String tagDeviceQueryNorth;//查询设备响应	发布	订阅
 
+    @Value("${tag.account.status.read.south")
+    private String tagAccountStatusReadSouth;//查询开户状态	发布	订阅
+    @Value("${tag.account.status.write.south}")
+    private String tagAccountStatusWriteSouth;//设置开户状态	发布	订阅
+
     @Value("${tag.auto.report.cache}")
     private String tagAutoReportCache;//设备自动上报数据缓存
     
@@ -199,6 +204,18 @@ public class RocketTopicConfig {
 		this.tagDeviceQueryNorth = tagDeviceQueryNorth;
 	}
 	
+	public String getTagAccountStatusReadSouth() {
+		return tagAccountStatusReadSouth;
+	}
+	public void setTagAccountStatusReadSouth(String tagAccountStatusReadSouth) {
+		this.tagAccountStatusReadSouth = tagAccountStatusReadSouth;
+	}
+	public String getTagAccountStatusWriteSouth() {
+		return tagAccountStatusWriteSouth;
+	}
+	public void setTagAccountStatusWriteSouth(String tagAccountStatusWriteSouth) {
+		this.tagAccountStatusWriteSouth = tagAccountStatusWriteSouth;
+	}
 	public String getTagAutoReportCache() {
 		return tagAutoReportCache;
 	}

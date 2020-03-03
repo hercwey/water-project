@@ -9,6 +9,8 @@ public class Protocol {
     public static final short DATA_DI_METER_CONFIG_WRITE      = (short)0xA001;   // 写入配置  (DI0=01, DI1=A0)
     public static final short DATA_DI_METER_VALVE_CTRL        = (short)0x6090;   // 阀门控制  (DI0=90, DI1=60)
     public static final short DATA_DI_METER_VOLUME_THRESHOLD  = (short)0x7090;   // 设置水量阈值(DI0=90, DI1=70)
+    public static final short DATA_DI_METER_ACCOUNT_READ      = (short)0x8171;   // 读水表开户指令(DI0=71, DI1=81)
+    public static final short DATA_DI_METER_ACCOUNT_WRITE     = (short)0xA071;   // 水表开户指令(DI0=71, DI1=A0)
 
     /* 表类型, 1字节 */
     public static final byte METER_TYPE_10H = (byte)0x10;  // 冷水表
