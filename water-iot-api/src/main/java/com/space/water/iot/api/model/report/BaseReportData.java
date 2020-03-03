@@ -12,6 +12,8 @@ import com.space.water.iot.api.model.iot.report.ServiceBean;
 import com.space.water.iot.api.model.iot.report.UploadMessageBean;
 import com.space.water.iot.api.protocol.PacketCodec;
 import com.space.water.iot.api.protocol.PacketFrame;
+import com.space.water.iot.api.protocol.bean.MeterAccountReadResp;
+import com.space.water.iot.api.protocol.bean.MeterAccountWriteResp;
 import com.space.water.iot.api.protocol.bean.MeterBase;
 import com.space.water.iot.api.protocol.bean.MeterConfig;
 import com.space.water.iot.api.protocol.bean.MeterConfigReadResp;
@@ -221,12 +223,12 @@ public class BaseReportData {
     	
     	if (serviceBean.getData().getJRprotocolXY().equalsIgnoreCase("9912364557")) {
 			//TODO G11 设备开始与电信平台建立连接
-        	dataBean.setType(ReportDataType.METER_DATA_TYPE_START_CONNECT);
+        	dataBean.setType(ReportDataType.START_CONNECT);
         	dataBean.setData(serviceBean.getData().getJRprotocolXY());
 //        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
 		} else if (serviceBean.getData().getJRprotocolXY().equalsIgnoreCase("aa1234bb")) {
 			//TODO G11 设备即将断开与电信平台的连接
-        	dataBean.setType(ReportDataType.METER_DATA_TYPE_START_DISCONNECT);
+        	dataBean.setType(ReportDataType.START_DISCONNECT);
         	dataBean.setData(serviceBean.getData().getJRprotocolXY());
 //        	dataBean.setDataBasic(serviceBean.getData().getJRprotocolXY());
 		} else {
@@ -247,21 +249,21 @@ public class BaseReportData {
 	            
 	            //FIXME G11 针对数据上报的其他类型数据，进行解析（后续根据需求对数据进行分类，优化处理逻辑）
 	            if (meterBase instanceof MeterReport) {
-	            	dataBean.setType(ReportDataType.METER_DATA_TYPE_REPORT);
+	            	dataBean.setType(ReportDataType.REPORT);
 	            	
 	                MeterReport meterReport = (MeterReport) meterBase;
 	                MeterReportBean meterDataBean = MeterReportBean.fromMeterReport(meterReport);
 	                dataBean.setData(MeterReportBean.toJsonString(meterDataBean));
 	                
 				} else if (meterBase instanceof MeterConfigReadResp) {
-	            	dataBean.setType(ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG);
+	            	dataBean.setType(ReportDataType.RSP_READ_CONFIG);
 	            	
 	                MeterConfig meterConfig = (MeterConfig) meterBase;
 	                DeviceParams meterConfigBean = DeviceParams.fromMeterConfig(meterConfig);
 	                dataBean.setData(DeviceParams.toJsonString(meterConfigBean));
 	                
 				} else if (meterBase instanceof MeterReadWaterResp) {
-	            	dataBean.setType(ReportDataType.METER_DATA_TYPE_MONTH_FREEZE);
+	            	dataBean.setType(ReportDataType.MONTH_FREEZE);
 	            	
 					MeterReadWaterResp meterReadWaterResp = (MeterReadWaterResp) meterBase;
 					MonthData meterMonthFreezeBean = MonthData.fromMeterTeadWaterResp(meterReadWaterResp);
@@ -269,28 +271,39 @@ public class BaseReportData {
 					
 				} else if (meterBase instanceof MeterConfigWriteResp) {
 
-	            	dataBean.setType(ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG);
+	            	dataBean.setType(ReportDataType.RSP_WRITE_CONFIG);
 	            	MeterConfig meterConfig = (MeterConfig) meterBase;
 	            	DeviceParams meterConfigBean = DeviceParams.fromMeterConfig(meterConfig);
 	                dataBean.setData(DeviceParams.toJsonString(meterConfigBean));
 	                
 				} else if (meterBase instanceof MeterValveControlResp) {
 
-	            	dataBean.setType(ReportDataType.METER_DATA_TYPE_RSP_SWITCH_VALVE);
+	            	dataBean.setType(ReportDataType.RSP_SWITCH_VALVE);
 	                dataBean.setData(JSON.toJSONString(meterBase));
 	                
 				} else if (meterBase instanceof MeterVolumeThresholdResp) {
 
-	            	dataBean.setType(ReportDataType.METER_DATA_TYPE_RSP_SET_THRESHOLD);
+	            	dataBean.setType(ReportDataType.RSP_SET_THRESHOLD);
+	                dataBean.setData(JSON.toJSONString(meterBase));
+	                
+				} else if (meterBase instanceof MeterAccountReadResp) {
+
+	            	dataBean.setType(ReportDataType.RSP_ACCOUNT_STATUS_READ);
+	                dataBean.setData(JSON.toJSONString(meterBase));
+	                
+				} else if (meterBase instanceof MeterAccountWriteResp) {
+
+	            	dataBean.setType(ReportDataType.RSP_ACCOUNT_STATUS_WRITE);
 	                dataBean.setData(JSON.toJSONString(meterBase));
 	                
 				} else {
-	            	dataBean.setType(ReportDataType.METER_DATA_TYPE_UNKNOWN);
+					
+	            	dataBean.setType(ReportDataType.UNKNOWN);
 	            	dataBean.setData(JSON.toJSONString(meterBase));
 				}
 			} catch (Exception e) {
 				if (serviceBean != null && serviceBean.getData() != null) {
-	            	dataBean.setType(ReportDataType.METER_DATA_TYPE_UNKNOWN);
+	            	dataBean.setType(ReportDataType.UNKNOWN);
 	            	dataBean.setData(serviceBean.getData().getJRprotocolXY());
 				}
 			}

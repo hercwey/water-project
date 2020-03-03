@@ -2,6 +2,10 @@ package com.space.water.iot.api.protocol;
 
 import static com.space.water.iot.api.protocol.Protocol.*;
 
+import com.space.water.iot.api.protocol.bean.MeterAccountReadCmd;
+import com.space.water.iot.api.protocol.bean.MeterAccountReadResp;
+import com.space.water.iot.api.protocol.bean.MeterAccountWriteCmd;
+import com.space.water.iot.api.protocol.bean.MeterAccountWriteResp;
 import com.space.water.iot.api.protocol.bean.MeterBase;
 import com.space.water.iot.api.protocol.bean.MeterConfigReadCmd;
 import com.space.water.iot.api.protocol.bean.MeterConfigReadResp;
@@ -100,6 +104,22 @@ public class PacketCodec {
                 }
                 break;
             }
+            case Protocol.DATA_DI_METER_ACCOUNT_READ:{
+                if (METER_CTR_0 == packetFrame.getCtrlCode()) {
+                    obj = new MeterAccountReadCmd();
+                } else if (METER_CTR_1 == packetFrame.getCtrlCode()){
+                    obj = new MeterAccountReadResp(packetFrame.getData());
+                }
+                break;
+            }
+            case Protocol.DATA_DI_METER_ACCOUNT_WRITE:{
+                if (METER_CTR_3 == packetFrame.getCtrlCode()) {
+                    obj = new MeterAccountWriteCmd(packetFrame.getData());
+                } else if (METER_CTR_4 == packetFrame.getCtrlCode()){
+                    obj = new MeterAccountWriteResp();
+                }
+                break;
+            }
             default:{
                 LogUtil.error("***错误的数据标识***");
             }
@@ -175,6 +195,22 @@ public class PacketCodec {
         } else if (data instanceof MeterVolumeThresholdResp){
             packetFrame.setCtrlCode(METER_CTR_4);
             packetFrame.setDataDI(DATA_DI_METER_VOLUME_THRESHOLD);
+            packetFrame.setData(data.encodeBytes());
+        }else if (data instanceof MeterAccountReadCmd){
+            packetFrame.setCtrlCode(METER_CTR_0);
+            packetFrame.setDataDI(DATA_DI_METER_ACCOUNT_READ);
+            packetFrame.setData(data.encodeBytes());
+        } else if (data instanceof MeterAccountReadResp){
+            packetFrame.setCtrlCode(METER_CTR_1);
+            packetFrame.setDataDI(DATA_DI_METER_ACCOUNT_READ);
+            packetFrame.setData(data.encodeBytes());
+        }else if (data instanceof MeterAccountWriteCmd){
+            packetFrame.setCtrlCode(METER_CTR_3);
+            packetFrame.setDataDI(DATA_DI_METER_ACCOUNT_WRITE);
+            packetFrame.setData(data.encodeBytes());
+        } else if (data instanceof MeterAccountWriteResp){
+            packetFrame.setCtrlCode(METER_CTR_4);
+            packetFrame.setDataDI(DATA_DI_METER_ACCOUNT_WRITE);
             packetFrame.setData(data.encodeBytes());
         }
 

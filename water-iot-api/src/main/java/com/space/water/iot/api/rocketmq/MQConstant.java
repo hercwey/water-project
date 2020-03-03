@@ -98,6 +98,14 @@ public class MQConstant {
 	 * @Fields P_G_SORTH_DEVICE_QUERY：生产者分组-调用IOT电信平台查询设备接口
 	 */
 	public static final String P_G_SORTH_DEVICE_QUERY = "SORTH_DEVICE_QUERY";
+	/**
+	 * @Fields P_G_SORTH_ACCOUNT_STATUS_READ：生产者分组-下发读取开户状态指令
+	 */
+	public static final String P_G_SORTH_ACCOUNT_STATUS_READ = "SORTH_ACCOUNT_STATUS_READ";
+	/**
+	 * @Fields P_G_SORTH_ACCOUNT_STATUS_WRITE：生产者分组-下发修改开户状态指令
+	 */
+	public static final String P_G_SORTH_ACCOUNT_STATUS_WRITE = "SORTH_ACCOUNT_STATUS_WRITE";
 	
 	/**
 	 * @Fields G_AUTO_REPORT_CACHE:设备上报数据缓存

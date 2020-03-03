@@ -1,5 +1,6 @@
 package com.space.water.iot.api.service.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,6 +77,7 @@ public class CommandService implements ICommandService {
 		OrderStatusResponse orderSatusResponse = new OrderStatusResponse();
 		orderSatusResponse.setId(commandBean.getId());
 		orderSatusResponse.setCommandId(commandBean.getCommandId());
+		orderSatusResponse.setTime(new Date(System.currentTimeMillis()));
 		JSONObject methodParams = JSONObject.parseObject(commandBean.getMethodParams());
 		String commandHex = "";
 		if (methodParams != null) {

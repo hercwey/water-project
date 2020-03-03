@@ -1,5 +1,7 @@
 package com.space.water.iot.api.controller;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -75,6 +77,7 @@ public class CommandController {
 		}
 		
 		response.setStatus(status);
+		response.setTime(new Date(System.currentTimeMillis()));
 		producer.sendNorth(OrderStatusResponse.toJsonString(response), topicConfig.getTagOrderStatus());
 
         return ResponseEntity.ok(JsonResult.success(JsonResult.SUCCESS,data).toString());
