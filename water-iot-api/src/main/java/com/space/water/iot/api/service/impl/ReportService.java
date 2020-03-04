@@ -136,12 +136,12 @@ public class ReportService implements IReportService {
 			response = AutoReport.toJsonString(reportDisonnect);
 			break;
 		case ReportDataType.RSP_ACCOUNT_STATUS_READ:
-			tag =  topicConfig.getTagAutoReport();
+			tag =  topicConfig.getTagAccountStatusReadNorth();
 			AccountStatusReadResponse accountStatusReadResponse = AccountStatusReadResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(accountStatusReadResponse);
 			break;
 		case ReportDataType.RSP_ACCOUNT_STATUS_WRITE:
-			tag =  topicConfig.getTagAutoReport();
+			tag =  topicConfig.getTagAccountStatusWriteNorth();
 			AccountStatusWriteResponse accountStatusWriteResponse = AccountStatusWriteResponse.fromJson(BaseReportData.toJsonString(meterBean));
 			response = AutoReport.toJsonString(accountStatusWriteResponse);
 			break;

@@ -20,7 +20,7 @@
 	</div>
 
 	<!-- 页面正在加载loading-->
-	<script th:src="@{/pivas/js/common/UseLoading.js}"></script>
+	<script src="/pivas/js/common/UseLoading.js"></script>
 
 	<script>
 		$(function() {
@@ -31,9 +31,9 @@
 				var url = "/module-product-register/main";
 				var callbackFunc = callback;
 				var containerId = "#container";
-				UseLoading.show();//显示正在加载提示
+				//UseLoading.show();//显示正在加载提示
 				loadPage(containerId, url, parms, function(){
-					UseLoading.hide();//隐藏正在加载提示
+					// UseLoading.hide();//隐藏正在加载提示
 				});
 			}
 			
