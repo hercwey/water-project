@@ -70,8 +70,12 @@ public class RocketTopicConfig {
 
     @Value("${tag.account.status.read.south")
     private String tagAccountStatusReadSouth;//查询开户状态	发布	订阅
+    @Value("${tag.account.status.read.north")
+    private String tagAccountStatusReadNorth;//查询开户状态	发布	订阅
     @Value("${tag.account.status.write.south}")
     private String tagAccountStatusWriteSouth;//设置开户状态	发布	订阅
+    @Value("${tag.account.status.write.north}")
+    private String tagAccountStatusWriteNorth;//设置开户状态	发布	订阅
 
     @Value("${tag.auto.report.cache}")
     private String tagAutoReportCache;//设备自动上报数据缓存
@@ -221,6 +225,18 @@ public class RocketTopicConfig {
 	}
 	public void setTagAutoReportCache(String tagAutoReportCache) {
 		this.tagAutoReportCache = tagAutoReportCache;
+	}
+	public String getTagAccountStatusReadNorth() {
+		return tagAccountStatusReadNorth;
+	}
+	public void setTagAccountStatusReadNorth(String tagAccountStatusReadNorth) {
+		this.tagAccountStatusReadNorth = tagAccountStatusReadNorth;
+	}
+	public String getTagAccountStatusWriteNorth() {
+		return tagAccountStatusWriteNorth;
+	}
+	public void setTagAccountStatusWriteNorth(String tagAccountStatusWriteNorth) {
+		this.tagAccountStatusWriteNorth = tagAccountStatusWriteNorth;
 	}
 	@Override
 	public String toString() {
