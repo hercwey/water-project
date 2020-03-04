@@ -1,0 +1,317 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-03-04 02:16:10
+ * @LastEditTime: 2020-03-04 06:06:23
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \undefined d:\work\code\water-project\water\src\main\resources\templates\easyuitest\easyui_starter.html
+ -->
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+
+	<!-- 引用js -->
+	<!-- 引用jquery -->
+	<script type="text/javascript" src="/jquery/3.3.1/jquery-3.3.1.js"></script>
+	<!-- 引用jquery cookie -->
+	
+	
+	<!-- 引用easyui -->
+	<script src="/jquery-easyui-1.9.4/jquery.easyui.min.js"></script>
+	<!-- 引入cookie管理，用于保存用户所选择的主题 -->
+	<script src="/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+	<!-- 引入jeasyui 的CSS -->
+	<!-- easy ui默认主题样式 -->
+	<!-- 注意：此link有ID -->
+	<link rel="stylesheet" id="easyuiTheme" type="text/css" href="/jquery-easyui-1.9.4/themes/default/easyui.css">
+	
+	<!-- easy ui 图标 、颜色-->
+	<link rel="stylesheet" type="text/css" href="/jquery-easyui-1.9.4/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="/jquery-easyui-1.9.4/themes/color.css">
+
+
+</head>
+
+<body class="easyui-layout">
+
+	<!-- banner 北向部分 -->
+	<div region="north" style="height: 78px;">
+		<table style="padding: 0px" width="100%">
+			<tr>
+				<td width="50%">
+					<h2>Easy UI搭建后台</h2>
+				</td>
+				<td valign="bottom" align="right" width="50%">
+					<font size="3">
+						<strong>欢迎：</strong>
+						admin
+					</font>
+				</td>
+
+			</tr>
+
+		</table>
+
+	</div>
+
+	<!-- 左侧工具栏 -->
+	<div region="west" style="width: 200px" title="导航菜单" split="true">
+		<div class="easyui-accordion" data-options="fit:true,border:false">
+			<div title="常用操作" data-options="selected:true,iconCls:'icon-edit'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" id="submenu-baidu" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					百&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;度
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-register" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					产品登记
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-default" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Default
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-bootstrap" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题BootStrap
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-black" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Black
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-gray" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Gray
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-material" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Material
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-material-blue" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Material-blue
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-material-teal" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Material-teal
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-metro" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Metro
+				</a>
+				            
+			</div>
+			<div title="管理" data-options="iconCls:'icon-bkgl'" style="padding: 10px;">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-writeblog'"
+					style="width: 150px;">
+					写博客
+				</a>
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-bkgl'"
+					style="width: 150px;">
+					信息管理
+				</a>
+			</div>
+			<div title="类别管理" data-options="iconCls:'icon-bklb'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-bklb'"
+					style="width: 150px;">
+					类别信息管理
+				</a>
+			</div>
+			<div title="评论管理" data-options="iconCls:'icon-plgl'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-review'"
+					style="width: 150px">
+					评论审核
+				</a>
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-plgl'"
+					style="width: 150px;">
+					评论信息管理
+				</a>
+			</div>
+			<div title="个人信息管理" data-options="iconCls:'icon-personal'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-personal'"
+					style="width: 150px;">
+					修改个人信息
+				</a>
+				            
+			</div>
+			<div title="系统管理" data-options="iconCls:'icon-system'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-link'"
+					style="width: 150px">
+					友情链接管理
+				</a>
+				                
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-modifyPassword'"
+					style="width: 150px;">
+					修改密码
+				</a>
+				                
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-refresh'"
+					style="width: 150px;">
+					刷新系统缓存
+				</a>
+				                
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-exit'"
+					style="width: 150px;">
+					安全退出
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<div data-options="region:'center'" style="background: #eee;">
+		<div class="easyui-tabs" fit="true" border="false" id="tabs">
+			<div title="首页" data-options="iconCls:'icon-filter'">
+				<div align="center" style="padding-top: 100px">
+					<font color="red" size="10">欢迎使用</font>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div region="south" style="height: 28px; margin:0px;" align="center">
+		<div region="south" style="height: 25px; margin-top:1px;" align="center">
+			Copyright
+			<strong>河北美夏电子科技</strong>
+			版权所有
+		</div>
+	</div>
+
+</body>
+<script>
+
+	/**
+	 * 
+	 *  使用 iframe 动态地添加显示在一个页面上的 Tabs。
+	 * 
+		   按title参数进行查询标签，
+		   	如果不存在则一个新的 tab 将被添加。
+			如果 tab 已经存在，它将被激活。
+	 * @param {String} title 标签title
+	 * @param {String} url 标签页所加载的页面地址
+	 * @return: void
+	 */
+ 
+	function addTab(title, url) {
+		const TABS_CONTAINER = "#tabs";
+		if ($(TABS_CONTAINER).tabs('exists', title)) {
+			$(TABS_CONTAINER).tabs('select', title);
+		} else {
+			var content = '<iframe scrolling="auto" frameborder="0"  src="'
+					+ url + '" style="width:100%;height:100%;"></iframe>';
+			$(TABS_CONTAINER).tabs('add', {
+				title : title,
+				content : content,
+				closable : true
+			});
+		}
+	}
+	 
+	 /**
+	   * 更换EasyUI主题的方法,可选的主题名称有：
+	   		default,black,gray,bootstrap,
+	   		metro,material,material-blue,material-teal.	   		
+	   	主题也可以自行定义，而后置于theme的相应目录中即可。
+	   		
+	   * @param ｛String} themeName 主题名称
+	   * @return 
+	   */
+	  changeTheme = function(themeName) {
+	    var $easyuiTheme = $('#easyuiTheme');
+	    var url = $easyuiTheme.attr('href');
+	    var href = url.substring(0, url.indexOf('themes')) + 'themes/' + themeName + '/easyui.css';
+	    $easyuiTheme.attr('href', href);
+	    var $iframe = $('iframe');
+	    if ($iframe.length > 0) {
+	      for ( var i = 0; i < $iframe.length; i++) {
+	        var ifr = $iframe[i];
+	        $(ifr).contents().find('#easyuiTheme').attr('href', href);
+	      }
+	    }
+	    //将主题保存至cookie中
+	    $.cookie('easyuiThemeName', themeName, {
+	      expires : 7
+	    });
+	  };
+	  
+	  /**
+	  	自cookie中读取用户选定的theme，如有则采用此主题
+	  */
+	  function getThemeFromCookie(){
+		if ($.cookie('easyuiThemeName')) {
+			 changeTheme($.cookie('easyuiThemeName'));
+		}
+	  }
+
+	// page loaded ready
+	$(function() {
+		
+		//-----------------------------------
+		getThemeFromCookie();  //自cookie中读取，并采用用户选定的主题。
+		
+		//-----------------------------------
+		
+		/**
+		 * 点击时加入新标签,采用外部链接地址：百度
+		 */
+		$("#submenu-baidu").on('click', function() {
+			//alert("test click event");
+			addTab("百度", "https://www.baidu.com");
+		});
+		
+		//项目内地址：产品登记
+		$("#submenu-register").on('click', function() {
+			//alert("test click event");
+			addTab("产品登记", "/module-product-register/starter");
+		});
+		
+		//------------------------------------
+		//切主题default
+		$("#submenu-theme-default").on('click', function() {
+			changeTheme('default');
+		});
+		
+		//切主题 bootstrap
+		$("#submenu-theme-bootstrap").on('click', function() {
+			changeTheme('bootstrap');
+		});
+		
+		//切主题black
+		$("#submenu-theme-black").on('click', function() {
+			changeTheme('black');
+		});
+		
+		//切主题gray
+		$("#submenu-theme-gray").on('click', function() {
+			changeTheme('gray');
+		});
+		
+		//切主题material
+		$("#submenu-theme-material").on('click', function() {
+			changeTheme('material');
+		});
+		
+		//切主题material-blue
+		$("#submenu-theme-material-blue").on('click', function() {
+			changeTheme('material-blue');
+		});
+		
+		//切主题material-teal
+		$("#submenu-theme-material-teal").on('click', function() {
+			changeTheme('material-teal');
+		});
+		
+		//切主题metro
+		$("#submenu-theme-metro").on('click', function() {
+			changeTheme('metro');
+		});
+		
+		
+
+	});
+</script>
+
+</html>

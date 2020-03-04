@@ -169,13 +169,13 @@
 
 			//加载字典列表页面
 			var url = BASE_CONTEXT_PATH + "/module-product-register/table";
-			UseLoading.show();//显示正在加载提示
+			//UseLoading.show();//显示正在加载提示
 			$(".module-product-no-table").load(url, parms, triggerResize);
 		}
 		
 		function triggerResize(){
 			console.log("call back........");
-			UseLoading.hide();//隐藏正在加载提示
+			//UseLoading.hide();//隐藏正在加载提示
 			var myEvent = new Event('resize');
 	        window.dispatchEvent(myEvent);
 		}
@@ -252,14 +252,14 @@
 		 */
 		function loadEditDialog(parms) {
 			var url = BASE_CONTEXT_PATH + '/module-product-register/load-edit-dialog';
-			UseLoading.show();//显示正在加载提示
+			//UseLoading.show();//显示正在加载提示
 			$("#module-product-no-edit-dialog").load(url, parms, openEditDialog); //加载完毕后显示
 		}
 		/*
 		 * 	打开(Open) 对话框
 		 */
 		function openEditDialog() {
-			UseLoading.hide();//隐藏正在加载提示
+			//UseLoading.hide();//隐藏正在加载提示
 			DialogUtil.openDialogFn(G_EDIT_DIALOG);
 		}
 		/* 

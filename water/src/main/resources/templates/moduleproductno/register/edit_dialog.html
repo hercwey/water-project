@@ -128,9 +128,9 @@
 			var parms = new Object();
 			parms.id = id;
 			parms.productNo = productNo;
-			UseLoading.show();//显示正在加载提示
+			//UseLoading.show();//显示正在加载提示
 			$.post(urlStr, parms, function(res){
-				UseLoading.hide();//隐藏正在加载提示
+				//UseLoading.hide();//隐藏正在加载提示
 				//console.log(res);  //	由于后端返回的是JSON对象,所以不必再进行转换. 
 				if (res != null && res != "") {
 					//var obj = $.parseJSON(res);						
