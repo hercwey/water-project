@@ -22,16 +22,21 @@ import com.learnbind.ai.iot.protocol.bean.MeterValveControlCmd;
 import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.iot.MeterConfigBean;
 import com.learnbind.ai.model.iot.WmCommand;
-import com.learnbind.ai.model.iotbean.command.BaseCommandRequest;
+import com.learnbind.ai.model.iotbean.command.AccountStatusReadRequest;
+import com.learnbind.ai.model.iotbean.command.AccountStatusWriteRequest;
 import com.learnbind.ai.model.iotbean.command.ConfigParamsRequest;
 import com.learnbind.ai.model.iotbean.command.ConfigThresholdRequest;
 import com.learnbind.ai.model.iotbean.command.ControlValveRequest;
 import com.learnbind.ai.model.iotbean.command.QueryMonthDataRequest;
+import com.learnbind.ai.model.iotbean.command.QueryParamsRequest;
+import com.learnbind.ai.model.iotbean.common.AccountStatus;
 import com.learnbind.ai.model.iotbean.common.ControlValveType;
 import com.learnbind.ai.model.iotbean.common.DeviceParams;
 import com.learnbind.ai.model.iotbean.common.DeviceParamsFlags;
 import com.learnbind.ai.model.iotbean.device.RegisterDeviceRequest;
 import com.learnbind.ai.model.iotbean.report.MeterStatusBean;
+import com.learnbind.ai.mq.south.AccountStatusReadProducer;
+import com.learnbind.ai.mq.south.AccountStatusWriteProducer;
 import com.learnbind.ai.mq.south.ConfigParmsProducer;
 import com.learnbind.ai.mq.south.ConfigThresholdProducer;
 import com.learnbind.ai.mq.south.ControlValveProducer;
@@ -78,6 +83,10 @@ public class MeterDeviceController {
 	@Autowired
 	private ConfigParmsProducer configParmsProducer;// 配置水表参数
 	@Autowired
+	private AccountStatusWriteProducer accountStatusWriteProducer;// 写表开户状态命令
+	@Autowired
+	private AccountStatusReadProducer accountStatusReadProducer;// 读表开户状态命令
+	@Autowired
 	private WmCommandService wmCommandService;// 下发命令记录
 
 	// ----------------加载水表配置对话框部分----------------------------------------------------------------------------------
@@ -85,14 +94,14 @@ public class MeterDeviceController {
 	public String loadMeterConfigDetailDialog(Model model, Long itemId) {
 
 		Meters device = metersService.selectByPrimaryKey(itemId);
-		MeterConfigBean meterConfigBean = null;
+		DeviceParams deviceParams = null;
 		if (device != null) {
 
 			String meterConfig = device.getMeterConfig();// 表配置信息
 			// String meterFreeze = device.getMeterFreeze();//表月冻结数据
-			meterConfigBean = MeterConfigBean.fromJson(meterConfig);
+			deviceParams = DeviceParams.fromJson(meterConfig);
 		}
-		model.addAttribute("meterConfigBean", meterConfigBean);
+		model.addAttribute("deviceParams", deviceParams);
 
 		return TEMPLATE_PATH + "meter_config_detail_dialog";
 	}
@@ -160,6 +169,15 @@ public class MeterDeviceController {
 		htmlPath = "meters/meter_device/command_openclose_dialog";// 默认为表配置对话框
 		return htmlPath;
 	}
+	
+	// ----------------加载发送表开户状态指令对话框部分----------------------------------------------------------------------------------
+	@RequestMapping(value = "/load-send-cmd-account-status-dialog")
+	public String loadSendCmdAccountStatusDialog(Model model, Long itemId, Integer cmdType) {
+
+		System.out.println("----------加载表开户状态指令对话框");
+		String htmlPath = "meters/meter_device/command_account_status_write_dialog";// 默认为表配置对话框
+		return htmlPath;
+	}
 
 	// ----------------加载发送指令对话框部分----------------------------------------------------------------------------------
 	@RequestMapping(value = "/load-send-cmd-meter-config-dialog")
@@ -170,15 +188,17 @@ public class MeterDeviceController {
 		System.out.println("----------加载水表配置指令对话框");
 		htmlPath = "meters/meter_device/command_meter_config_dialog";// 默认为表配置对话框
 
-		// WmDevice device = wmDeviceService.selectByPrimaryKey(itemId);
-		Meters device = metersService.selectByPrimaryKey(itemId);
-		MeterConfigBean meterConfigBean = null;
-		if (device != null) {
+		if(cmdType==1) {
+			// WmDevice device = wmDeviceService.selectByPrimaryKey(itemId);
+			Meters device = metersService.selectByPrimaryKey(itemId);
+			DeviceParams deviceParams = null;
+			if (device != null) {
 
-			String meterConfig = device.getMeterConfig();// 表配置信息
-			meterConfigBean = MeterConfigBean.fromJson(meterConfig);
+				String meterConfig = device.getMeterConfig();// 表配置信息
+				deviceParams = DeviceParams.fromJson(meterConfig);
+			}
+			model.addAttribute("deviceParams", deviceParams);
 		}
-		model.addAttribute("meterConfigBean", meterConfigBean);
 
 		return htmlPath;
 	}
@@ -264,8 +284,7 @@ public class MeterDeviceController {
 			// String command = this.generatorReadMonthFreezeCommand(meterTypeB,
 			// meterAddress, meterFactoryCode, sequence.byteValue(), device.getDeviceId());
 			// 获取指令对象
-			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_READ_MONTH_FREEZE.getKey(),
-					null);
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_READ_MONTH_FREEZE.getKey(), sequence);
 			int rows = wmCommandService.insertSelective(wmCommand);// 增加命令记录
 			if (rows > 0) {
 
@@ -377,12 +396,11 @@ public class MeterDeviceController {
 			// String command = this.generatorReadMeterConfigCommand(meterTypeB,
 			// meterAddress, meterFactoryCode, sequence.byteValue(), device.getDeviceId());
 			// 获取指令对象
-			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_READ_METER_CONFIG.getKey(),
-					null);
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_READ_METER_CONFIG.getKey(), sequence);
 			int rows = wmCommandService.insertSelective(wmCommand);// 增加命令记录
 			if (rows > 0) {
 
-				BaseCommandRequest request = new BaseCommandRequest();
+				QueryParamsRequest request = new QueryParamsRequest();
 				request.setId(wmCommand.getId());
 				request.setDeviceId(device.getDeviceId());
 				request.setMeterAddress(meterAddress);
@@ -392,7 +410,7 @@ public class MeterDeviceController {
 				request.setSequence(sequence.byteValue());
 				request.setServiceId(SERVICE_ID);
 
-				SendResult sendResult = queryParmsProducer.sendMsg(null, request.toJsonString(request));
+				SendResult sendResult = queryParmsProducer.sendMsg(null, QueryParamsRequest.toJsonString(request));
 				if (sendResult.getSendStatus() == SendStatus.SEND_OK) {
 					// 发送成功
 					return RequestResultUtil.getResultSuccess("发送读表配置指令成功，请到下发指令记录列表中查看结果！");
@@ -486,8 +504,7 @@ public class MeterDeviceController {
 			// meterFactoryCode, sequence.byteValue(),Integer.valueOf(cmdAction),
 			// device.getDeviceId());
 			// 获取指令对象
-			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_WATER_AMOUNT.getKey(),
-					null);
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_WATER_AMOUNT.getKey(), sequence);
 			int rows = wmCommandService.insertSelective(wmCommand);// 增加命令记录
 			if (rows > 0) {
 
@@ -582,25 +599,6 @@ public class MeterDeviceController {
 
 			log.debug("----------继续生成指令类型：" + cmdType + "，指令动作：" + cmdAction);
 
-//	    	<option value="10">冷水表</option>
-//			<option value="11">生活热水表</option>
-//			<option value="12">直饮水水表</option>
-//			<option value="13">中水水表</option>
-			if(StringUtils.isNotBlank(meterTypeStr)) {
-				Integer meterType = Integer.valueOf(meterTypeStr);
-				byte meterTypeB = 0x00;
-				if (meterType == 10) {
-					meterTypeB = Protocol.METER_TYPE_10H;
-				} else if (meterType == 11) {
-					meterTypeB = Protocol.METER_TYPE_11H;
-				} else if (meterType == 12) {
-					meterTypeB = Protocol.METER_TYPE_12H;
-				} else if (meterType == 13) {
-					meterTypeB = Protocol.METER_TYPE_13H;
-				}
-			}
-
-			byte sequenceB = 0x00;
 			// 5=开/关阀指令
 			System.out.println("----------生成开/关阀指令");
 			// 开/关阀指令
@@ -608,7 +606,7 @@ public class MeterDeviceController {
 			// meterFactoryCode, sequence.byteValue(),Integer.valueOf(cmdAction),
 			// device.getDeviceId());
 			// 获取指令对象
-			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_OPEN_CLOSE.getKey(), null);
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_OPEN_CLOSE.getKey(), sequence);
 			int rows = wmCommandService.insertSelective(wmCommand);// 增加命令记录
 			if (rows > 0) {
 
@@ -644,6 +642,163 @@ public class MeterDeviceController {
 //	    	Map<String, Object> resultMap = RequestResultUtil.getResultSuccess("生成指令成功！");
 //	    	resultMap.put("command", command);
 //	    	return resultMap;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return RequestResultUtil.getResultFail("生成指令异常！");
+
+	}
+	
+	/**
+	 * @Title: cmdWriteStatusGenerator
+	 * @Description: 写表开户状态指令
+	 * @param id
+	 * @param cmdType
+	 * @param cmdAction
+	 * @return 
+	 */
+	@RequestMapping(value = "/cmd-write-status-generator")
+	@ResponseBody
+	public Object cmdWriteStatusGenerator(Long id, Integer cmdType, String cmdAction) {
+		try {
+			// WmDevice device = wmDeviceService.selectByPrimaryKey(id);
+			Meters device = metersService.selectByPrimaryKey(id);
+
+			String meterTypeStr = device.getMeterUseType();// 表类型
+			String meterAddress = device.getMeterAddress();// 表地址
+			String meterFactoryCode = device.getMeterFactoryCode();// 表厂商
+			Integer sequence = device.getMeterSequence();// 序号
+
+			// TODO G11 需要每次+1，范围1到255，循环，sequence+1然后保存到数据库中
+			if (sequence < 255) {
+				sequence = sequence + 1;
+			} else {
+				sequence = 1;
+			}
+			device.setMeterSequence(sequence);
+			metersService.updateByPrimaryKeySelective(device);
+			if (StringUtils.isBlank(meterTypeStr) || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
+					|| sequence == null || StringUtils.isBlank(cmdAction)) {
+				return RequestResultUtil.getResultFail("参数错误！");
+			}
+			// 如果命令动作为空且指令类型为6=写表开户状态指令
+			// 或如果命令动作不为空且指令类型不为6=写表开户状态指令
+			if ((StringUtils.isNotBlank(cmdAction))) {
+				log.debug("----------允许生成指令类型：" + cmdType + "，指令动作：" + cmdAction);
+			} else {
+				return RequestResultUtil.getResultFail("参数错误！");
+			}
+
+			log.debug("----------继续生成指令类型：" + cmdType + "，指令动作：" + cmdAction);
+			int statusInt = Integer.valueOf(cmdAction);//开户状态：0=未开户（默认值）；1=已开户；
+			byte status = AccountStatus.CLOSE;
+			if(statusInt==0) {
+				status = AccountStatus.CLOSE;
+			}else {
+				status = AccountStatus.OPEN;
+			}
+
+			System.out.println("----------生成写表开户状态指令");
+			// 写表开户状态指令
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_WRITE_METER_ACCOUNT_STATUS.getKey(), sequence);
+			int rows = wmCommandService.insertSelective(wmCommand);// 增加命令记录
+			if (rows > 0) {
+
+				AccountStatusWriteRequest request = new AccountStatusWriteRequest();
+				request.setId(wmCommand.getId());
+				request.setDeviceId(device.getDeviceId());
+				request.setMeterAddress(meterAddress);
+				request.setMeterFactoryCode(meterFactoryCode);
+				request.setMeterType(Integer.valueOf(meterTypeStr).byteValue());
+				request.setMethod(METHOD);
+				request.setSequence(sequence.byteValue());
+				request.setServiceId(SERVICE_ID);
+
+				request.setStatus(status);
+				
+				SendResult sendResult = accountStatusWriteProducer.sendMsg(null, AccountStatusWriteRequest.toJsonString(request));
+				if (sendResult.getSendStatus() == SendStatus.SEND_OK) {
+					// 发送成功
+					return RequestResultUtil.getResultSuccess("发送写表开户状态指令成功，请到下发指令记录列表中查看结果！");
+				}
+			}
+			// 发送失败
+			return RequestResultUtil.getResultFail("发送写表开户状态指令失败，请重新操作！");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return RequestResultUtil.getResultFail("生成指令异常！");
+
+	}
+	
+	/**
+	 * @Title: cmdReadStatusGenerator
+	 * @Description: 生成读表配置指令
+	 * @param id
+	 * @param cmdType
+	 * @param cmdAction
+	 * @return 
+	 */
+	@RequestMapping(value = "/cmd-read-status-generator")
+	@ResponseBody
+	public Object cmdReadStatusGenerator(Long id, Integer cmdType, String cmdAction) {
+		try {
+			// WmDevice device = wmDeviceService.selectByPrimaryKey(id);
+			Meters device = metersService.selectByPrimaryKey(id);
+
+			String meterTypeStr = device.getMeterUseType();// 表类型
+			String meterAddress = device.getMeterAddress();// 表地址
+			String meterFactoryCode = device.getMeterFactoryCode();// 表厂商
+			Integer sequence = device.getMeterSequence();// 序号
+
+			// TODO G11 需要每次+1，范围1到255，循环，sequence+1然后保存到数据库中
+			if (sequence < 255) {
+				sequence = sequence + 1;
+			} else {
+				sequence = 1;
+			}
+			device.setMeterSequence(sequence);
+			metersService.updateByPrimaryKeySelective(device);
+
+			if (StringUtils.isBlank(meterTypeStr) || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
+					|| sequence == null || StringUtils.isBlank(cmdAction)) {
+				return RequestResultUtil.getResultFail("参数错误！");
+			}
+			// 如果命令动作为空且指令类型为7=读表开户状态指令
+			// 或如果命令动作不为空且指令类型不为7=读表开户状态指令
+			if ((StringUtils.isNotBlank(cmdAction))) {
+				log.debug("----------允许生成指令类型：" + cmdType + "，指令动作：" + cmdAction);
+			} else {
+				return RequestResultUtil.getResultFail("参数错误！");
+			}
+
+			log.debug("----------继续生成指令类型：" + cmdType + "，指令动作：" + cmdAction);
+
+			// 7=读表开户状态指令
+			System.out.println("----------生成读表开户状态指令");
+			// 获取指令对象
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_READ_METER_ACCOUNT_STATUS.getKey(), sequence);
+			int rows = wmCommandService.insertSelective(wmCommand);// 增加命令记录
+			if (rows > 0) {
+
+				AccountStatusReadRequest request = new AccountStatusReadRequest();
+				request.setId(wmCommand.getId());
+				request.setDeviceId(device.getDeviceId());
+				request.setMeterAddress(meterAddress);
+				request.setMeterFactoryCode(meterFactoryCode);
+				request.setMeterType(Integer.valueOf(meterTypeStr).byteValue());
+				request.setMethod(METHOD);
+				request.setSequence(sequence.byteValue());
+				request.setServiceId(SERVICE_ID);
+				
+				SendResult sendResult = accountStatusReadProducer.sendMsg(null, AccountStatusReadRequest.toJsonString(request));
+				if (sendResult.getSendStatus() == SendStatus.SEND_OK) {
+					// 发送成功
+					return RequestResultUtil.getResultSuccess("发送读表开户状态指令成功，请到下发指令记录列表中查看结果！");
+				}
+			}
+			// 发送失败
+			return RequestResultUtil.getResultFail("发送读表开户状态指令失败，请重新操作！");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -729,8 +884,7 @@ public class MeterDeviceController {
 			// meterFactoryCode, sequence.byteValue(),cmdAction, device.getDeviceId());
 
 			// 获取指令对象
-			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_METER_CONFIG.getKey(),
-					null);
+			WmCommand wmCommand = wmCommandService.getWmCommand(device, EnumCommandType.TYPE_METER_CONFIG.getKey(), sequence);
 			int rows = wmCommandService.insertSelective(wmCommand);// 增加命令记录
 			if (rows > 0) {
 

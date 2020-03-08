@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.model.iotbean.command.ConfigThresholdResponse;
+import com.learnbind.ai.model.iotbean.common.CommandCallbackConstants;
+import com.learnbind.ai.model.iotbean.common.ReportDataType;
+import com.learnbind.ai.service.iot.WmCommandService;
 import com.learnbind.ai.service.iot.WmMeterService;
 import com.learnbind.ai.service.meters.MetersService;
 
@@ -39,6 +42,8 @@ public class ConfigThresholdResponseProcessService {
 	private WmMeterService wmMeterService;
 	@Autowired
 	private MetersService metersService;
+	@Autowired
+	private WmCommandService wmCommandService;
 
 	/**
 	 * @Title: processAutoReportData
@@ -52,10 +57,15 @@ public class ConfigThresholdResponseProcessService {
 		// 1、保存设备上报数据到数据库
 		this.saveResponseData(configThresholdRspData);
 
-		//String deviceId = configThresholdRspData.getDeviceId();// IOT电信平台设备ID
+		String deviceId = configThresholdRspData.getDeviceId();// IOT电信平台设备ID
 		Integer dataType = configThresholdRspData.getDataType();// 数据类型
+		Integer sequence = configThresholdRspData.getSequence();//序号
 		
-		log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
+		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_SET_THRESHOLD) {// 如果数据类型是 设置水量阀值指令返回信息
+			this.updateCommandStatus(dataType, deviceId, sequence);
+		} else {
+			log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
+		}
 		
 	}
 	
@@ -92,6 +102,25 @@ public class ConfigThresholdResponseProcessService {
 		meter.setServiceType(configThresholdRspData.getServiceType());
 		meter.setUpdateTime(sysDate);
 		return wmMeterService.insertSelective(meter);
+	}
+	
+	// -------------------------------- 更新指令状态为成功 的业务处理部分--------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: updateCommandStatus
+	 * @Description: 更新指令状态为成功
+	 * @param dataType
+	 * @param iotDeviceId
+	 * @param sequence
+	 * @return 
+	 */
+	private int updateCommandStatus(Integer dataType, String iotDeviceId, Integer sequence) {
+			
+		Long deviceId = this.getDeviceId(iotDeviceId);
+		if(deviceId!=null) {
+			int status = CommandCallbackConstants.COMMAND_STATUS_SUCCESS;//4=执行成功
+			return wmCommandService.updateWmCommandStatus(deviceId, sequence, status);
+		}
+		return 0;
 	}
 
 	/**

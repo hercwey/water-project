@@ -60,6 +60,14 @@ public class MQConstant {
 	 * @Fields C_G_NORTH_DEVICE_QUERY：消费者分组-查询设备
 	 */
 	public static final String C_G_NORTH_DEVICE_QUERY = "NORTH_DEVICE_QUERY";
+	/**
+	 * @Fields C_G_NORTH_ACCOUNT_STATUS_WRITE：消费者分组-写表开户状态
+	 */
+	public static final String C_G_NORTH_ACCOUNT_STATUS_WRITE = "NORTH_ACCOUNT_STATUS_WRITE";
+	/**
+	 * @Fields C_G_NORTH_ACCOUNT_STATUS_READ：消费者分组-读表开户状态
+	 */
+	public static final String C_G_NORTH_ACCOUNT_STATUS_READ = "NORTH_ACCOUNT_STATUS_READ";
 	
 	//---------------------------生产者分组常量-------------------------------------------------------------
 	/**
@@ -98,6 +106,14 @@ public class MQConstant {
 	 * @Fields P_G_SORTH_DEVICE_QUERY：生产者分组-调用IOT电信平台查询设备接口
 	 */
 	public static final String P_G_SORTH_DEVICE_QUERY = "SORTH_DEVICE_QUERY";
+	/**
+	 * @Fields P_G_SORTH_ACCOUNT_STATUS_WRITE：生产者分组-调用IOT电信平台写表开户状态接口
+	 */
+	public static final String P_G_SORTH_ACCOUNT_STATUS_WRITE = "SORTH_ACCOUNT_STATUS_WRITE";
+	/**
+	 * @Fields P_G_SORTH_ACCOUNT_STATUS_READ：生产者分组-调用IOT电信平台读表开户状态接口
+	 */
+	public static final String P_G_SORTH_ACCOUNT_STATUS_READ = "SORTH_ACCOUNT_STATUS_READ";
 	
 	//---------------------------字符集常量-------------------------------------------------------------
 	/**

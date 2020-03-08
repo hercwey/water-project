@@ -37,4 +37,13 @@ public class ReportDataType {
 	 * @Fields METER_DATA_TYPE_RSP_SET_THRESHOLD：设置阈值指令返回信息
 	 */
 	public static final int METER_DATA_TYPE_RSP_SET_THRESHOLD = 8;//设置阈值指令返回信息
+	
+	/**
+	 * @Fields RSP_ACCOUNT_STATUS_READ：读取开户状态
+	 */
+	public static final int RSP_ACCOUNT_STATUS_READ = 9;//读取开户状态
+	/**
+	 * @Fields RSP_ACCOUNT_STATUS_WRITE：设置开户状态
+	 */
+	public static final int RSP_ACCOUNT_STATUS_WRITE = 10;//设置开户状态
 }

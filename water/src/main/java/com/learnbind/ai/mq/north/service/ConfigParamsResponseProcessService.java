@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.model.iotbean.command.ConfigParamsResponse;
+import com.learnbind.ai.model.iotbean.common.CommandCallbackConstants;
 import com.learnbind.ai.model.iotbean.common.ReportDataType;
+import com.learnbind.ai.service.iot.WmCommandService;
 import com.learnbind.ai.service.iot.WmMeterService;
 import com.learnbind.ai.service.meters.MetersService;
 
@@ -42,6 +44,8 @@ public class ConfigParamsResponseProcessService {
 	private WmMeterService wmMeterService;
 	@Autowired
 	private MetersService metersService;
+	@Autowired
+	private WmCommandService wmCommandService;
 
 	/**
 	 * @Title: processAutoReportData
@@ -57,12 +61,15 @@ public class ConfigParamsResponseProcessService {
 
 		String deviceId = configParamsRspData.getDeviceId();// IOT电信平台设备ID
 		Integer dataType = configParamsRspData.getDataType();// 数据类型
+		Integer sequence = configParamsRspData.getSequence();//序号
 		
 		// 2、收到上报数据后更新表配置与月冻结数据
-		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG
-				|| dataType == ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG) {// 如果数据类型是 设备配置信息数据 或 写配置指令返回信息
+//		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG
+//				|| dataType == ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG) {// 如果数据类型是 设备配置信息数据 或 写配置指令返回信息
+		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG) {// 如果数据类型是 写配置指令返回信息
 			// 水表配置信息，更新数据库device表meter_config内容
-			this.processReadConfigOrWriteConfigData(deviceId, configParamsRspData.getData());
+			//this.processReadConfigOrWriteConfigData(deviceId, configParamsRspData.getData());
+			this.updateCommandStatus(dataType, deviceId, sequence);//更新指令状态为成功
 		} else {
 			log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
 		}
@@ -84,6 +91,25 @@ public class ConfigParamsResponseProcessService {
 		Meters meter = new Meters();
 		meter.setMeterConfig(data);
 		return metersService.updateByExampleSelective(meter, example);
+	}
+	
+	// -------------------------------- 更新指令状态为成功 的业务处理部分--------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: updateCommandStatus
+	 * @Description: 更新指令状态为成功
+	 * @param dataType
+	 * @param iotDeviceId
+	 * @param sequence
+	 * @return 
+	 */
+	private int updateCommandStatus(Integer dataType, String iotDeviceId, Integer sequence) {
+			
+		Long deviceId = this.getDeviceId(iotDeviceId);
+		if(deviceId!=null) {
+			int status = CommandCallbackConstants.COMMAND_STATUS_SUCCESS;//4=执行成功
+			return wmCommandService.updateWmCommandStatus(deviceId, sequence, status);
+		}
+		return 0;
 	}
 	
 	// --------------------------------保存设备上报数据--------------------------------------------------------------------------------------------------

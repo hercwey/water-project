@@ -65,48 +65,12 @@
 	
 	<script type="text/javascript">
 	
-		/**
-		 * 	生成水量阀值指令通用函数
-		 */
-		function generatorWaterAmountCommandFn(id, cmdAction){
-			//cmdType 指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
-			//cmdAction 水量阀值（数字）;
-			console.log("----------生成水量阀值指令："+id+":"+cmdAction);
-			var url = BASE_CONTEXT_PATH + "/meter-device/cmd-water-amount-generator";
-			var parms = new Object();
-			parms.id = id;
-			parms.cmdType = 3;
-			parms.cmdAction = cmdAction;
-			
-			var command = null;
-			$.ajax({
-				type: "post",
-				url: url,
-				data: parms,
-				async: false, 
-				success: function(res){
-					console.log("----------"+JSON.stringify(res));
-					//var result = $.parseJSON(res);
-					if (res != null && res != "") {
-						if (res.result_code == "success") {
-							console.log("----------返回生成的水量阀值指令："+res.command);
-							command = res.command;
-							DialogUtil.closeDialogFn(G_WATER_AMOUNT_COMMAND_DIALOG_ID);//打开发送水量阀值指令对话框
-						}
-						//dialog type: success warning info error,默认为info
-						util.message(res.result_msg,null,"warning");
-					}
-			    }
-			});
-			
-			return command;
-		}
-		
 		$(function(){
 			/**
 			 * 	绑定对话框中发送指令按钮的click事件
 			 */
 			 $("#modal-container-command-water-amount #btn-send-cmd-water-amount").on("click", function(){
+				
 				var waterAmountValue = $("#modal-container-command-water-amount #set-water-amount-value").val();
 				if(waterAmountValue==null || waterAmountValue=="" || waterAmountValue<=0){
 					//dialog type: success warning info error,默认为info
@@ -114,16 +78,13 @@
 					return false;
 				}
 				
-				var deviceId = getSendCmdDeviceIdFn();//获取发送指令的设备ID
-				if(deviceId==null || deviceId==""){
-					alert("设备ID为空，请重新初始化对话框！");
-				}
+				var url = BASE_CONTEXT_PATH + "/meter-device/cmd-water-amount-generator";
 				
-				var command = generatorWaterAmountCommandFn(deviceId, waterAmountValue);//生成水量阀值指令通用函数
-				console.log("----------发送水量阀值指令："+command);
-				if(command!=null && command!=""){
-					util.confirm("确认发送指令【"+command+"】吗？", command, "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest")
-				}
+				setSendCmdParmsUrl(url);//设置发送指令参数-ajax请求url
+				setSendCmdParmsCmdAction(waterAmountValue);//设置发送指令参数-指令动作 水量阀值（数字）
+				
+				util.confirm("确认发送设置水量阀值指令吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest");
+				
 			});
 		});
 	

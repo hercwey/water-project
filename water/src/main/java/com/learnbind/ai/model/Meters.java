@@ -1,3 +1,4 @@
+
 package com.learnbind.ai.model;
 
 import java.text.SimpleDateFormat;
@@ -143,6 +144,9 @@ public class Meters {
     
     @Column(name = "METER_SEQUENCE")
     private Integer meterSequence;
+    
+    @Column(name = "ACCOUNT_STATUS")
+    private Integer accountStatus;
 
     /**
      * @return ID
@@ -711,7 +715,13 @@ public class Meters {
 		this.meterSequence = meterSequence;
 	}
 	
-	
+	public Integer getAccountStatus() {
+		return accountStatus;
+	}
+
+	public void setAccountStatus(Integer accountStatus) {
+		this.accountStatus = accountStatus;
+	}
 
 	@Override
 	public String toString() {
@@ -727,6 +737,8 @@ public class Meters {
 				+ ", sortValue=" + sortValue + ", deviceId=" + deviceId + ", protocolType=" + protocolType
 				+ ", meterNumber=" + meterNumber + ", meterConfig=" + meterConfig + ", meterFreeze=" + meterFreeze
 				+ ", meterName=" + meterName + ", sampleUnit=" + sampleUnit + ", meterUseType=" + meterUseType
-				+ ", meterFactoryCode=" + meterFactoryCode + ", meterSequence=" + meterSequence + "]";
+				+ ", meterFactoryCode=" + meterFactoryCode + ", meterSequence=" + meterSequence + ", accountStatus="
+				+ accountStatus + "]";
 	}
+
 }

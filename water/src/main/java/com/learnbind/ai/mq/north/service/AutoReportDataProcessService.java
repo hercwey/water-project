@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,12 @@ import com.learnbind.ai.model.MeterRecord;
 import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.PartitionWater;
 import com.learnbind.ai.model.iot.WmMeter;
+import com.learnbind.ai.model.iotbean.common.DeviceParams;
+import com.learnbind.ai.model.iotbean.common.DeviceParamsFlags;
 import com.learnbind.ai.model.iotbean.common.ReportDataType;
 import com.learnbind.ai.model.iotbean.report.AutoReport;
 import com.learnbind.ai.model.iotbean.report.MeterReportBean;
+import com.learnbind.ai.model.iotbean.report.MeterStatusBean;
 import com.learnbind.ai.service.business.MeterRecordBusiness;
 import com.learnbind.ai.service.customers.CustomerAccountItemService;
 import com.learnbind.ai.service.customers.CustomerMeterService;
@@ -210,24 +214,45 @@ public class AutoReportDataProcessService {
 	/**
 	 * @Title: processAutoReportData
 	 * @Description: 主动上报数据处理，更新meter_config
-	 * @param deviceId
+	 * @param iotDeviceId
 	 * @param data	原始HEX数据中数据域部分解析后的json数据
 	 * @return 
 	 */
-	private int processAutoReportData(String deviceId, String data) {
-		// TODO 水表数据封装信息保存（更新MeterConfig信息）
-		// TODO 需要重点测试
+	private int processAutoReportData(String iotDeviceId, String data) {
+		// 水表设备自动上报数据，更新数据库meters表meter_config内容
+		log.info("----------自动上报数据data参数："+data);
+		
 		MeterReportBean reportBean = MeterReportBean.fromJson(data);
 		if (reportBean != null) {
 
-			String meterReportJSON = reportBean.toJsonString(reportBean);// 转成JSON
+			//String meterReportJSON = reportBean.toJsonString(reportBean);// 转成JSON
+			Date meterTime = reportBean.getMeterTime();// 表当前时间: 7字节数字字符串(YYMMWWDDhhmmss), 年、月、星期、日、时、分、秒
+			int totalVolume = reportBean.getTotalVolume();// 累计使用量整数, (用水量(M3) = totalVolume * sampleUnit)
+			String sampleUnit = reportBean.getSampleUnit();// 采样参数：单位M3
+			String meterNumber = reportBean.getMeterNumber();// 表号: 6字节数字型字符串
+			MeterStatusBean meterStatus = reportBean.getMeterStatus();// 表状态字：由meterStatusFlag转换
+			
+			Meters meter = metersService.getMeter(iotDeviceId);//根据IOT电信平台设备ID查询水表设备信息
 
-			// 水表月冻结信息，更新数据库meters表meter_freeze内容
-			Example example = new Example(Meters.class);
-			example.createCriteria().andEqualTo("deviceId", deviceId);
-			Meters meter = new Meters();
-			meter.setMeterConfig(meterReportJSON);
-			return metersService.updateByExampleSelective(meter, example);
+			if(meter!=null) {
+				String meterConfig = meter.getMeterConfig();//表配置参数;
+				if(StringUtils.isNotBlank(meterConfig)) {
+					DeviceParams deviceParams = DeviceParams.fromJson(meterConfig);
+					Long meterId = meter.getId();//水表设备主键ID
+					deviceParams.setMeterTime(meterTime);
+					deviceParams.setMeterBasicValue(totalVolume);
+					deviceParams.setSampleUnit(Float.valueOf(sampleUnit));
+					deviceParams.setMeterNumber(meterNumber);
+					deviceParams.setMeterStatus(meterStatus);
+					
+					String meterConfigJSON = DeviceParams.toJsonString(deviceParams);//对象转JSON字符串
+					
+					Meters updateObj = new Meters();
+					updateObj.setId(meterId);
+					updateObj.setMeterConfig(meterConfigJSON);
+					return metersService.updateByPrimaryKeySelective(updateObj);
+				}
+			}
 		}
 		return 0;
 	}

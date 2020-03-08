@@ -20,13 +20,14 @@
     <result column="ISSUED_TIMES" jdbcType="DECIMAL" property="issuedTimes" />
     <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
     <result column="COMMAND_TYPE" jdbcType="DECIMAL" property="commandType" />
+    <result column="COMMAND_SEQUENCE" jdbcType="DECIMAL" property="commandSequence" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--
       WARNING - @mbg.generated
     -->
     ID, COMMAND_ID, APP_ID, DEVICE_ID, SERVICE_ID, METHOD_ID, METHOD_PARAMS, OPERATOR_ID, 
-    STATUS, REMARK, EXPIRE_TIME, PLATFORM_ISSUED_TIME, ISSUED_TIMES, CREATE_TIME
+    STATUS, REMARK, EXPIRE_TIME, PLATFORM_ISSUED_TIME, ISSUED_TIMES, CREATE_TIME, COMMAND_SEQUENCE 
   </sql>
   
   <select id="selectById" resultType="com.learnbind.ai.model.iot.TestCommandBean">

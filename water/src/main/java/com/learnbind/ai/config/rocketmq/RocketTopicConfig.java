@@ -68,6 +68,14 @@ public class RocketTopicConfig {
     @Value("${tag.device.query.north}")
     private String tagDeviceQueryNorth;//查询设备响应
     
+    @Value("${tag.account.status.read.south")
+    private String tagAccountStatusReadSouth;//查询开户状态	发布	订阅
+    @Value("${tag.account.status.write.south}")
+    private String tagAccountStatusWriteSouth;//设置开户状态	发布	订阅
+    @Value("${tag.account.status.read.north")
+    private String tagAccountStatusReadNorth;//查询开户状态	发布	订阅
+    @Value("${tag.account.status.write.north}")
+    private String tagAccountStatusWriteNorth;//设置开户状态	发布	订阅
     
 	public String getTopicName() {
 		return topicName;
@@ -196,9 +204,34 @@ public class RocketTopicConfig {
 		this.tagDeviceQueryNorth = tagDeviceQueryNorth;
 	}
 	
+	public String getTagAccountStatusReadSouth() {
+		return tagAccountStatusReadSouth;
+	}
+	public void setTagAccountStatusReadSouth(String tagAccountStatusReadSouth) {
+		this.tagAccountStatusReadSouth = tagAccountStatusReadSouth;
+	}
+	public String getTagAccountStatusWriteSouth() {
+		return tagAccountStatusWriteSouth;
+	}
+	public void setTagAccountStatusWriteSouth(String tagAccountStatusWriteSouth) {
+		this.tagAccountStatusWriteSouth = tagAccountStatusWriteSouth;
+	}
+	public String getTagAccountStatusReadNorth() {
+		return tagAccountStatusReadNorth;
+	}
+	public void setTagAccountStatusReadNorth(String tagAccountStatusReadNorth) {
+		this.tagAccountStatusReadNorth = tagAccountStatusReadNorth;
+	}
+	public String getTagAccountStatusWriteNorth() {
+		return tagAccountStatusWriteNorth;
+	}
+	public void setTagAccountStatusWriteNorth(String tagAccountStatusWriteNorth) {
+		this.tagAccountStatusWriteNorth = tagAccountStatusWriteNorth;
+	}
+	
 	@Override
 	public String toString() {
-		return "RocketTopicConfig [topicName=" + topicName + ", tagAutoReport=" + tagAutoReport
+		return "RocketTopicConfig [log=" + log + ", topicName=" + topicName + ", tagAutoReport=" + tagAutoReport
 				+ ", tagConfigParmsSouth=" + tagConfigParmsSouth + ", tagConfigParmsNorth=" + tagConfigParmsNorth
 				+ ", tagConfigThresholdSouth=" + tagConfigThresholdSouth + ", tagConfigThresholdNorth="
 				+ tagConfigThresholdNorth + ", tagQueryParmsSouth=" + tagQueryParmsSouth + ", tagQueryParmsNorth="
@@ -209,7 +242,9 @@ public class RocketTopicConfig {
 				+ tagDeviceUpdateSouth + ", tagDeviceDeleteSouth=" + tagDeviceDeleteSouth + ", tagDeviceQuerySouth="
 				+ tagDeviceQuerySouth + ", tagDeviceRegisterNorth=" + tagDeviceRegisterNorth + ", tagDeviceUpdateNorth="
 				+ tagDeviceUpdateNorth + ", tagDeviceDeleteNorth=" + tagDeviceDeleteNorth + ", tagDeviceQueryNorth="
-				+ tagDeviceQueryNorth + "]";
+				+ tagDeviceQueryNorth + ", tagAccountStatusReadSouth=" + tagAccountStatusReadSouth
+				+ ", tagAccountStatusWriteSouth=" + tagAccountStatusWriteSouth + ", tagAccountStatusReadNorth="
+				+ tagAccountStatusReadNorth + ", tagAccountStatusWriteNorth=" + tagAccountStatusWriteNorth + "]";
 	}
-    
+	
 }

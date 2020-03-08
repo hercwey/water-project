@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发送表开户状态指令对话框</title>
+
+<!-- 发送表开户状态指令:对话框 -->
+
+</head>
+<body>
+
+	<th:block th:fragment="dialog">
+	
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				
+				<!-- 模态对话框 -->
+				<div class="modal fade" id="modal-container-command-account-status-write" role="dialog"	aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-md">
+						<div class="modal-content">
+
+							<!-- 头部 -->
+							<div class="modal-header" style="background-color: #a5f1b6;height: 50px;">
+								<h5 class="modal-title" id="myModalLabel">
+									<span id="modal-title-span">开户状态指令</span>
+									<i class="fa fa-tags fa-1x" aria-hidden="true" style="color:blue;"></i>
+								</h5>
+								<button type="button" class=" btn btn-primary btn-sm close" data-dismiss="modal" aria-hidden="true">×</button>
+
+							</div>
+
+							<!-- 主体(用于展示表单) -->
+							<div class="modal-body mx-auto">
+								<!-- cmdAction 开户状态：0=未开户（默认值）；1=已开户； -->
+								<button type="button" class="btn btn-success btn-sm" id="btn-send-command-account-status-close" data-command="0">未开户</button>
+								<button type="button" class="btn btn-warning btn-sm" id="btn-send-command-account-status-open" data-command="1">已开户</button> 
+							</div>
+
+							<!-- 尾部 -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">关闭</button>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end of dialog -->
+
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+	
+		$(function(){
+			/**
+			 * 	绑定未开户按钮的click事件
+			 */
+			$("#modal-container-command-account-status-write #btn-send-command-account-status-close").on("click", function(){
+				
+				var cmdAction = $(this).attr("data-command");//指令动作 开户状态：0=未开户（默认值）；1=已开户；
+				var url = BASE_CONTEXT_PATH + "/meter-device/cmd-write-status-generator";
+				
+				setSendCmdParmsUrl(url);//设置发送指令参数-ajax请求url
+				setSendCmdParmsCmdAction(cmdAction);//设置发送指令参数-指令动作
+				
+				util.confirm("确认发送设置未开户状态指令吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest");
+				
+			});
+			/**
+			 * 	绑定已开户按钮的click事件
+			 */
+			$("#modal-container-command-account-status-write #btn-send-command-account-status-open").on("click", function(){
+				
+				var cmdAction = $(this).attr("data-command");//指令动作 开户状态：0=未开户（默认值）；1=已开户；
+				var url = BASE_CONTEXT_PATH + "/meter-device/cmd-write-status-generator";
+				
+				setSendCmdParmsUrl(url);//设置发送指令参数-ajax请求url
+				setSendCmdParmsCmdAction(cmdAction);//设置发送指令参数-指令动作
+				
+				util.confirm("确认发送设置已开户状态指令吗？", "xxx", "sendCommandAjaxRequest", "cancelSendCommandAjaxRequest");
+			});
+		});
+	
+	</script>
+	
+	</th:block>
+
+</body>
+</html>

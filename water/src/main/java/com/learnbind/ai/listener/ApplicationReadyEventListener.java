@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.common.enumclass.EnumCcbBatchStatus;
 import com.learnbind.ai.model.CcbBatchWithholdRecord;
+import com.learnbind.ai.mq.north.AccountStatusReadConsumer;
+import com.learnbind.ai.mq.north.AccountStatusWriteConsumer;
 import com.learnbind.ai.mq.north.AutoReportConsumer;
 import com.learnbind.ai.mq.north.ConfigParmsConsumer;
 import com.learnbind.ai.mq.north.ConfigThresholdConsumer;
@@ -81,6 +83,10 @@ public class ApplicationReadyEventListener implements  ApplicationListener<Appli
 	private QueryMonthDataConsumer queryMonthDataConsumer;//消费者-查询月冻结返回数据
 	@Autowired
 	private QueryParmsConsumer queryParmsConsumer;//消费者-查询参数返回数据
+	@Autowired
+	private AccountStatusReadConsumer accountStatusReadConsumer;//消费者-读开户状态返回数据
+	@Autowired
+	private AccountStatusWriteConsumer accountStatusWriteConsumer;//消费者-写开户状态返回数据
 	
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
@@ -125,6 +131,8 @@ public class ApplicationReadyEventListener implements  ApplicationListener<Appli
 	    	orderStatusConsumer.start();//消费者-命令执行状态返回数据
 	    	queryMonthDataConsumer.start();//消费者-查询月冻结返回数据
 	    	queryParmsConsumer.start();//消费者-查询参数返回数据
+	    	accountStatusWriteConsumer.start();//消费者-写开户状态返回数据
+	    	accountStatusReadConsumer.start();//消费者-读开户状态返回数据
 		} catch (MQClientException e) {
 			e.printStackTrace();
 		}

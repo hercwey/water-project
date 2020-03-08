@@ -39,7 +39,17 @@ public enum EnumCommandType {
 	/**
 	 * @Fields TYPE_READ_METER_CONFIG：5=读表配置指令
 	 */
-	TYPE_READ_METER_CONFIG(5, "读表配置指令");
+	TYPE_READ_METER_CONFIG(5, "读表配置指令"),
+	
+	/**
+	 * @Fields TYPE_WRITE_METER_ACCOUNT_STATUS：6=写表开户状态指令
+	 */
+	TYPE_WRITE_METER_ACCOUNT_STATUS(6, "写表开户状态指令"),
+	
+	/**
+	 * @Fields TYPE_READ_METER_ACCOUNT_STATUS：7=读表开户状态指令
+	 */
+	TYPE_READ_METER_ACCOUNT_STATUS(7, "读表开户状态指令");
 	
 	/**
 	 * @Fields key：键名称

@@ -51,6 +51,9 @@ public class WmCommand {
     
     @Column(name = "COMMAND_TYPE")
     private Integer commandType;
+    
+    @Column(name = "COMMAND_SEQUENCE")
+    private Integer commandSequence;
 
     /**
      * @return ID
@@ -256,28 +259,22 @@ public class WmCommand {
 		this.commandType = commandType;
 	}
 
+	public Integer getCommandSequence() {
+		return commandSequence;
+	}
+
+	public void setCommandSequence(Integer commandSequence) {
+		this.commandSequence = commandSequence;
+	}
+
 	@Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", commandId=").append(commandId);
-        sb.append(", appId=").append(appId);
-        sb.append(", deviceId=").append(deviceId);
-        sb.append(", serviceId=").append(serviceId);
-        sb.append(", methodId=").append(methodId);
-        sb.append(", methodParams=").append(methodParams);
-        sb.append(", operatorId=").append(operatorId);
-        sb.append(", status=").append(status);
-        sb.append(", remark=").append(remark);
-        sb.append(", expireTime=").append(expireTime);
-        sb.append(", platformIssuedTime=").append(platformIssuedTime);
-        sb.append(", issuedTimes=").append(issuedTimes);
-        sb.append(", createTime=").append(createTime);
-        sb.append(", commandType=").append(commandType);
-        sb.append("]");
-        return sb.toString();
-    }
+	public String toString() {
+		return "WmCommand [id=" + id + ", commandId=" + commandId + ", appId=" + appId + ", deviceId=" + deviceId
+				+ ", serviceId=" + serviceId + ", methodId=" + methodId + ", methodParams=" + methodParams
+				+ ", operatorId=" + operatorId + ", status=" + status + ", remark=" + remark + ", expireTime="
+				+ expireTime + ", platformIssuedTime=" + platformIssuedTime + ", issuedTimes=" + issuedTimes
+				+ ", createTime=" + createTime + ", commandType=" + commandType + ", commandSequence=" + commandSequence
+				+ "]";
+	}
+	
 }

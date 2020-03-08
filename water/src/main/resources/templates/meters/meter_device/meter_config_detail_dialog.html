@@ -61,62 +61,62 @@
 										<tbody>
 											<tr>
 												<td>定时上传周期</td>
-												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.reportPeriod}"></td>
+												<td th:text="${deviceParams==null ? '' : deviceParams.reportPeriod}"></td>
 											</tr>
 											<tr>
 												<td>定时上传周期单位</td>
 												<td>
-													<span th:if="${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==0}">分钟</span>
-													<span th:if="${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==1}">小时</span>
-													<span th:if="${meterConfigBean!=null && meterConfigBean.reportPeriodUnit==2}">天</span>
+													<!-- <span th:if="${deviceParams!=null && deviceParams.reportPeriodUnit==0}">分钟</span> -->
+													<span th:if="${deviceParams!=null && deviceParams.reportPeriodUnit==1}">小时</span>
+													<span th:if="${deviceParams!=null && deviceParams.reportPeriodUnit==2}">天</span>
 												</td>
 											</tr>
 											<tr>
 												<td>定量上传值</td>
-												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.reportRation}"></td>
+												<td th:text="${deviceParams==null ? '' : deviceParams.reportRation}"></td>
 											</tr>
 											<tr>
 												<td>用户临时开阀用水限定时间</td>
-												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.temporaryTime}"></td>
+												<td th:text="${deviceParams==null ? '' : deviceParams.temporaryTime}"></td>
 											</tr>
 											<tr>
 												<td>
 													阀门行程时间
 												</td>
-												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.valveRunTime}"></td>
+												<td th:text="${deviceParams==null ? '' : deviceParams.valveRunTime}"></td>
 											</tr>
 											<tr>
 												<td>阀门维护周期</td>
-												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.valveMaintainPeriod}"></td>
+												<td th:text="${deviceParams==null ? '' : deviceParams.valveMaintainPeriod}"></td>
 											</tr>
 											<tr>
 												<td>表底数</td>
-												<td th:text="${meterConfigBean==null ? '' : meterConfigBean.meterBasicValue}"></td>
+												<td th:text="${deviceParams==null ? '' : deviceParams.meterBasicValue}"></td>
 											</tr>
 											<tr>
 												<td>采样参数单位</td>
-												<td th:text="${meterConfigBean==null} ? '' : ${meterConfigBean.sampleUnit}+'立方米'">
+												<td th:text="${deviceParams==null} ? '' : ${deviceParams.sampleUnit}+'立方米'">
 													<!-- 采样参数：1字节(0-255)十进制，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样； -->
 												</td>
 											</tr>
 											<tr>
 												<td>表当前时间</td>
-												<td th:text="${meterConfigBean!=null && meterConfigBean.meterTime!=null ? #dates.format(meterConfigBean.meterTime, 'yyyy-MM-dd HH:mm:ss') : ''}"></td>
+												<td th:text="${deviceParams!=null && deviceParams.meterTime!=null ? #dates.format(deviceParams.meterTime, 'yyyy-MM-dd HH:mm:ss') : ''}"></td>
 											</tr>
 											<tr>
 												<td>上传功能</td>
 												<td>
 													<!-- 表状态字-定时/定量上传功能开关 (1开 / 0关) -->
-													<span th:if="${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.periodOn==1}">定时上传</span>
-													<span th:if="${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.maxReportOn==1}">定量上传</span>
+													<span th:if="${deviceParams!=null && deviceParams.meterStatus!=null && deviceParams.meterStatus.periodOn==1}">定时上传</span>
+													<span th:if="${deviceParams!=null && deviceParams.meterStatus!=null && deviceParams.meterStatus.maxReportOn==1}">定量上传</span>
 												</td>
 											</tr>
 											<tr>
 												<td>磁干扰关阀功能</td>
 												<td>
 													<!-- 表状态字-磁干扰关阀功能开关 (1开 / 0关) -->
-													<span th:if="${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticOn==1}">开</span>
-													<span th:if="${meterConfigBean!=null && meterConfigBean.meterStatus!=null && meterConfigBean.meterStatus.magneticOn==0}">关</span>
+													<span th:if="${deviceParams!=null && deviceParams.meterStatus!=null && deviceParams.meterStatus.magneticOn==1}">开</span>
+													<span th:if="${deviceParams!=null && deviceParams.meterStatus!=null && deviceParams.meterStatus.magneticOn==0}">关</span>
 												</td>
 											</tr>
 											

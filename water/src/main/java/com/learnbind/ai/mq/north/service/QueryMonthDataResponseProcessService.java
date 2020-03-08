@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.model.iotbean.command.QueryMonthDataResponse;
+import com.learnbind.ai.model.iotbean.common.CommandCallbackConstants;
 import com.learnbind.ai.model.iotbean.common.ReportDataType;
+import com.learnbind.ai.service.iot.WmCommandService;
 import com.learnbind.ai.service.iot.WmMeterService;
 import com.learnbind.ai.service.meters.MetersService;
 
@@ -42,6 +44,8 @@ public class QueryMonthDataResponseProcessService {
 	private WmMeterService wmMeterService;
 	@Autowired
 	private MetersService metersService;
+	@Autowired
+	private WmCommandService wmCommandService;
 	
 	/**
 	 * @Title: processResponseData
@@ -56,11 +60,13 @@ public class QueryMonthDataResponseProcessService {
 		
 		String deviceId = queryMonthDataRsp.getDeviceId();// IOT电信平台设备ID
 		Integer dataType = queryMonthDataRsp.getDataType();// 数据类型
+		Integer sequence = queryMonthDataRsp.getSequence();//序号
 		
 		// 2、收到上报数据后更新表配置与月冻结数据
 		if (dataType == ReportDataType.METER_DATA_TYPE_MONTH_FREEZE) {// 如果数据类型是 设备月冻结数据
 			// 水表月冻结信息，更新数据库device表meter_freeze内容
 			this.processMonthFreezeData(deviceId, queryMonthDataRsp.getData());
+			this.updateCommandStatus(dataType, deviceId, sequence);//更新指令状态为成功
 		} else {
 			log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
 		}
@@ -82,6 +88,25 @@ public class QueryMonthDataResponseProcessService {
 		Meters meter = new Meters();
 		meter.setMeterFreeze(data);
 		return metersService.updateByExampleSelective(meter, example);
+	}
+	
+	// -------------------------------- 更新指令状态为成功 的业务处理部分--------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: updateCommandStatus
+	 * @Description: 更新指令状态为成功
+	 * @param dataType
+	 * @param iotDeviceId
+	 * @param sequence
+	 * @return 
+	 */
+	private int updateCommandStatus(Integer dataType, String iotDeviceId, Integer sequence) {
+			
+		Long deviceId = this.getDeviceId(iotDeviceId);
+		if(deviceId!=null) {
+			int status = CommandCallbackConstants.COMMAND_STATUS_SUCCESS;//4=执行成功
+			return wmCommandService.updateWmCommandStatus(deviceId, sequence, status);
+		}
+		return 0;
 	}
 	
 	// --------------------------------保存设备上报数据--------------------------------------------------------------------------------------------------

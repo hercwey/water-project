@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.model.iotbean.command.ControlValveResponse;
+import com.learnbind.ai.model.iotbean.common.CommandCallbackConstants;
+import com.learnbind.ai.model.iotbean.common.ReportDataType;
+import com.learnbind.ai.service.iot.WmCommandService;
 import com.learnbind.ai.service.iot.WmMeterService;
 import com.learnbind.ai.service.meters.MetersService;
 
@@ -39,6 +42,8 @@ public class ControlValveResponseProcessService {
 	private WmMeterService wmMeterService;
 	@Autowired
 	private MetersService metersService;
+	@Autowired
+	private WmCommandService wmCommandService;
 
 	/**
 	 * @Title: processAutoReportData
@@ -52,8 +57,15 @@ public class ControlValveResponseProcessService {
 		// 1、保存设备上报数据到数据库
 		this.saveResponseData(controlValveRspData);
 
-		//String deviceId = configThresholdRspData.getDeviceId();// IOT电信平台设备ID
+		String iotDeviceId = controlValveRspData.getDeviceId();// IOT电信平台设备ID
 		Integer dataType = controlValveRspData.getDataType();// 数据类型
+		Integer sequence = controlValveRspData.getSequence();//序号
+		
+		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_SWITCH_VALVE) {// 如果数据类型是 开关阀指令返回数据
+			Long deviceId = this.getDeviceId(iotDeviceId);//获取设备表主键ID
+			int status = CommandCallbackConstants.COMMAND_STATUS_SUCCESS;//4=执行成功
+			wmCommandService.updateWmCommandStatus(deviceId, sequence, status);
+		}
 		
 		log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
 		

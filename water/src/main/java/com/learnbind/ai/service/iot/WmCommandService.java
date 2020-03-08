@@ -23,10 +23,20 @@ public interface WmCommandService extends IBaseService<WmCommand, Long> {
 	 * @Title: getWmCommand
 	 * @Description: 根据IOT设备ID获取命令对象
 	 * @param meter
-	 * @param commandType	指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令
-	 * @param commandVal
+	 * @param commandType		指令类型 1=水表配置指令；2=开/关阀指令；3=水量阀值指令；4=读月冻结指令；5=读表配置指令；6=写表开户状态指令；7=读表开户状态指令
+	 * @param commandSequence	下发指令序号
 	 * @return 
 	 */
-	public WmCommand getWmCommand(Meters meter, Integer commandType, String commandVal);
+	public WmCommand getWmCommand(Meters meter, Integer commandType, Integer commandSequence);
+	
+	/**
+	 * @Title: updateWmCommandStatus
+	 * @Description: 更新指令状态
+	 * @param deviceId
+	 * @param commandSequence
+	 * @param status
+	 * @return 
+	 */
+	public int updateWmCommandStatus(Long deviceId, Integer commandSequence, int status);
 	
 }

@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import com.learnbind.ai.model.Meters;
 import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.model.iotbean.command.QueryParamsResponse;
+import com.learnbind.ai.model.iotbean.common.CommandCallbackConstants;
 import com.learnbind.ai.model.iotbean.common.ReportDataType;
+import com.learnbind.ai.service.iot.WmCommandService;
 import com.learnbind.ai.service.iot.WmMeterService;
 import com.learnbind.ai.service.meters.MetersService;
 
@@ -42,6 +44,8 @@ public class QueryParmsResponseProcessService {
 	private WmMeterService wmMeterService;
 	@Autowired
 	private MetersService metersService;
+	@Autowired
+	private WmCommandService wmCommandService;
 	
 	/**
 	 * @Title: processResponseData
@@ -53,14 +57,17 @@ public class QueryParmsResponseProcessService {
 		// 1、保存设备上报数据到数据库
 		this.saveResponseData(queryParamsRsp);
 		
-		String deviceId = queryParamsRsp.getDeviceId();// IOT电信平台设备ID
+		String iotDeviceId = queryParamsRsp.getDeviceId();// IOT电信平台设备ID
 		Integer dataType = queryParamsRsp.getDataType();// 数据类型
+		Integer sequence = queryParamsRsp.getSequence();//序号
 		
-		// 2、收到上报数据后更新表配置与月冻结数据
-		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG
-				|| dataType == ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG) {// 如果数据类型是 设备配置信息数据 或 写配置指令返回信息
+		// 2、收到上报数据后更新表配置
+//		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG
+//				|| dataType == ReportDataType.METER_DATA_TYPE_RSP_WRITE_CONFIG) {// 如果数据类型是 设备配置信息数据 或 写配置指令返回信息
+		if (dataType == ReportDataType.METER_DATA_TYPE_RSP_READ_CONFIG) {// 如果数据类型是 读表参数配置指令返回信息
 			// 水表配置信息，更新数据库device表meter_config内容
-			this.processReadConfigOrWriteConfigData(deviceId, queryParamsRsp.getData());
+			this.processReadConfigResponseData(iotDeviceId, queryParamsRsp.getData());
+			this.updateCommandStatus(dataType, iotDeviceId, sequence);
 		} else {
 			log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
 		}
@@ -71,17 +78,37 @@ public class QueryParmsResponseProcessService {
 	/**
 	 * @Title: processReadConfigOrWriteConfigData
 	 * @Description: 数据类型是 设备配置信息数据 或 写配置指令返回信息 的业务处理，更新meter_config
-	 * @param deviceId
+	 * @param iotDeviceId
 	 * @param data	原始HEX数据中数据域部分解析后的json数据
 	 * @return 
 	 */
-	private int processReadConfigOrWriteConfigData(String deviceId, String data) {
+	private int processReadConfigResponseData(String iotDeviceId, String data) {
+		log.info("----------读表配置响应数据data参数："+data);
 		// 水表配置信息，更新数据库meters表meter_config内容
 		Example example = new Example(Meters.class);
-		example.createCriteria().andEqualTo("deviceId", deviceId);
+		example.createCriteria().andEqualTo("deviceId", iotDeviceId);
 		Meters meter = new Meters();
 		meter.setMeterConfig(data);
 		return metersService.updateByExampleSelective(meter, example);
+	}
+	
+	// -------------------------------- 更新指令状态为成功 的业务处理部分--------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: updateCommandStatus
+	 * @Description: 更新指令状态为成功
+	 * @param dataType
+	 * @param iotDeviceId
+	 * @param sequence
+	 * @return 
+	 */
+	private int updateCommandStatus(Integer dataType, String iotDeviceId, Integer sequence) {
+			
+		Long deviceId = this.getDeviceId(iotDeviceId);
+		if(deviceId!=null) {
+			int status = CommandCallbackConstants.COMMAND_STATUS_SUCCESS;//4=执行成功
+			return wmCommandService.updateWmCommandStatus(deviceId, sequence, status);
+		}
+		return 0;
 	}
 	
 	// --------------------------------保存设备上报数据--------------------------------------------------------------------------------------------------
