@@ -44,6 +44,7 @@
 				<th>描述</th>
 				<th>停/复水</th>
 				<th>注册状态</th>
+				<th>开户状态</th>
 				<th style="width:100px;">操作</th>
 			</tr>
 		</thead>
@@ -83,6 +84,16 @@
 					</span>
 					<span th:if="${item.deviceId!=null && item.deviceId!=''}" th:remove="tag">
 						<span class="badge badge-success">已注册</span>
+					</span>
+				</td>
+				<!-- 开户状态 -->
+				<td>
+					<!-- 开户状态：0=未开户（默认值）；1=已开户； -->
+					<span th:if="${item.accountStatus!=null && item.accountStatus==0}" th:remove="tag">
+						<span class="badge badge-warning">未开户</span>
+					</span>
+					<span th:if="${item.accountStatus!=null && item.accountStatus==1}" th:remove="tag">
+						<span class="badge badge-success">已开户</span>
 					</span>
 				</td>
 				<!-- 操作列 -->

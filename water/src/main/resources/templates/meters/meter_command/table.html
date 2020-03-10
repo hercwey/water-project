@@ -39,13 +39,15 @@
 					<!-- <td th:text="${item.SERVICE_NAME}">服务名称</td> -->
 					<!-- 指令类型 -->
 					<td>
-						<!-- 指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令； -->
+						<!-- 指令类型：0=未知指令（默认值）；1=表配置指令；2=开/关阀指令；3=设置水量阀值指令；4=读月冻结指令；5=读表配置指令；6=写表开户状态指令；7=读表开户状态指令； -->
 						<span th:if="${item.COMMAND_TYPE==0}">未知指令</span>
 						<span th:if="${item.COMMAND_TYPE==1}">表配置指令</span>
 						<span th:if="${item.COMMAND_TYPE==2}">开/关阀指令</span>
 						<span th:if="${item.COMMAND_TYPE==3}">设置水量阀值指令</span>
 						<span th:if="${item.COMMAND_TYPE==4}">读月冻结指令</span>
 						<span th:if="${item.COMMAND_TYPE==5}">读表配置指令</span>
+						<span th:if="${item.COMMAND_TYPE==6}">写表开户状态指令</span>
+						<span th:if="${item.COMMAND_TYPE==7}">读表开户状态指令</span>
 					</td>
 					<!-- 水表编号 -->
 					<td th:text="${item.METER_NO}">水表编号</td>
