@@ -196,7 +196,7 @@
 	<!-- 根据id查询客户名称 -->
 	<select id="getCustomerNameById" resultType="String">
 		SELECT
-		PROP_NAME
+			CUSTOMER_NAME
 		FROM customers
 		<where>
 			<!--删除状态，1=已删除，0=未删除（默认） -->

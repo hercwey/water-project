@@ -1,7 +1,8 @@
 * { margin:0; padding:0;}
 img { border:none; vertical-align: top;}
 a { text-decoration:none;}
-a:blur{outline:none; -moz-outline:none;}
+/* a:blur{outline:none; -moz-outline:none;} */
+a:focus {outline:none;-moz-outline:none;}
 li { list-style:none;}
 /*h1,h2,h3,h4,h5,h6,strong{ font-weight: normal;}*/
 /* input,select,textarea { outline:none; background: transparent;}
