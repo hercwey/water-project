@@ -14,7 +14,6 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.learnbind.ai.mq.MQConstant;
 
@@ -31,7 +30,6 @@ import com.learnbind.ai.mq.MQConstant;
  * @version V1.0 
  *
  */
-@Component
 public abstract class BaseConsumer {
 
 	/**
