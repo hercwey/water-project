@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <title>智慧营收系统欢迎页</title>
 
-<div th:include="common/common_head::headx('欢迎页')" th:remove="tag"></div>
-<link rel="stylesheet" th:href="@{/assets/css/welcome.css}">
+<!-- <div th:include="common/common_head::headx('欢迎页')" th:remove="tag"></div> -->
+<link rel="stylesheet" href="/assets/css/welcome.css">
 </head>
 <body>
-	<div class="page-container welcome">
+	<div class="page-container welcome-page">
         <div class="wel-wrap">
           <div class="wel-img">
-            <p>欢迎 <b th:text="${realname}">XXX</b> 登录智慧水务平台</p>
+            <span class="welcome-title">欢迎 <b th:text="${realname}">XXX</b> 登录智慧水务平台</span>
             <img src="/assets/img/welcome.jpg" alt="">
           </div>
         </div>

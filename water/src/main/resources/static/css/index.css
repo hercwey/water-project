@@ -1,0 +1,96 @@
+* { margin:0; padding:0;}
+img { border:none; vertical-align: top;}
+a { text-decoration:none;}
+a:blur{outline:none; -moz-outline:none;}
+li { list-style:none;}
+/*h1,h2,h3,h4,h5,h6,strong{ font-weight: normal;}*/
+/* input,select,textarea { outline:none; background: transparent;}
+.clearfix:after, .clearfix:before{ content: ""; display: table;}
+.clearfix:after{clear: both;}
+.clearfix{ zoom:1;}
+input{ border:1px solid #ccc;} */
+.top{
+    height: 60px; 
+	background:url("../images/index/bg.jpg");
+	background-repeat:repeat-x;
+    overflow: hidden;
+}
+.top .logoboxs{ float:left;}
+.top .navbox{ float:left; margin-left:20px;}
+.top .navbox ul li{ float:left; text-align:center; color:#ffffff; font-size:14px; padding-left:15px; padding-right:15px; padding-top:10px;}
+.top .navbox ul li img{ height:24px; text-align:center; color:#ffffff;}
+.top .navbox ul li p{ line-height:26px; margin-top: 0; margin-bottom: 0;}
+.top .bd{ float: left; overflow: hidden; height: 30px; color: #FFFFFF;margin-top: 24px; font-size:14px; margin-left:5%;}
+.top .bd span{ margin-left:5px;}
+.top .bd ul{ overflow:hidden; zoom:1;}
+.top .bd ul li{ margin-right:20px;  float:left; width:auto !important; white-space: nowrap; }
+
+.top .btns-boxs{ float:right; margin-right:3%; margin-top:5px;}
+.top .btns-boxs .user{ float:left; margin-right:10px;}
+.top .btns-boxs .welcome .showdata .data{ font-size:14px; color:#ffffff;}
+.top .btns-boxs .user img{ width:100%;}
+.top .btns-boxs .welcome{ float:right; }
+.top .btns-boxs .welcome span{ color:#ffffff; font-size:14px;}
+.top .btns-boxs .welcome a img{ padding-top:1px;}
+
+.logo{
+    float: left;
+    margin: 5px 10px;
+    height: 50px;
+}
+.top>h3{
+    float: left;
+    color: #FFFFFF;
+    line-height: 60px;
+}
+.top>ul{
+    float: left;
+    height: 100%;
+    margin-left: 100px;
+}
+.top>ul li{
+    float: left;
+    color: #FFFFFF;
+    font-size: 14px;
+    height: 100%;
+    text-align: center;
+    padding: 6px 10px 0 10px;
+    box-sizing: border-box;
+}
+
+.user img:nth-of-type(1){
+    margin-top: 2px;
+    margin-right: 4px;
+}
+.user img:nth-of-type(2){
+    margin-top: 6px;
+    margin-left: 4px;
+}
+.top  .active{
+    background:rgba(0,64,132,0.7)
+}
+.top ul li:hover{
+    cursor: pointer;
+}
+
+.download {
+    float: right;
+    color: #ffffff;
+    margin-top: 25px;
+    font-size: 14px;
+    margin-right: 25px;
+}
+
+/* EasyUI Accordion 折叠面板 打开时CSS */
+.accordion .accordion-header-selected {
+    background: #abd1f2;
+}
+/* EasyUI Accordion 折叠面板 Linkbutton 链接按钮 选中时CSS */
+.l-btn-plain-selected, .l-btn-plain-selected:hover {
+    background: #abd1f2;
+}
+/* EasyUI Menubutton 菜单按钮 选中时CSS */
+.m-btn-plain-active, .s-btn-plain-active {
+	border-color: #ffffff;
+	background-color: #abd1f2;
+}

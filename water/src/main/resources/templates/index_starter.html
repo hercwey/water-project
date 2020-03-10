@@ -1,244 +1,405 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-03-04 02:16:10
+ * @LastEditTime: 2020-03-04 06:06:23
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \undefined d:\work\code\water-project\water\src\main\resources\templates\easyuitest\easyui_starter.html
+ -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="zh-cn">
+<html>
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="renderer" content="webkit">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>首页</title>
+	<meta charset="UTF-8">
+	<title>智慧水务平台首页</title>
 
-<div th:include="common/common_head::headx('首页')" th:remove="tag"></div>
+	<!-- 引用js -->
+	<!-- 引用jquery -->
+	<script type="text/javascript" src="/jquery/3.3.1/jquery-3.3.1.js"></script>
+	<!-- 引用jquery cookie -->
+	
+	
+	<!-- 引用easyui -->
+	<script src="/jquery-easyui-1.9.4/jquery.easyui.min.js"></script>
+	<!-- 引入cookie管理，用于保存用户所选择的主题 -->
+	<script src="/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-<link rel="stylesheet" th:href="@{/assets/common/noty/noty.css}">
-<link rel="stylesheet"
-	th:href="@{/assets/common/noty/themes/metroui.css}">
-<link rel="stylesheet"
-	th:href="@{/assets/common/metismenu/metisMenu.min.css}">
-<link rel="stylesheet"
-	th:href="@{/assets/common/daterangepicker/daterangepicker.css}">
-<link rel="stylesheet"
-	th:href="@{/assets/common/bootstrap-select/css/bootstrap-select.css}">
-<link rel="stylesheet" th:href="@{/assets/font/iconfont.css}">
-<link rel="stylesheet" th:href="@{/assets/css/layout.css}">
+	<!-- 引入jeasyui 的CSS -->
+	<!-- easy ui默认主题样式 -->
+	<!-- 注意：此link有ID -->
+	<link rel="stylesheet" id="easyuiTheme" type="text/css" href="/jquery-easyui-1.9.4/themes/default/easyui.css">
+	
+	<!-- easy ui 图标 、颜色-->
+	<link rel="stylesheet" type="text/css" href="/jquery-easyui-1.9.4/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="/jquery-easyui-1.9.4/themes/color.css">
 
-<script th:src="@{/assets/common/moment.min.js}"></script>
-<script th:src="@{/assets/common/moment-zh-cn.js}"></script>
-<script th:src="@{/assets/common/jquery.nicescroll.min.js}"></script>
-<script th:src="@{/assets/common/metismenu/metisMenu.min.js}"></script>
-<script
-	th:src="@{/assets/common/bootstrap-select/js/bootstrap-select.min.js}"></script>
-<script
-	th:src="@{/assets/common/bootstrap-select/js/i18n/defaults-zh_CN.min.js}"></script>
-<script th:src="@{/assets/common/noty/noty.min.js}"></script>
-<script th:src="@{/assets/common/daterangepicker/daterangepicker.js}"></script>
+	<!-- bootstrap -->	
+	<!-- <link href="/bootstrap/4.0.0/css/bootstrap.min.css"	rel="stylesheet" /> -->	
+	<!-- Bootstrap Js -->
+	<!-- <script src="/bootstrap/4.3.1/js/bootstrap.min.js"></script> -->
+	
+	<!-- 字体图标CSS -->
+	<link rel="stylesheet"	href="/font-awesome/4.7.0/css/font-awesome.css" />
+	
+	<!-- JavaScript 日期处理类库 moment.js -->
+	<script type="text/javascript" src="/assets/common/moment.min.js"></script>
 
-<script th:src="@{/assets/js/layout.js}"></script>
-<link rel="stylesheet"	href="/css/commform.css" />
-
-<!-- 显示/隐藏正在加载阴影 -->
-<script th:src="@{/pivas/js/common/Loading.js}"></script>
-<!-- 设置ajax公共请求头 -->
-<!-- <script th:src="@{/pivas/js/common/ajaxSetup.js}"></script>	 -->
+	<!-- 一级菜单切换 index.js -->
+	<script type="text/javascript" src="/js/index/index.js"></script>
+	
+	<!-- 主页面css -->
+	<link rel="stylesheet" type="text/css" href="/css/index.css">
+	
+	<!-- 显示/隐藏正在加载阴影 -->
+	<script type="text/javascript" src="/pivas/js/common/Loading.js"></script>
 
 </head>
 
-<body>
+<body class="easyui-layout">
 
 	<!-- 修改密码对话框 -->
-	<div id="edit-password-dialog" ></div>
+	<!-- <div id="edit-password-dialog" ></div> -->
+	<div id="edit-password-dialog"></div>
 	
-	<div class="header">
-		<nav class="navbar navbar-expand">
-			<div class="navbar-brand">
-				<div class="logo-content">
-					<img src="/assets/img/logo.jpg" alt="智慧水务平台" />
-					<div class="logo-text">
-						<p class="text">泊头市普惠仪表有限公司</p>
-						<p class="eng">BOTOUSHIPUHUIYIBIAOYOUXIANGONGSI</p>
-					</div>
-				</div>
-
-			</div>
-			<div id="navCollapse" class="collapse navbar-collapse">
-				<ul id="headerNav" class="navbar-nav mr-auto">
-					<!-- type 类型，0:菜单目录 1:菜单 2:功能 -->
+	<!-- banner 北向部分 -->
+	<div region="north" style="height: 62px;">
+		<div class="top">
+			<div class="logoboxs">
+			    <a href="/main-index/starter">
+			    	<!-- <img class="logo" src="/images/index/logo.png" alt="LOGO"> -->
+			    	<img class="logo" src="/images/index/logo.jpg" alt="LOGO">
+			    </a>
+		    </div>
+		    <div class="navbox first-menu">
+			    <ul>
+			        <!-- <li onclick="MenuChange('10')">
+			            <img src="/images/index/top8.png" alt="">
+			            <p>营收系统</p>
+			        </li>   
+			        <li onclick="MenuChange('108')">
+			            <img src="/images/index/top9.png" alt="">
+			            <p>系统管理</p>
+			        </li>  -->
+			        <!-- type 类型，0:菜单目录 1:菜单 2:功能 -->
 		            <span th:each="item,iterStat : ${privilegeList}" th:remove="tag">
 		            	<span th:if="${item.rightLevel==0}" th:remove="tag">
-							<li th:attr="class='nav-item '+ ${iterStat.index==0 ? 'active' : ''}" th:onclick="'Layout.headerNavSelect(this,'+${item.id}+');'">
-								<a class="nav-link" href="javascript:void(0);">
-									<!-- <span class="iconfont icon-account"></span> -->
-									<img th:src="${item.rightIcon}"> 
-									<span th:text="${item.rightName}" th:remove="tag">日常维护</span>
-								</a>
+							<li th:attr="class=${iterStat.index==0 ? 'active' : ''}, data-first-menu-id=${item.id}" th:onclick="'Layout.headerNavSelect(this,'+${item.id}+');'">
+							<!-- <li> -->
+								<img th:src="${item.rightIcon}"> 
+								<p th:text="${item.rightName}">日常维护</p>
 							</li>
 						</span>
-		            </span>
-					<!-- type 类型，0:菜单目录 1:菜单 2:功能 -->
-		            <!-- <span th:each="item,iterStat : ${privilegeList}" th:remove="tag">
-		            	<span th:if="${item.rightLevel==0}" th:remove="tag">
-				            <li th:id="'menu_'+${item.id}" th:onclick="'menuShowSub(&quot;menu_'+${item.id}+'&quot;)'">
-								<span class="lt-menu-icon"><img th:src="'/index/images/li'+${iterStat.count}+'.png'"></span>
-								<span class="lt-menu-icon"><img th:src="${item.rightIcon}"></span>
-								<a style="cursor: default;color: white;" th:text="${item.rightName}">业务管理</a>
-							</li>
-						</span>
-		            </span> -->
-					<!-- <li class="nav-item active"
-						onclick="Layout.headerNavSelect(this,0)"><a class="nav-link"
-						href="#"> <span class="iconfont icon-account"></span>
-							<img src="/assets/img/icon/maintenance.png"> 日常维护
-					</a></li>
-					<li class="nav-item" onclick="Layout.headerNavSelect(this,1)">
-						<a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
-							<img src="/assets/img/icon/computer_system.png"> 系统管理
+		            </span>  
+			    </ul>
+		    </div>
+		    <div class="btns-boxs">
+			    <div class="user"> 
+			    	<!-- <a id="userSet" style="cursor: pointer;">
+			    		<img src="/images/index/user.png" alt="">
+			    		<i class="fa fa-user-circle-o fa-2x" aria-hidden="true" style="color: white;margin-top: 12px;"></i>
+			    	</a> -->
+			    	<a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+					    data-options="menu:'#mm',StaticEnableDefaultPopOutImage:false">
+					   	<i class="fa fa-user-circle-o fa-2x" aria-hidden="true" style="color: white;margin-top: 12px;"></i>
 					</a>
-					</li>
-					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
-							<img src="/assets/img/icon/delivery_file.png"> 档案管理
-					</a></li>
-					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
-							<img src="/assets/img/icon/money.png"> 营业管理
-					</a></li>
-					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
-							<img src="/assets/img/icon/settings.png"> 数据配置
-					</a></li>
-					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
-							<img src="/assets/img/icon/statistics.png"> 系统分析
-					</a></li>
-					<li class="nav-item"><a class="nav-link" href="#"> <span class="iconfont icon-account"></span>
-							<img src="/assets/img/icon/computer.png"> 营收系统
-					</a></li> -->
-				</ul>
-				<div class="navbar-text">
-					<div id="date" class="date"></div>
-					<div class="operater">
-						<ul>
-							<li>
-					        	<a href="/upload/app/app-aiwater.apk" style="color: yellow">APP</a>
-					       	</li>
-							<li onclick="initUserInfo()">[<span class="user-name" th:text="${userName}">系统管理员</span>] 欢迎登录！
-							</li>
-							<li><button class="btn btn-link btn-sm" onclick="changepass()">修改密码</button></li>
-							<li><button class="btn btn-link btn-sm"onclick="openLogout()">退出</button></li>
-						</ul>
+					<div id="mm" style="width:150px;">
+						<div id="btn-update-password">修改密码</div>
+					    <div class="menu-sep"></div>
+					    <div id="btn-logout-system">退出</div>
+					</div>
+			    </div>
+			    <div class="welcome" style=" margin-top:5px; line-height:20px;">
+			    	<div class="showdata">
+			        	<div id="showalltime" class="data">2020年3月9日11时9分</div>
+			            <span>欢迎您 <b class="user-name" th:text="${userName}">系统管理员</b></span>  
+			            <!-- <span><i class="fa fa-sign-out fa-lg" aria-hidden="true"></i></span> -->         
+			        </div>
+			    </div>
+			</div>
+			<div class="download">
+				<a href="/main-index/starter" id="links">
+					<!-- <img src="/images/index/down.png" alt="">使用手册下载 -->
+					<i class="fa fa-download fa-lg" aria-hidden="true" style="color: white;">&nbsp;使用手册下载</i>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<!-- 左侧工具栏 -->
+	<div id="leftmenu" region="west" style="width: 200px" title="导航菜单" split="true">
+	
+		
+		<div th:each="firstMenu,iterStat : ${privilegeList}" th:remove="tag">
+			<div class="easyui-accordion second-menu-nav" data-options="fit:true,border:false" th:id="'second-menu-nav-'+${firstMenu.id}" style="display: none;">
+				<div th:each="secondMenu,iterStat : ${privilegeList}" th:remove="tag">
+					<div th:if="${secondMenu.rightLevel==1 && firstMenu.id==secondMenu.pid}" th:remove="tag">
+						<div th:title="${secondMenu.rightName}" data-options="selected:true" style="padding: 5px;" th:id="'second-menu-'+${firstMenu.id}" th:attr="class='second-menu '+'second-menu-'+${firstMenu.id}">
+							<div th:each="privilege,iterStatus : ${privilegeList}" th:remove="tag">
+	   							<div th:if="${privilege.rightLevel==2 && secondMenu.id==privilege.pid}" th:remove="tag">
+	   								<a href="#" class="easyui-linkbutton" data-options="plain:true" style="width: 180px" th:id="'submenu-'+${privilege.id}" 
+										th:attr="data-url=${privilege.rightLink}, data-title=${privilege.rightName}" th:text="${privilege.rightName}">
+										三级菜单
+									</a>
+	   							</div>
+	   						</div>
+						</div>
 					</div>
 				</div>
-			</div>
-		</nav>
-	</div>
-	<div id="contentWrapper" class="content-wrapper">
-		<div class="left-nav">
-			<div class="left-menu-wrapper">
-				<span th:each="firstMenu,iterStat : ${privilegeList}" th:remove="tag">
-					<span th:if="${firstMenu.rightLevel==0}" th:remove="tag">
-						<ul th:id="'menu'+${firstMenu.id}" th:attr="class='left-menu '+'leftmenu-'+${firstMenu.id}">
-							<span th:each="secondMenu,iterStat : ${privilegeList}" th:remove="tag">
-								<span th:if="${secondMenu.rightLevel==1 && firstMenu.id==secondMenu.pid}" th:remove="tag">
-									<li>
-										<a class="has-arrow"> 
-											<span class="iconfont icon-menuoff"></span> 
-											<span class="menu-label" th:text="${secondMenu.rightName}">二级菜单</span>
-										</a>
-										<ul class="nav-second-level">
-											<span th:each="privilege,iterStatus : ${privilegeList}" th:remove="tag">
-					   							<span th:if="${privilege.rightLevel==2 && secondMenu.id==privilege.pid}" th:remove="tag">
-													<li th:attr="data-url=${privilege.rightLink}">
-														<a href="#" th:text="${privilege.rightName}">三级菜单</a>
-													</li>
-												</span>
-											</span>
-										</ul>
-									</li>
-								</span>
-							</span>
-						</ul>
-					</span>
-				</span>
-            	
-				<!-- <ul id="menu0" class="left-menu">
-					<li><a> <span class="iconfont icon-menuoff"></span> <span
-							class="menu-label"> 字典维护</span>
-					</a></li>
-					<li><a class="has-arrow"> <span
-							class="iconfont icon-menuoff"></span> <span class="menu-label">
-								水表检测</span>
-					</a>
-						<ul class="nav-second-level">
-							<li><a href="#">2-1</a></li>
-							<li><a href="#">2-2</a></li>
-						</ul></li>
-					<li><a class="has-arrow"> <span
-							class="iconfont icon-menuoff"></span> <span class="menu-label">
-								抄表员考核</span>
-					</a>
-						<ul class="nav-second-level">
-							<li><a href="#">3-1</a></li>
-							<li><a class="has-arrow"><span>3-2</span></a>
-								<ul class="nav-third-level">
-									<li><a href="#">3-2-1</a></li>
-									<li><a href="#">3-2-2</a></li>
-									<li><a href="#">3-2-3</a></li>
-								</ul></li>
-						</ul></li>
-				</ul> -->
-				<!-- <ul id="menu1" class="left-menu">
-					<li><a> <span class="iconfont icon-menuoff"></span> <span
-							class="menu-label"> 字典维护2</span>
-					</a></li>
-					<li><a class="has-arrow"> <span
-							class="iconfont icon-menuoff"></span> <span class="menu-label">
-								水表检测2</span>
-					</a>
-						<ul class="nav-second-level">
-							<li><a href="#">2-1</a></li>
-							<li><a href="#">2-2</a></li>
-						</ul></li>
-					<li><a class="has-arrow"> <span
-							class="iconfont icon-menuoff"></span> <span class="menu-label">
-								抄表员考核</span>
-					</a>
-						<ul class="nav-second-level">
-							<li><a href="#">3-1</a></li>
-							<li><a class="has-arrow"><span>3-2</span></a>
-								<ul class="nav-third-level">
-									<li><a href="#">3-2-1</a></li>
-									<li><a href="#">3-2-2</a></li>
-									<li><a href="#">3-2-3</a></li>
-								</ul></li>
-						</ul></li>
-				</ul> -->
+				
 			</div>
 		</div>
-		<div class="main-container">
-			<!-- 左侧菜单显示隐藏 -->
-			<div class="hamburger-btn" onclick="Layout.toggleSidebar()">
-				<span class="iconfont icon-menuoff"></span>
-			</div>
-			<ol id="topBreadcrumb" class="breadcrumb" >
-			</ol>
-			<div class="page-container">
-				<iframe id="page-container-iframe" src="/welcome" frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%;" height="100%;">
-					<!-- 此处加载内容 -->
-	    		</iframe>
-			</div>
-		</div>
-	</div>
-	
-	<script type="text/javascript">
-		//双击隐藏左侧菜单栏
-		$("#topBreadcrumb").dblclick(function () {
-			Layout.toggleSidebar();
-			window.getSelection().empty();//取消页面文字选中
-		})
-	
-		//修改密码
-		function changepass(){
-			var url = BASE_CONTEXT_PATH + '/main-index/edit-password-dialog';
-			$("#edit-password-dialog").load(url, null, openEditPasswordDialog); //加载完毕后显示
-		}
 			
-		/*
+	
+		<!-- <div class="easyui-accordion second-menu" id="second-menu-20">
+			<div title="管理" data-options="iconCls:'icon-bkgl'" style="padding: 10px;">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-writeblog'"
+					style="width: 150px;">
+					写博客
+				</a>
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-bkgl'"
+					style="width: 150px;">
+					信息管理
+				</a>
+			</div>
+			<div title="类别管理" data-options="iconCls:'icon-bklb'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-bklb'"
+					style="width: 150px;">
+					类别信息管理
+				</a>
+			</div>
+			<div title="个人信息管理" data-options="iconCls:'icon-personal'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-personal'"
+					style="width: 150px;">
+					修改个人信息
+				</a>
+				            
+			</div>
+		</div> -->
+		<!-- <div class="easyui-accordion d-none second-menu" id="second-menu-1" data-options="fit:true,border:false">
+			<div title="管理" data-options="iconCls:'icon-bkgl'" style="padding: 10px;">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-writeblog'"
+					style="width: 150px;">
+					写博客
+				</a>
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-bkgl'"
+					style="width: 150px;">
+					信息管理
+				</a>
+			</div>
+			<div title="类别管理" data-options="iconCls:'icon-bklb'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-bklb'"
+					style="width: 150px;">
+					类别信息管理
+				</a>
+			</div>
+			<div title="个人信息管理" data-options="iconCls:'icon-personal'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-personal'"
+					style="width: 150px;">
+					修改个人信息
+				</a>
+				            
+			</div>
+		</div> -->
+		<!-- <div class="easyui-accordion d-none" data-options="fit:true,border:false">
+			<div title="常用操作" data-options="selected:true,iconCls:'icon-edit'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" id="submenu-baidu" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					百&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;度
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-register" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					产品登记
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-default" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Default
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-bootstrap" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题BootStrap
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-black" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Black
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-gray" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Gray
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-material" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Material
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-material-blue" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Material-blue
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-material-teal" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Material-teal
+				</a>
+				<a href="#" class="easyui-linkbutton" id="submenu-theme-metro" data-options="plain:true,iconCls:'icon-add'"
+					style="width: 150px">
+					切主题Metro
+				</a>
+				            
+			</div>
+			<div title="管理" data-options="iconCls:'icon-bkgl'" style="padding: 10px;">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-writeblog'"
+					style="width: 150px;">
+					写博客
+				</a>
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-bkgl'"
+					style="width: 150px;">
+					信息管理
+				</a>
+			</div>
+			<div title="类别管理" data-options="iconCls:'icon-bklb'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-bklb'"
+					style="width: 150px;">
+					类别信息管理
+				</a>
+			</div>
+			<div title="评论管理" data-options="iconCls:'icon-plgl'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-review'"
+					style="width: 150px">
+					评论审核
+				</a>
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-plgl'"
+					style="width: 150px;">
+					评论信息管理
+				</a>
+			</div>
+			<div title="个人信息管理" data-options="iconCls:'icon-personal'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-personal'"
+					style="width: 150px;">
+					修改个人信息
+				</a>
+				            
+			</div>
+			<div title="系统管理" data-options="iconCls:'icon-system'" style="padding: 10px">
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-link'"
+					style="width: 150px">
+					友情链接管理
+				</a>
+				                
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-modifyPassword'"
+					style="width: 150px;">
+					修改密码
+				</a>
+				                
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-refresh'"
+					style="width: 150px;">
+					刷新系统缓存
+				</a>
+				                
+				<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-exit'"
+					style="width: 150px;">
+					安全退出
+				</a>
+			</div>
+		</div> -->
+	</div>
+
+	<div data-options="region:'center'" style="background: #eee;">
+		<div class="easyui-tabs" fit="true" border="false" id="tabs">
+			<div title="欢迎页" data-options="iconCls:'icon-filter'" id="welcome-page">
+				<!-- <div align="center" style="padding-top: 100px">
+					<font color="red" size="10">欢迎使用</font>
+				</div> -->
+			</div>
+		</div>
+
+	</div>
+
+	<div region="south" style="height: 28px; margin:0px;" align="center">
+		<div region="south" style="height: 25px; margin-top:1px;" align="center">
+			Copyright
+			<strong>河北美夏电子科技</strong>
+			版权所有
+		</div>
+	</div>
+
+</body>
+
+<!-- 初始化时间部分 -->
+	<script type="text/javascript">
+		
+	</script>
+
+<script>
+
+	/**
+	 * 
+	 *  使用 iframe 动态地添加显示在一个页面上的 Tabs。
+	 * 
+		   按title参数进行查询标签，
+		   	如果不存在则一个新的 tab 将被添加。
+			如果 tab 已经存在，它将被激活。
+	 * @param {String} title 标签title
+	 * @param {String} url 标签页所加载的页面地址
+	 * @return: void
+	 */
+ 
+	function addTab(title, url) {
+		const TABS_CONTAINER = "#tabs";
+		if ($(TABS_CONTAINER).tabs('exists', title)) {
+			$(TABS_CONTAINER).tabs('select', title);
+		} else {
+			var content = '<iframe scrolling="auto" frameborder="0"  src="'
+					+ url + '" style="width:100%;height:98%;"></iframe>';
+			$(TABS_CONTAINER).tabs('add', {
+				title : title,
+				content : content,
+				closable : true
+			});
+		}
+	}
+	 
+	 /**
+	   * 更换EasyUI主题的方法,可选的主题名称有：
+	   		default,black,gray,bootstrap,
+	   		metro,material,material-blue,material-teal.	   		
+	   	主题也可以自行定义，而后置于theme的相应目录中即可。
+	   		
+	   * @param ｛String} themeName 主题名称
+	   * @return 
+	   */
+	  changeTheme = function(themeName) {
+	    var $easyuiTheme = $('#easyuiTheme');
+	    var url = $easyuiTheme.attr('href');
+	    var href = url.substring(0, url.indexOf('themes')) + 'themes/' + themeName + '/easyui.css';
+	    $easyuiTheme.attr('href', href);
+	    var $iframe = $('iframe');
+	    if ($iframe.length > 0) {
+	      for ( var i = 0; i < $iframe.length; i++) {
+	        var ifr = $iframe[i];
+	        $(ifr).contents().find('#easyuiTheme').attr('href', href);
+	      }
+	    }
+	    //将主题保存至cookie中
+	    $.cookie('easyuiThemeName', themeName, {
+	      expires : 7
+	    });
+	  };
+	  
+	  /**
+	  	自cookie中读取用户选定的theme，如有则采用此主题
+	  */
+	  function getThemeFromCookie(){
+		if ($.cookie('easyuiThemeName')) {
+			 changeTheme($.cookie('easyuiThemeName'));
+		}
+	  }
+
+	  function loadWelcomePage(){
+		  var url = "/welcome";
+		  $("#welcome-page").load(url, null, function(){
+			  console.log("加载欢迎页完成。。。");
+		  });
+	  }
+	  
+	  /*
 		 * 	打开(Open) 修改密码对话框
 		 */
 		function openEditPasswordDialog() {
@@ -260,38 +421,66 @@
 		function closeEditPasswordDialog() {
 			$("#modal-container-edit-password-dialog").modal("hide");
 		}
-	
-		/**
-		 * 登出
-		 */
-		function openLogout(){
-			//location.href=BASE_CONTEXT_PATH + "/user-logout";
-			location.href=BASE_CONTEXT_PATH + "/logout";
-		}
+	// page loaded ready
+	$(function() {
 		
-		var is_load_welcome_page = false;//是否需要加载欢迎页面
+		//-----------------------------------
+		getThemeFromCookie();  //自cookie中读取，并采用用户选定的主题。
+		loadWelcomePage();//加载欢迎页
+		
 		/**
-		 * 	绑定三级菜单的click事件，点击后获取三级菜单的url，并在iframe中加载
+		 * 	登出
 		 */
-		$(".left-nav .left-menu-wrapper ul.left-menu ul.nav-second-level li").on("click", function(){
-			is_load_welcome_page = true;//是否需要加载欢迎页面
+		$("#btn-logout-system").on("click", function(){
+			//location.href=BASE_CONTEXT_PATH + "/user-logout";
+			location.href = "/logout";
+		});
+		
+		/**
+		 * 	修改密码
+		 */
+		$("#btn-update-password").on("click", function(){
+			var url = '/main-index/edit-password-dialog';
+			//$("#edit-password-dialog").load(url, null, openEditPasswordDialog); //加载
+			
+			$('#edit-password-dialog').dialog({
+			    title: '修改密码',
+			    width: 400,
+			    height: 300,
+			    closed: false,
+			    cache: false,
+			    href: url,
+			    modal: true,
+			    buttons:[{
+					text:'保存',
+					handler:function(){
+						modiItem(true);
+					}
+				},{
+					text:'关闭',
+					handler:function(){
+						$('#edit-password-dialog').dialog('close'); // close a dialog
+					}
+				}]
+			});
+			
+		});
+		
+		/**
+		 * 点击时加入新标签,采用外部链接地址：百度
+		 */
+		$("#leftmenu .easyui-linkbutton").on('click', function() {
+			
+			$("#leftmenu .easyui-linkbutton").linkbutton("unselect");
+			$(this).linkbutton("select");
 			
 			var url = $(this).attr("data-url");
-			$("#page-container-iframe").attr("src", url);
+			var title = $(this).attr("data-title");
+			addTab(title, url);
 		});
-		/**
-		 * 	绑定一级菜单的click事件，点击后根据is_load_welcome_page变量判断是否需要在iframe中加载欢迎页面，需要则加载，不需要不做操作
-		 */
-		$("#navCollapse ul.navbar-nav li").on("click", function(){
-			if(is_load_welcome_page){
-				is_load_welcome_page = false;//是否需要加载欢迎页面
-				var url = BASE_CONTEXT_PATH+"/welcome";
-				$("#page-container-iframe").attr("src", url);
-			}
-			
-		});
-	
-	</script>
-</body>
+		//-----------------------------------
+
+	});
+</script>
 
 </html>

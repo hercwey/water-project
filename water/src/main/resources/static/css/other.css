@@ -1,0 +1,205 @@
+.content{
+    position: relative;
+}
+.content_left{
+    width: 200px;
+    /*border-right: 1px solid #CCCCCC;*/
+    position: absolute;left: 0;top: 0;
+    overflow-y: auto;
+}
+.left_title{
+    position: relative;
+    background: #ebebeb;
+    height: 36px;
+    line-height: 36px;
+}
+.left_title h4{
+    font-size: 16px;
+    color: #999;
+    margin-left: 6px;
+}
+.left_title img{
+    position: absolute;top: 8px;right: 6px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.content_left ul{
+
+}
+.content_left ul li{
+    border-bottom: 1px solid #CCCCCC;
+    font-size: 14px;
+    line-height: 36px;
+    background: url("../images/index/left3.png") no-repeat right 10px top 14px;
+    background-size: 6px 10px;
+    cursor: pointer;
+}
+.content_left ul li p{
+	
+	padding-left:10px;
+	
+}
+.content_left ul li img{
+    margin-top: 10px;
+    margin-right: 2px;
+    margin-left:10px;
+}
+.content_left ul li div{
+    display: none;
+}
+.content_right{
+    position: absolute;left: 200px;top: 0;right: 0; bottom:0; 
+}
+
+.tabs li a.tabs-close{
+    background: url('../images/index/delete.png') no-repeat !important;
+    background-size: 100% 100% !important;
+}
+
+.icon{
+    position: absolute;top: 0;right: 4px;
+}
+.icon a{
+    font-size: 12px;
+    color: #999;
+    display: inline-block;
+    line-height: 26px;
+    padding: 0 4px;
+}
+.icon a img{
+    margin-top: 8px;
+    margin-right: 2px;
+}
+
+.bottom{
+    position: fixed;left: 0;bottom: 0;
+    background: #306ebb;
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 14px;
+    line-height: 30px;
+    z-index:887;
+}
+
+.home{
+    padding: 10px;
+    background: #ecf0f5;
+	width:auto;
+	height:97%;
+	overflow-y:auto;
+}
+.list{
+}
+.list ul{
+    height: 220px;
+    width: 69%;
+    overflow: hidden;
+    float: left;
+    margin-right: 1%;
+}
+.list li{
+    width: 23.5%;
+    height: 105px;
+    margin-bottom: 10px;
+    float: left;
+    margin-right: 10px;
+    color: #fff;
+    padding-left: 84px;
+    padding-top: 26px;
+    box-sizing: border-box;
+	line-height:18px;
+	cursor: pointer;
+}
+.list li>div{ padding-top:5px;}
+.list li strong{
+    font-size: 16px;
+}
+.list li:nth-of-type(1){
+    background: #578ebe url("../images/index/index1.png") no-repeat 16px 26px;
+}
+.list li:nth-of-type(2){
+    background: #e35b5a url("../images/index/index2.png") no-repeat 16px 26px;
+}
+.list li:nth-of-type(3){
+    background: #44b6ae url("../images/index/index3.png") no-repeat 16px 26px;
+}
+.list li:nth-of-type(4){
+    background: #8775a7 url("../images/index/index4.png") no-repeat 16px 26px;
+}
+.list li:nth-of-type(5){
+    background: #4f5c65 url("../images/index/index5.png") no-repeat 16px 26px;
+}
+.list li:nth-of-type(6){
+    background: #14aae4 url("../images/index/index6.png") no-repeat 16px 26px;
+}
+.list li:nth-of-type(7){
+    background: #949fb1 url("../images/index/index7.png") no-repeat 16px 26px;
+}
+.list li:nth-of-type(8){
+    background: #f29503 url("../images/index/index8.png") no-repeat 16px 26px;
+}
+.list>div{
+    background: #ffffff;
+    float: left;
+    width: 30%;
+    border: 1px solid #cccccc;
+    height: 220px;
+    box-sizing: border-box;
+}
+.list>div h3{
+    height: 38px;
+    border-bottom: 1px solid #cccccc;
+    box-sizing: border-box;
+    line-height: 38px;
+    padding-left: 10px;
+    font-weight: normal;
+}
+.list>div h3 img{
+    margin-top: 10px;
+    margin-right: 4px;
+}
+.chart1{
+    height: 350px;
+}
+.chart11{
+    height: 170px;
+    background:#ffffff;
+}
+.chart1 img{
+    width: 100%;
+    height: 100%;
+}
+
+.chart{
+    height: 375px;
+    margin-top: 10px;
+}
+.chart2{
+    width: 68%;
+    float: left;
+    background: #ffffff;
+    margin-right: 2%;
+    border: 1px solid #cccccc;
+    box-sizing: border-box;
+}
+.chart3{
+    float: left;
+    width: 30%;
+    background: #ffffff;
+    border: 1px solid #cccccc;
+    box-sizing: border-box;
+}
+.chart h3{
+    height: 38px;
+    border-bottom: 1px solid #cccccc;
+    box-sizing: border-box;
+    line-height: 38px;
+    padding-left: 10px;
+    font-weight: normal;
+}
+.chart h3 img{
+    margin-top: 10px;
+    margin-right: 4px;
+}
