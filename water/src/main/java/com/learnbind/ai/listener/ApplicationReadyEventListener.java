@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.rocketmq.client.exception.MQClientException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -111,31 +110,27 @@ public class ApplicationReadyEventListener implements  ApplicationListener<Appli
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-    	this.startConsumer();//启动消费者监听
+    	this.initConsumer();//初始化消费者
     }
     
     /**
-     * @Title: startConsumer
-     * @Description: 启动消费者监听
+     * @Title: initConsumer
+     * @Description: 初始化消费者
      */
-    private void startConsumer() {
-    	try {
-			autoReportConsumer.start();//消费者-设备自动上报数据
-			configParmsConsumer.start();//消费者-配置设备参数返回数据
-	    	configThresholdConsumer.start();//消费者-设置阈值返回数据
-	    	controlValveConsumer.start();//消费者-控制设备（开关阀控制）返回数据
-	    	deviceDeleteConsumer.start();//消费者-删除设备返回数据
-	    	deviceQueryConsumer.start();//消费者-查询设备返回数据
-	    	deviceRegisterConsumer.start();//消费者-注册设备返回数据
-	    	deviceUpdateConsumer.start();//消费者-修改设备返回数据
-	    	orderStatusConsumer.start();//消费者-命令执行状态返回数据
-	    	queryMonthDataConsumer.start();//消费者-查询月冻结返回数据
-	    	queryParmsConsumer.start();//消费者-查询参数返回数据
-	    	accountStatusWriteConsumer.start();//消费者-写开户状态返回数据
-	    	accountStatusReadConsumer.start();//消费者-读开户状态返回数据
-		} catch (MQClientException e) {
-			e.printStackTrace();
-		}
+    private void initConsumer() {
+			autoReportConsumer.initConsumer();//消费者-设备自动上报数据
+			configParmsConsumer.initConsumer();//消费者-配置设备参数返回数据
+	    	configThresholdConsumer.initConsumer();//消费者-设置阈值返回数据
+	    	controlValveConsumer.initConsumer();//消费者-控制设备（开关阀控制）返回数据
+	    	deviceDeleteConsumer.initConsumer();//消费者-删除设备返回数据
+	    	deviceQueryConsumer.initConsumer();//消费者-查询设备返回数据
+	    	deviceRegisterConsumer.initConsumer();//消费者-注册设备返回数据
+	    	deviceUpdateConsumer.initConsumer();//消费者-修改设备返回数据
+	    	orderStatusConsumer.initConsumer();//消费者-命令执行状态返回数据
+	    	queryMonthDataConsumer.initConsumer();//消费者-查询月冻结返回数据
+	    	queryParmsConsumer.initConsumer();//消费者-查询参数返回数据
+	    	accountStatusWriteConsumer.initConsumer();//消费者-写开户状态返回数据
+	    	accountStatusReadConsumer.initConsumer();//消费者-读开户状态返回数据
     }
     
     /**
