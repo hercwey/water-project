@@ -83,13 +83,13 @@
       <!-- 输出日志的格式 -->
       <PatternLayout pattern="${LOG_PATTERN}"/>
       <!-- 控制台只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
-      <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+      <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
     </console>
   
   	<!-- 这个会打印出所有的error及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
     <RollingFile name="Debug" fileName="${FILE_PATH}/debug.log" filePattern="${FILE_PATH}/${FILE_NAME}-DEBUG-%d{yyyy-MM-dd}_%i.log.gz">
       <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
-      <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+      <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="${LOG_PATTERN}"/>
       <Policies>
         <!--interval属性用来指定多久滚动一次，默认是1 hour-->
@@ -130,12 +130,12 @@
     </logger>
     
     <!-- 将业务dao接口填写进去,并用控制台输出即可 -->
-    <logger name="com.learnbind.ai" level="info" additivity="false">
+    <!-- <logger name="com.learnbind.ai" level="info" additivity="false">
         <appender-ref ref="Console"/>
         <appender-ref ref="Debug"/>
-    </logger>
+    </logger> -->
 
-    <root level="debug">
+    <root level="info">
       <appender-ref ref="Console"/>
       <appender-ref ref="Debug"/>
     </root>
