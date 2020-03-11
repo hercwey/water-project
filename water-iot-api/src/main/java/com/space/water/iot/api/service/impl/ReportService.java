@@ -6,6 +6,7 @@ import org.apache.rocketmq.client.producer.SendResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.space.water.iot.api.command.CommandCache;
 import com.space.water.iot.api.common.JsonResult;
 import com.space.water.iot.api.model.command.AccountStatusReadResponse;
@@ -138,6 +139,13 @@ public class ReportService implements IReportService {
 		case ReportDataType.RSP_ACCOUNT_STATUS_READ:
 			tag =  topicConfig.getTagAccountStatusReadNorth();
 			AccountStatusReadResponse accountStatusReadResponse = AccountStatusReadResponse.fromJson(BaseReportData.toJsonString(meterBean));
+			try {
+				JSONObject statusJson = JSONObject.parseObject(meterBean.getData());
+				if (statusJson.containsKey("status")) {
+					accountStatusReadResponse.setStatus(statusJson.getByte("status"));
+				}
+			} catch (Exception e) {
+			}
 			response = AutoReport.toJsonString(accountStatusReadResponse);
 			break;
 		case ReportDataType.RSP_ACCOUNT_STATUS_WRITE:

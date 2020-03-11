@@ -14,26 +14,26 @@ import com.space.water.iot.api.util.LogUtil;
 import com.space.water.iot.api.util.StringUtil;
 
 public class DeviceParams {
-	private short reportPeriod; // 定时上传周期：2字节(0-65535)十进制，按定时上传周期单位值计数，到该值则定时上传数据包至系统后台；
+	private int reportPeriod; // 定时上传周期：2字节(0-65535)十进制，按定时上传周期单位值计数，到该值则定时上传数据包至系统后台；
 	private byte reportPeriodUnit; // 定时上传周期单位：1字节(0-255)十进制，0为分钟，1为小时，2为天；
-	private short reportRation; // 定量上传值：2字节(0-65535)十进制，在本次计量周期内，累计使用量达到该值则上传数据包至系统后台；
+	private int reportRation; // 定量上传值：2字节(0-65535)十进制，在本次计量周期内，累计使用量达到该值则上传数据包至系统后台；
 	private byte temporaryTime; // 用户临时开阀用水限定时间：1字节(0-255)十进制，单位为小时，用户可通过磁吸装置实现临时用水；
 	private byte valveRunTime; // 阀门行程时间：1字节(0-255)十进制，单位为秒，正常情况下阀门单行程的最大时间值；
-	private short valveMaintainPeriod; // 阀门维护周期：2字节(0-65535)十进制，单位为小时，水表以该周期值进行阀门维护操作；
+	private int valveMaintainPeriod; // 阀门维护周期：2字节(0-65535)十进制，单位为小时，水表以该周期值进行阀门维护操作；
 	private int meterBasicValue; // 表底数: 4字节, 整型
 	private float sampleUnit; // 采样参数：1字节(0-255)十进制，0为0.1M3采样，1为1M3采样，2为0.01M3采样，3为1L采样；
 	private String meterNumber; // 表号：12字节数字字符串(6字节水表资产编号，BCD格式；)
 	private Date meterTime = new Date(0L); // 表当前时间：14字节数字字符串格式为yyyymmddHHMMSS (7字节，年、月、星期、日、时、分、秒，BCD格式；)
 	private MeterStatusBean meterStatus; // 表状态字：由meterStatusFlag转换
 	private String serverIp; // 服务器IP：AAA.BBB.CCC.DDD格式
-	private short serverPort; // 端口号：2字节(0-65535)十进制
+	private int serverPort; // 端口号：2字节(0-65535)十进制
 	private DeviceParamsFlags configFlag;//参数修改标识
 
-	public short getReportPeriod() {
+	public int getReportPeriod() {
 		return reportPeriod;
 	}
 
-	public void setReportPeriod(short reportPeriod) {
+	public void setReportPeriod(int reportPeriod) {
 		this.reportPeriod = reportPeriod;
 	}
 
@@ -45,11 +45,11 @@ public class DeviceParams {
 		this.reportPeriodUnit = reportPeriodUnit;
 	}
 
-	public short getReportRation() {
+	public int getReportRation() {
 		return reportRation;
 	}
 
-	public void setReportRation(short reportRation) {
+	public void setReportRation(int reportRation) {
 		this.reportRation = reportRation;
 	}
 
@@ -69,11 +69,11 @@ public class DeviceParams {
 		this.valveRunTime = valveRunTime;
 	}
 
-	public short getValveMaintainPeriod() {
+	public int getValveMaintainPeriod() {
 		return valveMaintainPeriod;
 	}
 
-	public void setValveMaintainPeriod(short valveMaintainPeriod) {
+	public void setValveMaintainPeriod(int valveMaintainPeriod) {
 		this.valveMaintainPeriod = valveMaintainPeriod;
 	}
 
@@ -117,11 +117,11 @@ public class DeviceParams {
 		this.serverIp = serverIp;
 	}
 
-	public short getServerPort() {
+	public int getServerPort() {
 		return serverPort;
 	}
 
-	public void setServerPort(short serverPort) {
+	public void setServerPort(int serverPort) {
 		this.serverPort = serverPort;
 	}
 
@@ -152,18 +152,18 @@ public class DeviceParams {
 	public static DeviceParams fromMeterConfig(MeterConfig meterConfig) {
 		DeviceParams configBean = new DeviceParams();
 		if (meterConfig != null) {
-			configBean.setReportPeriod(meterConfig.getReportPeriod());
+			configBean.setReportPeriod(meterConfig.getReportPeriod() & 0x0FFFF);
 			configBean.setReportPeriodUnit(meterConfig.getReportPeriodUnit());
-			configBean.setReportRation(meterConfig.getReportRation());
+			configBean.setReportRation(meterConfig.getReportRation() & 0x0FFFF);
 			configBean.setTemporaryTime(meterConfig.getTemporaryTime());
-			configBean.setValveMaintainPeriod(meterConfig.getValveMaintainPeriod());
+			configBean.setValveMaintainPeriod(meterConfig.getValveMaintainPeriod() & 0x0FFFF);
 			configBean.setMeterBasicValue(meterConfig.getMeterBasicValue());
 			configBean.setSampleUnit(meterConfig.getSampleUnit());
 			configBean.setMeterNumber(meterConfig.getMeterNumber());
 			configBean.setMeterTime(StringUtil.meterTimeTrans(meterConfig.getMeterTime()));
 			configBean.setMeterStatus(MeterStatusBean.fromStatusFlag(meterConfig.getMeterStatusFlag()));
 			configBean.setServerIp(meterConfig.getServerIp());
-			configBean.setServerPort(meterConfig.getServerPort());
+			configBean.setServerPort(meterConfig.getServerPort() & 0x0FFFF);
 		}
 		return configBean;
 	}
@@ -176,7 +176,7 @@ public class DeviceParams {
 		}
 		
 		if (configFlag.getPeriod()) {// 定时上传周期
-			meterConfig.setReportPeriod(params.getReportPeriod());
+			meterConfig.setReportPeriod((short) params.getReportPeriod());
 		} else {
 			meterConfig.setReportPeriod((short) 0);
 		}
@@ -186,7 +186,7 @@ public class DeviceParams {
 			meterConfig.setReportPeriodUnit((byte) 0);
 		}
 		if (configFlag.getMaxReport()) {// 定量上传值
-			meterConfig.setReportRation(params.getReportRation());
+			meterConfig.setReportRation((short) params.getReportRation());
 		} else {
 			meterConfig.setReportRation((short) 0);
 		}
@@ -201,7 +201,7 @@ public class DeviceParams {
 			meterConfig.setValveRunTime((byte) 0);
 		}
 		if (configFlag.getValveMaintainTime()) {// 阀门维护周期
-			meterConfig.setValveMaintainPeriod(params.getValveMaintainPeriod());
+			meterConfig.setValveMaintainPeriod((short) params.getValveMaintainPeriod());
 		} else {
 			meterConfig.setValveMaintainPeriod((short) 0);
 		}
@@ -236,7 +236,7 @@ public class DeviceParams {
 			meterConfig.setServerIp("0.0.0.0");
 		}
 		if (configFlag.getServerPort()) {// 端口号
-			meterConfig.setServerPort(params.getServerPort());
+			meterConfig.setServerPort((short) params.getServerPort());
 		} else {
 			meterConfig.setServerPort((short) 0);
 		}
@@ -255,7 +255,7 @@ public class DeviceParams {
 	}
 
 	public static void main(String[] args) {
-		String tempString = "681054360745404358812621810101000105000c070100aaaaaaaa0154360745404307080506010220290089633c753316dc16";
+		String tempString = "681033400745404358812621812902000164000c07ffefc800000002334007454043004813080103200900899d3c753316a816";
 
 		PacketFrame packetFrame = PacketCodec.decodeFrame(HexStringUtils.hexStringToBytes(tempString));
 		MeterConfig meterConfig = (MeterConfig) PacketCodec.decodeData(packetFrame);
@@ -265,5 +265,8 @@ public class DeviceParams {
 		DeviceParams meterConfig2 = DeviceParams.fromJson(DeviceParams.toJsonString(meterConfigBean));
 
 		LogUtil.debug(DeviceParams.toJsonString(meterConfig2));
+		short s=-4097;
+		
+		
 	}
 }
