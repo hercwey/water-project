@@ -61,7 +61,9 @@
 						5=设备即将断开连接； 
 						6=写配置返回数据；
 						7=开关阀门返回数据； 
-						8=设置阈值返回数据-->
+						8=设置阈值返回数据
+						9=读取开户状态返回数据;
+						10=设置开户状态返回数据;-->
 					<td>
 						<span th:if="${item.dataType==0}" th:remove="tag">
 							未知类型数据
@@ -89,6 +91,12 @@
 						</span>
 						<span th:if="${item.dataType==8}" th:remove="tag">
 							设置阈值返回数据
+						</span>
+						<span th:if="${item.dataType==9}" th:remove="tag">
+							读开户状态返回数据
+						</span>
+						<span th:if="${item.dataType==10}" th:remove="tag">
+							写开户状态返回数据
 						</span>
 					</td>
 					<!-- 上报到电信平台的时间 -->

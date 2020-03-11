@@ -68,11 +68,11 @@ public class RocketTopicConfig {
     @Value("${tag.device.query.north}")
     private String tagDeviceQueryNorth;//查询设备响应
     
-    @Value("${tag.account.status.read.south")
+    @Value("${tag.account.status.read.south}")
     private String tagAccountStatusReadSouth;//查询开户状态	发布	订阅
     @Value("${tag.account.status.write.south}")
     private String tagAccountStatusWriteSouth;//设置开户状态	发布	订阅
-    @Value("${tag.account.status.read.north")
+    @Value("${tag.account.status.read.north}")
     private String tagAccountStatusReadNorth;//查询开户状态	发布	订阅
     @Value("${tag.account.status.write.north}")
     private String tagAccountStatusWriteNorth;//设置开户状态	发布	订阅

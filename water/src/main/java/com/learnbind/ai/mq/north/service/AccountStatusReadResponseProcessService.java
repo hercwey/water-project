@@ -1,5 +1,6 @@
 package com.learnbind.ai.mq.north.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.learnbind.ai.model.Meters;
+import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.model.iotbean.command.AccountStatusReadResponse;
 import com.learnbind.ai.model.iotbean.common.AccountStatus;
 import com.learnbind.ai.model.iotbean.common.CommandCallbackConstants;
 import com.learnbind.ai.model.iotbean.common.ReportDataType;
 import com.learnbind.ai.service.iot.WmCommandService;
+import com.learnbind.ai.service.iot.WmMeterService;
 import com.learnbind.ai.service.meters.MetersService;
 
 import tk.mybatis.mapper.entity.Example;
@@ -42,6 +45,8 @@ public class AccountStatusReadResponseProcessService {
 	private MetersService metersService;
 	@Autowired
 	private WmCommandService wmCommandService;
+	@Autowired
+	private WmMeterService wmMeterService;
 	
 	/**
 	 * @Title: processResponseData
@@ -50,6 +55,9 @@ public class AccountStatusReadResponseProcessService {
 	public void processResponseData(AccountStatusReadResponse accountStatusReadRsp) {
 
 		log.debug("----------读开户状态响应数据处理");
+		
+		// 1、保存设备上报数据到数据库
+		this.saveReportData(accountStatusReadRsp);
 		
 		String deviceId = accountStatusReadRsp.getDeviceId();// IOT电信平台设备ID
 		Integer dataType = accountStatusReadRsp.getDataType();// 数据类型
@@ -66,6 +74,41 @@ public class AccountStatusReadResponseProcessService {
 			log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
 		}
 		
+	}
+	
+	// --------------------------------保存设备上报数据--------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: save
+	 * @Description: 保存设备上报数据
+	 * @param accountStatusReadRsp
+	 * @return
+	 */
+	private int saveReportData(AccountStatusReadResponse accountStatusReadRsp) {
+
+		Date sysDate = new Date();// 系统时间
+		Long deviceId = this.getDeviceId(accountStatusReadRsp.getDeviceId());// 通过IOT电信平台ID查询本地库设备表主键ID
+
+		WmMeter meter = new WmMeter();
+		meter.setCreateTime(sysDate);
+		meter.setCtrlCode(accountStatusReadRsp.getCtrlCode());
+		meter.setDataDi(String.valueOf(accountStatusReadRsp.getDataDI()));
+		meter.setDeviceId(deviceId);
+		meter.setEventTime(accountStatusReadRsp.getEventTime());
+		meter.setFactoryCode(accountStatusReadRsp.getFactoryCode());
+		meter.setGatewayId(accountStatusReadRsp.getGatewayId());
+		meter.setJsonData(accountStatusReadRsp.getJsonData());
+		meter.setMeterAddr(accountStatusReadRsp.getMeterAddr());
+		meter.setMeterChecksum(accountStatusReadRsp.getChecksum().longValue());
+		meter.setMeterData(accountStatusReadRsp.getData());
+		meter.setMeterDataBasic(accountStatusReadRsp.getDataBasic());
+		meter.setMeterDataType(accountStatusReadRsp.getDataType());
+		meter.setMeterSequence(accountStatusReadRsp.getSequence().longValue());
+		meter.setMeterType(accountStatusReadRsp.getMeterType().longValue());
+		meter.setRequestId(accountStatusReadRsp.getRequestId());
+		meter.setServiceId(accountStatusReadRsp.getServiceId());
+		meter.setServiceType(accountStatusReadRsp.getServiceType());
+		meter.setUpdateTime(sysDate);
+		return wmMeterService.insertSelective(meter);
 	}
 	
 	// --------------------------------数据类型是 获取开户状态响应数据 的业务处理部分--------------------------------------------------------------------------------------------------

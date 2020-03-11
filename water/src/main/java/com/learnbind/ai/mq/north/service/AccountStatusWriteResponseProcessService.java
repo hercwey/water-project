@@ -1,5 +1,6 @@
 package com.learnbind.ai.mq.north.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,11 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.learnbind.ai.model.Meters;
+import com.learnbind.ai.model.iot.WmMeter;
 import com.learnbind.ai.model.iotbean.command.AccountStatusWriteResponse;
-import com.learnbind.ai.model.iotbean.common.AccountStatus;
 import com.learnbind.ai.model.iotbean.common.CommandCallbackConstants;
 import com.learnbind.ai.model.iotbean.common.ReportDataType;
 import com.learnbind.ai.service.iot.WmCommandService;
+import com.learnbind.ai.service.iot.WmMeterService;
 import com.learnbind.ai.service.meters.MetersService;
 
 /**
@@ -40,6 +42,8 @@ public class AccountStatusWriteResponseProcessService {
 	private MetersService metersService;
 	@Autowired
 	private WmCommandService wmCommandService;
+	@Autowired
+	private WmMeterService wmMeterService;
 	
 	/**
 	 * @Title: processResponseData
@@ -48,6 +52,9 @@ public class AccountStatusWriteResponseProcessService {
 	public void processResponseData(AccountStatusWriteResponse accountStatusWriteRsp) {
 
 		log.debug("----------写开户状态响应数据处理");
+		
+		// 1、保存设备上报数据到数据库
+		this.saveReportData(accountStatusWriteRsp);
 		
 		String deviceId = accountStatusWriteRsp.getDeviceId();// IOT电信平台设备ID
 		Integer dataType = accountStatusWriteRsp.getDataType();// 数据类型
@@ -62,6 +69,41 @@ public class AccountStatusWriteResponseProcessService {
 			log.debug("----------其他数据类型，不做处理，数据类型："+dataType);
 		}
 		
+	}
+	
+	// --------------------------------保存设备上报数据--------------------------------------------------------------------------------------------------
+	/**
+	 * @Title: save
+	 * @Description: 保存设备上报数据
+	 * @param accountStatusWriteRsp
+	 * @return
+	 */
+	private int saveReportData(AccountStatusWriteResponse accountStatusWriteRsp) {
+
+		Date sysDate = new Date();// 系统时间
+		Long deviceId = this.getDeviceId(accountStatusWriteRsp.getDeviceId());// 通过IOT电信平台ID查询本地库设备表主键ID
+
+		WmMeter meter = new WmMeter();
+		meter.setCreateTime(sysDate);
+		meter.setCtrlCode(accountStatusWriteRsp.getCtrlCode());
+		meter.setDataDi(String.valueOf(accountStatusWriteRsp.getDataDI()));
+		meter.setDeviceId(deviceId);
+		meter.setEventTime(accountStatusWriteRsp.getEventTime());
+		meter.setFactoryCode(accountStatusWriteRsp.getFactoryCode());
+		meter.setGatewayId(accountStatusWriteRsp.getGatewayId());
+		meter.setJsonData(accountStatusWriteRsp.getJsonData());
+		meter.setMeterAddr(accountStatusWriteRsp.getMeterAddr());
+		meter.setMeterChecksum(accountStatusWriteRsp.getChecksum().longValue());
+		meter.setMeterData(accountStatusWriteRsp.getData());
+		meter.setMeterDataBasic(accountStatusWriteRsp.getDataBasic());
+		meter.setMeterDataType(accountStatusWriteRsp.getDataType());
+		meter.setMeterSequence(accountStatusWriteRsp.getSequence().longValue());
+		meter.setMeterType(accountStatusWriteRsp.getMeterType().longValue());
+		meter.setRequestId(accountStatusWriteRsp.getRequestId());
+		meter.setServiceId(accountStatusWriteRsp.getServiceId());
+		meter.setServiceType(accountStatusWriteRsp.getServiceType());
+		meter.setUpdateTime(sysDate);
+		return wmMeterService.insertSelective(meter);
 	}
 	
 	// -------------------------------- 更新指令状态为成功 的业务处理部分--------------------------------------------------------------------------------------------------

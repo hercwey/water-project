@@ -761,12 +761,12 @@ public class MeterDeviceController {
 			metersService.updateByPrimaryKeySelective(device);
 
 			if (StringUtils.isBlank(meterTypeStr) || StringUtils.isBlank(meterAddress) || StringUtils.isBlank(meterFactoryCode)
-					|| sequence == null || StringUtils.isBlank(cmdAction)) {
+					|| sequence == null) {
 				return RequestResultUtil.getResultFail("参数错误！");
 			}
 			// 如果命令动作为空且指令类型为7=读表开户状态指令
 			// 或如果命令动作不为空且指令类型不为7=读表开户状态指令
-			if ((StringUtils.isNotBlank(cmdAction))) {
+			if ((StringUtils.isBlank(cmdAction))) {
 				log.debug("----------允许生成指令类型：" + cmdType + "，指令动作：" + cmdAction);
 			} else {
 				return RequestResultUtil.getResultFail("参数错误！");

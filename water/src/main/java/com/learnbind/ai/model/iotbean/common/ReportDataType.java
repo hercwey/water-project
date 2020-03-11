@@ -41,9 +41,9 @@ public class ReportDataType {
 	/**
 	 * @Fields RSP_ACCOUNT_STATUS_READ：读取开户状态
 	 */
-	public static final int RSP_ACCOUNT_STATUS_READ = 9;//读取开户状态
+	public static final int RSP_ACCOUNT_STATUS_READ = 9;//读取开户状态返回信息
 	/**
 	 * @Fields RSP_ACCOUNT_STATUS_WRITE：设置开户状态
 	 */
-	public static final int RSP_ACCOUNT_STATUS_WRITE = 10;//设置开户状态
+	public static final int RSP_ACCOUNT_STATUS_WRITE = 10;//设置开户状态返回信息
 }
