@@ -91,10 +91,16 @@ public class CommandService implements ICommandService {
 			orderSatusResponse.setStatus(CommandCallbackConstants.COMMAND_STATUS_SENT);
 		}
 
-		LogUtil.debug("---------------------------");
-		LogUtil.debug("| 控制指令异步发送到IoT平台：" + commandBean.getDeviceId() + "==" + response.getCommandId());
-		LogUtil.debug("| 控制指令异步发送完成：" + result);
-		LogUtil.debug("---------------------------");
+		if (commandBean != null && response != null) {
+		   LogUtil.debug("---------------------------");
+		   LogUtil.debug("| 控制指令异步发送到IoT平台：" + commandBean.getDeviceId() + "==" + response.getCommandId());
+		   LogUtil.debug("| 控制指令异步发送完成：" + result);
+		   LogUtil.debug("---------------------------");
+		}
+//		LogUtil.debug("---------------------------");
+//		LogUtil.debug("| 控制指令异步发送到IoT平台：" + commandBean.getDeviceId() + "==" + response.getCommandId());
+//		LogUtil.debug("| 控制指令异步发送完成：" + result);
+//		LogUtil.debug("---------------------------");
 
 		producer.sendNorth(OrderStatusResponse.toJsonString(orderSatusResponse), topicConfig.getTagOrderStatus());
 	}
