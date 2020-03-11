@@ -6,6 +6,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.space.water.iot.api.rocketmq.RocketTopicConfig;
+import com.space.water.iot.api.rocketmq.consumers.AccountStatusReadConsumer;
+import com.space.water.iot.api.rocketmq.consumers.AccountStatusWriteConsumer;
 import com.space.water.iot.api.rocketmq.consumers.AutoReportCacheConsumer;
 import com.space.water.iot.api.rocketmq.consumers.ConfigParamsConsumer;
 import com.space.water.iot.api.rocketmq.consumers.ConfigThresholdConsumer;
@@ -50,12 +52,16 @@ public class ApplicationReadyEventListener implements  ApplicationListener<Appli
 	@Autowired
 	DeviceDeleteConsumer deviceDeleteConsumer;
 	@Autowired
+	AccountStatusReadConsumer accountStatusReadConsumer;
+	@Autowired
+	AccountStatusWriteConsumer accountStatusWriteConsumer;
+	@Autowired
 	RocketTopicConfig topicConfig;
 	
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
     	authService.login();
-//    	subService.subscribeDeviceData();
+    	subService.subscribeDeviceData();
 //    	consumer.initConsumer();
     	initConsumers();
     }
@@ -71,6 +77,8 @@ public class ApplicationReadyEventListener implements  ApplicationListener<Appli
     	deviceUpdateConsumer.initConsumer();
     	deviceQueryConsumer.initConsumer();
     	deviceDeleteConsumer.initConsumer();
+    	accountStatusReadConsumer.initConsumer();
+    	accountStatusWriteConsumer.initConsumer();
     }
 }
 
