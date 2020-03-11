@@ -5,8 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
-
 public class StringUtil {
 
     public static boolean strIsNullOrEmpty(String s) {
@@ -53,6 +51,20 @@ public class StringUtil {
     	return new Date(0);
     	
     }
+    
+    public static String toMeterTime(Date time) {
+		String meterTime = "00010101000000";
+		if (time == null) {
+			time = new Date(0L);
+		}
+		//日期格式（秒/分/时/日/星期/月/年），7字节数字字符串(YYMMWWDDhhmmss)
+		SimpleDateFormat sdf = new SimpleDateFormat("YYMMwwddHHmmss");
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+		String tempTime = sdf.format(time);
+		System.out.println(tempTime);
+		
+		return meterTime;
+	}
     
     public static void main(String[] args) {
     	String date = timeZoneTrans("20200211T000441Z").toString();
